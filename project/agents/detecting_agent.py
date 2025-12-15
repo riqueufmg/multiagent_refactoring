@@ -5,22 +5,25 @@ from collections import defaultdict
 
 class DetectingAgent:
 
-    def __init__(self, project_path, output_path):
+    def __init__(self, project_path, output_path, classes_path):
         self.project_path = project_path
         self.output_path = output_path
-
-        Path(self.output_path).mkdir(parents=True, exist_ok=True) ## TODO: move for run_designite
+        self.classes_path = classes_path
 
     ##
     # Run DesigniteJava tool to analyze the Java project.
     ##
     def run_designite(self):
+        
+        Path(self.output_path).mkdir(parents=True, exist_ok=True)
+        
         cmd = [
             "java", "-jar", "tools/DesigniteJava.jar",
             "-i", self.project_path,
-            "-o", self.output_path
+            "-o", self.output_path,
+            "-c", self.classes_path
         ]
-
+        
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         print(result.stdout)
@@ -118,5 +121,5 @@ class DetectingAgent:
         self.run_designite()
 
     def run(self):
-        #self.collect_metrics()
+        self.collect_metrics()
         print("DetectingAgent run method executed.")
