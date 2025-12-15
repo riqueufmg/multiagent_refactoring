@@ -6,6 +6,9 @@ from collections import defaultdict
 
 class DetectingAgent:
 
+    ##
+    # Initialize the DetectingAgent with project path, output path, and classes path.
+    ##
     def __init__(self, project_path, output_path, classes_path):
         self.project_path = project_path
         self.output_path = output_path
@@ -29,6 +32,35 @@ class DetectingAgent:
 
         print(result.stdout)
         print(result.stderr)
+    
+    def collect_package_dependencies(self):
+        cmd = [
+            "jdeps",
+            "-verbose:package",
+            str(self.project_path)
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        dependencies = defaultdict(list)
+
+        if result.returncode != 0:
+            print("Error running jdeps:", result.stderr)
+            return {}
+
+        for line in result.stdout.splitlines():
+            line = line.strip()
+            if "->" in line:
+                source, target = line.split("->")
+                source = source.strip()
+                target = target.split()[0].strip()
+
+                if source.startswith(("java.", "javax.")) or target.startswith(("java.", "javax.")):
+                    continue
+
+                if target not in dependencies[source]:
+                    dependencies[source].append(target)
+
+        return dict(dependencies)
     
     ##
     # Normalize DataFrame column names by stripping whitespace,
@@ -150,8 +182,27 @@ class DetectingAgent:
 
         return packages
     
+    @staticmethod
+    def attach_package_dependencies(packages, package_dependencies):
+        package_index = {
+            pkg["package_name"]: pkg
+            for pkg in packages
+        }
+
+        for source_pkg, targets in package_dependencies.items():
+            if source_pkg in package_index:
+                package_index[source_pkg]["dependencies"].extend(targets)
+            else:
+                # Opcional: pode logar para debug
+                print(f"Warning: Package {source_pkg} not found in project structure")
+
+        return packages
+    
+    ##
+    # Collect metrics by running Designite and processing the output CSV files.
+    ##
     def collect_metrics(self):
-        #self.run_designite()
+        self.run_designite()
 
         class_csv = Path(self.output_path) / "TypeMetrics.csv"
         method_csv = Path(self.output_path) / "MethodMetrics.csv"
@@ -167,6 +218,9 @@ class DetectingAgent:
 
         method_rows = method_df.to_dict(orient="records") ## convert df to list of dicts
         packages = self.attach_methods_to_classes(packages, method_rows)
+
+        package_dependencies = self.collect_package_dependencies()
+        packages = self.attach_package_dependencies(packages, package_dependencies)
 
         final_json = {
             "project": Path(self.project_path).name,
@@ -184,6 +238,10 @@ class DetectingAgent:
         print(f"Metrics collected and saved to {output_file}")
         return final_json
 
+    ##
+    # Main run method to execute the agent's functionality.
+    ##
     def run(self):
-        self.collect_metrics()
+        #self.collect_metrics()
+        self.collect_package_dependencies()
         print("DetectingAgent run method executed.")
