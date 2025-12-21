@@ -1,0 +1,45 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.jsoup.examples", "metrics": {"num_classes": 4, "loc": 190, "Ce": 4, "Ca": 4}, "classes": [{"package": "org.jsoup.examples", "class": "ListLinks", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/ListLinks.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 1, "loc": 34, "wmc": 8, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.helper.Validate", "org.jsoup.Jsoup", "org.jsoup.nodes.Document", "org.jsoup.select.Elements"]}, {"package": "org.jsoup.examples", "class": "HtmlToPlainText", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/HtmlToPlainText.java", "metrics": {"nof": 5, "nopf": 0, "nom": 3, "nopm": 1, "loc": 96, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.select.Elements", "org.jsoup.examples.HtmlToPlainText.FormattingVisitor", "org.jsoup.nodes.Element", "org.jsoup.helper.Validate", "org.jsoup.Jsoup", "org.jsoup.nodes.Document", "org.jsoup.Connection"]}, {"package": "org.jsoup.examples", "class": "HtmlToPlainText.FormattingVisitor", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/HtmlToPlainText.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 44, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.examples.HtmlToPlainText"]}, {"package": "org.jsoup.examples", "class": "Wikipedia", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/Wikipedia.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 16, "wmc": 3, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Jsoup", "org.jsoup.nodes.Document", "org.jsoup.select.Elements"]}], "dependencies": ["org.jsoup.helper", "org.jsoup.nodes", "org.jsoup", "org.jsoup.select"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

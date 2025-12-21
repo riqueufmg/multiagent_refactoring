@@ -40,7 +40,7 @@ class DetectingAgent:
             "packages": packages
         }
 
-        output_file = Path(self.output_path) / "project_metrics.json"
+        output_file = Path(self.output_path, "project_metrics.json")
         with open(output_file, "w") as f:
             json.dump(final_json, f, indent=4)
 
