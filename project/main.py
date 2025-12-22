@@ -12,8 +12,8 @@ def main():
     
     detector = DetectingAgent(project_path, output_path, classes_path, jar_path)
 
-    metrics_json = detector.collect_metrics()
-    print("Metrics collected!")
+    #metrics_json = detector.collect_metrics()
+    #print("Metrics collected!")
 
     smell = {
         "name": "God Component",

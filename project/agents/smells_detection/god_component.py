@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from agents.llm_inference.llm_engine import LLMInferenceEngine
+from agents.llm_inference.gpt_engine import GPTEngine
 
 class GodComponentDetector:
 
@@ -58,14 +59,43 @@ class GodComponentDetector:
     def detect(self, smell):
         list_of_prompt_files = self.generate_prompts(smell)
 
-        llm_config = {
-            "model_name_or_path": "meta-llama/Llama-3.2-1B",
+        '''llm_config = {
+            "model_name_or_path": "meta-llama/Llama-3.1-8B-Instruct",
+            "model_name": "gpt-5mini",
             "max_input_tokens": 2048,
             "max_total_tokens": 4096,
-            "temperature": 0.7,
+            "temperature": 0.2,
             "top_k": 50,
             "top_p": 0.9
+        }'''
+
+        llm_config = {
+            "model_name": "gpt-5-mini",
+            "max_input_tokens": 10240,
+            "max_completion_tokens": 1024
         }
 
-        llm_engine = LLMInferenceEngine(**llm_config)
-        llm_engine.infer("")
+        #llm_engine = LLMInferenceEngine(**llm_config)
+        llm_engine = GPTEngine(**llm_config)
+
+        i = 0
+
+        for prompt_file in list_of_prompt_files:
+
+            i += 1
+
+            if i <= 6:
+                continue
+
+            with open(prompt_file, "r") as f:
+                prompt_content = f.read()
+
+            #llm_engine.load_model()
+            #response = llm_engine.generate(prompt_content)
+
+            response = llm_engine.generate(prompt_content)
+
+            output_file = Path("data", "processed", "llm_outputs", self.project_name, f"{prompt_file.stem}.txt")
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_file, "w") as out_f:
+                out_f.write(response)
