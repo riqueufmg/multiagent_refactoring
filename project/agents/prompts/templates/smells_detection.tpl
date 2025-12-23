@@ -43,3 +43,4 @@ If the available data are insufficient to detect this smell, return:
     "message": "It is impossible to detect {SMELL_NAME} with the available data."
 }
 ```
+

@@ -1,29 +1,36 @@
 # Task
 
-You are a software engineering expert in software refactoring.
+You are a deterministic static analysis function.
 
-Your task is to detect the smell: God Component
+Detect the smell: God Component
 
 Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
-
-# Constraints
-
-- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
-- The **justification** field must summarize the key elements that support the detection result.
-- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
-- All fields in the **#Successful Output** are mandatory.
 
 # Input
 
 The following metrics and dependencies are available at package and class levels:
 
 ```json
-{"package": "org.jsoup.examples", "metrics": {"num_classes": 4, "loc": 190, "Ce": 4, "Ca": 4}, "classes": [{"package": "org.jsoup.examples", "class": "ListLinks", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/ListLinks.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 1, "loc": 34, "wmc": 8, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.select.Elements", "org.jsoup.helper.Validate", "org.jsoup.Jsoup", "org.jsoup.nodes.Document"]}, {"package": "org.jsoup.examples", "class": "HtmlToPlainText", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/HtmlToPlainText.java", "metrics": {"nof": 5, "nopf": 0, "nom": 3, "nopm": 1, "loc": 96, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Jsoup", "org.jsoup.nodes.Document", "org.jsoup.select.Elements", "org.jsoup.helper.Validate", "org.jsoup.examples.HtmlToPlainText.FormattingVisitor", "org.jsoup.nodes.Element", "org.jsoup.Connection"]}, {"package": "org.jsoup.examples", "class": "HtmlToPlainText.FormattingVisitor", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/HtmlToPlainText.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 44, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.examples.HtmlToPlainText"]}, {"package": "org.jsoup.examples", "class": "Wikipedia", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/Wikipedia.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 16, "wmc": 3, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.select.Elements", "org.jsoup.Jsoup", "org.jsoup.nodes.Document"]}], "dependencies": ["org.jsoup.nodes", "org.jsoup.helper", "org.jsoup", "org.jsoup.select"]}
+{"package": "org.jsoup.examples", "metrics": {"num_classes": 4, "loc": 190, "Ce": 4, "Ca": 4}, "classes": [{"package": "org.jsoup.examples", "class": "ListLinks", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/ListLinks.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 1, "loc": 34, "wmc": 8, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.helper.Validate", "org.jsoup.nodes.Document", "org.jsoup.select.Elements", "org.jsoup.Jsoup"]}, {"package": "org.jsoup.examples", "class": "HtmlToPlainText", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/HtmlToPlainText.java", "metrics": {"nof": 5, "nopf": 0, "nom": 3, "nopm": 1, "loc": 96, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection", "org.jsoup.Jsoup", "org.jsoup.select.Elements", "org.jsoup.helper.Validate", "org.jsoup.nodes.Document", "org.jsoup.nodes.Element", "org.jsoup.examples.HtmlToPlainText.FormattingVisitor"]}, {"package": "org.jsoup.examples", "class": "HtmlToPlainText.FormattingVisitor", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/HtmlToPlainText.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 44, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.examples.HtmlToPlainText"]}, {"package": "org.jsoup.examples", "class": "Wikipedia", "file": "data/repositories/jsoup/src/main/java/org/jsoup/examples/Wikipedia.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 16, "wmc": 3, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.nodes.Document", "org.jsoup.select.Elements", "org.jsoup.Jsoup"]}], "dependencies": ["org.jsoup", "org.jsoup.select", "org.jsoup.helper", "org.jsoup.nodes"]}
 ```
 
-# Successful Output
+# HARD OUTPUT RULES (MANDATORY)
+- Output exactly ONE valid JSON object.
+- Output MUST contain ONLY these keys: ["smell", "package", "detection", "justification"].
+- Do NOT include explanations, steps, metadata, comments, or formatting.
+- Do NOT include markdown or code fences.
+- Do NOT invent metrics or packages.
+- Perform all reasoning internally.
 
-Provide the output in this structure:
+# SUFFICIENCY RULE
+If required information is missing:
+- detection = false
+- package = []
+- justification = "Insufficient information"
+
+# Output
+
+This is the expected output structure:
 
 ```json
 {
@@ -34,12 +41,4 @@ Provide the output in this structure:
 }
 ```
 
-# Unsucessfull Output
-
-If the available data are insufficient to detect this smell, return:
-
-```json
-{
-    "message": "It is impossible to detect God Component with the available data."
-}
-```
+Now, provide the output in the structure presented above, without adding any new information or explanation.

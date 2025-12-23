@@ -1,17 +1,19 @@
 import json
 from pathlib import Path
+import os
+
 from agents.llm_inference.llm_engine import LLMInferenceEngine
 from agents.llm_inference.gpt_engine import GPTEngine
 
 class GodComponentDetector:
 
-    def __init__(self, project_name, json_path, prompts_path):
+    def __init__(self, project_name):
         self.project_name = project_name
-        self.json_path = Path(json_path)
-        self.prompts_path = Path(prompts_path)
+        self.json_path = f"{os.getenv("OUTPUT_PATH")}/metrics/{project_name}/project_metrics.json"
+        self.prompts_path = os.getenv("PROMPTS_PATH")
 
     def load_packages(self):
-        if not self.json_path.exists():
+        if not Path(self.json_path).exists():
             raise FileNotFoundError(f"JSON file not found: {self.json_path}")
 
         with open(self.json_path, "r") as f:
@@ -56,18 +58,7 @@ class GodComponentDetector:
         
         return list_of_prompt_files
     
-    def detect(self, smell):
-        list_of_prompt_files = self.generate_prompts(smell)
-
-        '''llm_config = {
-            "model_name_or_path": "meta-llama/Llama-3.1-8B-Instruct",
-            "model_name": "gpt-5mini",
-            "max_input_tokens": 2048,
-            "max_total_tokens": 4096,
-            "temperature": 0.2,
-            "top_k": 50,
-            "top_p": 0.9
-        }'''
+    def detect_gpt(self, list_of_prompt_files):
 
         llm_config = {
             "model_name": "gpt-5-mini",
@@ -75,24 +66,40 @@ class GodComponentDetector:
             "max_completion_tokens": 1024
         }
 
-        #llm_engine = LLMInferenceEngine(**llm_config)
         llm_engine = GPTEngine(**llm_config)
 
-        i = 0
-
         for prompt_file in list_of_prompt_files:
-
-            i += 1
-
-            if i <= 6:
-                continue
 
             with open(prompt_file, "r") as f:
                 prompt_content = f.read()
 
-            #llm_engine.load_model()
-            #response = llm_engine.generate(prompt_content)
+            response = llm_engine.generate(prompt_content)
 
+            output_file = Path("data", "processed", "llm_outputs", self.project_name, f"{prompt_file.stem}.txt")
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_file, "w") as out_f:
+                out_f.write(response)
+            break
+        
+    def detect_hf(self, list_of_prompt_files):
+
+        llm_config = {
+            "model_name_or_path": "meta-llama/Llama-3.2-3B-Instruct",
+            "max_input_tokens": 2048,
+            "max_total_tokens": 4096,
+            "temperature": 0.2,
+            "top_k": 50,
+            "top_p": 0.9
+        }
+
+        llm_engine = LLMInferenceEngine(**llm_config)
+
+        for prompt_file in list_of_prompt_files:
+
+            with open(prompt_file, "r") as f:
+                prompt_content = f.read()
+
+            llm_engine.load_model()
             response = llm_engine.generate(prompt_content)
 
             output_file = Path("data", "processed", "llm_outputs", self.project_name, f"{prompt_file.stem}.txt")

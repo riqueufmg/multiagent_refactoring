@@ -1,29 +1,36 @@
 # Task
 
-You are a software engineering expert in software refactoring.
+You are a deterministic static analysis function.
 
-Your task is to detect the smell: God Component
+Detect the smell: God Component
 
 Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
-
-# Constraints
-
-- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
-- The **justification** field must summarize the key elements that support the detection result.
-- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
-- All fields in the **#Successful Output** are mandatory.
 
 # Input
 
 The following metrics and dependencies are available at package and class levels:
 
 ```json
-{"package": "org.jsoup", "metrics": {"num_classes": 11, "loc": 1585, "Ce": 8, "Ca": 8}, "classes": [{"package": "org.jsoup", "class": "Jsoup", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Jsoup.java", "metrics": {"nof": 0, "nopf": 0, "nom": 24, "nopm": 23, "loc": 269, "wmc": 25, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.examples.HtmlToPlainText", "org.jsoup.safety.Cleaner", "org.jsoup.parser.Parser", "org.jsoup.examples.ListLinks", "org.jsoup.helper.HttpConnection", "org.jsoup.nodes.Document", "org.jsoup.examples.Wikipedia", "org.jsoup.nodes.FormElement", "org.jsoup.helper.DataUtil", "org.jsoup.safety.Safelist", "org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "UnsupportedMimeTypeException", "file": "data/repositories/jsoup/src/main/java/org/jsoup/UnsupportedMimeTypeException.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 4, "loc": 21, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "SerializationException", "file": "data/repositories/jsoup/src/main/java/org/jsoup/SerializationException.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 4, "loc": 33, "wmc": 4, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "HttpStatusException", "file": "data/repositories/jsoup/src/main/java/org/jsoup/HttpStatusException.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 3, "loc": 18, "wmc": 3, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "Connection", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 43, "nopm": 0, "loc": 772, "wmc": 43, "nc": 1, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.examples.HtmlToPlainText", "org.jsoup.parser.Parser", "org.jsoup.Jsoup", "org.jsoup.helper.RequestAuthenticator", "org.jsoup.helper.UrlConnectionExecutor", "org.jsoup.helper.HttpConnection.Base", "org.jsoup.Connection.KeyVal", "org.jsoup.Progress", "org.jsoup.helper.HttpConnection", "org.jsoup.Connection.Request", "org.jsoup.helper.HttpConnection.KeyVal", "org.jsoup.nodes.Document", "org.jsoup.helper.HttpConnection.Response", "org.jsoup.Connection.Method", "org.jsoup.nodes.FormElement", "org.jsoup.helper.UrlBuilder", "org.jsoup.Connection.Response", "org.jsoup.helper.HttpClientExecutor", "org.jsoup.helper.HttpConnection.Request", "org.jsoup.helper.CookieUtil"]}, {"package": "org.jsoup", "class": "Connection.Method", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 18, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Connection.Base", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 119, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "Connection.Request", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 179, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Connection.Response", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 91, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Connection.KeyVal", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 54, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Progress", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Progress.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 11, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.helper.HttpConnection.Request", "org.jsoup.helper.HttpConnection", "org.jsoup.Connection", "org.jsoup.internal.ControllableInputStream"]}], "dependencies": ["org.jsoup.helper", "org.jsoup.nodes", "org.jsoup.internal", "org.jsoup.parser", "org.jsoup.examples", "org.jsoup.safety", "org.jsoup.integration", "org.jsoup.select"]}
+{"package": "org.jsoup", "metrics": {"num_classes": 11, "loc": 1585, "Ce": 8, "Ca": 8}, "classes": [{"package": "org.jsoup", "class": "Jsoup", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Jsoup.java", "metrics": {"nof": 0, "nopf": 0, "nom": 24, "nopm": 23, "loc": 269, "wmc": 25, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.safety.Cleaner", "org.jsoup.helper.HttpConnection", "org.jsoup.helper.DataUtil", "org.jsoup.examples.ListLinks", "org.jsoup.parser.Parser", "org.jsoup.Connection", "org.jsoup.examples.Wikipedia", "org.jsoup.safety.Safelist", "org.jsoup.nodes.Document", "org.jsoup.nodes.FormElement", "org.jsoup.examples.HtmlToPlainText"]}, {"package": "org.jsoup", "class": "UnsupportedMimeTypeException", "file": "data/repositories/jsoup/src/main/java/org/jsoup/UnsupportedMimeTypeException.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 4, "loc": 21, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "SerializationException", "file": "data/repositories/jsoup/src/main/java/org/jsoup/SerializationException.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 4, "loc": 33, "wmc": 4, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "HttpStatusException", "file": "data/repositories/jsoup/src/main/java/org/jsoup/HttpStatusException.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 3, "loc": 18, "wmc": 3, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "Connection", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 43, "nopm": 0, "loc": 772, "wmc": 43, "nc": 1, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.helper.HttpConnection.Response", "org.jsoup.helper.HttpConnection.Request", "org.jsoup.Connection.Method", "org.jsoup.helper.HttpConnection", "org.jsoup.Connection.Request", "org.jsoup.helper.CookieUtil", "org.jsoup.Connection.KeyVal", "org.jsoup.helper.HttpConnection.KeyVal", "org.jsoup.helper.UrlBuilder", "org.jsoup.parser.Parser", "org.jsoup.helper.UrlConnectionExecutor", "org.jsoup.nodes.Document", "org.jsoup.Progress", "org.jsoup.Connection.Response", "org.jsoup.helper.RequestAuthenticator", "org.jsoup.nodes.FormElement", "org.jsoup.Jsoup", "org.jsoup.helper.HttpConnection.Base", "org.jsoup.helper.HttpClientExecutor", "org.jsoup.examples.HtmlToPlainText"]}, {"package": "org.jsoup", "class": "Connection.Method", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 18, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Connection.Base", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 119, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.jsoup", "class": "Connection.Request", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 179, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Connection.Response", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 91, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Connection.KeyVal", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Connection.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 54, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection"]}, {"package": "org.jsoup", "class": "Progress", "file": "data/repositories/jsoup/src/main/java/org/jsoup/Progress.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 11, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.jsoup.Connection", "org.jsoup.helper.HttpConnection.Request", "org.jsoup.internal.ControllableInputStream", "org.jsoup.helper.HttpConnection"]}], "dependencies": ["org.jsoup.safety", "org.jsoup.nodes", "org.jsoup.select", "org.jsoup.helper", "org.jsoup.examples", "org.jsoup.parser", "org.jsoup.internal", "org.jsoup.integration"]}
 ```
 
-# Successful Output
+# HARD OUTPUT RULES (MANDATORY)
+- Output exactly ONE valid JSON object.
+- Output MUST contain ONLY these keys: ["smell", "package", "detection", "justification"].
+- Do NOT include explanations, steps, metadata, comments, or formatting.
+- Do NOT include markdown or code fences.
+- Do NOT invent metrics or packages.
+- Perform all reasoning internally.
 
-Provide the output in this structure:
+# SUFFICIENCY RULE
+If required information is missing:
+- detection = false
+- package = []
+- justification = "Insufficient information"
+
+# Output
+
+This is the expected output structure:
 
 ```json
 {
@@ -34,12 +41,4 @@ Provide the output in this structure:
 }
 ```
 
-# Unsucessfull Output
-
-If the available data are insufficient to detect this smell, return:
-
-```json
-{
-    "message": "It is impossible to detect God Component with the available data."
-}
-```
+Now, provide the output in the structure presented above, without adding any new information or explanation.
