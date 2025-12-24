@@ -12,7 +12,7 @@ class InsufficientModularizationDetector:
         self.json_path = f"{os.getenv("OUTPUT_PATH")}/metrics/{project_name}/project_metrics.json"
         self.prompts_path = os.getenv("PROMPTS_PATH")
 
-    def load_packages(self):
+    def filter_data(self):
         if not Path(self.json_path).exists():
             raise FileNotFoundError(f"JSON file not found: {self.json_path}")
 
@@ -22,7 +22,7 @@ class InsufficientModularizationDetector:
         return data.get("packages", [])
     
     def generate_prompts(self, smell):
-        packages = self.load_packages()
+        packages = self.filter_data()
 
         with open(Path(self.prompts_path, "templates", "detection_insufficient_modularization.tpl"), "r") as file:
             template_content = file.read()
@@ -31,6 +31,7 @@ class InsufficientModularizationDetector:
 
         for package in packages:
 
+            ## TODO: remove it later, because I've defined one template per smell
             prompt = template_content.replace("{SMELL_NAME}", smell['smell_name']) \
                          .replace("{SMELL_DEFINITION}", smell['smell_definition']) \
                          .replace("{INPUT_DATA}", json.dumps(package))
@@ -63,7 +64,7 @@ class InsufficientModularizationDetector:
         llm_config = {
             "model_name": "gpt-5-mini",
             "max_input_tokens": 10240,
-            "max_completion_tokens": 2048
+            "max_completion_tokens": 4096
         }
 
         llm_engine = GPTEngine(**llm_config)
@@ -75,7 +76,7 @@ class InsufficientModularizationDetector:
 
             response = llm_engine.generate(prompt_content)
 
-            output_file = Path("data", "processed", "llm_outputs", self.project_name, f"{prompt_file.stem}.txt")
+            output_file = Path("data", "processed", "llm_outputs", self.project_name, "insufficient_modularization", f"{prompt_file.stem}.txt")
             output_file.parent.mkdir(parents=True, exist_ok=True)
             with open(output_file, "w") as out_f:
                 out_f.write(response)
@@ -101,7 +102,7 @@ class InsufficientModularizationDetector:
             llm_engine.load_model()
             response = llm_engine.generate(prompt_content)
 
-            output_file = Path("data", "processed", "llm_outputs", self.project_name, f"{prompt_file.stem}.txt")
+            output_file = Path("data", "processed", "llm_outputs", self.project_name, "insufficient_modularization", f"{prompt_file.stem}.txt")
             output_file.parent.mkdir(parents=True, exist_ok=True)
             with open(output_file, "w") as out_f:
                 out_f.write(response)

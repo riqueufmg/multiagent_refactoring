@@ -1,0 +1,46 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup.select",
+  "detections": [
+    {
+      "class": "Elements",
+      "detection": true,
+      "justification": "Very large class and API surface (loc=557, nom=60, nopm=58) with high complexity (wmc=98). Concentrates many methods and responsibilities related to element collection/manipulation, suggesting it could be decomposed into smaller, cohesive abstractions (e.g., query/transform/util operations separated)."
+    },
+    {
+      "class": "Evaluator",
+      "detection": true,
+      "justification": "Extremely large file (loc=773) that contains many nested evaluator implementations (nc=33, nof=24) and diverse responsibilities for selecting/matching elements. The size and the number of distinct evaluator types indicate multiple concerns bundled together rather than modular evaluator components."
+    },
+    {
+      "class": "QueryParser",
+      "detection": true,
+      "justification": "High complexity and many methods (loc=341, nom=31, wmc=111). Implements parsing and interpretation logic that appears large and complex enough to warrant splitting into smaller parser/processor units (tokenization, AST building, validation, specific selector handling)."
+    },
+    {
+      "class": "Nodes",
+      "detection": true,
+      "justification": "Relatively large with many methods (loc=247, nom=26, wmc=38). Acts as a collection/utility holder for node operations, suggesting multiple responsibilities that could be separated (collection manipulation vs. traversal vs. utility functions)."
+    },
+    {
+      "class": "NodeTraversor",
+      "detection": false,
+      "justification": "Moderate size and focused responsibility (loc=124, nom=4, wmc=32). Metrics indicate a traversal-specific utility with limited public surface, consistent with a single, cohesive concern."
+    },
+    {
+      "class": "NodeVisitor",
+      "detection": false,
+      "justification": "Small and focused interface-like class (loc=26, nom=3, wmc=3). Low complexity and small API surface imply good modularization for its visitor role."
+    },
+    {
+      "class": "NodeFilter",
+      "detection": false,
+      "justification": "Small, narrowly scoped (loc=48, nom=3, wmc=3) and appears to encapsulate a single filtering concern, so it does not exhibit insufficient modularization."
+    },
+    {
+      "class": "Collector",
+      "detection": false,
+      "justification": "Relatively compact (loc=79, nom=7, wmc=7) and appears focused on collecting/selecting nodes; metrics suggest a cohesive utility rather than a bloated, multi-responsibility class."
+    }
+  ]
+}

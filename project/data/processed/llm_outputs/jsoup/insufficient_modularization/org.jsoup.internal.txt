@@ -1,0 +1,71 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup.internal",
+  "detections": [
+    {
+      "class": "SimpleStreamReader",
+      "detection": false,
+      "justification": "Moderate size (loc 62) with small number of methods (nom 4) and moderate complexity (wmc 16). Cohesion (lcom 0.0) and lack of many dependencies indicate focused responsibility; does not appear to concentrate excessive, separable responsibilities."
+    },
+    {
+      "class": "SoftPool",
+      "detection": false,
+      "justification": "Small utility-like class (loc 50, nom 4, wmc 7) with limited responsibilities. Metrics do not indicate a bloated interface or mixed concerns."
+    },
+    {
+      "class": "Functions",
+      "detection": false,
+      "justification": "Very small (loc 24, nom 5, wmc 5). Low complexity and size suggest it is appropriately modular."
+    },
+    {
+      "class": "SharedConstants",
+      "detection": false,
+      "justification": "Very small (loc 17) acting as a constants holder (many fields, nom 1, nopf 10). Purpose is narrow and cohesive, not an indicator of insufficient modularization."
+    },
+    {
+      "class": "ControllableInputStream",
+      "detection": true,
+      "justification": "Large and complex (loc 169, nom 17, wmc 34) with many public/protected members (nopm 14) and multiple external dependencies (Validate, HttpConnection, Progress, DataUtil, SimpleBufferedInput). Metrics and dependency mix indicate multiple responsibilities (stream control, HTTP/connection concerns, progress) that could be separated for better modularization."
+    },
+    {
+      "class": "SimpleBufferedInput",
+      "detection": true,
+      "justification": "Significant size and complexity (loc 120, nom 11, wmc 34) and dependencies on pooling and controllable streams. High complexity combined with responsibilities around buffering, pooling and stream interaction suggests it aggregates concerns that could be decomposed."
+    },
+    {
+      "class": "StringUtil",
+      "detection": true,
+      "justification": "Very large utility class (loc 322, nom 26, wmc 50) with broad usage (many dependencies across parser, nodes, helpers) and numerous public methods (nopm 25). The volume and diversity of functionality indicate a bloated abstraction that likely mixes multiple string-related responsibilities and helpers that could be split into focused modules."
+    },
+    {
+      "class": "StringUtil.StringJoiner",
+      "detection": false,
+      "justification": "Small inner helper (loc 42, nom 0) closely tied to StringUtil; its narrow purpose as a joiner does not on its own indicate insufficient modularization."
+    },
+    {
+      "class": "QuietAppendable",
+      "detection": false,
+      "justification": "Moderate size (loc 63, nom 4, wmc 5) and focused on appendable behaviour for node types. Nested classes implement variants; overall responsibilities appear cohesive and appropriately modularized."
+    },
+    {
+      "class": "QuietAppendable.BaseAppendable",
+      "detection": false,
+      "justification": "Very small (loc 27) subclass with a focused role; does not indicate insufficient modularization."
+    },
+    {
+      "class": "QuietAppendable.Action",
+      "detection": false,
+      "justification": "Trivial/marker-like inner element (loc 3); no evidence of bloated responsibilities."
+    },
+    {
+      "class": "QuietAppendable.StringBuilderAppendable",
+      "detection": false,
+      "justification": "Small implementation detail (loc 24) with focused responsibility; not a modularization problem."
+    },
+    {
+      "class": "Normalizer",
+      "detection": false,
+      "justification": "Small (loc 30, nom 4, wmc 4) with focused responsibilities around normalization and limited dependencies; metrics indicate acceptable modularization."
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup.parser",
+  "detections": [
+    {
+      "class": "HtmlTreeBuilderState",
+      "detection": true,
+      "justification": "Extremely large implementation within the package (loc 1735) with very high complexity (wmc 473) and many methods (nom 45). The class contains numerous responsibilities reflected by many dependencies and constants, indicating a concentration of parsing state logic that could be decomposed into smaller state/strategy units. Its size and complexity relative to other classes suggest poor decomposition and a bloated abstraction."
+    },
+    {
+      "class": "TokeniserState",
+      "detection": true,
+      "justification": "Very large state logic (loc 1386) with very high complexity (wmc 409) and many methods (nom 75). The class appears to centralize many tokenization behaviors and state transitions, implying multiple responsibilities that should be modularized into smaller, cohesive components."
+    },
+    {
+      "class": "HtmlTreeBuilder",
+      "detection": true,
+      "justification": "Large class (loc 765) with high complexity (wmc 227) and many methods (nom 95). It mixes parsing, tree construction, and node manipulation concerns, has numerous dependencies, and a substantial public footprint (nopf/nopm present). These characteristics indicate an abstraction that has not been adequately decomposed."
+    },
+    {
+      "class": "CharacterReader",
+      "detection": true,
+      "justification": "Substantially large (loc 533) and complex (wmc 130) with many methods (nom 57). It combines input handling, predicate logic and pooling behavior; the breadth of responsibilities and relatively low cohesion hint that functionality could be split (e.g., buffering, predicates, pooling) for clearer modularization."
+    },
+    {
+      "class": "Parser",
+      "detection": true,
+      "justification": "Moderately large (loc 298) with many methods (nom 30) and a very high number of publicly visible methods (nopm 29), indicating a wide, possibly bloated interface. The Parser coordinates many subsystems (tokeniser, tree builder, settings), concentrating orchestration logic that could be separated to reduce the class' surface and responsibilities."
+    },
+    {
+      "class": "TokenQueue",
+      "detection": true,
+      "justification": "Relatively large (loc 396) with significant complexity (wmc 86) and many methods (nom 34). It handles token management and parsing helpers along with selector/query concerns (dependencies to Selector/QueryParser), suggesting mixed responsibilities that would benefit from splitting into focused components."
+    },
+    {
+      "class": "ParseSettings",
+      "detection": false,
+      "justification": "Small and focused (loc 70, nom 8) with low complexity (wmc 11) and a compact interface. Metrics and dependencies indicate a narrowly scoped role (settings/normalization), so it does not exhibit signs of insufficient modularization."
+    },
+    {
+      "class": "ParseError",
+      "detection": false,
+      "justification": "Small (loc 52), few methods (nom 8) and low complexity (wmc 8). Its responsibilities (representing parse errors) are narrow and cohesive, so it does not appear to suffer from insufficient modularization."
+    },
+    {
+      "class": "StreamParser.ElementIterator",
+      "detection": false,
+      "justification": "Very small nested iterator class (loc 66, very low wmc/nom) with a single focused purpose. Its size and single responsibility indicate appropriate modularization."
+    }
+  ]
+}

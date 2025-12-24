@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup.nodes",
+  "detections": [
+    {
+      "class": "Element",
+      "detection": true,
+      "justification": "Very large size and surface: 1571 LOC, 157 methods and high complexity (WMC 241). Numerous dependencies and inner types (NodeList, TextAccumulator) indicate it mixes many responsibilities (DOM manipulation, parsing/formatting helpers, selection/traversal, cleaning/safety hooks). LCOM (~0.34) shows only moderate cohesion for the large API, suggesting the abstraction could be decomposed into focused components (e.g., mutation/DOM ops, parsing/tree-building, rendering/printing, selector utilities)."
+    },
+    {
+      "class": "Node",
+      "detection": true,
+      "justification": "Substantial implementation: 766 LOC, 79 methods and high complexity (WMC 139). Serves as a common ancestor but embeds many behaviors (traversal, printing, selection support, attribute handling references) and depends on many subsystems. As a base abstraction, it appears to aggregate diverse concerns that could be split into smaller collaborating abstractions (core node model vs traversal/printing/selectors)."
+    },
+    {
+      "class": "Attributes",
+      "detection": true,
+      "justification": "Large and complex collection class: 522 LOC, 48 methods, WMC 99, with several nested helpers (Dataset, DatasetIterator, EntrySet) and numerous responsibilities (attribute storage, normalization, parsing/iteration, interaction with parser/cleaner). The class surface and mixed concerns (data storage vs parsing/normalization vs dataset API) indicate opportunities to separate storage, normalization, and dataset view logic."
+    },
+    {
+      "class": "Document",
+      "detection": false,
+      "justification": "Moderate size and focused role: 447 LOC, 31 methods, WMC 51. It models the document and contains related settings (OutputSettings nested), with cohesion around document-level concerns (tree root, parsing entry points, output). While non-trivial, its responsibilities are cohesive for a Document abstraction and some decomposition (e.g., OutputSettings already separated) is present."
+    },
+    {
+      "class": "Attribute",
+      "detection": false,
+      "justification": "Relatively compact element representation: 272 LOC, 30 methods, WMC 53. Its role is a single attribute abstraction (name/value, normalization) and metrics and dependencies suggest focused responsibility rather than a bloated interface, so insufficient modularization is not evident."
+    },
+    {
+      "class": "Entities",
+      "detection": false,
+      "justification": "Contains significant logic (299 LOC, 21 methods, WMC 59) for entity encoding/decoding and ties to Parser/OutputSettings, but this is a cohesive, domain-specific concern (entity handling). The class groups related functionality (including nested types for modes/data) rather than mixing unrelated responsibilities, so it does not strongly exhibit insufficient modularization."
+    }
+  ]
+}

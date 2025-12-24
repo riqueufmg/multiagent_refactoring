@@ -24,10 +24,15 @@ def main():
     '''smell = {
         "smell_name": "God Component",
         "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
-    }'''
+    }
 
     smell = {
         "smell_name": "Insufficient Modularization",
+        "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
+    }'''
+
+    smell = {
+        "smell_name": "Unstable Dependency",
         "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
     }
 

@@ -1,0 +1,61 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup",
+  "detections": [
+    {
+      "class": "Jsoup",
+      "detection": true,
+      "justification": "Large class-level size and complexity (loc 269, nom 24, wmc 25) with many unrelated dependencies (parser, cleaner, Connection, examples). That concentration of responsibilities (parsing, connecting, cleaning, example utilities) indicates inadequate decomposition."
+    },
+    {
+      "class": "UnsupportedMimeTypeException",
+      "detection": false,
+      "justification": "Small, focused exception class (loc 21, nom 4) with no dependencies; represents a single responsibility and is appropriately modular."
+    },
+    {
+      "class": "SerializationException",
+      "detection": false,
+      "justification": "Small, focused exception class (loc 33, nom 4) with minimal complexity; does not show signs of bloated responsibilities."
+    },
+    {
+      "class": "HttpStatusException",
+      "detection": false,
+      "justification": "Compact exception class (loc 18, nom 3) with low complexity and a single concern; not suffering from insufficient modularization."
+    },
+    {
+      "class": "Connection",
+      "detection": true,
+      "justification": "Very large and complex (loc 772, nom 43, wmc 43) and centralizes many roles and dependencies (executors, parsers, helpers, nested types). Its size and breadth of responsibilities indicate a bloated abstraction that should be decomposed."
+    },
+    {
+      "class": "Connection.Method",
+      "detection": false,
+      "justification": "Small enum-like inner type (loc 18) with a narrow role tied to Connection; its focused purpose does not indicate poor modularization."
+    },
+    {
+      "class": "Connection.Base",
+      "detection": true,
+      "justification": "Substantial inner class (loc 119) defined inside the large Connection file; its non-trivial size suggests it encapsulates multiple behaviors that could be separated into clearer, smaller abstractions."
+    },
+    {
+      "class": "Connection.Request",
+      "detection": true,
+      "justification": "Significant size for an inner class (loc 179) likely handling many request-related concerns; colocating this large component inside Connection contributes to a monolithic file and indicates insufficient decomposition."
+    },
+    {
+      "class": "Connection.Response",
+      "detection": false,
+      "justification": "Moderate size (loc 91) and likely focused on representing response data; its scope appears cohesive and does not clearly indicate a need for further decomposition."
+    },
+    {
+      "class": "Connection.KeyVal",
+      "detection": false,
+      "justification": "Relatively small helper type (loc 54) that represents a simple key-value concept; focused responsibility and limited complexity."
+    },
+    {
+      "class": "Progress",
+      "detection": false,
+      "justification": "Very small utility type (loc 11, nom 1) with a narrowly defined role; does not exhibit signs of insufficient modularization."
+    }
+  ]
+}

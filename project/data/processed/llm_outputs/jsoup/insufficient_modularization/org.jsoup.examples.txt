@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup.examples",
+  "detections": [
+    {
+      "class": "ListLinks",
+      "detection": false,
+      "justification": "Small, focused example: 34 LOC, 3 methods (nom=3), no fields, moderate complexity (wmc=8). Limited dependencies and a single responsibility (listing links), so it does not exhibit signs of insufficient modularization."
+    },
+    {
+      "class": "HtmlToPlainText",
+      "detection": true,
+      "justification": "Relatively large and mixed responsibility: 96 LOC with 5 fields (nof=5) and 3 methods, moderate cyclomatic complexity (wmc=8), and LCOM=0.0 suggesting cohesion concerns. It contains parsing/formatting logic and an inner FormattingVisitor class (coupled implementation), indicating the class aggregates multiple responsibilities that could be decomposed (e.g., separate formatter/visitor)."
+    },
+    {
+      "class": "HtmlToPlainText.FormattingVisitor",
+      "detection": true,
+      "justification": "Sizable nested element: 44 LOC and its own implementation (dit=1) within the HtmlToPlainText class. As a non-trivial inner class handling formatting/visiting, it represents a distinct responsibility that would be a candidate to extract to a dedicated class to improve modularization."
+    },
+    {
+      "class": "Wikipedia",
+      "detection": false,
+      "justification": "Very small and focused example: 16 LOC, 2 methods (nom=2), low complexity (wmc=3). It serves a narrow purpose and does not show evidence of excessive size, complexity, or a bloated interface."
+    }
+  ]
+}

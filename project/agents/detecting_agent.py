@@ -7,6 +7,7 @@ from .smells_detection.metrics_parser import MetricsParser
 
 from .smells_detection.god_component import GodComponentDetector
 from .smells_detection.insufficient_modularization import InsufficientModularizationDetector
+from .smells_detection.unstable_dependency import UnstableDependencyDetector
 
 class DetectingAgent:
 
@@ -74,6 +75,15 @@ class DetectingAgent:
 
                 print(f"Prompts for Insufficient Modularization from {self.project_path} generated.")
                 return list_of_prompt_files
+            elif smell_name == "Unstable Dependency":
+                from .smells_detection.unstable_dependency import UnstableDependencyDetector
+                list_of_prompt_files = UnstableDependencyDetector(self.project_name).generate_prompts({
+                    "smell_name": smell_name,
+                    "smell_definition": smell_definition
+                })
+
+                print(f"Prompts for Unstable Dependency from {self.project_path} generated.")
+                return list_of_prompt_files
             else:
                 print(f"Prompt generator for {smell_name} is not implemented yet.")
         except Exception as e:
@@ -83,13 +93,17 @@ class DetectingAgent:
     def detect(self, smell_name, list_of_prompt_files):
         try:
             if smell_name == "God Component":
-                #GodComponentDetector(self.project_name).detect_gpt(list_of_prompt_files)
-                GodComponentDetector(self.project_name).detect_hf(list_of_prompt_files)
+                GodComponentDetector(self.project_name).detect_gpt(list_of_prompt_files)
+                #GodComponentDetector(self.project_name).detect_hf(list_of_prompt_files)
                 print(f"God Component detection for {self.project_path} completed.")
             elif smell_name == "Insufficient Modularization":
                 InsufficientModularizationDetector(self.project_name).detect_gpt(list_of_prompt_files)
                 #InsufficientModularizationDetector(self.project_name).detect_hf(list_of_prompt_files)
                 print(f"Insufficient Modularization detection for {self.project_path} completed.")
+            elif smell_name == "Unstable Dependency":
+                UnstableDependencyDetector(self.project_name).detect_gpt(list_of_prompt_files)
+                #UnstableDependencyDetector(self.project_name).detect_hf(list_of_prompt_files)
+                print(f"Unstable Dependency detection for {self.project_path} completed.")
             else:
                 print(f"Smell detection for {smell_name} is not implemented yet.")
         except Exception as e:

@@ -1,0 +1,46 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.jsoup.helper",
+  "detections": [
+    {
+      "class": "HttpConnection",
+      "detection": true,
+      "justification": "Very large class (loc 1021) with many methods (nom 48) and high complexity (wmc 58). Contains or coordinates multiple nested concerns (Request, Response, KeyVal, Base) and depends on many different subsystems (parsing, cookie handling, executors, authentication). The size, breadth of dependencies and responsibilities indicates a concentrated, bloated abstraction that would benefit from further decomposition."
+    },
+    {
+      "class": "HttpConnection.Response",
+      "detection": true,
+      "justification": "Substantial size (loc 388) and complexity embedded in the same module as HttpConnection. Its large body and ties to request/stream handling and authentication suggest it encapsulates multiple responsibilities (response parsing, stream management, auth interaction) that could be separated for clearer modularity."
+    },
+    {
+      "class": "DataUtil",
+      "detection": true,
+      "justification": "Large utility class (loc 316) with many methods (nom 19) and high complexity (wmc 49). It interacts with parsing, streams, normalisation, document charset detection and many node/document concerns, indicating a mix of IO, parsing and normalization responsibilities that make it a candidate for splitting into more focused modules."
+    },
+    {
+      "class": "W3CDom",
+      "detection": true,
+      "justification": "Relatively large (loc 343) with many methods (nom 18) and elevated complexity (wmc 28). It includes an internal W3CBuilder and deals with converting between different DOM models; the combination of conversion logic and builder internals suggests multiple roles that could be separated to reduce class size and clarify responsibilities."
+    },
+    {
+      "class": "Validate",
+      "detection": true,
+      "justification": "Substantial size (loc 191) with many methods (nom 21) and high complexity (wmc 37). The recorded wide range of dependencies (parsers, selectors, node types, helpers) implies it aggregates many validation routines across unrelated concerns, indicating insufficient decomposition of validation responsibilities."
+    },
+    {
+      "class": "CookieUtil",
+      "detection": false,
+      "justification": "Moderate size (loc 78) with a limited set of methods (nom 5). Although its complexity (wmc 17) is non-trivial, its purpose appears focused (cookie parsing/handling) and it has a constrained set of dependencies, suggesting cohesion and appropriate modularization for its responsibility."
+    },
+    {
+      "class": "RequestAuthenticator",
+      "detection": false,
+      "justification": "Small class (loc 68) with low complexity (wmc 1) and few methods; its responsibilities are narrowly scoped around authentication handling. Metrics and dependencies indicate it is focused rather than a bloated abstraction, so it does not show signs of insufficient modularization."
+    },
+    {
+      "class": "Regex",
+      "detection": false,
+      "justification": "Moderate size (loc 87) with a focused role (regex matching for selectors) and a reasonable method count (nom 9, wmc 11). Its dependencies are related to evaluation and matching concerns, indicating cohesion rather than an overly broad responsibility."
+    }
+  ]
+}
