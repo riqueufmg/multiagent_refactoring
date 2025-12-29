@@ -1,0 +1,1362 @@
+[
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.sequencesearch.FoundSequence",
+        "detection": false,
+        "justification": "Relatively small size (loc 48), modest number of methods (nom 6) and fields, very high cohesion (lcom 0.0), and limited dependencies. The class appears focused with a small, cohesive interface, so it does not exhibit signs of inadequate decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.sequencesearch.SequenceSearchOperation",
+        "detection": true,
+        "justification": "Large and complex for a single class (loc 116) with high cyclomatic/weighted complexity (wmc 35), multiple methods (nom 8, nopm 5) and lower cohesion (lcom 0.25). It depends on several bytecode-related types and FoundSequence, indicating it centralizes search logic and multiple responsibilities. These elements suggest the class is insufficiently modularized and could be decomposed into smaller, more cohesive components."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.nmethod.NMethodInfo",
+        "detection": true,
+        "justification": "Relatively large implementation (154 LOC) with many methods (12) and a high WMC (15). The class directly depends on both model types (IMetaMember, Compilation) and UI concerns (IPrevNextCompilationListener, StringUtil), indicating mixed responsibilities (representation/logic + UI interaction). It has no subclasses (nc=0, dit=0), concentrating functionality rather than delegating or decomposing it, which suggests insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.nmethod.AbstractNMethodStage",
+        "detection": false,
+        "justification": "Smaller (105 LOC) and structured as an abstract stage with 2 subclasses (nc=2, dit=1), indicating intended decomposition via inheritance. Cohesion is reasonable (LCOM≈0.18) and its dependencies (UI utilities, NMethodInfo, resize listener, JITWatchUI) match a stage/controller role. Although complexity (WMC=15) is non-trivial, the abstraction and clear separation of UI-stage responsibilities suggest adequate modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.stage.StageManager",
+        "detection": true,
+        "justification": "Significantly larger and more complex than its peers (137 LOC, 15 methods, 12 public methods) with high implementation complexity (WMC 31). It depends on diverse concerns (IMetaMember, ICompilationChangeListener, UserInterfaceUtil, IStageClosedListener), indicating it coordinates multiple responsibilities. The large public interface combined with size and complexity suggests it concentrates responsibilities that could be separated into smaller, more focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener",
+        "detection": false,
+        "justification": "Very small interface with a single method (3 LOC, WMC 1), minimal complexity and a focused responsibility as a listener; no evidence of bloated interface or multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.assembly.AssemblyLabel",
+        "detection": false,
+        "justification": "Very small and focused: loc=10, nom=2, wmc=2, single field (nof=1) and a single external dependency. LCOM=0.0 indicates high cohesion. The class surface and complexity are minimal, so it does not show signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.assembly.ViewerAssembly",
+        "detection": true,
+        "justification": "Large and complex: loc=249, nom=15 methods, wmc=57 (high complexity) and 7 public methods (nopm=7). It depends on many types across assembly, architecture, bytecode and UI packages (multiple responsibilities such as parsing, rendering, UI integration). This concentration of size, complexity and cross-cutting dependencies indicates the class likely combines responsibilities that should be split into smaller, more cohesive modules."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.Report",
+        "detection": true,
+        "justification": "Relatively large and complex for this small package: 80 LOC, 12 methods and a high WMC (28). In a package with only three classes this concentration of methods and complexity suggests multiple responsibilities or a bloated interface that could be decomposed into smaller, more focused abstractions (e.g., separate builders/formatters/collectors)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.ReportType",
+        "detection": false,
+        "justification": "Trivial/marker-like class (1 LOC, no methods). It does not exhibit size or complexity indicative of insufficient modularization and appears focused on a single, narrow role."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.AbstractReportBuilder",
+        "detection": false,
+        "justification": "Small and focused: 18 LOC, 4 methods and low complexity (WMC 4). The class has a clear role (builder/abstraction) with modest surface area, so it does not demonstrate signs of lacking modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.locks.OptimisedLocksWalker",
+        "detection": false,
+        "justification": "Class is very small and simple: 8 lines of code, 2 methods (1 public), and low complexity (WMC=2). Cohesion appears high (LCOM=-1.0), there is no incoming or outgoing coupling recorded (fanin=0, fanout=0), and it exposes a minimal interface. Although its inheritance depth is 4 (DIT=4), the class does not show signs of a bloated interface or concentrated, separable responsibilities based on the available metrics."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.ICompiler",
+        "detection": false,
+        "justification": "Very small interface (loc=3, nom=1) with no implementation code; serves as a narrow abstraction implemented by multiple concrete compilers (nc=6). Low complexity and no evidence of multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.CompilerKotlin",
+        "detection": false,
+        "justification": "Small, focused implementation (loc=29, nom=2, wmc=5) with perfect cohesion (lcom=0.0) and no coupling signs (fanin/fanout=0). Appears to represent a single responsibility (Kotlin compilation)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.CompilerGroovy",
+        "detection": false,
+        "justification": "Compact and cohesive (loc=28, nom=2, wmc=5, lcom=0.0). Limited surface area and dependencies indicate a single, well-scoped responsibility."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.CompilerJava",
+        "detection": false,
+        "justification": "Modest size and complexity (loc=31, nom=2, wmc=6) with high cohesion (lcom=0.0). Structure and metrics do not indicate a bloated or multi-responsibility class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.CompilerJavaScript",
+        "detection": false,
+        "justification": "Small implementation (loc=28, nom=2, wmc=5) and high cohesion (lcom=0.0). No sign of aggregated responsibilities or excessive interface."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.CompilerJRuby",
+        "detection": false,
+        "justification": "Similar to other language-specific compilers (loc=28, nom=2, wmc=5, lcom=0.0). Focused on a single role; metrics do not suggest insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.compiler.CompilerScala",
+        "detection": true,
+        "justification": "Largest and most complex class in the package (loc=48, wmc=10) with more methods (nom=4, nopm=3) and noticeably lower cohesion (lcom=0.5). Relative to other language compilers it concentrates more logic and complexity, suggesting multiple responsibilities that could be decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.compilation.CompilationUtil",
+        "detection": true,
+        "justification": "Very large class (loc=224) with high complexity (wmc=54) and many methods (nom=12, nopm=10). Moderate/low cohesion (lcom=0.333) and many dependencies across model and util types indicate multiple responsibilities (parsing, tag/compilation handling, utilities) concentrated in one place — a typical sign that the abstraction is not decomposed into smaller, cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.compilation.AbstractCompilationWalker",
+        "detection": false,
+        "justification": "Small and focused (loc=11, nom=3, wmc=3) with low method count and simple responsibilities (visitor/walking support). Metrics do not indicate excessive size or mixed responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.compilation.AbstractCompilationVisitable",
+        "detection": false,
+        "justification": "Very small abstraction (loc=8, nom=1, wmc=2) likely representing a single responsibility. No signs of bloated interface or high complexity."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.compilation.ICompilationVisitable",
+        "detection": false,
+        "justification": "Tiny interface (loc=3, nom=1) with a single role. No evidence of multiple responsibilities or excessive size."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.nmethod.compilerthread.CompilerThreadStage",
+        "detection": true,
+        "justification": "Very large and complex class: loc=467, nom=28, wmc=77 and nof=17. The class holds many fields and methods and also defines nested types, depends on both UI and model packages, indicating it concentrates multiple responsibilities (UI presentation, data handling, plotting/queue counting). Despite a low LCOM value, the absolute size and high complexity suggest it has not been adequately decomposed and would benefit from separating concerns into smaller, focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.nmethod.compilerthread.CompilerThreadStage.PlotMode",
+        "detection": false,
+        "justification": "Trivial nested type with loc=1 and no measurable methods or complexity; clearly focused and small, not exhibiting signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.nmethod.compilerthread.CompilerThreadStage.QueueCounter",
+        "detection": false,
+        "justification": "Small helper class (loc=19, minimal complexity) with a narrow dependency on Compilation. Its size and focused purpose indicate it is already modular and does not suffer from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.escapeanalysis.eliminatedallocation.EliminatedAllocationWalker",
+        "detection": false,
+        "justification": "Class is very small and cohesive: loc=8, nom=2, wmc=2 and LCOM indicates high cohesion. It has no evident bloated interface or many responsibilities (low method count, no fields/coupling: fanin=0, fanout=0). Although DIT=4 shows a deep inheritance chain, the class itself is lightweight and does not exhibit excessive size or complexity that would indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.IExternalProcess",
+        "detection": false,
+        "justification": "Very small interface (loc=4) with only 2 methods and low complexity (wmc=2). It does not dominate package size or surface area and does not exhibit signs of bloated responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.AbstractProcess",
+        "detection": true,
+        "justification": "This class concentrates almost all package code (loc=95 of package loc=99), has a relatively large public surface (nom=9, nopm=6) and elevated complexity (wmc=19). Despite moderate cohesion (lcom=0.33) and shallow inheritance (dit=1), the concentration of size and behavior in one class suggests responsibilities could be split into smaller, more focused abstractions (insufficient modularization)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.inlining.InliningRowBuilder",
+        "detection": false,
+        "justification": "Relatively small class (loc=69) with a modest number of methods (nom=8, public methods=7) and low overall complexity (wmc=8). No incoming/outgoing coupling (fanin=0, fanout=0) and no large/bloated interface or excessive responsibilities visible from the metrics, so there is no clear evidence of an under-modularized, overly large abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.inlining.InliningRowBean",
+        "detection": false,
+        "justification": "Very small class (loc=29) with few methods (nom=6, all public) and limited size. Although it has some external dependencies (Report, Compilation, ReportType) and a nonzero inheritance depth (dit=2), its size and method count do not indicate a bloated or overly complex abstraction; metrics do not show poor cohesion or excessive responsibilities, so insufficient modularization is not supported by the available data."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.FileUtil",
+        "detection": false,
+        "justification": "Moderate size (loc 132) and method count (nom 8, nopm 6) with WMC 25; while some methods are complex, the class is not among the largest or most interface‑bloated in the package and appears focused on file operations rather than multiple distinct responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.TimerUtil",
+        "detection": false,
+        "justification": "Very small utility (loc 26, nom 2, wmc 4) with minimal public surface; does not exhibit signs of a bloated abstraction or concentrated responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.NetUtil",
+        "detection": false,
+        "justification": "Small class (loc 39, nom 3, wmc 5) with limited public methods; not indicative of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.DisassemblyUtil",
+        "detection": false,
+        "justification": "While method complexity is relatively high (wmc 31) for its size (loc 100, nom 6), the class has a small number of methods and does not present a large, sprawling interface — the issue is concentrated method complexity rather than an overly broad abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.ClassUtil",
+        "detection": false,
+        "justification": "Relatively small utility (loc 42, nom 7, wmc 11) focused on class-related helpers; method count and size do not indicate an inadequately decomposed abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.HeadlessUtil",
+        "detection": false,
+        "justification": "Moderate size (loc 77, nom 6, wmc 15) but limited public surface and purpose; does not show evidence of multiple disparate responsibilities concentrated in one class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "detection": true,
+        "justification": "Clear candidate for insufficient modularization: exceptionally large (loc 753) with many methods (nom 46, nopm 43) and very high complexity (wmc 200). It has many public methods and numerous dependencies, indicating a bloated interface and multiple responsibilities that could be decomposed into smaller, cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.TooltipUtil",
+        "detection": false,
+        "justification": "Very small (loc 32, nom 2, wmc 7) and narrowly focused; does not demonstrate a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.OSUtil",
+        "detection": false,
+        "justification": "Small utility (loc 44, nom 2, wmc 11) with focused responsibilities; size and interface do not suggest inadequate modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.OSUtil.OperatingSystem",
+        "detection": false,
+        "justification": "Trivial nested type (loc 1) with no measurable methods or complexity; not a candidate for this smell."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "detection": true,
+        "justification": "Large utility with broad interface: substantial size (loc 283), many methods (nom 29, nopm 28) and high complexity (wmc 72). The volume of string-related helpers suggests it could be split into more focused utilities (e.g., formatting, parsing, encoding) to reduce a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.JVMSUtil",
+        "detection": false,
+        "justification": "Moderate size (loc 97, nom 8, wmc 19) and limited method count; while somewhat complex, it does not present an extensive public interface or the scale of other flagged classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.VmVersionDetector",
+        "detection": false,
+        "justification": "Small and focused (loc 53, nom 2, wmc 11) with a narrow responsibility; not indicative of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.ObservableResourceFactory",
+        "detection": false,
+        "justification": "Small factory utility (loc 36, nom 7, wmc 9) with limited responsibilities; does not appear bloated."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.LocaleCell",
+        "detection": false,
+        "justification": "Tiny class (loc 11, nom 1) with a single, focused role; not a candidate for modularization concerns."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "detection": true,
+        "justification": "Relatively large UI helper (loc 144) with many methods (nom 14, nopm 11) and elevated complexity (wmc 29). The breadth of UI-related utilities in one class suggests multiple responsibilities that could be split (e.g., layout, styling, bindings) to improve modularity."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil.TooltipBinding",
+        "detection": false,
+        "justification": "Small nested helper (loc 10) with no methods complexity; focused role and not suffering from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.RuntimeJRuby",
+        "detection": false,
+        "justification": "Small size (loc 32), low method count (nom 4), moderate complexity (wmc 7) and reasonable cohesion (lcom 0.5). No incoming/outgoing coupling (fanin/fanout 0) and single obvious dependency on a logger indicate focused responsibility rather than a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.RuntimeJavaScript",
+        "detection": false,
+        "justification": "Small class (loc 32) with few methods (nom 4), moderate complexity (wmc 7) and decent cohesion (lcom 0.75). Minimal coupling (fanin/fanout 0) and a narrow dependency set suggest it is adequately decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.RuntimeJava",
+        "detection": false,
+        "justification": "Largest in the package but still small (loc 48) with a modest number of methods (nom 4) and complexity (wmc 10). Cohesion is acceptable (lcom 0.5) and no evidence of excessive coupling; responsibilities appear contained rather than concentrated."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.RuntimeGroovy",
+        "detection": false,
+        "justification": "Moderate size (loc 45), method count (nom 6) and complexity (wmc 9) but maintains cohesion (lcom 0.5). No fanin/fanout and a single logger dependency indicate focused functionality, not an under-modularized class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.IRuntime",
+        "detection": false,
+        "justification": "Very small interface (loc 5, nom 3, wmc 3) designed to abstract runtime behaviours. Its minimal size and role as a contract make it the opposite of insufficiently modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.RuntimeKotlin",
+        "detection": false,
+        "justification": "Small (loc 35) with few methods (nom 4), moderate complexity (wmc 7) and good cohesion (lcom 0.5). Although it has additional dependencies (ResourceLoader, CompilerKotlin), the class metrics do not indicate a bloated interface or excessive responsibility concentration."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.runtime.RuntimeScala",
+        "detection": false,
+        "justification": "Small footprint (loc 32), low method count (nom 4), moderate complexity (wmc 7) and acceptable cohesion (lcom 0.5). Lack of coupling (fanin/fanout 0) and focused dependencies imply adequate modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.browser.BrowserStage",
+        "detection": false,
+        "justification": "Class is small (LOC 19) with only 2 methods and 2 fields, low complexity (WMC 3), and high cohesion (LCOM 0.0). Fan-in/fan-out are 0 and it has minimal external dependencies. These characteristics indicate the class is not a bloated or monolithic abstraction and does not exhibit signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.freqinlinesize.FreqInlineSizeOperation",
+        "detection": false,
+        "justification": "Class is small (57 LOC) with only 4 methods and 2 fields. Although WMC is 9, the overall size and method count are low, LCOM 0.5 indicates acceptable cohesion, and fanin/fanout are 0 showing low coupling. DIT is 1 (simple inheritance) and there is no evidence of a bloated interface or concentrated, separable responsibilities. Based on the provided metrics and context, there is insufficient evidence that this class suffers from inadequate modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.toplist.TopListStage",
+        "detection": true,
+        "justification": "TopListStage shows signs of concentrated responsibilities: relatively large size (loc 110) with 9 methods and 6 public methods (nopm 6), and a high cyclomatic/weight measure (wmc 16) indicating internal complexity. It depends on many different interfaces and concerns (model interfaces IMetaMember, IReadOnlyJITDataModel, UI listener IMemberSelectedListener, scoring ITopListScore, utility UserInterfaceUtil and the TopListWrapper), suggesting it coordinates UI, model and scoring logic. Although LCOM (0.222) indicates some cohesion, the combination of size, complexity, number of public methods and multiple cross-cutting dependencies supports that responsibilities could be further decomposed into smaller classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.toplist.TopListWrapper",
+        "detection": false,
+        "justification": "TopListWrapper is small and focused: low size (loc 19), few methods (nom 4), low complexity (wmc 4) and perfect cohesion (lcom 0.0). It has minimal dependencies and appears to represent a single, well-scoped abstraction, so there is no evidence of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.sandbox.Sandbox",
+        "detection": true,
+        "justification": "Class is the only type in its package (package has 1 class) suggesting the package-level abstraction was not decomposed. It is large (loc 258) with many fields (nof 13) and methods (nom 11) and a high complexity score (wmc 52), indicating concentrated complexity. The class depends on a wide range of subsystems (model, process, parser, UI.sandbox, util, jvmlang, compiler, runtime, logger, config, etc.), implying it coordinates multiple responsibilities (process/control, parsing, UI integration, file/config handling, disassembly/analysis). Together these facts indicate the class bundles multiple concerns and would benefit from being split into smaller, more cohesive abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.nextinstruction.NextInstructionCount",
+        "detection": false,
+        "justification": "Small class (loc=14) with low complexity (wmc=3), few methods (nom=3) and very high cohesion (lcom=0.0). Minimal dependencies and no sign of multiple responsibilities, so not insufficiently modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.nextinstruction.NextInstructionOperation",
+        "detection": true,
+        "justification": "Largest class in package (loc=55) with relatively high complexity (wmc=12), several public methods (nopm=4/nom=5), non-trivial inheritance (dit=2) and lower cohesion (lcom=0.4). It also depends on multiple package elements (NextInstructionCountList, Opcode, InstructionSequence), indicating it concentrates multiple responsibilities and should be decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.nextinstruction.NextInstructionCountList",
+        "detection": false,
+        "justification": "Small utility-like class (loc=15) with low complexity (wmc=3) and few methods (nom=3). Although cohesion is moderate (lcom=0.6667), the class size and limited scope suggest it does not represent an inadequately modularized abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.stats.StatsTableBuilder",
+        "detection": false,
+        "justification": "Small class (loc 17) with only 2 methods (nom=2), low complexity (wmc=2), no external fan-in/fan-out and no listed dependencies. Responsibilities appear focused on building table elements rather than aggregating unrelated concerns."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.stats.StatsTableRow",
+        "detection": false,
+        "justification": "Compact, cohesive data/representation class (loc 15, nom=3, nopm=3, wmc=3, lcom=0.0) with no dependencies. Metrics indicate a single, well-scoped responsibility rather than a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.stats.StatsStage",
+        "detection": true,
+        "justification": "Disproportionately large/central within the package (loc 42 of package LOC 74) and depends on multiple external concerns (StatsTableBuilder, StatsTableRow, org.adoptopenjdk.jitwatch.model.JITStats, util.UserInterfaceUtil, ui.main.JITWatchUI). Although method count is modest (nom=3), the class appears to coordinate UI, model and utility responsibilities, concentrating cross-cutting functionality in one place — an indication of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.resize.RateLimitedResizeListener",
+        "detection": true,
+        "justification": "Contains multiple fields (nof=5) and several methods (nom=4) while exhibiting relatively high cyclomatic complexity (wmc=10) for a small implementation (loc=48). This concentration of state and logic in one class within a tiny package (2 classes total) suggests it is handling multiple responsibilities (rate limiting, resize/listener behavior, scheduling) that could be separated into smaller, more focused abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.resize.IRedrawable",
+        "detection": false,
+        "justification": "Tiny, single-responsibility abstraction (nom=1, loc=3, wmc=1). As a single-method interface it is focused and minimal, so there is no evidence it suffers from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jvmlang.LanguageManager",
+        "detection": true,
+        "justification": "The class centralizes responsibilities for many language-specific compilers and runtimes (dependencies include Compiler/Runtime classes for Java, Scala, Kotlin, JavaScript, Groovy, JRuby), indicating concentration of cross-cutting concerns. It is the only class in its package (package has 1 class), suggesting the abstraction was not decomposed into smaller modules. Internal metrics show relatively high complexity (WMC=43) and moderate cohesion (LCOM=0.5) across 8 methods and 123 LOC, consistent with a bloated class handling multiple responsibilities. These factors together indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.AbstractHistoVisitable",
+        "detection": false,
+        "justification": "Small size (18 LOC), modest method count (4) and low complexity (WMC 4). Serves as a lightweight abstraction/base (DIT 2) with no heavy fan-out or many dependencies, so it does not appear to concentrate multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.NativeSizeHistoWalker",
+        "detection": false,
+        "justification": "Very small class (13 LOC, 2 methods) with low complexity (WMC 4) and focused dependencies; it appears to have a single, narrow responsibility."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.IHistoVisitable",
+        "detection": false,
+        "justification": "Interface with minimal surface (3 LOC, 1 method). Too small and focused to indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.AttributeNameHistoWalker",
+        "detection": false,
+        "justification": "Small and focused (22 LOC, 2 methods, WMC 4). Limited scope and low complexity indicate appropriate modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.Histo",
+        "detection": true,
+        "justification": "Relatively large and complex compared with package peers (77 LOC, 9 methods, WMC 15) with only moderate cohesion (LCOM ~0.33). Its size and complexity suggest it concentrates multiple responsibilities related to histogram management/behavior and could be decomposed into smaller, more focused abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.InlineSizeHistoVisitable",
+        "detection": true,
+        "justification": "Largest and most complex class in the package (94 LOC, 5 methods, WMC 17) with moderate cohesion (LCOM 0.4) and many diverse dependencies (parsing, model, compilation utilities). The combination of high complexity, size and mixed responsibilities (visiting, parsing, computation) indicates it likely violates modularization and would benefit from decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.histo.CompileTimeHistoWalker",
+        "detection": false,
+        "justification": "Small and focused (12 LOC, 2 methods, WMC 4) with narrow dependencies; does not exhibit the size/complexity characteristics of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.visualiser.HistoPlotter",
+        "detection": true,
+        "justification": "The package contains only one class (num_classes = 1), indicating lack of decomposition at the package level. HistoPlotter itself is relatively large and complex for a single class (loc = 154, nom = 12, nof = 8) with a high cyclomatic/complexity signal (wmc = 24). It has no inheritance depth (dit = 0) and low external reuse (fanin = 0), suggesting it centralizes behavior rather than delegating. The moderate cohesion measure (lcom = 0.333) combined with many fields and methods implies multiple responsibilities are concentrated in this class (visualisation and UI/plot logic), consistent with insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.instructioncount.InstructionCountOperation",
+        "detection": false,
+        "justification": "Small class size (LOC 48) with a modest number of methods (nom 5), low to moderate complexity (WMC 9) and shallow inheritance (DIT 1). Cohesion is acceptable (LCOM 0.4) and coupling appears minimal (fanin 0, fanout 0). The class does not exhibit a bloated interface or excessive responsibilities based on the provided metrics, so insufficient modularization is not indicated."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "detection": false,
+        "justification": "Small class (loc=20, nom=4, wmc=5) with low complexity and few methods; does not exhibit signs of being an under-modularized large abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "detection": true,
+        "justification": "Relatively large and complex (loc=134, nom=23, wmc=40, nopm=23) indicating many responsibilities and a bloated interface; candidate for decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.IBytecodeParam",
+        "detection": false,
+        "justification": "Tiny interface (loc=3, nom=1) with a single responsibility; not indicative of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BCParamSwitch",
+        "detection": false,
+        "justification": "Moderate size (loc=35, nom=6, wmc=8) and limited methods; appears focused in purpose, not a large multi-responsibility class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "detection": true,
+        "justification": "High complexity and size (loc=181, nom=19, wmc=47, nopm=17) suggesting multiple responsibilities and internal complexity that could be split into smaller abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.SourceMapper",
+        "detection": false,
+        "justification": "Moderate size (loc=70, nom=6, wmc=17) with focused dependencies; not excessively large relative to role, unlikely to be insufficiently modular on its own."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.InnerClassRelationship",
+        "detection": false,
+        "justification": "Small and focused (loc=26, nom=5, wmc=6); responsibilities appear limited and cohesive."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "detection": false,
+        "justification": "Small helper class (loc=45, nom=7, wmc=13) with limited responsibilities; does not show bloat."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "detection": true,
+        "justification": "Relatively large and complex (loc=112, nom=14, wmc=30, nopm=14) with many dependencies; likely aggregates multiple responsibilities and could be decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.ConstantPool",
+        "detection": false,
+        "justification": "Effectively empty/placeholder (loc=2) and not a sign of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder",
+        "detection": true,
+        "justification": "Very large and highly complex (loc=474, nom=27, wmc=97, dit=2) with extensive dependencies across the model; strong indicator of a class doing many things and needing decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BCParamConstant",
+        "detection": false,
+        "justification": "Small class (loc=13, nom=3, wmc=3) with focused purpose; not an under-modularized abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+        "detection": true,
+        "justification": "Notable size and complexity (loc=151, nom=17, wmc=37) and multiple responsibilities around mapping/entries; candidate for splitting into smaller, cohesive parts."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTable",
+        "detection": false,
+        "justification": "Relatively small (loc=33, nom=6, wmc=9) and focused on a single domain concept; does not indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.UncommonTrap",
+        "detection": false,
+        "justification": "Moderate size (loc=52, nom=7, wmc=9) but appears cohesive around a single concern; not clearly under-modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry",
+        "detection": false,
+        "justification": "Small entry-type class (loc=46, nom=6, wmc=11) representing a single concept; not a candidate for further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "detection": false,
+        "justification": "Effectively empty/enum-like (loc=1) and not relevant to modularization concerns."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "detection": false,
+        "justification": "Relatively small (loc=42, nom=10, wmc=10) and likely a simple value/utility holder; size and responsibilities appear appropriate."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BCParamNumeric",
+        "detection": false,
+        "justification": "Small and single-purpose (loc=12, nom=3, wmc=3); not exhibiting insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.BCParamString",
+        "detection": false,
+        "justification": "Small and focused (loc=12, nom=3, wmc=3); no indication of multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry",
+        "detection": false,
+        "justification": "Small entry-type class (loc=32, nom=6, wmc=6) representing a single responsibility; not under-modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.bytecode.LineAnnotation",
+        "detection": false,
+        "justification": "Moderate size (loc=51, nom=8, wmc=18) but likely focused on annotation concerns; does not clearly aggregate unrelated responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.escapeanalysis.AbstractEscapeAnalysisWalker",
+        "detection": false,
+        "justification": "Class is small (65 LOC) with a modest number of methods (nom=6) and only one field, indicating limited size. Cohesion is moderate (lcom=0.5). Although complexity (wmc=14) is non‑trivial, the class appears to be an abstractional walker that naturally depends on several model/report types; those dependencies are expected for its role rather than evidence of a bloated, multifaceted responsibility. DIT=3 shows it participates in an inheritance hierarchy but does not by itself indicate an undecomposed, monolithic abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.nmethod.codecache.CodeCacheLayoutStage",
+        "detection": true,
+        "justification": "Significant size and complexity: 291 LOC and WMC=46 indicate substantial implementation complexity. Many members and a broad interface: nof=20 fields, nom=18 methods with nopm=11 (likely many public methods) which suggests a bloated surface. Multiple responsibilities implied by dependencies to UI, model and codecache walker (interacts with IMetaMember, CodeCacheEvent, Compilation, CodeCacheWalkerResult and JITWatchUI) — suggests mixing layout, event handling and model-processing logic. Although LCOM is low (0.166), the combination of high LOC, high complexity and many fields/public methods points to inadequate decomposition and a candidate for splitting into smaller, more focused classes (e.g., separate layout, data-processing and UI-controller components)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.sandbox.ISandboxStage",
+        "detection": false,
+        "justification": "Very small abstraction (LOC 10) representing an interface-like role with few members (nom 8) and no internal state; minimal complexity and no evidence of multiple responsibilities or a bloated interface."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.sandbox.SandboxConfigStage",
+        "detection": true,
+        "justification": "Large class footprint (LOC 475) with many members (nof 16) and methods (nom 37) and high cyclomatic complexity (wmc 85). The size, breadth of methods and public surface suggest multiple responsibilities concentrated in one class, indicating insufficient decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.sandbox.VMLanguageConfigStage",
+        "detection": false,
+        "justification": "Moderate size (LOC 97) with a small number of methods (nom 9) and moderate complexity (wmc 16); low field count and limited dependencies imply a focused responsibility and no clear sign of a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.sandbox.SandboxStage",
+        "detection": true,
+        "justification": "Very large and complex class (LOC 451, nom 43, wmc 97) with many dependencies across subsystems (parser, UI, sandbox, process, util). The high method count and complexity combined with broad coupling indicate this class centralizes multiple responsibilities and would benefit from further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.sandbox.EditorPane",
+        "detection": false,
+        "justification": "Moderate LOC (184) and method count (nom 19) with moderate complexity (wmc 36) and cohesion indicator (lcom 0.0). Dependencies are limited and focused on editing/UI concerns, suggesting a cohesive single responsibility rather than insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.sandbox.VMLanguageList",
+        "detection": false,
+        "justification": "Small and simple (LOC 40, nom 4, wmc 8) with limited responsibilities and few dependencies; size and structure do not indicate inadequate decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.allocationcount.AllocationCountOperation",
+        "detection": false,
+        "justification": "Small to moderate size (loc=36), low lack-of-cohesion (lcom=0.0) and only 4 methods (nom=4). Although complexity is somewhat higher (wmc=9), the class appears cohesive and focused on a single operation, so it does not evidence insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.allocationcount.InstructionAllocCountMap",
+        "detection": false,
+        "justification": "Very small and focused (loc=20, nom=2, wmc=4) with perfect cohesion (lcom=0.0). The class has a narrow responsibility (mapping instruction allocation counts) and does not show signs of being overburdened."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.allocationcount.AllocCountMap",
+        "detection": true,
+        "justification": "Relative indicators of poor modularization: higher lack-of-cohesion (lcom=0.6667) combined with moderate size (loc=37) and multiple methods (nom=3, nopm=3, wmc=6). Within this small package (3 classes, total loc=93) this class likely concentrates multiple responsibilities (mapping/count logic) instead of being split into smaller cohesive abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.methodlength.MethodLengthOperation",
+        "detection": false,
+        "justification": "Class is small (57 LOC) with only 4 methods (nom=4) and moderate complexity (WMC=9). LCOM=0.5 indicates only a mild cohesion concern, but not clear evidence of multiple distinct responsibilities. Depth of inheritance is minimal (DIT=1) and fanin/fanout are 0, showing low coupling and no large exposed/bloated interface. Given the small size and limited method count, there is insufficient evidence that this class suffers from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.MemberScore",
+        "detection": false,
+        "justification": "Very small (loc 14, nom 3, wmc 3) with no fanin/fanout and a single dependency; compact, focused responsibility."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.ITopListVisitable",
+        "detection": false,
+        "justification": "Tiny interface (loc 3, nom 1) representing a single abstraction; cannot be further decomposed meaningfully from metrics."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.StringTopListScore",
+        "detection": false,
+        "justification": "Small and cohesive (loc 14, nom 3, wmc 3) with no external coupling; no evidence of bloated interface or multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.NativeMethodSizeTopListVisitable",
+        "detection": false,
+        "justification": "Modest size (loc 27, nom 2, wmc 4) with focused dependencies; complexity level does not indicate insufficient decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.CompileTimeTopListVisitable",
+        "detection": false,
+        "justification": "Small visitor (loc 12, nom 2, wmc 4) tied to specific model interfaces; metrics do not suggest a bloated class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.InliningFailReasonTopListVisitable",
+        "detection": true,
+        "justification": "Relatively large and complex (loc 77, nom 5, wmc 14) with moderate cohesion (lcom 0.4) and many dependencies; size and complexity concentrated in one class indicate multiple responsibilities that could be split into smaller abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.StaleTaskToplistVisitable",
+        "detection": false,
+        "justification": "Moderate complexity (loc 28, nom 3, wmc 8) but small number of methods and focused dependencies; no strong indication of inadequate decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.AbstractTopListVisitable",
+        "detection": true,
+        "justification": "Contains multiple methods and moderate complexity (loc 33, nom 6, wmc 8) and serves many subclasses (nc 7); moderate cohesion (lcom 0.5) and centralization of behavior suggest the abstraction may be shouldering multiple responsibilities and could be further modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.MostUsedIntrinsicsTopListVisitable",
+        "detection": false,
+        "justification": "Relatively small (loc 26, nom 3, wmc 7) with focused role and specific dependencies; does not appear overly bloated."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.CompiledAttributeTopListVisitable",
+        "detection": false,
+        "justification": "Very small (loc 13, nom 2, wmc 3) and focused on a narrow concern; not indicative of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.ITopListScore",
+        "detection": false,
+        "justification": "Simple interface (loc 4, nom 2) with minimal surface area; no evidence of a bloated interface."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.toplist.HotThrowTopListVisitable",
+        "detection": false,
+        "justification": "Moderate size (loc 26, nom 3, wmc 7) with specific dependencies and a focused purpose; metrics do not show a bloated or overly complex class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.launch.LaunchHeadless",
+        "detection": true,
+        "justification": "Large and complex: 152 LOC, 10 methods (nom), WMC 30 indicates high complexity. Broad responsibilities implied by many external dependencies (parser, model, report comparator, tree visitor, suggestion walker, inline visitor, util classes) suggesting the class orchestrates parsing, reporting, tree visiting and inline analysis. Moderate cohesion (LCOM 0.4) with many public methods (nopm 8) signals a bloated interface and multiple responsibilities that could be separated into smaller, cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.launch.LaunchUI",
+        "detection": false,
+        "justification": "Very small and focused: 7 LOC, 2 methods, WMC 2, single public method (nopm 1), no listed dependencies. Metrics indicate low complexity and a narrow responsibility; there is no evidence of a bloated interface or multiple responsibilities requiring further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.JarScan",
+        "detection": true,
+        "justification": "Large size and complexity (303 LOC, WMC=60) with many methods/fields (14 methods, 12 fields) and direct dependencies on numerous operation classes (freq inline, sequence count, method size histo, allocation count, sequence search, invoke count, next instruction, instruction count, method length, etc.). This concentration of responsibilities and coordination of many distinct operations indicates a bloated abstraction that is not sufficiently decomposed, making it hard to understand and maintain."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.IJarScanOperation",
+        "detection": false,
+        "justification": "Very small and focused interface (4 LOC, 2 methods, WMC=2) with a narrow purpose and low complexity. As a simple contract used by multiple operation implementations, it does not exhibit signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.invokecount.InvokeMethodCountMap",
+        "detection": false,
+        "justification": "Small class (loc 20) with only 2 methods and low complexity (wmc 4). LCOM 0.0 indicates high cohesion. Focused dependencies and no evidence of a bloated public interface (nopm 2). Appears to represent a single, well-scoped responsibility."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.invokecount.MethodCountMap",
+        "detection": true,
+        "justification": "Relatively larger for a single-responsibility utility (loc 36) with moderate complexity (wmc 6) and elevated lack-of-cohesion (LCOM 0.666), suggesting methods operate on different sets of fields/concerns. All methods are public (nopm 3) which hints at a broader interface than necessary for its size, indicating responsibilities that could be split into smaller, more cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.invokecount.InvokeCountOperation",
+        "detection": true,
+        "justification": "Higher complexity (wmc 10) despite modest size (loc 27) and multiple external responsibilities implied by dependencies on bytecode types, a map class and ParseUtil. The combination of bytecode parsing, counting and mapping behaviors concentrated in one class suggests it is doing multiple duties and would benefit from decomposition into smaller, focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.filechooser.FileChooserListSrcZip",
+        "detection": false,
+        "justification": "Small size and low complexity: LOC 23, WMC 4, only 2 methods and 1 field. Public surface is minimal (2 public methods) and fan-in/fan-out are zero, indicating limited responsibilities and adequate modularization at class level."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.filechooser.FileChooserList",
+        "detection": true,
+        "justification": "Relatively large and complex compared to peers: LOC 123 and WMC 21 with 9 methods (6 public) and 5 fields. The class exposes a sizable interface and concentrates multiple behaviors (higher method count and complexity), suggesting it could be decomposed into smaller, more focused classes to reduce size and complexity."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.suggestion.SuggestionWalker",
+        "detection": true,
+        "justification": "The class is large (loc 310) with many fields (nof 32) and high complexity (wmc 45). It implements 10 methods while depending on multiple subsystems (report, model, parsing/util, compilation), and it is the sole class in its package (package LOC equals the class LOC). These facts indicate concentrated responsibilities, significant internal complexity, and insufficient decomposition into smaller, more focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.intrinsic.IntrinsicFinder",
+        "detection": true,
+        "justification": "Package contains a single class, suggesting limited decomposition at the package level. The class has moderate size (LOC=89) and elevated complexity (WMC=14) while exposing few methods (nom=3), indicating concentrated functionality. LCOM=0.666 signals low cohesion (multiple responsibilities or unrelated functionality in the same class). Together these factors (single-class package, moderate size/complexity, and reduced cohesion) justify that IntrinsicFinder is insufficiently modularized and would benefit from decomposition into smaller, more cohesive abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.eliminatedallocation.EliminatedAllocationRowBuilder",
+        "detection": false,
+        "justification": "Class is moderate in size (69 LOC) with 8 methods and WMC=8, shows no incoming/outgoing coupling in the provided data (fanin/fanout=0) and has a negative LCOM indicating cohesion. There is no evidence of a bloated interface or excessive responsibility concentration from the available metrics."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.eliminatedallocation.EliminatedAllocationRowBean",
+        "detection": false,
+        "justification": "Class appears to be a small data/row bean (32 LOC, 6 methods) with limited dependencies to reporting and model types, shallow inheritance (DIT=2), and a negative LCOM indicating cohesion. Metrics do not indicate excessive size, complexity, or a bloated interface that would suggest insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.x86.X86RegisterType",
+        "detection": false,
+        "justification": "Small size (loc 38), few methods (nom 4) and a small public interface (nopm 3). Very low LCOM (0.0) indicates high cohesion. WMC (11) is moderate for its size but does not by itself indicate a bloated, multi-responsibility class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.x86.AssemblyParserX86",
+        "detection": true,
+        "justification": "Large and complex: high LOC (160), many methods (nom 7) all exposed (nopm 7) and a high WMC (37) indicating substantial internal complexity. LCOM (0.571) shows only moderate cohesion, suggesting mixed responsibilities. The class depends on multiple assembly-related abstractions, implying it centralizes parsing responsibilities that could be decomposed into smaller, more focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.x86.X86Directive",
+        "detection": false,
+        "justification": "Very small and focused: low LOC (17), few methods (nom 2) and small public interface (nopm 1). LCOM (0.0) indicates cohesion. Metrics do not indicate excessive size or mixed responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.loader.BytecodeLoader",
+        "detection": true,
+        "justification": "Very large class (loc 541) with many methods (nom 25) and extremely high complexity (wmc 119). It depends on a wide range of bytecode, model and process classes, indicating it handles parsing, mapping, javap/reflection interactions and model construction. The combination of size, method count, high cyclomatic complexity and broad dependency surface strongly suggests multiple responsibilities that should be decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.loader.BytecodeLoader.BytecodeSection",
+        "detection": false,
+        "justification": "Trivial inner type (loc 1, no methods) with no dependencies and no complexity; does not exhibit symptoms of excessive responsibilities or size."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.loader.DisposableURLClassLoader",
+        "detection": false,
+        "justification": "Very small utility-like class (loc 10, nom 2, wmc 2) with minimal members and complexity, suggesting a single focused responsibility rather than insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.loader.ResourceLoader",
+        "detection": false,
+        "justification": "Moderate size (loc 107) and complexity (wmc 23, nom 7) but far smaller and more focused than BytecodeLoader. Cohesion metric (lcom ~0.29) does not indicate severe lack of cohesion and its dependency set is limited, so it does not clearly suffer from insufficient modularization based on the provided data."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.compilechain.CompileChainStage",
+        "detection": true,
+        "justification": "The class accounts for virtually the entire package (224 of 228 LOC) and exhibits signs of being a large, multi-responsibility component: 16 fields, 13 methods, and a relatively high cyclomatic/weight metric (WMC 26). It depends on many distinct subsystems (UI main, model, compile chain walker, compilation chooser, resize listener, util classes), suggesting it coordinates UI, model access, chain traversal, resizing and selection logic. Concentration of most package functionality in one class and wide-ranging dependencies indicate inadequate decomposition and a bloated abstraction that should be split into smaller, more focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.compilechain.CompileChainStage.PlotNode",
+        "detection": false,
+        "justification": "Very small nested helper (4 LOC, 2 fields, no methods) with minimal complexity and no external dependencies. Its narrow scope and size indicate it is appropriately modular and does not suffer from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.methodsizehisto.MethodSizeHistoOperation",
+        "detection": false,
+        "justification": "The class is small (41 LOC) with only 4 methods and moderate complexity (WMC=8). Although LCOM=0.75 suggests some cohesion concerns and all methods are public (nopm=4), the overall size and low coupling (fanin=0, fanout=0, minimal external dependencies) do not indicate a bloated, hard-to-manage abstraction. On balance, the data do not support that this class suffers from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.compilationchooser.CompilationChooser",
+        "detection": false,
+        "justification": "Class is small (LOC 48) with a modest number of methods (6) and moderate cyclomatic/weight (WMC 11). Cohesion is high (LCOM 0.0), there are no subclasses (NC 0) and it has minimal coupling indicators (fanin 0, fanout 0 in the provided data, and only three explicit type dependencies). Package contains a single class, and the class does not exhibit a bloated interface or concentrated, disparate responsibilities—metrics indicate a focused, cohesive abstraction rather than insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "detection": true,
+        "justification": "Very large implementation (loc 462) with many methods (nom 29) and very high complexity (wmc 109). It depends on parsing/util utilities and bytecode classes and likely mixes parsing, representation and utility logic. Size and high complexity indicate multiple responsibilities that could be split (e.g., parsing, formatting, and representation concerns)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.AbstractMetaMember",
+        "detection": true,
+        "justification": "Substantial size and complexity (loc 311, nom 38, wmc 80) while being an abstract base used across different meta-member types. It also interacts with bytecode, assembly, compilation and utility classes, suggesting it consolidates diverse concerns (bytecode handling, assembly mapping, compilation metadata) that would benefit from decomposition into focused collaborators or smaller classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.Compilation",
+        "detection": true,
+        "justification": "Large and complex (loc 280, nom 39, wmc 71) with many methods and responsibilities (interacts with tasks, assembly, compiler thread, tags and parsing utilities). The breadth of dependencies and high method/complexity counts suggest the class aggregates multiple roles (parsing, state tracking, event handling, assembly association) and could be modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.JITDataModel",
+        "detection": true,
+        "justification": "Central data model with substantial size and complexity (loc 228, nom 22, wmc 50) and many dependencies across the package (members, stats, events, classes, threads, tags, package manager, compilations). Its role as a coordinator plus breadth of responsibilities indicates risk of being a god-object that should be split into clearer subcomponents (storage, query, update, event handling)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.BCIOpcodeMap",
+        "detection": false,
+        "justification": "Tiny utility-like class (loc 3, nof 1, nom 0) with no evident complexity or multiple responsibilities. Metrics indicate a focused, single-purpose role that does not show signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.EventType",
+        "detection": false,
+        "justification": "Very small and simple (loc 8, nom 2, wmc 2) with no complex dependencies; appears to represent an enum/typed value object and does not aggregate multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.NumberedLine",
+        "detection": false,
+        "justification": "Small class (loc 20, nom 5, wmc 5) likely representing a simple data/utility concept. Metrics and lack of dependencies suggest it is cohesive and appropriately modular."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "detection": false,
+        "justification": "Small exception-type class (loc 9, nom 2, wmc 2) with a single responsibility (error representation) and no indicators of bloated interface or mixed concerns."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.locks.OptimisedLockRowBuilder",
+        "detection": false,
+        "justification": "Focused responsibility: 8 methods, 69 LOC and WMC 8 indicate a moderate-sized class whose purpose (building rows) is consistent. It has no recorded external dependencies or fan-in/fan-out, suggesting it encapsulates a single concern rather than aggregating unrelated functionality."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.locks.OptimisedLockRowBean",
+        "detection": true,
+        "justification": "Likely mixes data and processing/reporting responsibilities: despite modest LOC (36) it has 7 methods and a relatively high WMC (10) for a 'Bean' class, plus dependencies on Report, Compilation and ReportType and a DIT of 2. These signs indicate behavior beyond a simple data holder and a concentration of responsibilities that could be split into a pure data model and separate reporting/processing components."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.cell.LinkedBCICell",
+        "detection": false,
+        "justification": "Moderate size (loc 30) and method count (nom 4) but low field count (nof 2) and perfect cohesion (lcom 0.0). Although it depends on model and UI types, its overall size and cohesion indicate a focused role (likely rendering/linking of BCI) rather than a bloated, multi-responsibility class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.cell.IntegerTableCell",
+        "detection": false,
+        "justification": "Very small (loc 13), few methods (nom 2), low complexity (wmc 3), no fields and no external dependencies — consistent with a single, well-contained responsibility (formatting/rendering integer cell)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.cell.TextTableCell",
+        "detection": false,
+        "justification": "Small (loc 13), minimal methods (nom 2), low complexity (wmc 3) and no dependencies or fields, indicating a narrowly scoped, cohesive class not suffering from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.cell.MemberTableCell",
+        "detection": true,
+        "justification": "Largest in the package (loc 48) with the highest field count (nof 6) and notable complexity (wmc 7). It depends on multiple distinct concerns (Report, IMetaMember, Compilation, IStageAccessProxy), suggesting it mixes model access, reporting logic and UI interaction. These signs point to concentrated responsibilities and a bloated interface that would benefit from decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.cell.TextWrapTableCell",
+        "detection": false,
+        "justification": "Small to moderate size (loc 20), few methods (nom 2), low complexity (wmc 3), no fields or dependencies — appears focused on a single UI rendering task and does not exhibit indicators of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.source.ViewerSource",
+        "detection": false,
+        "justification": "Class is small (loc=28) with only 2 methods (nom=2) and modest complexity (wmc=5). Cohesion metric indicates high cohesion (lcom=-1.0). Fanout and fanin are zero, and there is only one class in the package, so there is no evidence of a bloated interface or multiple consolidated responsibilities. Overall metrics do not support insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.hotspot.HotSpotLogParser",
+        "detection": true,
+        "justification": "The package contains only this single class (all 253 LOC), indicating a concentration of responsibilities. The class defines many methods (19) and exhibits high overall complexity (WMC=70), suggesting it implements multiple behaviors rather than a focused abstraction. It also depends on several distinct subsystems (model, util, core, assembly/architecture), implying it coordinates diverse concerns. Although LCOM is relatively low, the combination of size, high complexity, numerous methods, and cross-cutting dependencies supports that the class is inadequately decomposed and likely suffers from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.demo.MakeHotSpotLog",
+        "detection": true,
+        "justification": "Class has a large implementation surface and complexity for a single class: 39 methods, 331 LOC and WMC=66 indicate substantial size and cognitive load. The package contains only this single class (no other classes to which responsibilities could be delegated) and fan-in/fan-out are 0, suggesting the behavior is concentrated here rather than distributed. Although LCOM is low (high cohesion) and there is only one field, the high method count and complexity imply multiple behaviors/responsibilities are bundled into one class rather than decomposed into smaller abstractions, consistent with insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.chain.CompileNode",
+        "detection": true,
+        "justification": "Relatively large and complex: 19 methods (nom), 9 fields, 111 LOC and high cyclomatic burden (WMC 28). It depends on multiple model and parsing interfaces and utilities, suggesting it combines parsing, model access and node responsibilities. The package contains only two classes, indicating this class centralizes much functionality for the chain. These characteristics (many methods, high complexity and many dependencies) indicate an abstraction that has not been sufficiently decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.chain.CompileChainWalker",
+        "detection": false,
+        "justification": "Smaller, focused surface: only 5 methods (nom) with modest size (117 LOC) and lower complexity (WMC 18). LCOM is 0.0 indicating high cohesion, and it primarily orchestrates traversal using CompileNode and model interfaces rather than accumulating diverse responsibilities. Metrics and dependencies suggest it is a coordinator rather than a bloated multi-responsibility class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "detection": true,
+        "justification": "Very large class (loc 568) with many fields and methods (nof 59, nom 86) and very high complexity (wmc 142). Size and complexity indicate multiple responsibilities concentrated in one abstraction, making it hard to understand and maintain — a strong sign of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.JITWatchConfig.TieredCompilation",
+        "detection": false,
+        "justification": "Tiny nested type (loc 1) with no methods/fields; represents a small, focused abstraction and does not exhibit signs of being insufficiently modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.JITWatchConfig.CompressedOops",
+        "detection": false,
+        "justification": "Very small nested type (loc 1) with no observable methods/fields; size and role do not indicate lack of modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.JITWatchConfig.BackgroundCompilation",
+        "detection": false,
+        "justification": "Minimal nested type (loc 1) with no methods/fields; not exhibiting excessive size or mixed responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.JITWatchConfig.OnStackReplacement",
+        "detection": false,
+        "justification": "Very small nested type (loc 1) without methods/fields; appropriate granularity for its likely role."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.ErrorLog",
+        "detection": false,
+        "justification": "Small class (loc 28, nom 3, wmc 6) with limited responsibilities; metrics do not suggest a bloated or overly complex abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.TagProcessor",
+        "detection": false,
+        "justification": "Moderate size (loc 170) and complexity (wmc 41) but relatively few methods (nom 6) and fields (nof 5). While somewhat complex, it appears focused on tag processing and does not exhibit the extreme size or broad interface typical of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "detection": true,
+        "justification": "Very large constants holder (loc 296) with an extremely high number of fields (nof 283, nopf 282) producing a bloated interface. Even if cohesive as constants, the sheer volume suggests it could be split by concern (groups of related constants) to improve modularity."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.core.IJITListener",
+        "detection": false,
+        "justification": "Small interface (loc 5, nom 3) with a narrow responsibility (listening to events). Its size and focused role do not indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.arm.MnemonicEntry",
+        "detection": false,
+        "justification": "Very small class (loc=8, nom=1, wmc=1) with perfect cohesion (lcom=0.0) and no dependencies — unlikely to contain multiple responsibilities or be insufficiently modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMExtend",
+        "detection": false,
+        "justification": "Small class (loc=28, nom=4) with limited public surface and modest complexity (wmc=10). Although lcom=0.75 indicates some cohesion concerns, its size and method count suggest focused responsibility rather than a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMDirective",
+        "detection": false,
+        "justification": "Small and cohesive (loc=17, nom=2, wmc=6, lcom=0.0). Metrics indicate narrow responsibility and no sign of excessive size or a bloated interface."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMRegisterType",
+        "detection": false,
+        "justification": "Moderately small (loc=33, nom=5, wmc=10) with reasonable cohesion (lcom=0.4). Method count and size are limited, suggesting the class is focused on register-type concerns rather than combining many responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.arm.AssemblyParserARM",
+        "detection": true,
+        "justification": "Large and complex parser (loc=214, nom=9, wmc=56) that depends on multiple assembly abstractions. High LOC and very high WMC indicate concentrated parsing logic and complexity; moderate cohesion (lcom≈0.44) and multiple responsibilities (parsing instructions, labels, architecture specifics) suggest inadequate decomposition and a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMShifter",
+        "detection": false,
+        "justification": "Small helper-like class (loc=28, nom=4, wmc=10) with limited public API. Despite lcom=0.75, the class size and method count are low, pointing to a focused role (shifter logic) rather than an insufficiently modularized abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.ReportStage",
+        "detection": true,
+        "justification": "Contains the majority of package LOC (86 of 125), high cyclomatic complexity (WMC 19) and multiple methods/fields while depending on many unrelated builders and UI components (InliningRowBuilder, EliminatedAllocationRowBuilder, SuggestionRowBuilder, OptimisedLockRowBuilder, various cell classes, filters and UI proxies). It coordinates disparate responsibilities (building different report row types, UI cell handling, filtering and stage access), indicating concentrated responsibilities and coupling that suggest it should be split into smaller, cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.ReportPackageFilter",
+        "detection": false,
+        "justification": "Small class (21 LOC) with low complexity (WMC 4), few methods and a focused dependency on ReportStage. Its size and single responsibility (package filtering) indicate adequate modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.AbstractReportRowBean",
+        "detection": false,
+        "justification": "Modest size (15 LOC), low complexity and serves as an abstract/base abstraction (DIT 1) for row beans. Its role as a small common base suggests cohesion rather than insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.IReportRowBean",
+        "detection": false,
+        "justification": "Minimal interface (2 LOC) with a single responsibility; too small to suffer from insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.ReportStageType",
+        "detection": false,
+        "justification": "Trivial/marker-like type (1 LOC), likely an enum or simple type with no methods or dependencies; not a candidate for insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.javap.JavapProcess",
+        "detection": false,
+        "justification": "Relatively small and focused: 46 LOC, 4 methods, 2 fields and moderate complexity (WMC 9). No external fan-in/fan-out and LCOM 0.0 indicates cohesion. Metrics suggest a single, cohesive responsibility rather than a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.process.javap.ReflectionJavap",
+        "detection": true,
+        "justification": "Larger and more complex than its sibling: 94 LOC, 5 methods, 6 fields and higher complexity (WMC 12). It also depends on a classloader (DisposableURLClassLoader), which indicates it may combine reflection logic with class-loading concerns. The combination of greater size, more fields, higher complexity and mixed responsibilities suggests this class is not sufficiently decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.sequencecount.InstructionSequence",
+        "detection": false,
+        "justification": "Small size (26 LOC) with 6 methods, low complexity (WMC=7), a single field, and high cohesion (LCOM=0.0). Metrics indicate a focused, cohesive abstraction rather than a bloated class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.jarscan.sequencecount.SequenceCountOperation",
+        "detection": true,
+        "justification": "Relatively large and complex (105 LOC, 10 methods) with high cyclomatic complexity (WMC=34), multiple fields, and only moderate cohesion (LCOM=0.2). It depends on several bytecode-related types and InstructionSequence, suggesting it combines parsing/analysis and counting responsibilities that could be decomposed into smaller, more cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.inlining.InliningWalker",
+        "detection": true,
+        "justification": "The class exhibits signs of a bloated abstraction: moderate size (52 LOC) combined with relatively high complexity (WMC=14) for only 5 methods, and a non-negligible lack of cohesion (LCOM=0.6). Its dependency list spans many unrelated concepts (reporting, bytecode annotations, model parsing, tags, exception types and dictionaries), indicating it handles multiple responsibilities (report generation + bytecode annotation building/parsing). DIT=3 suggests increased behavioral surface through inheritance, making the class harder to decompose and maintain. Together these factors indicate the abstraction is insufficiently modularized and would benefit from splitting responsibilities into smaller, more cohesive classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.IPrevNextCompilationListener",
+        "detection": false,
+        "justification": "Very small interface: loc=4, nom=2, wmc=2, no fields; minimal responsibilities and no signs of a bloated interface or multiple concerns."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.ICompilationChangeListener",
+        "detection": false,
+        "justification": "Tiny interface: loc=3, nom=1, wmc=1; single responsibility (listening for compilation changes), no evidence of insufficient decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.NothingMountedStage",
+        "detection": false,
+        "justification": "Small UI stage: loc=44, nom=3, wmc=3; limited methods and low complexity indicating adequate modularization for its role."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.ClassTree",
+        "detection": true,
+        "justification": "Relatively large and complex UI class: loc=192, nom=16, nopm=13, wmc=48. High complexity concentrated in one class with many responsibilities (tree management, UI interactions) suggesting it could be decomposed into smaller, focused components."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.CompilationTableRow",
+        "detection": false,
+        "justification": "Moderate size: loc=71, nom=10, wmc=20, lcom=0.2. Although somewhat complex, it appears to represent a single UI row model with cohesive responsibilities and not an obvious candidate for further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.ClassMemberList",
+        "detection": true,
+        "justification": "Large and feature-rich UI component: loc=222, nom=27, nopm=15, wmc=45 with multiple external dependencies (IntrinsicFinder, JITWatchConfig, stage proxy). The class likely mixes rendering, event handling and data logic and would benefit from splitting responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.ClassMemberList.MetaMethodCell",
+        "detection": false,
+        "justification": "Very small nested class: loc=18, no methods reported; focused on a small piece of UI functionality and not a decomposition concern."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.MainConfigStage",
+        "detection": true,
+        "justification": "Configuration stage with concentrated complexity: loc=122, nom=6, nopm=5, wmc=25 and many dependencies (file choosers, stage manager, logging). High method complexity and multiple external concerns indicate responsibilities that could be modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "detection": false,
+        "justification": "Small interface-like class: loc=10, nom=8, wmc=8. Serves as an access proxy and does not exhibit a bloated implementation or excessive responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.IMemberSelectedListener",
+        "detection": false,
+        "justification": "Minimal listener interface: loc=4, nom=2, wmc=2; single responsibility and appropriately small."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "detection": true,
+        "justification": "Clear god-class candidate: very large and complex (loc=983, nom=79, nopm=59, nof=74, wmc=174) with a vast list of dependencies and many responsibilities (managing multiple stages, viewers, parsers, reports). This concentration of fields, methods and varied dependencies indicates insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.main.CompilationTableBuilder",
+        "detection": false,
+        "justification": "Small helper: loc=33, nom=2, wmc=2; limited scope and focused responsibility, not a modularization problem."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.zing.ZingLineType",
+        "detection": false,
+        "justification": "Very small class (loc=1, nom=0) with no methods and no complexity; it does not exhibit bloat or concentrated responsibilities and therefore does not show insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.zing.ZingLogParser",
+        "detection": true,
+        "justification": "Relatively large and complex parser (loc=230, nom=12, wmc=43) with moderate cohesion (lcom=0.333) and several dependencies. High WMC and size indicate multiple responsibilities and complex control flow within a single class, making it a candidate for decomposition (e.g., splitting parsing stages or handlers)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.zing.ZingLine",
+        "detection": true,
+        "justification": "Large class surface (loc=147, nom=34, nopm=33, wmc=34) with a very large public interface. Although measured cohesion is low (lcom=0.0), the sheer number of methods and public members suggests a bloated abstraction that likely bundles many responsibilities and could be split into smaller, more focused classes (data holder vs. parsing/processing helpers)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.bytecode.BytecodeLabel",
+        "detection": false,
+        "justification": "Very small, single-purpose class: LOC=10, 2 methods, 1 field, WMC=2 and LCOM=0.0. Metrics indicate high cohesion and low complexity, consistent with a focused UI label responsibility rather than an under-modularized abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.bytecode.ViewerBytecode",
+        "detection": true,
+        "justification": "Indicators of insufficient modularization: relatively large size (LOC=276) with many methods (nom=17) and high complexity (WMC=60). The class depends on many different concerns (model, bytecode annotation/building, parsing/utilities, reporting, UI navigation), suggesting it mixes multiple responsibilities (UI rendering, parsing, annotation, navigation, reporting) instead of delegating them to smaller cohesive classes—signs of a bloated abstraction that should be decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.compilation.codecache.CodeCacheWalkerResult",
+        "detection": false,
+        "justification": "Small size (loc 44), modest number of methods (nom 8) and fields (nof 3), low LCOM (0.25) indicating strong cohesion, and no incoming/outgoing coupling (fanin/fanout 0). Appears to be a cohesive data/result holder and does not concentrate multiple responsibilities that would warrant further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.compilation.codecache.CodeCacheEventWalker",
+        "detection": true,
+        "justification": "Relatively high cyclomatic/complexity (wmc 9) concentrated into few methods (nom 4), moderate cohesion (LCOM 0.5) and multiple external dependencies (IMetaMember, model interfaces, result class). The combination of high per-method complexity, mixed cohesion and several responsibilities implied by its dependencies and inheritance depth (DIT 3) suggests behavior and responsibilities are concentrated and could be decomposed for better modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.graphing.TimeLineStage",
+        "detection": true,
+        "justification": "Relatively large size and complexity (loc ~200, WMC 36, 12 methods) combined with many domain dependencies (JITEvent, JITStats, Compilation, ParseUtil, IMetaMember, Tag, JITWatchUI) indicate the class handles multiple concerns (data parsing, event handling, UI concerns). Although cohesion metric is not high, the concentrated size and breadth of responsibilities suggest the abstraction has not been decomposed into smaller, focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.graphing.AbstractGraphStage",
+        "detection": true,
+        "justification": "Acts as a large shared abstraction with many members (23 fields) and many operations (19 methods, loc ~199, WMC 30). As a single abstract stage holding substantial behavior and state used across graphing stages, it centralizes varied responsibilities (string/util handling, UI resize, parse utilities, tag handling) that could be split into smaller, more focused abstractions or helper components."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.graphing.CodeCacheStage",
+        "detection": false,
+        "justification": "Moderate size (loc 106) with a small number of methods (5) and focused dependencies (CodeCacheEvent, UserInterfaceUtil, Tag, JITWatchUI). Its responsibilities appear narrow and UI-focused, indicating adequate modularization for its purpose."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.graphing.HistoStage",
+        "detection": false,
+        "justification": "Small and focused (loc 85, 3 methods, WMC 7) with specific dependencies around histogram functionality (Histo, IHistoVisitable, IReadOnlyJITDataModel, UserInterfaceUtil). The limited scope and tight dependency set suggest it is properly modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.Dialogs",
+        "detection": true,
+        "justification": "This class dominates the package (183 LOC of 199 total) and has many methods (nom=15) and relatively high complexity (wmc=21). It contains multiple inner types (Dialog, Response) and appears to concentrate UI dialog responsibilities that could be separated. The combination of large size, many methods and centralization of functionality indicates the abstraction is not adequately decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.Dialogs.Response",
+        "detection": false,
+        "justification": "Very small (loc=1) with no methods or complexity; it does not exhibit signs of being an insufficiently modular abstraction and likely exists to support the larger Dialogs class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.Dialogs.Dialog",
+        "detection": false,
+        "justification": "Small inner class (loc=15) with no reported complexity or many methods; it appears cohesive and narrowly scoped, so it does not show insufficient modularization by itself."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.ClassSearch",
+        "detection": false,
+        "justification": "Relatively small (loc 103) with 10 methods and 6 fields, LCOM 0.0 indicates good cohesion; limited dependencies. Size and cohesion suggest a focused responsibility rather than a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "detection": false,
+        "justification": "Small interface (loc 8) representing a listener abstraction; minimal methods and no signs of concentrated unrelated responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.ILineListener.LineType",
+        "detection": false,
+        "justification": "Trivial nested type (loc 1) with no complexity or multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.CompilationInfo",
+        "detection": false,
+        "justification": "Small (loc 95) with few methods (5) and focused dependencies (Compilation, UI util). Metrics show modest complexity (wmc 10) and high cohesion (LCOM 0.0), consistent with a single responsibility."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.NoOpLineListener",
+        "detection": false,
+        "justification": "Tiny implementation (loc 12) of the listener interface, single focused role; no evidence of excessive size or multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.TriViewPane",
+        "detection": false,
+        "justification": "Small UI component (loc 55, 8 methods) that appears to delegate to Viewer/TriView; size and cohesion indicate a focused responsibility rather than a bloated class."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.Viewer",
+        "detection": true,
+        "justification": "Large and complex: loc 386, 42 methods, 24 fields, very high complexity (wmc 92). Many dependencies across parsing, UI, and configuration subsystems. Method and field counts plus complexity indicate multiple responsibilities and a potentially bloated interface that would benefit from decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.TriView",
+        "detection": true,
+        "justification": "Clearly a hotspot for insufficient modularization: very large (loc 751), many fields (33) and methods (55), high cyclomatic complexity (wmc 173), many dependencies and public API surface (28 public methods). Low-to-moderate cohesion (LCOM ~0.13) and breadth of responsibilities (UI, navigation, bytecode, assembly, compilation handling) indicate it should be decomposed into smaller, cohesive abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.TriViewNavigationStack",
+        "detection": false,
+        "justification": "Small utility-like class (loc 44, 5 methods) with focused purpose (navigation stack) and limited coupling; size and role do not indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.triview.InstructionLabel",
+        "detection": false,
+        "justification": "Very small UI element (loc 13, 3 methods) with narrow responsibility; metrics do not suggest a need for further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.suggestion.SuggestionRowBuilder",
+        "detection": false,
+        "justification": "Small class size (LOC 49) with a modest number of methods (6) and moderate complexity (WMC 6). No reported fan-in/fan-out and package has only two classes, so responsibilities appear limited rather than concentrated. Metrics do not indicate a bloated interface or excessive size that would suggest insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.report.suggestion.SuggestionRowBean",
+        "detection": false,
+        "justification": "Very small data-holder style class (LOC 17) with only 3 methods; although WMC is 8, the overall size and method count are low and the class likely encapsulates a focused responsibility (a bean). It has minimal dependencies and does not present signs of being an over-large, multi-responsibility abstraction requiring further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser",
+        "detection": true,
+        "justification": "Interface exposes 11 methods (nom=11) and relatively high complexity (wmc=11) while depending on multiple assembly model types; the breadth of responsibilities (parsing, labels, methods, architecture concerns) suggests a bloated interface that could be split into smaller, focused interfaces."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyProcessor",
+        "detection": true,
+        "justification": "Large and complex class (loc=186, wmc=46) with many responsibilities and wide dependencies (meta model, parsers, utilities, package manager); moderate cohesion (lcom=0.25) combined with high complexity indicates it centralizes multiple concerns and would benefit from decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "detection": true,
+        "justification": "Relatively many methods for its size (nom=14, loc=73) and high complexity (wmc=20) with only moderate cohesion (lcom≈0.36); it bundles representation, parsing/formatting and block management behavior that could be separated into smaller abstractions."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyBlock",
+        "detection": false,
+        "justification": "Small class (loc=35) with a modest number of methods (nom=8) and moderate complexity (wmc=10); its focused dependencies and size indicate a single, cohesive responsibility (block-level behavior)."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyLabels",
+        "detection": false,
+        "justification": "Moderate size (loc=69) but few methods (nom=5), low cohesion concern (lcom=0.0) and focused dependencies related to labeling and assembly formatting — appears cohesive and focused rather than overly broad."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyReference",
+        "detection": true,
+        "justification": "Very large file (loc=216) with many fields (nof=16) and substantial complexity (wmc=32); though cohesion is not extremely poor (lcom≈0.18), the size and presence of nested handler logic indicate multiple responsibilities (reference handling, architecture specifics) that could be modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyReference.AssemblyReferenceHandler",
+        "detection": false,
+        "justification": "Inner handler class is localized (loc=80) and appears specialized; as an inner helper it encapsulates a narrow responsibility rather than indicating broader modularization issues."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "detection": false,
+        "justification": "Very small abstraction (loc=19, nom=1) with focused responsibility; size and simplicity indicate it is already well modularized."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction",
+        "detection": false,
+        "justification": "Large and complex (loc=178, wmc=41, nom=15) but shows very high cohesion (lcom=0.0) and focused dependencies around instruction representation/formatting; its size appears driven by domain complexity rather than mixed responsibilities, so decomposition is not clearly required."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AssemblyUtil",
+        "detection": false,
+        "justification": "Small utility class (loc=36, nom=3) that coordinates parsers and architecture-specific types; although wmc is notable (12), its role as a utility/registry is focused and does not clearly indicate bundled, separable responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.model.assembly.AbstractAssemblyParser",
+        "detection": true,
+        "justification": "Abstract parser contains substantial logic (loc=138, wmc=32) with multiple dependencies on directives, processors and instruction/block classes; having only a few declared methods but high complexity suggests it centralizes diverse parsing behavior that could be split into smaller parser components or strategy objects."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.viewer.AbstractTextViewerStage",
+        "detection": false,
+        "justification": "Small size and focused interface: loc 19, nom 2, nof 1 and low complexity wmc 2. LCOM 0.0 and no fanout indicate cohesion and limited responsibilities; dependencies are UI helpers consistent with a single abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.viewer.TextViewerStage",
+        "detection": false,
+        "justification": "Class is small and focused: loc 27 with a single exposed method (nom 1) and no fields (nof 0). Although wmc is 5, the class appears to implement a single viewer responsibility (cohesive, lcom -1.0) and has minimal external coupling."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.viewer.JournalViewerStage",
+        "detection": false,
+        "justification": "Relatively small and single-responsibility: loc 33, nom 1, no fields, wmc 6 indicates some internal complexity but not multiple responsibilities. LCOM -1.0 and limited size suggest adequate modularization for its purpose."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.inline.HeadlessInlineVisitor",
+        "detection": true,
+        "justification": "Relatively large class body (loc=144) with a moderate-to-high complexity (wmc=9) and many fields (nof=10) but few declared methods (nom=4), producing a state-rich, behavior-sparse abstraction. Cohesion is only moderate (lcom=0.5). It also contains two sizeable inner classes (InlineJournalVisitor loc=75 and InlineFailureInfo loc=32) in the same compilation unit, indicating multiple responsibilities bundled together rather than cleanly separated — signs that the abstraction would benefit from decomposition/extraction of responsibilities into smaller, focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.inline.HeadlessInlineVisitor.InlineJournalVisitor",
+        "detection": false,
+        "justification": "While non-trivial in size (loc=75), the metrics show low cyclomatic complexity (wmc=0) and very high cohesion (lcom=-1.0). As an inner visitor-type helper (dit=2) it appears focused on a single role (journal visiting) and is appropriately encapsulated as an inner class rather than indicating an under-modularized primary abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.inline.HeadlessInlineVisitor.InlineFailureInfo",
+        "detection": false,
+        "justification": "Small helper/data-holder sized class (loc=32, nof=4) with low complexity and very high cohesion (lcom=-1.0). It represents a narrow responsibility (failure info) and does not exhibit signs of being a bloated, multi-responsibility abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.treevisitor.TreeVisitor",
+        "detection": false,
+        "justification": "Relatively small class (loc 23) with a limited number of methods (nom 3) and a moderate complexity (wmc 7) that suggests contained logic rather than a bloated abstraction. It has no reported fan-out and a small, focused set of dependencies, indicating responsibilities are not overly concentrated and the abstraction is not excessively large or complex."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.treevisitor.ITreeVisitable",
+        "detection": false,
+        "justification": "Very small interface (loc 4) with only two methods (nom 2) serving a focused contract. As an interface it represents a narrow abstraction with clear responsibility and no signs of a bloated interface or excessive cohesion issues."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.parserchooser.IParserSelectedListener",
+        "detection": false,
+        "justification": "Very small interface (loc 3) with a single method (nom 1), minimal complexity (wmc 1) and no fields or fan-in/fan-out. It represents a focused contract rather than a bloated abstraction, so there is no evidence of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.ui.parserchooser.ParserChooser",
+        "detection": false,
+        "justification": "Relatively small class (loc 23) with few methods (nom 4), moderate complexity (wmc 4) and moderate cohesion (lcom 0.5). There is no indication of an overly large interface, excessive responsibilities, or disproportionate size that would suggest inadequate decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.j9.J9Line",
+        "detection": true,
+        "justification": "Consumes 143 LOC (≈57% of package LOC), has 19 methods (all public), high cyclomatic complexity (WMC=22) and many responsibilities (depends on multiple model/util types). The class is substantially larger and more complex than its peers in a small 3-class package, indicating a bloated abstraction that could be decomposed."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.j9.J9LogParser",
+        "detection": false,
+        "justification": "Moderate size (70 LOC) and small public interface (nom=4, nopm=1). Although complexity (WMC=16) is non-trivial, responsibilities are focused on parsing and it delegates line-level details to J9Line, so it does not show a bloated interface or excessive size relative to its role."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.j9.J9Util",
+        "detection": false,
+        "justification": "Small utility class (36 LOC) with only 2 methods and low complexity (WMC=7). It provides narrow, focused functionality and does not concentrate multiple responsibilities or a large interface."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.ParserType",
+        "detection": false,
+        "justification": "Very small class (loc 19) with few methods (nom 2) and no fields of concern. Minimal dependencies and low complexity indicate it is a simple, focused abstraction and not a candidate for further decomposition."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.ParserFactory",
+        "detection": false,
+        "justification": "Small, focused factory (loc 12, nom 2, wmc 5). Its responsibility (creating parsers) is narrow and the class size/complexity do not indicate concentrated multiple responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.AbstractLogParser",
+        "detection": true,
+        "justification": "Large and complex implementation (loc 374, nom 35 methods, nof 17 fields, wmc 80) with many dependencies across model and util types. The class centralizes extensive parsing logic and interacts with many concerns (events, model updates, tag processing), indicating multiple responsibilities that should be split into smaller, more cohesive components."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.ILogParseErrorListener",
+        "detection": false,
+        "justification": "Very small interface (loc 3, nom 1) representing a single responsibility (error listening). Its size and narrow purpose do not suggest insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.parser.ILogParser",
+        "detection": false,
+        "justification": "Interface with a moderate number of methods (nom 12, loc 16) that defines the parser contract. While related implementations (notably AbstractLogParser) are large, the interface itself is a focused API and does not on its own indicate an inadequately decomposed abstraction."
+    },
+    {
+        "identifier": "(default package).CodeCacheBuster",
+        "detection": true,
+        "justification": "Extremely large class surface: 5001 methods (nom) and 5001 public methods (nopm) with 20,010 LOC and WMC 5002. Very large, highly complex implementation and a huge public interface indicate a single abstraction that has not been decomposed and concentrates many responsibilities."
+    },
+    {
+        "identifier": "(default package).EscapeTestManyFields",
+        "detection": true,
+        "justification": "Very high number of fields (nof=41) combined with only 2 methods (nom=2) and moderate LOC (88) suggests a bloated stateful class that aggregates many pieces of data and responsibilities that could be split into smaller, focused abstractions."
+    },
+    {
+        "identifier": "(default package).LoopUnroll",
+        "detection": true,
+        "justification": "Relatively large and complex for an example/test: 125 LOC, 13 methods (nom) and WMC 31 with low cohesion (lcom=0.2308). The combination of size, complexity and low cohesion indicates mixed responsibilities and potential for better decomposition."
+    },
+    {
+        "identifier": "(default package).InlineSmallCode",
+        "detection": false,
+        "justification": "Small and focused: 35 LOC, 4 methods (nom) and WMC 5 with high cohesion (lcom=1.0). Metrics indicate a cohesive abstraction without excessive size or a bloated interface."
+    },
+    {
+        "identifier": "(default package).UpperCase",
+        "detection": false,
+        "justification": "Moderate size and complexity (40 LOC, 5 methods, WMC 9) with acceptable cohesion (lcom=0.6). Methods appear related to a single responsibility, so the class does not show signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.logger.ILogListener",
+        "detection": false,
+        "justification": "Small interface (loc 4) with only 2 methods and very low complexity (wmc 2); compact public surface and no incoming/outgoing coupling (fanin/fanout 0). Not a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.logger.StdLogListener",
+        "detection": false,
+        "justification": "Very small implementation (loc 8) with 2 methods, low complexity (wmc 2), single-level inheritance (dit 1) and no coupling (fanin/fanout 0). No sign of excessive size or mixed responsibilities."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.logger.NullLogListener",
+        "detection": false,
+        "justification": "Tiny class (loc 6) with 2 methods and low complexity (wmc 2), cohesive (lcom negative) and low coupling. Not sufficiently large or complex to indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.hotthrow.HotThrowFinder",
+        "detection": true,
+        "justification": "Relatively large and complex behavior concentrated in a single class: 118 LOC with a high weighted method complexity (WMC=20) distributed over only 3 methods, indicating very complex methods. The class depends on many different concerns (parsing, model interfaces, bytecode exception tables, compilation utilities), suggesting it mixes responsibilities (log/parse handling, bytecode/exception analysis, compilation mapping). These facts indicate the abstraction is not adequately decomposed and likely should be split into smaller, focused classes."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.hotthrow.HotThrowResult",
+        "detection": false,
+        "justification": "Small, focused holder of result-related functionality: 51 LOC, limited external coupling (depends only on IMetaMember), cohesive (LCOM=0.0) and likely encapsulates result state and accessors. Although method complexity exists (WMC=18 over 7 methods), the class appears to concentrate a single responsibility and does not show the wide mix of concerns seen in HotThrowFinder."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.comparator.MemberComparator",
+        "detection": false,
+        "justification": "Very small class (loc=5) with a single method (nom=1, nopm=1), low complexity (wmc=1), no internal coupling (fanin=0, fanout=0) and a focused dependency on Report. Metrics indicate a single, cohesive responsibility rather than a bloated abstraction."
+    },
+    {
+        "identifier": "org.adoptopenjdk.jitwatch.report.comparator.ScoreComparator",
+        "detection": false,
+        "justification": "Very small class (loc=5) with a single method (nom=1, nopm=1), low complexity (wmc=1), no internal coupling (fanin=0, fanout=0) and a focused dependency on Report. Metrics indicate a single, cohesive responsibility rather than a bloated abstraction."
+    }
+]

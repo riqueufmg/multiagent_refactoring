@@ -1,0 +1,42 @@
+[
+    {
+        "package": "org.jsoup.nodes",
+        "detection": true,
+        "justification": "The package contains 34 classes and 5,498 LOC, indicating a very large component. Several individual classes are extremely large and complex (Element: 1,571 LOC, WMC 241, nom 157; Node: 766 LOC, WMC 139, nom 79; Attributes: 522 LOC, WMC 99, nom 48; Document: 447 LOC). Multiple other classes exceed typical single-class sizes (Range 202 LOC, Entities 299 LOC, Printer 176 LOC). High class sizes and high WMC values, combined with many cross-dependencies within the package, indicate concentrated responsibilities and complexity consistent with a God Component."
+    },
+    {
+        "package": "org.jsoup.internal",
+        "detection": true,
+        "justification": "The package contains 13 classes with a total of 953 LOC and a broad set of responsibilities. Several classes are disproportionately large and complex: org.jsoup.internal.StringUtil (322 LOC, 26 methods, WMC 50) and org.jsoup.internal.ControllableInputStream (169 LOC, 17 methods, WMC 34) and org.jsoup.internal.SimpleBufferedInput (120 LOC, 11 methods, WMC 34). StringUtil in particular touches many subsystems (parser, nodes, helper classes) indicating mixed responsibilities and high cognitive load. The package also has multiple external dependencies, suggesting it is a central utility hub. These factors (high package LOC concentrated in a few complex classes, many methods and high complexity metrics, and wide dependency reach) support diagnosing a God Component."
+    },
+    {
+        "package": "org.jsoup",
+        "detection": true,
+        "justification": "The package totals 1,585 LOC across 11 classes, but size and responsibility are highly concentrated: org.jsoup.Connection is 772 LOC with 43 methods and WMC 43, and org.jsoup.JSoup is 269 LOC with 24 methods and WMC 25 — these two classes account for the majority (~64%) of the package LOC and large numbers of methods/complexity. The package also shows substantial coupling (Ce=8, Ca=8) and many dependencies to other internal packages, indicating centralized, highly connected functionality. This concentration of code, methods, and complexity in a few large classes supports detection of a God Component at the package level."
+    },
+    {
+        "package": "org.jsoup.helper",
+        "detection": true,
+        "justification": "Contextual judgment on the provided metrics indicates an excessively large component. The package contains 29 classes and 3,574 LOC overall, with several very large classes concentrated in the same package: HttpConnection (1,021 LOC, 48 methods, high complexity), HttpConnection.Response (388 LOC), W3CDom (343 LOC), DataUtil (316 LOC), Validate (191 LOC). Multiple classes also show high method counts and complexity (e.g. HttpConnection.nom=48, DataUtil.nom=19, W3CDom.nom=18), and the package mixes diverse responsibilities (HTTP connection handling, response processing, data utilities, DOM conversion, validation). These elements together support detecting a God Component in org.jsoup.helper."
+    },
+    {
+        "package": "org.jsoup.examples",
+        "detection": false,
+        "justification": "The package contains only 4 classes and a total of 190 LOC, which is small for a 'God Component'. The largest class (HtmlToPlainText) is 96 LOC — notable but not excessively large. Complexity metrics are modest (maximum WMC = 8), and class-level coupling (fanin/fanout = 0) is low. Package-level coupling (Ca = 4, Ce = 4) is moderate and does not indicate a single overwhelmingly central component. Based on class count, overall LOC, and modest complexity/coupling, there is insufficient evidence to classify this package as a God Component."
+    },
+    {
+        "package": "org.jsoup.select",
+        "detection": true,
+        "justification": "The package is excessively large and concentrates many responsibilities: 70 classes and 3,822 LOC in one package. Several very large/complex classes indicate centralization of functionality — Evaluator (773 LOC, 24 inner evaluator types), Elements (557 LOC, WMC 98), QueryParser (341 LOC, WMC 111), Nodes (247 LOC), StructuralEvaluator (220 LOC) and NodeTraversor (124 LOC). Numerous inner classes for different evaluation behaviours and high method/complexity metrics on core classes show the package handles parsing, querying, traversal and selection logic rather than a single cohesive responsibility, consistent with a God Component smell."
+    },
+    {
+        "package": "org.jsoup.safety",
+        "detection": true,
+        "justification": "The package has 9 classes and 636 LOC, but one class (Safelist) contains 399 LOC (~63% of package LOC), 22 methods (nom), and high complexity (wmc 54). Safelist also defines several inner types (TagName, AttributeKey, AttributeValue, Protocol, TypedValue) indicating multiple responsibilities bundled into a single large class. The next largest class (Cleaner) is 133 LOC, substantially smaller. The concentration of size, methods and inner types in Safelist supports that a single component is excessively large relative to the package, consistent with the God Component smell."
+    },
+    {
+        "package": "org.jsoup.parser",
+        "detection": true,
+        "justification": "Contextual judgement based on the provided data indicates the package concentrates a very large amount of functionality and code in a single component. The package contains 30 classes but a large total of 7,615 LOC, with several classes disproportionately large and highly complex: HtmlTreeBuilderState (1,735 LOC, WMC 473, nom 45), TokeniserState (1,386 LOC, WMC 409, nom 75), HtmlTreeBuilder (765 LOC, WMC 227, nom 95), CharacterReader (533 LOC, WMC 130, nom 57), Token (397 LOC, nom 20), TokenQueue (396 LOC, WMC 86, nom 34), Parser (298 LOC, nom 30). Multiple classes have very high cyclomatic complexity (WMC values up to 473/409) and large numbers of methods, showing concentrated responsibility and complexity inside this package. These facts (high total LOC, many very large/complex classes, and concentrated functionality) support the detection of a God Component in org.jsoup.parser."
+    }
+]

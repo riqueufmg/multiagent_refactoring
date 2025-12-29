@@ -1,0 +1,262 @@
+[
+    {
+        "package": "net.bytebuddy.dynamic.scaffold",
+        "detection": true,
+        "justification": "The package is excessively large and concentrated: 168 classes and 36,243 LOC overall, indicating a very large component. Several individual classes are extremely large (examples: TypeWriter ~4,701 LOC; TypeWriter.Default ~3,402 LOC; MethodGraph ~1,553 LOC; InstrumentedType ~1,502 LOC; TypeWriter.ValidatingClassVisitor ~1,255 LOC; MethodRegistry ~776 LOC), and there are many additional sizable inner/auxiliary classes (multiple TypeWriter and MethodGraph inner types exceeding hundreds of LOC). This concentration of functionality and high LOC across many classes (including many classes >1k LOC) suggests the package is doing too much, harming cohesion and maintainability — consistent with the God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.constant",
+        "detection": true,
+        "justification": "The package contains 28 classes and 1,768 LOC, which is large for a single package and suggests many responsibilities concentrated in one component. Several classes are particularly large and complex: MethodConstant (388 LOC, WMC 20), IntegerConstant (155 LOC, WMC 14), and ClassConstant (139 LOC, WMC 13). There are multiple additional classes in the 70–90 LOC range and many nested/auxiliary types (inner classes), indicating complexity and responsibility clustering. The combination of high class count, total LOC and concentrated complexity supports detecting a God Component."
+    },
+    {
+        "package": "net.bytebuddy.matcher",
+        "detection": true,
+        "justification": "The package contains 73 classes and 5,083 LOC with a strong concentration of size and complexity in a few files. In particular, ElementMatchers alone accounts for 1,785 LOC, ~198 methods (nom) and a very high WMC (207), indicating it centralizes a large portion of behavior. Additional relatively large classes include LatentMatcher (240 LOC, many nested types), ModifierMatcher (136 LOC), StringMatcher (132 LOC) and FilterableList (111 LOC). The presence of one dominant, highly complex class together with several medium-sized classes within the same package indicates the package functions as an excessively large component (responsibility concentration), supporting the detection of a God Component."
+    },
+    {
+        "package": "net.bytebuddy.build.gradle.android",
+        "detection": true,
+        "justification": "The package contains 37 classes and 2,856 LOC, indicating substantial size. Several classes are very large and complex (ByteBuddyAndroidPlugin: 528 LOC; ByteBuddyLocalClassesEnhancerTask: 313 LOC, WMC 25; ByteBuddyAndroidService: 292 LOC, WMC 26; ByteBuddyAndroidTaskExtension: 228 LOC, WMC 23; LegacyByteBuddyLocalClassesEnhancerTask: 153 LOC, WMC 17; Transformation: 103 LOC, WMC 11; ByteBuddyAndroidService.State: 101 LOC). Multiple inner/auxiliary classes are embedded in the same package/class files, and the package aggregates responsibilities for plugin, tasks, service and transformation logic. The concentration of large, high-complexity classes and many responsibilities in this single package supports the identification of a God Component."
+    },
+    {
+        "package": "org.gradle.api.provider",
+        "detection": false,
+        "justification": "The package contains a single class (Provider) with only 18 LOC and low complexity (WMC=2, nom=2). There is only one class in the package (num_classes=1) and no signs of aggregation of many classes or very large source size. Coupling is minimal (Ce=0, fanin=0, fanout=0) and metrics do not indicate an excessively large component, so this package does not meet the contextual criteria for a God Component."
+    },
+    {
+        "package": "org.gradle.api.tasks",
+        "detection": false,
+        "justification": "The package contains only 1 class and 16 lines of code, with minimal complexity metrics (low WMC, LOC) and no significant internal or external dependencies (fanin/fanout = 0). Given its very small size and low complexity, it is not excessively large and does not qualify as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode",
+        "detection": false,
+        "justification": "The package contains 27 classes and 1,514 LOC, which is moderate in size and does not indicate an excessively large component. The LOC is distributed: the largest class (StackManipulation) is 209 LOC (~13.8% of package LOC) and the next largest classes (Duplication 134 LOC, ByteCodeAppender 131 LOC, StackSize 111 LOC) together do not dominate the package. Many classes are small (around 30–60 LOC), showing decomposition of responsibilities rather than a single monolith. The package is cohesive (all classes relate to bytecode implementation) and coupling (Ca=22, Ce=4) is consistent with a core utility package rather than evidence of a god component. Based on this contextual assessment (without fixed thresholds), the package does not exhibit the God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.utility.visitor",
+        "detection": true,
+        "justification": "The package totals 993 LOC spread over 6 classes but the size and complexity are highly concentrated in a few classes: MetadataAwareClassVisitor (loc 332, nom 39, wmc 44), StackAwareMethodVisitor (loc 318, nom 24, wmc 84) and ExceptionTableSensitiveMethodVisitor (loc 237, nom 35, wmc 36). These three classes alone account for ~887 LOC (~89% of the package), with very high numbers of methods and high cyclomatic complexity (wmc), indicating multiple responsibilities concentrated in a small set of components. This concentration of LOC, methods and complexity supports detection of a God Component in this package."
+    },
+    {
+        "package": "com.service.definition",
+        "detection": false,
+        "justification": "Package 'com.service.definition' contains a single class (num_classes=1) with only 3 LOC. Class metrics show low complexity (wmc=1), no fanin/fanout, and no incoming/outgoing package dependencies (Ca=0, Ce=0). There is no evidence of excessive size in terms of lines of code or number of classes, so it does not qualify as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.utility",
+        "detection": true,
+        "justification": "The package contains 69 classes and 8,542 LOC, which is large for a single component and indicates aggregation of many responsibilities. Several very large classes concentrate much of that size: JavaConstant alone is ~1,907 LOC with many inner types (MethodHandle, MethodType, Dynamic, Simple, Visitor, Dispatcher, etc.), JavaConstant.Dynamic ~408 LOC, JavaConstant.MethodHandle ~522 LOC, AsmClassWriter ~514 LOC, AsmClassReader ~331 LOC and multiple other classes >150 LOC (JavaModule 238 LOC, JavaType 186 LOC). The presence of many sizable classes and numerous nested/inner types within the same package, plus broad dependencies to and from other packages, suggests this package is doing excessive work and acts as a god component."
+    },
+    {
+        "package": "com.service.usage",
+        "detection": false,
+        "justification": "The package contains a single class and only 5 LOC (num_classes=1, loc=5). Class metrics are very small (wmc=1, nom=1, nopm=1, loc=5) and there are no incoming/outgoing dependencies (Ca=0, Ce=0, fanin=0, fanout=0). These indicators show the component is minimal in size and responsibility, so it does not exhibit a God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.dynamic.loading",
+        "detection": true,
+        "justification": "The package contains an unusually large amount of code and classes: 118 classes and ~14,892 LOC concentrated in a single package. Several very large classes/files indicate aggregation of many responsibilities in the package (ClassInjector ~2245 LOC, ByteArrayClassLoader ~1127 LOC, ClassLoadingStrategy ~450 LOC, ClassReloadingStrategy ~430 LOC, ModuleLayerFromSingleClassLoaderDecorator ~407 LOC). Many nested/inner types are defined in the same files and there are high complexity/size hotspots (e.g. ByteArrayClassLoader WMC=30). The combination of high LOC, high class count and multiple large, complex classes handling distinct concerns (class injection, class loading strategies, module layer handling, reloading, etc.) supports identifying net.bytebuddy.dynamic.loading as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.description.type",
+        "detection": true,
+        "justification": "The package is excessively large: 175 classes and 33,551 LOC, which indicates concentration of many responsibilities in a single component. Multiple individual types are very large (e.g. TypeDescription: 8,174 LOC; TypeDescription.Generic: 5,738 LOC; TypeDescription.ForLoadedType variants and large inner types such as Builder: 583 LOC, LazyProjection: 597 LOC, TypeList: 844 LOC, RecordComponentList: 232 LOC). The package also contains many nested/inner classes and wide external dependencies, showing high coupling and large surface area. Taken together (very high total LOC, high class count, and several very large classes), these elements justify flagging this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.utility.dispatcher",
+        "detection": true,
+        "justification": "The package contains 19 classes and 2,788 LOC with heavy concentration in a single component: JavaDispatcher (1,180 LOC, WMC=51) that also declares many nested types (InvokerCreationAction, DirectInvoker, Dispatcher, ForDefaultValue, DynamicClassLoader, Resolver, etc.). Several other large types in the same package (Dispatcher: 501 LOC, ForDefaultValue: 253 LOC, DynamicClassLoader: 244 LOC) indicate multiple large responsibilities co-located. The combination of very large class/file size, high complexity (WMC) and multiple sizeable nested/related classes supports detecting a God Component in this package."
+    },
+    {
+        "package": "net.bytebuddy.description.field",
+        "detection": false,
+        "justification": "The package contains 17 classes and 1,418 LOC, with two larger classes (FieldDescription: 509 LOC; FieldList: 217 LOC) but an average ~83 LOC/class. The package also contains several small inner/auxiliary classes (tokens, latent, substituting, etc.) that decompose behavior. Coupling metrics (Ce=6, Ca=20) show moderate external dependencies and clients rather than an isolated monolithic hotspot. While individual classes are relatively large, the size appears domain-appropriate (field description/manipulation) and responsibilities are split into focused inner types, so the evidence does not support labeling the package a God Component."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.collection",
+        "detection": false,
+        "justification": "The package contains 10 classes and 675 LOC (average ~67.5 LOC/class), which is moderate rather than excessively large. The largest files are ArrayFactory (235 LOC), ArrayAccess (136 LOC) and ArrayFactory.ArrayCreator (107 LOC), indicating a few localized hotspots but no single class or the package as a whole overwhelmingly dominates size. Complexity hotspots (WMC = 14) exist for ArrayFactory and ArrayAccess, but the package's external coupling is low (Ce = 4, Ca = 1) and responsibilities appear focused on collection/array-related bytecode generation. Given the distribution of LOC and limited coupling, the data do not support classifying this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.implementation",
+        "detection": true,
+        "justification": "The package is excessively large: 264 classes and 32,056 LOC concentrated in a single package. It contains numerous very large classes (examples: MethodCall 2,648 LOC; InvokeDynamic 2,217 LOC; Implementation 1,761 LOC; MethodDelegation 1,134 LOC; Implementation.Context 1,133 LOC; MethodCall.ArgumentLoader 794 LOC; FieldAccessor 1,020 LOC; EqualsMethod 843 LOC; HashCodeMethod 641 LOC; ToStringMethod 605 LOC). Several classes exceed 1,000+ LOC and multiple exceed 2,000 LOC, indicating a concentration of responsibilities. The high class count combined with many large classes and many nested/inner types within the same package supports a contextual judgment that this package functions as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.description.modifier",
+        "detection": false,
+        "justification": "The package contains 27 classes and 1,317 LOC, but the majority of classes are small (most ~46 LOC, many in the 46–90 LOC range), giving an average of ~49 LOC/class. Only one file (ModifierContributor) is notably larger (~204 LOC) and several inner types are declared there, but overall method complexity (wmc) values are low across classes and fanin/fanout are zero for most types. The package appears cohesive (all classes model modifier-related concepts) and has low efferent coupling (Ce=1) with modest afferent coupling (Ca=16). Given the distribution of size and low internal complexity, the component is not excessively large in this context and does not meet the contextual criteria for a God Component."
+    },
+    {
+        "package": "net.bytebuddy.build.gradle",
+        "detection": true,
+        "justification": "The package contains 42 classes and 3,915 LOC, indicating substantial size and surface area. Several classes concentrate most of the complexity and lines: AbstractByteBuddyTask (474 LOC, WMC 50), AbstractByteBuddyTaskExtension (360 LOC, WMC 41), ByteBuddyPlugin (314 LOC), Transformation (221 LOC), and Adjustment (177 LOC). Multiple large classes with high WMC and many inner/related classes (numerous nested types listed) show concentrated responsibilities and complexity within this single package. The combination of high total LOC, large individual classes, and concentrated complexity supports identifying this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.member",
+        "detection": true,
+        "justification": "The package contains 25 classes and 1,737 LOC, indicating substantial size for a single component. Several very large classes concentrate most of the code: MethodInvocation (371 LOC), MethodVariableAccess (309 LOC) and FieldAccess (191 LOC). Multiple inner/embedded types are defined in the same files (e.g., many MethodVariableAccess inner types), increasing class count and file complexity. The combination of high LOC, many classes (including large classes) and clustered responsibilities supports identifying this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.android",
+        "detection": true,
+        "justification": "The package contains 17 classes but a concentrated amount of code (2012 LOC) is clustered in a single component file (AndroidClassLoadingStrategy.java). The top-level AndroidClassLoadingStrategy alone is 654 LOC and hosts many nested/related classes recorded in the same file (DexProcessor 279 LOC, ForSdkCompiler 252 LOC, Injecting 172 LOC, Dispatcher 140 LOC, plus multiple smaller inner classes). This concentration of sizable classes and responsibilities in one component/file indicates the package has an excessively large, central component handling many concerns, consistent with the God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bind",
+        "detection": true,
+        "justification": "The package contains 32 classes and 2,628 LOC, indicating substantial size. A large portion of functionality is concentrated in single large sources: MethodDelegationBinder.java alone is 777 LOC and defines many nested types (MethodBinding 174 LOC, ParameterBinding 127 LOC, AmbiguityResolver 146 LOC, Builder 126 LOC, etc.). ArgumentTypeResolver is another large class (203 LOC). The concentration of many responsibilities and substantial lines of code in a few files (especially MethodDelegationBinder and its many inner classes) supports the detection of a God Component."
+    },
+    {
+        "package": "net.bytebuddy.agent.builder",
+        "detection": true,
+        "justification": "The package net.bytebuddy.agent.builder is excessively large: 229 classes and 34,339 LOC. It contains a very large top-level class AgentBuilder (~9,519 LOC) with many large inner components (AgentBuilder.Default ~2,133 LOC, AgentBuilder.RedefinitionStrategy ~2,097 LOC, AgentBuilder.LambdaInstrumentationStrategy ~1,105 LOC, AgentBuilder.ExecutingTransformer ~484 LOC, plus numerous other inner classes and sizable nested types). The concentration of thousands of LOC and many responsibilities (transformation, dispatching, loading strategies, instrumentation strategies, resubmission, listeners, etc., as reflected by class names) indicates a single component managing excessive functionality and size, consistent with the God Component smell."
+    },
+    {
+        "package": "org.gradle.work",
+        "detection": false,
+        "justification": "The package contains only 3 classes and a total of 38 LOC, with the largest class being 16 LOC. Class-level metrics show very low complexity (WMC ≤ 2) and no large number of methods or fields. External couplings are minimal (Ce=1, Ca=1) and no single class or the package as a whole shows excessive size or concentration of functionality that would indicate a God Component."
+    },
+    {
+        "package": "net.bytebuddy.dynamic.scaffold.inline",
+        "detection": true,
+        "justification": "The package contains 20 classes totaling 2,242 LOC, indicating a large component surface. Several classes concentrate much of that size and complexity: MethodRebaseResolver (425 LOC), MethodRebaseResolver.Resolution (305 LOC) and DecoratingDynamicTypeBuilder (323 LOC, WMC=36, 36 methods) are notably large and complex. The package groups multiple responsibilities (builders, resolvers, implementation targets, matchers) and many nested/inner types, suggesting responsibility concentration. Coupling metrics (Ce=20, Ca=8) show the package has many outgoing and incoming dependencies, reinforcing its central, heavy role. Taken together — high total LOC, multiple very large classes, concentrated complexity and coupling — these elements support detection of a God Component."
+    },
+    {
+        "package": "net.bytebuddy.implementation.attribute",
+        "detection": true,
+        "justification": "The package contains 44 classes and 3,359 LOC, which is large for a single package. Several classes are particularly large and concentrate responsibilities: AnnotationAppender (556 LOC), MethodAttributeAppender (338 LOC), TypeAttributeAppender (164 LOC), FieldAttributeAppender (175 LOC), and RecordComponentAttributeAppender (175 LOC). Many files define multiple inner/variant classes (e.g., AnnotationAppender, MethodAttributeAppender, FieldAttributeAppender) indicating a concentration of varied behavior in the same package. This combination of high class count, high total LOC and multiple very large classes suggests the package is excessively large and fulfils the characteristics of a God Component."
+    },
+    {
+        "package": "org.gradle.api.file",
+        "detection": false,
+        "justification": "The package contains only 2 classes and a total of 42 LOC, with individual class LOC of 26 and 16. Complexity metrics (WMC 4 and 2), lack of many methods, and minimal dependencies indicate the component is small and not excessively large, so it does not qualify as a God Component."
+    },
+    {
+        "package": "com.service.usage2",
+        "detection": false,
+        "justification": "The package com.service.usage2 contains a single class (ServiceImplementation) with only 5 LOC, 1 method (nom=1), WMC=1, no fields, no incoming/outgoing dependencies (Ca=0, Ce=0, fanin=0, fanout=0). The component is very small in both size and class count and shows low complexity, so it does not meet the contextual criteria for a God Component."
+    },
+    {
+        "package": "net.bytebuddy.build",
+        "detection": true,
+        "justification": "The package net.bytebuddy.build is excessively large and concentrated: 131 classes and 21,284 LOC. Several enormous compilation units concentrate functionality in this package (e.g. Plugin.java ~4,286 LOC with many inner types, Plugin.Engine ~3,681 LOC, Plugin.Source ~956 LOC, Plugin.Default ~568 LOC, Plugin.Factory ~520 LOC, BuildLogger ~478 LOC). The Plugin class alone defines a large number of nested types and responsibilities, indicating high functional concentration. These metrics (large total LOC, very high class count in one package, multiple individual files with thousands of lines and many inner classes) support that this package behaves as a God Component by centralizing excessive code size and responsibilities."
+    },
+    {
+        "package": "net.bytebuddy.benchmark.runner",
+        "detection": false,
+        "justification": "The package contains only one class (num_classes=1) with 23 lines of code (loc=23). The single class QuickRunner has low complexity (wmc=2), few methods (nom=2), minimal public fields/methods (nof=1, nopf=0, nopm=1), and no incoming/outgoing dependencies (fanin=0, fanout=0). There is no evidence of an excessively large component by LOC or by number of classes, so the God Component smell is not present."
+    },
+    {
+        "package": "net.bytebuddy.agent",
+        "detection": true,
+        "justification": "The package net.bytebuddy.agent is excessively large and concentrated: it contains 64 classes and 12,617 LOC. Several very large classes/files concentrate most of the size and responsibility (VirtualMachine ~2449 LOC; ByteBuddyAgent ~1185 LOC; VirtualMachine.ForHotSpot ~1213 LOC; VirtualMachine.ForOpenJ9 ~1121 LOC; VirtualMachine.Connection ~1004 LOC). Many nested/inner classes are declared inside the same files (e.g., many VirtualMachine.* and ByteBuddyAgent.* types), increasing file/class size and responsibility. The main classes also have high complexity indicators (ByteBuddyAgent WMC=47) and many methods/fields (e.g., VirtualMachine nof=70, ByteBuddyAgent nof=35). This combination of high LOC, many classes grouped in a single package/file set, and concentrated complexity supports detecting a God Component."
+    },
+    {
+        "package": "net.bytebuddy.dynamic.scaffold.subclass",
+        "detection": false,
+        "justification": "The package contains 9 classes and 812 LOC, with the largest class (ConstructorStrategy) at 256 LOC and other sizable classes at 158, 106 and 104 LOC. While some classes are non-trivial, the overall class count (9) and total LOC (812) are moderate and the functionality is split into clearly named responsibilities (ConstructorStrategy variants, SubclassImplementationTarget, SubclassDynamicTypeBuilder, factories and small inner types). Complexity metrics (WMC values generally low, LCOM values indicating cohesion) and the presence of multiple focused classes suggest the package is modular rather than a single excessively large God Component."
+    },
+    {
+        "package": "net.bytebuddy",
+        "detection": true,
+        "justification": "The package contains 32 classes and 3,541 LOC overall, with several very large classes concentrated in the package. The top class ByteBuddy alone is 898 LOC with 52 methods and WMC 59, indicating high complexity and many responsibilities. Other large classes include ClassFileVersion (476 LOC), NamingStrategy (381 LOC) and TypeCache (369 LOC). The ByteBuddy class also declares a very large set of dependencies across many package areas, suggesting it centralizes orchestration and cross-cutting concerns. The concentration of size and complexity in a few classes plus the package-level size supports identifying this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.pool",
+        "detection": true,
+        "justification": "The package net.bytebuddy.pool is excessively large: 160 classes and 34,265 LOC. It contains multiple very large classes concentrated in the same component (examples: TypePool ~7,626 LOC; TypePool.Default ~6,861 LOC; TypePool.LazyTypeDescription ~4,392 LOC; TypePool.GenericTypeToken ~1,711 LOC; TypePool.TypeExtractor ~712 LOC). Many nested/inner types are defined within a single source (TypePool.java) and the package aggregates substantial functionality and code volume, indicating an overlarge (God) component."
+    },
+    {
+        "package": "net.bytebuddy.asm",
+        "detection": true,
+        "justification": "The package is excessively large: 411 classes and 81,157 LOC in a single package. Multiple individual classes/nested types contain extremely large bodies (example metrics): Advice (~11,101 LOC), MemberSubstitution (~6,597 LOC), MemberSubstitution.Substitution (~4,607 LOC), MemberSubstitution.Chain (~4,143 LOC), MemberSubstitution.Step (~4,013 LOC), Advice.Dispatcher (~2,415 LOC), Advice.OffsetMapping (~3,434 LOC), MemberSubstitution.OffsetMapping (~2,356 LOC), ClassVisitorFactory (~971 LOC), Advice.StackMapFrameHandler (~941 LOC). The size is concentrated in many very large classes/nested types rather than being evenly distributed, indicating a single component that owns a disproportionate amount of code and responsibility. These facts support detection of the God Component smell for net.bytebuddy.asm."
+    },
+    {
+        "package": "net.bytebuddy.description.method",
+        "detection": true,
+        "justification": "The package contains 53 classes and 7,252 LOC, indicating a very large component. Several individual classes are extremely large and feature-rich (e.g. MethodDescription ~1,695 LOC, 29 methods, WMC 29; ParameterDescription ~899 LOC; ParameterList ~505 LOC; plus multiple large inner/auxiliary types), and many responsibilities are co-located in the same package/file (multiple nested types within MethodDescription/ParameterDescription). Coupled with significant incoming/outgoing coupling (Ca=26, Ce=11) making it central to other code, the package exhibits excessive size and concentrated responsibility consistent with a God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.assign.reference",
+        "detection": true,
+        "justification": "The package holds 9 classes with a total of 976 LOC, indicating substantial size for a single component. Two classes within it are very large: GenericTypeAwareAssigner (loc 360) and GenericTypeAwareAssigner.IsAssignableToVisitor (loc 336), which together account for ~700 LOC — a strong concentration of implementation in a few artifacts. Several other nested/inner variants are present in the same compilation unit, suggesting that multiple responsibilities are collocated. Although the package's class count (9) is moderate, the high LOC concentrated in a small number of classes and nested types supports identifying this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.benchmark.specimen",
+        "detection": false,
+        "justification": "The package contains only 2 classes and 298 LOC, with code distributed across ExampleClass (167 LOC, 18 methods, WMC 18) and ExampleInterface (131 LOC, 18 methods, WMC 18). There is no evidence of excessive class count or a single overwhelmingly large class — sizes are moderate and balanced. Coupling is very low (package Ce=0, Ca=1, class fanin/fanout=0), and there are no dependencies indicating a central, highly connected component. Given this context, the data do not support labeling this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.benchmark.jmh_generated",
+        "detection": true,
+        "justification": "The package contains 59 classes and 11,019 LOC, which indicates substantial size for a single component. Many classes are relatively large and complex (numerous jmhTest classes with ~275 LOC and WMC=42 repeated across the package), giving an average of ~186 LOC per class and a concentration of complexity in multiple files. Additionally, the package has no external afferent/emanent couplings (Ca=0, Ce=0), suggesting the functionality is self-contained rather than split across modules. These elements (high total LOC, large number of classes, multiple high-complexity/large classes) support detecting a God Component smell for this package."
+    },
+    {
+        "package": "net.bytebuddy.dynamic",
+        "detection": true,
+        "justification": "The package net.bytebuddy.dynamic is excessively large: 143 classes and 26,076 LOC at package level. It contains multiple very large types concentrating functionality (examples: DynamicType ~4,937 LOC, DynamicType.Builder ~4,407 LOC, DynamicType.AbstractBase variants totaling ~1,970 LOC, ClassFileLocator ~1,670 LOC, DynamicType.Adapter ~1,214 LOC) plus many additional inner/adaptor classes. The size is concentrated in a few huge classes and many nested/related classes, indicating a single component responsible for many concerns (type building, class-file location, loading/injection, scaffolding and many adapters). These elements together justify detecting a God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.assign",
+        "detection": false,
+        "justification": "The package contains 6 classes and 238 LOC total (average ~40 LOC/class), with the largest class (Assigner) at 95 LOC. Class-level metrics (low WMCs, small LOCs, low method counts) do not indicate an excessively large or complex component. Coupling (Ce=5, Ca=12) is moderate but does not by itself imply a God Component. Based on the provided size and complexity data, this package is not excessively large and therefore not a God Component."
+    },
+    {
+        "package": "net.bytebuddy.description.enumeration",
+        "detection": false,
+        "justification": "The package contains 4 classes and 254 LOC, which is moderate. The largest class, EnumerationDescription, is 138 LOC but has low complexity (wmc=3, nc=1) and the remaining classes are small (27, 46, 43 LOC). Coupled metrics are low (Ce=3, Ca=7) and there is no evidence of an excessively large number of classes or extreme LOC concentration that would indicate a God Component. Overall size and complexity are not excessive in context."
+    },
+    {
+        "package": "net.bytebuddy.description.module",
+        "detection": true,
+        "justification": "The package contains 23 classes and 2,300 LOC, indicating a large component. Several classes are very large and concentrated in the same package/file: ModuleDescription is 931 LOC, ForLoadedModule is 421 LOC, ModuleDescriptor is 157 LOC and Latent is 142 LOC. The LOC-to-class ratio and the presence of a single class approaching 1,000 LOC (plus multiple substantial inner/related classes in the same compilation unit) suggest that responsibilities are concentrated and the component is excessively large, consistent with the God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.assign.primitive",
+        "detection": true,
+        "justification": "The package contains 12 classes totaling 959 LOC, with a clear concentration of size and complexity in a few large classes: PrimitiveUnboxingDelegate (235 LOC, WMC 23), PrimitiveNarrowingDelegate (180 LOC, WMC 19), PrimitiveWideningDelegate (178 LOC, WMC 19) and PrimitiveBoxingDelegate (130 LOC, WMC 11). Several inner classes further increase the class count and responsibilities. The package centralizes many related but distinct responsibilities (boxing, unboxing, widening, narrowing) into large, complex classes and nested types, while having no afferent coupling (Ca = 0) and moderate efferent coupling (Ce = 6), indicating concentrated implementation rather than widely reused, modular components. These facts support that the package is excessively large and acts as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.build.maven",
+        "detection": true,
+        "justification": "The package contains 29 classes and 2,303 LOC, with a pronounced concentration in a single class file: ByteBuddyMojo (971 LOC, WMC 38, 37 fields). ByteBuddyMojo alone accounts for ~42% of the package LOC and declares numerous inner types (e.g. Transformer, ForLifecycleTypes, ForProductionTypes, ForConfiguredPlugin, ForDiscoveredPlugin, StalenessFilter, TransformationLogger, MavenBuildLogger, Coordinate, FilePrefixMatcher, etc.), indicating many responsibilities bundled into one component. ByteBuddyMojo also has many external dependencies listed, increasing its coupling and responsibility scope. This imbalance (one very large, complex class dominating the package) supports detection of a God Component."
+    },
+    {
+        "package": "(default package)",
+        "detection": false,
+        "justification": "The package contains only 2 classes and a total of 186 LOC (each class ~93 LOC). Neither the number of classes nor the total LOC indicate an excessively large component. Class complexity (WMC=12) is moderate and coupling is low (fanin/fanout=0). Based on these elements, the package does not meet the contextual criteria for a God Component."
+    },
+    {
+        "package": "net.bytebuddy.benchmark",
+        "detection": true,
+        "justification": "The package contains 8 classes with a total of 1,284 LOC, but complexity and responsibilities are heavily concentrated in a few very large classes: ClassByImplementation (370 LOC, 32 methods, 29 public methods, WMC=66), ClassByExtension (309 LOC, 23 methods, WMC=25) and SuperClassInvocationBenchmark (265 LOC). Several classes have large method counts and high complexity, indicating concentrated responsibilities rather than being evenly distributed. The package also has Ce=7 (it depends on many external packages) and Ca=0 (no incoming dependencies), suggesting the package is relatively self-contained yet large. Taken together—multiple classes with high LOC, high nominal method counts and high WMC—this supports that the package is excessively large and behaves like a God Component."
+    },
+    {
+        "package": "net.bytebuddy.description",
+        "detection": false,
+        "justification": "The package contains 28 classes and 1,656 LOC, an average of ~59 LOC per class; while a few classes/files are relatively large (ModifierReviewable entries sum to ~825 LOC across nested types, TypeVariableSource ~118 LOC, ByteCodeElement ~103 LOC), the overall package size is moderate and the classes are thematically cohesive (named/bytecode/modifier description abstractions). Coupling metrics are also moderate (Ce=4, Ca=12), suggesting the package is not an overwhelmingly large, monolithic component dominating the system. Therefore, based on the provided data and contextual judgement, this package does not qualify as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.implementation.auxiliary",
+        "detection": true,
+        "justification": "The package contains 26 classes and 1,979 LOC, with a clear concentration of size and responsibility in a few large classes: TypeProxy (450 LOC, 38 members) and MethodCallProxy (279 LOC, 12 members). Several files define multiple nested/inner types (e.g., AuxiliaryType and TypeProxy), increasing single-component complexity. The LOC distribution is skewed (average ~76 LOC/class) but concentrated in these large classes and many small helpers, indicating concatenated responsibilities. Coupling is non-trivial (Ce=18, Ca=9), showing the component depends on and is depended on by many other modules. Together these elements (high total LOC, many classes with heavy internal concentration and nested types, and notable coupling) support classifying this package as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.description.annotation",
+        "detection": true,
+        "justification": "The package net.bytebuddy.description.annotation is excessively large in context: it contains 49 classes and 9,225 lines of code, concentrated in a few very large classes/files. Notable examples include AnnotationValue (~2,457 LOC) with many inner types, AnnotationDescription (~1,151 LOC), AnnotationValue.ForConstant (~730 LOC), AnnotationValue.PropertyDelegate (~392 LOC), AnnotationDescription.Builder (~390 LOC) and AnnotationList (~307 LOC). Multiple large inner classes are defined in the same files, suggesting high functional concentration. Given the large aggregate LOC, high class count and several individual classes/files that are very large, this package exhibits the God Component smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bind.annotation",
+        "detection": true,
+        "justification": "The package contains 97 classes and 7,068 LOC, which is large for a single component and indicates concentration of functionality. Several individual classes are very large and/or complex (examples: Binder.FieldProxy — 683 LOC, wmc 27; TargetMethodAnnotationDrivenBinder — 442 LOC; Binder.Morph — 358 LOC, wmc 14; Binder.Pipe — 291 LOC, wmc 14; DefaultMethod — 154 LOC). Many nested/related binder classes are housed in the same package (numerous Binder.* types and TargetMethodAnnotationDrivenBinder inner types), concentrating responsibilities. The combination of high total LOC, high class count and multiple large, complex classes suggests the package is taking excessive responsibility and qualifies as a God Component."
+    },
+    {
+        "package": "net.bytebuddy.utility.privilege",
+        "detection": false,
+        "justification": "The package contains only 3 classes and 85 LOC in total, which is small for a component-level God Component. Individual classes have low LOC (22, 39, 24), low complexity (WMC = 2 for each), minimal method counts, and no significant coupling (fan-in/fan-out = 0, Ca = 1, Ce = 1). These metrics indicate the component is modest in size and responsibility, so it does not exhibit the excessive size characteristic of a God Component."
+    }
+]

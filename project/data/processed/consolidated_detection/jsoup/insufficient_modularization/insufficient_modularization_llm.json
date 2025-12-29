@@ -1,0 +1,342 @@
+[
+    {
+        "identifier": "org.jsoup.nodes.Element",
+        "detection": true,
+        "justification": "Very large size and surface: 1571 LOC, 157 methods and high complexity (WMC 241). Numerous dependencies and inner types (NodeList, TextAccumulator) indicate it mixes many responsibilities (DOM manipulation, parsing/formatting helpers, selection/traversal, cleaning/safety hooks). LCOM (~0.34) shows only moderate cohesion for the large API, suggesting the abstraction could be decomposed into focused components (e.g., mutation/DOM ops, parsing/tree-building, rendering/printing, selector utilities)."
+    },
+    {
+        "identifier": "org.jsoup.nodes.Node",
+        "detection": true,
+        "justification": "Substantial implementation: 766 LOC, 79 methods and high complexity (WMC 139). Serves as a common ancestor but embeds many behaviors (traversal, printing, selection support, attribute handling references) and depends on many subsystems. As a base abstraction, it appears to aggregate diverse concerns that could be split into smaller collaborating abstractions (core node model vs traversal/printing/selectors)."
+    },
+    {
+        "identifier": "org.jsoup.nodes.Attributes",
+        "detection": true,
+        "justification": "Large and complex collection class: 522 LOC, 48 methods, WMC 99, with several nested helpers (Dataset, DatasetIterator, EntrySet) and numerous responsibilities (attribute storage, normalization, parsing/iteration, interaction with parser/cleaner). The class surface and mixed concerns (data storage vs parsing/normalization vs dataset API) indicate opportunities to separate storage, normalization, and dataset view logic."
+    },
+    {
+        "identifier": "org.jsoup.nodes.Document",
+        "detection": false,
+        "justification": "Moderate size and focused role: 447 LOC, 31 methods, WMC 51. It models the document and contains related settings (OutputSettings nested), with cohesion around document-level concerns (tree root, parsing entry points, output). While non-trivial, its responsibilities are cohesive for a Document abstraction and some decomposition (e.g., OutputSettings already separated) is present."
+    },
+    {
+        "identifier": "org.jsoup.nodes.Attribute",
+        "detection": false,
+        "justification": "Relatively compact element representation: 272 LOC, 30 methods, WMC 53. Its role is a single attribute abstraction (name/value, normalization) and metrics and dependencies suggest focused responsibility rather than a bloated interface, so insufficient modularization is not evident."
+    },
+    {
+        "identifier": "org.jsoup.nodes.Entities",
+        "detection": false,
+        "justification": "Contains significant logic (299 LOC, 21 methods, WMC 59) for entity encoding/decoding and ties to Parser/OutputSettings, but this is a cohesive, domain-specific concern (entity handling). The class groups related functionality (including nested types for modes/data) rather than mixing unrelated responsibilities, so it does not strongly exhibit insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.internal.SimpleStreamReader",
+        "detection": false,
+        "justification": "Moderate size (loc 62) with small number of methods (nom 4) and moderate complexity (wmc 16). Cohesion (lcom 0.0) and lack of many dependencies indicate focused responsibility; does not appear to concentrate excessive, separable responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.internal.SoftPool",
+        "detection": false,
+        "justification": "Small utility-like class (loc 50, nom 4, wmc 7) with limited responsibilities. Metrics do not indicate a bloated interface or mixed concerns."
+    },
+    {
+        "identifier": "org.jsoup.internal.Functions",
+        "detection": false,
+        "justification": "Very small (loc 24, nom 5, wmc 5). Low complexity and size suggest it is appropriately modular."
+    },
+    {
+        "identifier": "org.jsoup.internal.SharedConstants",
+        "detection": false,
+        "justification": "Very small (loc 17) acting as a constants holder (many fields, nom 1, nopf 10). Purpose is narrow and cohesive, not an indicator of insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.internal.ControllableInputStream",
+        "detection": true,
+        "justification": "Large and complex (loc 169, nom 17, wmc 34) with many public/protected members (nopm 14) and multiple external dependencies (Validate, HttpConnection, Progress, DataUtil, SimpleBufferedInput). Metrics and dependency mix indicate multiple responsibilities (stream control, HTTP/connection concerns, progress) that could be separated for better modularization."
+    },
+    {
+        "identifier": "org.jsoup.internal.SimpleBufferedInput",
+        "detection": true,
+        "justification": "Significant size and complexity (loc 120, nom 11, wmc 34) and dependencies on pooling and controllable streams. High complexity combined with responsibilities around buffering, pooling and stream interaction suggests it aggregates concerns that could be decomposed."
+    },
+    {
+        "identifier": "org.jsoup.internal.StringUtil",
+        "detection": true,
+        "justification": "Very large utility class (loc 322, nom 26, wmc 50) with broad usage (many dependencies across parser, nodes, helpers) and numerous public methods (nopm 25). The volume and diversity of functionality indicate a bloated abstraction that likely mixes multiple string-related responsibilities and helpers that could be split into focused modules."
+    },
+    {
+        "identifier": "org.jsoup.internal.StringUtil.StringJoiner",
+        "detection": false,
+        "justification": "Small inner helper (loc 42, nom 0) closely tied to StringUtil; its narrow purpose as a joiner does not on its own indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.internal.QuietAppendable",
+        "detection": false,
+        "justification": "Moderate size (loc 63, nom 4, wmc 5) and focused on appendable behaviour for node types. Nested classes implement variants; overall responsibilities appear cohesive and appropriately modularized."
+    },
+    {
+        "identifier": "org.jsoup.internal.QuietAppendable.BaseAppendable",
+        "detection": false,
+        "justification": "Very small (loc 27) subclass with a focused role; does not indicate insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.internal.QuietAppendable.Action",
+        "detection": false,
+        "justification": "Trivial/marker-like inner element (loc 3); no evidence of bloated responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.internal.QuietAppendable.StringBuilderAppendable",
+        "detection": false,
+        "justification": "Small implementation detail (loc 24) with focused responsibility; not a modularization problem."
+    },
+    {
+        "identifier": "org.jsoup.internal.Normalizer",
+        "detection": false,
+        "justification": "Small (loc 30, nom 4, wmc 4) with focused responsibilities around normalization and limited dependencies; metrics indicate acceptable modularization."
+    },
+    {
+        "identifier": "org.jsoup.Jsoup",
+        "detection": true,
+        "justification": "Large class-level size and complexity (loc 269, nom 24, wmc 25) with many unrelated dependencies (parser, cleaner, Connection, examples). That concentration of responsibilities (parsing, connecting, cleaning, example utilities) indicates inadequate decomposition."
+    },
+    {
+        "identifier": "org.jsoup.UnsupportedMimeTypeException",
+        "detection": false,
+        "justification": "Small, focused exception class (loc 21, nom 4) with no dependencies; represents a single responsibility and is appropriately modular."
+    },
+    {
+        "identifier": "org.jsoup.SerializationException",
+        "detection": false,
+        "justification": "Small, focused exception class (loc 33, nom 4) with minimal complexity; does not show signs of bloated responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.HttpStatusException",
+        "detection": false,
+        "justification": "Compact exception class (loc 18, nom 3) with low complexity and a single concern; not suffering from insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.Connection",
+        "detection": true,
+        "justification": "Very large and complex (loc 772, nom 43, wmc 43) and centralizes many roles and dependencies (executors, parsers, helpers, nested types). Its size and breadth of responsibilities indicate a bloated abstraction that should be decomposed."
+    },
+    {
+        "identifier": "org.jsoup.Connection.Method",
+        "detection": false,
+        "justification": "Small enum-like inner type (loc 18) with a narrow role tied to Connection; its focused purpose does not indicate poor modularization."
+    },
+    {
+        "identifier": "org.jsoup.Connection.Base",
+        "detection": true,
+        "justification": "Substantial inner class (loc 119) defined inside the large Connection file; its non-trivial size suggests it encapsulates multiple behaviors that could be separated into clearer, smaller abstractions."
+    },
+    {
+        "identifier": "org.jsoup.Connection.Request",
+        "detection": true,
+        "justification": "Significant size for an inner class (loc 179) likely handling many request-related concerns; colocating this large component inside Connection contributes to a monolithic file and indicates insufficient decomposition."
+    },
+    {
+        "identifier": "org.jsoup.Connection.Response",
+        "detection": false,
+        "justification": "Moderate size (loc 91) and likely focused on representing response data; its scope appears cohesive and does not clearly indicate a need for further decomposition."
+    },
+    {
+        "identifier": "org.jsoup.Connection.KeyVal",
+        "detection": false,
+        "justification": "Relatively small helper type (loc 54) that represents a simple key-value concept; focused responsibility and limited complexity."
+    },
+    {
+        "identifier": "org.jsoup.Progress",
+        "detection": false,
+        "justification": "Very small utility type (loc 11, nom 1) with a narrowly defined role; does not exhibit signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.helper.HttpConnection",
+        "detection": true,
+        "justification": "Very large class (loc 1021) with many methods (nom 48) and high complexity (wmc 58). Contains or coordinates multiple nested concerns (Request, Response, KeyVal, Base) and depends on many different subsystems (parsing, cookie handling, executors, authentication). The size, breadth of dependencies and responsibilities indicates a concentrated, bloated abstraction that would benefit from further decomposition."
+    },
+    {
+        "identifier": "org.jsoup.helper.HttpConnection.Response",
+        "detection": true,
+        "justification": "Substantial size (loc 388) and complexity embedded in the same module as HttpConnection. Its large body and ties to request/stream handling and authentication suggest it encapsulates multiple responsibilities (response parsing, stream management, auth interaction) that could be separated for clearer modularity."
+    },
+    {
+        "identifier": "org.jsoup.helper.DataUtil",
+        "detection": true,
+        "justification": "Large utility class (loc 316) with many methods (nom 19) and high complexity (wmc 49). It interacts with parsing, streams, normalisation, document charset detection and many node/document concerns, indicating a mix of IO, parsing and normalization responsibilities that make it a candidate for splitting into more focused modules."
+    },
+    {
+        "identifier": "org.jsoup.helper.W3CDom",
+        "detection": true,
+        "justification": "Relatively large (loc 343) with many methods (nom 18) and elevated complexity (wmc 28). It includes an internal W3CBuilder and deals with converting between different DOM models; the combination of conversion logic and builder internals suggests multiple roles that could be separated to reduce class size and clarify responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.helper.Validate",
+        "detection": true,
+        "justification": "Substantial size (loc 191) with many methods (nom 21) and high complexity (wmc 37). The recorded wide range of dependencies (parsers, selectors, node types, helpers) implies it aggregates many validation routines across unrelated concerns, indicating insufficient decomposition of validation responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.helper.CookieUtil",
+        "detection": false,
+        "justification": "Moderate size (loc 78) with a limited set of methods (nom 5). Although its complexity (wmc 17) is non-trivial, its purpose appears focused (cookie parsing/handling) and it has a constrained set of dependencies, suggesting cohesion and appropriate modularization for its responsibility."
+    },
+    {
+        "identifier": "org.jsoup.helper.RequestAuthenticator",
+        "detection": false,
+        "justification": "Small class (loc 68) with low complexity (wmc 1) and few methods; its responsibilities are narrowly scoped around authentication handling. Metrics and dependencies indicate it is focused rather than a bloated abstraction, so it does not show signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.helper.Regex",
+        "detection": false,
+        "justification": "Moderate size (loc 87) with a focused role (regex matching for selectors) and a reasonable method count (nom 9, wmc 11). Its dependencies are related to evaluation and matching concerns, indicating cohesion rather than an overly broad responsibility."
+    },
+    {
+        "identifier": "org.jsoup.examples.ListLinks",
+        "detection": false,
+        "justification": "Small, focused example: 34 LOC, 3 methods (nom=3), no fields, moderate complexity (wmc=8). Limited dependencies and a single responsibility (listing links), so it does not exhibit signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.examples.HtmlToPlainText",
+        "detection": true,
+        "justification": "Relatively large and mixed responsibility: 96 LOC with 5 fields (nof=5) and 3 methods, moderate cyclomatic complexity (wmc=8), and LCOM=0.0 suggesting cohesion concerns. It contains parsing/formatting logic and an inner FormattingVisitor class (coupled implementation), indicating the class aggregates multiple responsibilities that could be decomposed (e.g., separate formatter/visitor)."
+    },
+    {
+        "identifier": "org.jsoup.examples.HtmlToPlainText.FormattingVisitor",
+        "detection": true,
+        "justification": "Sizable nested element: 44 LOC and its own implementation (dit=1) within the HtmlToPlainText class. As a non-trivial inner class handling formatting/visiting, it represents a distinct responsibility that would be a candidate to extract to a dedicated class to improve modularization."
+    },
+    {
+        "identifier": "org.jsoup.examples.Wikipedia",
+        "detection": false,
+        "justification": "Very small and focused example: 16 LOC, 2 methods (nom=2), low complexity (wmc=3). It serves a narrow purpose and does not show evidence of excessive size, complexity, or a bloated interface."
+    },
+    {
+        "identifier": "org.jsoup.select.Elements",
+        "detection": true,
+        "justification": "Very large class and API surface (loc=557, nom=60, nopm=58) with high complexity (wmc=98). Concentrates many methods and responsibilities related to element collection/manipulation, suggesting it could be decomposed into smaller, cohesive abstractions (e.g., query/transform/util operations separated)."
+    },
+    {
+        "identifier": "org.jsoup.select.Evaluator",
+        "detection": true,
+        "justification": "Extremely large file (loc=773) that contains many nested evaluator implementations (nc=33, nof=24) and diverse responsibilities for selecting/matching elements. The size and the number of distinct evaluator types indicate multiple concerns bundled together rather than modular evaluator components."
+    },
+    {
+        "identifier": "org.jsoup.select.QueryParser",
+        "detection": true,
+        "justification": "High complexity and many methods (loc=341, nom=31, wmc=111). Implements parsing and interpretation logic that appears large and complex enough to warrant splitting into smaller parser/processor units (tokenization, AST building, validation, specific selector handling)."
+    },
+    {
+        "identifier": "org.jsoup.select.Nodes",
+        "detection": true,
+        "justification": "Relatively large with many methods (loc=247, nom=26, wmc=38). Acts as a collection/utility holder for node operations, suggesting multiple responsibilities that could be separated (collection manipulation vs. traversal vs. utility functions)."
+    },
+    {
+        "identifier": "org.jsoup.select.NodeTraversor",
+        "detection": false,
+        "justification": "Moderate size and focused responsibility (loc=124, nom=4, wmc=32). Metrics indicate a traversal-specific utility with limited public surface, consistent with a single, cohesive concern."
+    },
+    {
+        "identifier": "org.jsoup.select.NodeVisitor",
+        "detection": false,
+        "justification": "Small and focused interface-like class (loc=26, nom=3, wmc=3). Low complexity and small API surface imply good modularization for its visitor role."
+    },
+    {
+        "identifier": "org.jsoup.select.NodeFilter",
+        "detection": false,
+        "justification": "Small, narrowly scoped (loc=48, nom=3, wmc=3) and appears to encapsulate a single filtering concern, so it does not exhibit insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.select.Collector",
+        "detection": false,
+        "justification": "Relatively compact (loc=79, nom=7, wmc=7) and appears focused on collecting/selecting nodes; metrics suggest a cohesive utility rather than a bloated, multi-responsibility class."
+    },
+    {
+        "identifier": "org.jsoup.safety.Safelist",
+        "detection": true,
+        "justification": "Very large class (LOC 399) with many methods (nom 22) and high complexity (WMC 54). It contains multiple nested types (TagName, AttributeKey, AttributeValue, Protocol, TypedValue) and handles multiple concerns (tags, attributes, protocols, attribute values), indicating a concentrated, bloated abstraction that could be decomposed."
+    },
+    {
+        "identifier": "org.jsoup.safety.Safelist.TagName",
+        "detection": false,
+        "justification": "Very small (LOC 8), no methods, implemented as a nested type to represent a focused concept; serves as a compact helper rather than a sign of inadequate modularization."
+    },
+    {
+        "identifier": "org.jsoup.safety.Safelist.AttributeKey",
+        "detection": false,
+        "justification": "Very small (LOC 8) and appears as a focused nested helper for Safelist; limited scope and responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.safety.Safelist.AttributeValue",
+        "detection": false,
+        "justification": "Very small (LOC 8) and used as a supporting nested type; single, narrow responsibility."
+    },
+    {
+        "identifier": "org.jsoup.safety.Safelist.Protocol",
+        "detection": false,
+        "justification": "Very small (LOC 8) and scoped as a nested type for protocol representation; limited, cohesive role."
+    },
+    {
+        "identifier": "org.jsoup.safety.Safelist.TypedValue",
+        "detection": false,
+        "justification": "Small (LOC 19) and appears to be a focused helper/value type with narrow responsibility; does not indicate poor modularization on its own."
+    },
+    {
+        "identifier": "org.jsoup.safety.Cleaner",
+        "detection": false,
+        "justification": "Moderate size (LOC 133) with a modest number of methods (nom 6) and moderate complexity (WMC 10). Responsibilities align with a single concern (cleaning) and it uses small nested helpers, suggesting reasonable modularization."
+    },
+    {
+        "identifier": "org.jsoup.safety.Cleaner.CleaningVisitor",
+        "detection": false,
+        "justification": "Relatively small (LOC 45), nested inside Cleaner to encapsulate traversal behavior; focused single responsibility as a visitor."
+    },
+    {
+        "identifier": "org.jsoup.safety.Cleaner.ElementMeta",
+        "detection": false,
+        "justification": "Tiny helper type (LOC 8) used by Cleaner to hold element metadata; narrow, cohesive role."
+    },
+    {
+        "identifier": "org.jsoup.parser.HtmlTreeBuilderState",
+        "detection": true,
+        "justification": "Extremely large implementation within the package (loc 1735) with very high complexity (wmc 473) and many methods (nom 45). The class contains numerous responsibilities reflected by many dependencies and constants, indicating a concentration of parsing state logic that could be decomposed into smaller state/strategy units. Its size and complexity relative to other classes suggest poor decomposition and a bloated abstraction."
+    },
+    {
+        "identifier": "org.jsoup.parser.TokeniserState",
+        "detection": true,
+        "justification": "Very large state logic (loc 1386) with very high complexity (wmc 409) and many methods (nom 75). The class appears to centralize many tokenization behaviors and state transitions, implying multiple responsibilities that should be modularized into smaller, cohesive components."
+    },
+    {
+        "identifier": "org.jsoup.parser.HtmlTreeBuilder",
+        "detection": true,
+        "justification": "Large class (loc 765) with high complexity (wmc 227) and many methods (nom 95). It mixes parsing, tree construction, and node manipulation concerns, has numerous dependencies, and a substantial public footprint (nopf/nopm present). These characteristics indicate an abstraction that has not been adequately decomposed."
+    },
+    {
+        "identifier": "org.jsoup.parser.CharacterReader",
+        "detection": true,
+        "justification": "Substantially large (loc 533) and complex (wmc 130) with many methods (nom 57). It combines input handling, predicate logic and pooling behavior; the breadth of responsibilities and relatively low cohesion hint that functionality could be split (e.g., buffering, predicates, pooling) for clearer modularization."
+    },
+    {
+        "identifier": "org.jsoup.parser.Parser",
+        "detection": true,
+        "justification": "Moderately large (loc 298) with many methods (nom 30) and a very high number of publicly visible methods (nopm 29), indicating a wide, possibly bloated interface. The Parser coordinates many subsystems (tokeniser, tree builder, settings), concentrating orchestration logic that could be separated to reduce the class' surface and responsibilities."
+    },
+    {
+        "identifier": "org.jsoup.parser.TokenQueue",
+        "detection": true,
+        "justification": "Relatively large (loc 396) with significant complexity (wmc 86) and many methods (nom 34). It handles token management and parsing helpers along with selector/query concerns (dependencies to Selector/QueryParser), suggesting mixed responsibilities that would benefit from splitting into focused components."
+    },
+    {
+        "identifier": "org.jsoup.parser.ParseSettings",
+        "detection": false,
+        "justification": "Small and focused (loc 70, nom 8) with low complexity (wmc 11) and a compact interface. Metrics and dependencies indicate a narrowly scoped role (settings/normalization), so it does not exhibit signs of insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.parser.ParseError",
+        "detection": false,
+        "justification": "Small (loc 52), few methods (nom 8) and low complexity (wmc 8). Its responsibilities (representing parse errors) are narrow and cohesive, so it does not appear to suffer from insufficient modularization."
+    },
+    {
+        "identifier": "org.jsoup.parser.StreamParser.ElementIterator",
+        "detection": false,
+        "justification": "Very small nested iterator class (loc 66, very low wmc/nom) with a single focused purpose. Its size and single responsibility indicate appropriate modularization."
+    }
+]

@@ -1,0 +1,232 @@
+[
+    {
+        "package": "com.google.zxing.oned.rss",
+        "detection": false,
+        "justification": "The package contains 6 classes and 609 LOC, which is moderate in scale and not clearly 'excessively' large as a component. Although one class (RSS14Reader) is relatively large (362 LOC, WMC 73) and concentrates complexity, the rest of the package is small (e.g., AbstractRSSReader 104 LOC, RSSUtils 64 LOC, others << 100 LOC). Coupled instability/afferent-efferent coupling (Ca=4, Ce=4) is modest. Overall, the package size and class count do not justify labeling the entire package a God Component; the problem appears localized to a single large class rather than the component as a whole."
+    },
+    {
+        "package": "com.google.zxing.oned.rss.expanded.decoders",
+        "detection": true,
+        "justification": "The package has 21 classes and 1,080 LOC with size and complexity concentrated in a few classes: GeneralAppIdDecoder is 350 LOC (≈32% of package LOC) with very high complexity (WMC=102) and 18 methods, and FieldParser is 244 LOC (≈23% of package LOC, WMC=18). Together those two classes account for ~55% of the package LOC, indicating centralized responsibilities. The remainder of the package contains many small classes, suggesting poor decomposition. Package-level coupling is low (Ca=3, Ce=3), meaning the functionality is largely self-contained rather than distributed, which reinforces that this component is carrying excessive size and responsibility and therefore behaves like a God Component."
+    },
+    {
+        "package": "com.google.zxing.pdf417.decoder",
+        "detection": true,
+        "justification": "The package contains 11 classes but a total of 1,750 LOC with a strong concentration of size and complexity in a few classes: DecodedBitStreamParser (479 LOC, WMC 115), PDF417ScanningDecoder (455 LOC, WMC 108), DetectionResult (238 LOC, WMC 61) and DetectionResultRowIndicatorColumn (190 LOC, WMC 45). These four classes alone account for the majority of the package LOC and exhibit very high cyclomatic complexity (WMC) and many methods (e.g. PDF417ScanningDecoder nom=25, DecodedBitStreamParser nof=30), indicating large, complex responsibilities concentrated in a few components. This concentration of code and complexity within the package fits the contextual definition of a God Component (excessively large component in LOC and class-level complexity), so the smell is detected."
+    },
+    {
+        "package": "com.google.zxing.client.android",
+        "detection": true,
+        "justification": "The package is substantially large and central: 33 classes and 2,328 LOC. Several very large/high-complexity classes concentrate responsibilities in the package (notably CaptureActivity: 529 LOC, 29 methods, WMC 112; Intents: 193 LOC; DecodeHintManager: 162 LOC, WMC 32; HttpHelper: 161 LOC, WMC 27; LocaleManager: 134 LOC; ViewfinderView: 121 LOC, WMC 15). The package also depends on many subsystems (camera, history, share, encode, result.supplement, clipboard) indicating multiple responsibilities. These factors (high total LOC, many classes and multiple very large/complex classes plus wide dependency footprint) support the detection of a God Component."
+    },
+    {
+        "package": "com.google.zxing.maxicode.decoder",
+        "detection": false,
+        "justification": "The package contains only 3 classes and 228 LOC overall, which is not excessively large for a focused decoder package. Although DecodedBitStreamParser is the largest class (137 LOC, WMC 33, 10 methods) and could be considered relatively complex, the other classes are small (Decoder: 62 LOC, WMC 12; BitMatrixParser: 29 LOC, WMC 5). Afferent/efferent coupling is low (Ca=4, Ce=4) and responsibilities appear cohesive (all classes relate to MaxiCode decoding). Taken together, the size and class count do not indicate a package-level God Component despite one moderately large class."
+    },
+    {
+        "package": "com.google.zxing.common.reedsolomon",
+        "detection": true,
+        "justification": "The package totals 530 LOC across 5 classes, but the implementation and complexity are heavily concentrated in a few large, complex classes: GenericGFPoly (220 LOC, WMC 49), ReedSolomonDecoder (137 LOC, WMC 25), and GenericGF (118 LOC, WMC 20). A small number of classes hold most of the code and complexity, indicating centralized responsibilities. Additionally the package shows significant external coupling (Ce=8, Ca=8) and multiple cross-package dependencies, suggesting it is a central, tightly coupled component. These elements together support detecting a God Component (excessive size/complexity concentrated in this component)."
+    },
+    {
+        "package": "com.google.zxing.oned.rss.expanded",
+        "detection": true,
+        "justification": "The package's LOC is 726 but one class, RSSExpandedReader, contains 607 LOC (~83.6% of the package) and very high complexity (WMC=123) and many methods (nom=21), while the remaining three classes are small (36, 45, 38 LOC). This concentration of size and complexity in a single class indicates the component is excessively large and likely embodies a God Component."
+    },
+    {
+        "package": "com.google.zxing.pdf417",
+        "detection": false,
+        "justification": "The package contains only 4 classes and 353 LOC in total (class LOCs: 54, 73, 106, 120). No single class overwhelmingly dominates the package size — the largest class is 120 LOC — and the class count is small. While some classes have moderate complexity (WMC up to 22), the package is not excessively large in terms of lines of code or number of classes, so it does not meet the contextual criteria for a God Component."
+    },
+    {
+        "package": "com.google.zxing.web.generator.client",
+        "detection": true,
+        "justification": "The package contains 16 classes with a total of 1,224 LOC and several classes concentrating a large portion of that size and complexity. Notably CalendarEventGenerator (235 LOC, WMC 41, 21 methods) and ContactInfoGenerator (221 LOC, WMC 46, 20 methods) together account for a large share of package LOC; Generator (194 LOC, WMC 18, 14 methods) and WifiGenerator (121 LOC, WMC 28) are also substantial. Multiple classes show high method counts and cyclomatic complexity, indicating concentrated responsibilities rather than evenly distributed functionality. These facts (total LOC, multiple very large/complex classes, many methods in a few classes) support detection of a God Component in this package."
+    },
+    {
+        "package": "com.google.zxing.client.result",
+        "detection": true,
+        "justification": "The package contains 37 classes and 2,296 LOC, indicating substantial size and responsibility concentration. Several classes inside the package are individually large and complex (examples: VCardResultParser — loc 284, wmc 61; ResultParser — loc 184, wmc 43, nc 17; CalendarParsedResult — loc 173, wmc 28; VINResultParser — loc 153, wmc 54; AddressBookParsedResult — loc 137, wmc 22; ExpandedProductParsedResult — loc 113, wmc 20). The presence of many parser/result classes bundled in a single package handling diverse result types suggests the package aggregates multiple responsibilities rather than being focused/cohesive. These factors together (high overall LOC, high per-class LOC and complexity across many classes, and numerous distinct responsibilities) support detecting this package as a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.wifi",
+        "detection": true,
+        "justification": "The package contains only 2 classes and 237 LOC, but one class (WifiConfigManager) accounts for 224 LOC (~94% of the package), with 14 methods and a high WMC of 47. This single class disproportionately dominates the package in size and complexity, matching the God Component smell (excessively large component)."
+    },
+    {
+        "package": "com.google.zxing.web",
+        "detection": true,
+        "justification": "The package contains 15 classes and 864 LOC with a clear concentration of size and complexity in a few classes: DecodeServlet (loc 349, wmc 41, nom 8) accounts for ~40% of the package LOC, ChartServlet (loc 115, wmc 15) and DoSTracker (loc 85) add further large, distinct responsibilities. Several smaller classes (filters, request parameter parsing, utilities) coexist with heavy-weight servlets and tracking logic, indicating multiple responsibilities centralized in this package. High WMC values (e.g. 41 for DecodeServlet) and the mix of servlet logic, DoS tracking, filters and utilities support the judgment that this component is excessively large and acting as a God Component."
+    },
+    {
+        "package": "com.google.zxing.qrcode.encoder",
+        "detection": true,
+        "justification": "The package concentrates a large portion of functionality and code in a few very large, complex classes: total package LOC=1641 across 11 classes, with Encoder (LOC=434, WMC=90, NOM=25), MinimalEncoder (LOC=382, WMC=46, NOM=13) and MatrixUtil (LOC=226, WMC=55, NOM=20) together accounting for >60% of the package LOC. These classes show high complexity and many methods, and the package mixes encoding algorithms, matrix utilities, masking and data structures (QRCode, ByteMatrix, MaskUtil, BlockPair) indicating multiple responsibilities concentrated in one component. The concentration of size and complexity in a small number of classes supports the detection of a God Component."
+    },
+    {
+        "package": "com.google.zxing.oned",
+        "detection": true,
+        "justification": "The package contains 32 classes and 3,631 LOC (average ~113 LOC/class), indicating substantial size and many responsibilities. Several classes are individually large and complex (examples: Code128Writer 405 LOC, WMC 65; Code128Reader 326 LOC, WMC 79; UPCEANReader 279 LOC, WMC 40; Code39Reader 254 LOC, WMC 52; Code93Reader 221 LOC, WMC 47; OneDReader 196 LOC). There are also multiple inner types in the same package (e.g. Code128Writer inner classes and encoder), and the package mixes many concerns (multiple reader/writer formats, extension/support classes, manufacturer lookup, etc.). These factors (high total LOC, many classes, several highly complex classes and mixed responsibilities) justify detecting a God Component smell for com.google.zxing.oned."
+    },
+    {
+        "package": "com.google.zxing.client.android.book",
+        "detection": false,
+        "justification": "The package contains 6 classes and 422 LOC total — not an excessive number of classes or overwhelmingly large size. The largest class, SearchBookContentsActivity, is 190 LOC and an inner NetworkTask is 94 LOC; other classes are small (27–48 LOC). Complexity metrics (WMC values mostly in single digits) and low coupling (Ce=1, Ca=1) indicate responsibilities are distributed and the package is not dominated by a single, excessively large component. Therefore, there is insufficient evidence to label this package as a God Component."
+    },
+    {
+        "package": "com.google.zxing.aztec",
+        "detection": false,
+        "justification": "The package contains only 3 classes and 161 LOC in total, with the largest class being 75 LOC (AztecReader) and the others 54 and 32 LOC. Method and complexity metrics are moderate (WMC 11–13) and there is no single class that dominates the package by size or complexity. Fan-in/fan-out at the class level are zero in the provided data, and dependencies are distributed to related subpackages rather than indicating a centralized, excessively large component. Based on these contextual metrics, the package is not excessively large and does not exhibit the God Component smell."
+    },
+    {
+        "package": "com.google.zxing",
+        "detection": false,
+        "justification": "The package contains 24 classes and 1,265 LOC, which is moderate rather than excessively large. Class-level LOC values are distributed (several around ~80–130 LOC, many much smaller) with no single class dominating the package size. Coupling metrics (Ce=37, Ca=37) and the variety of small/medium classes (e.g., MultiFormatReader 126 LOC, LuminanceSource 105 LOC, BinaryBitmap 95 LOC, Result 99 LOC) indicate responsibilities are spread across multiple focused classes rather than concentrated in one monolithic component. Based on this contextual evidence, the package does not exhibit the extreme size/centralization characteristic of a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.encode",
+        "detection": true,
+        "justification": "The package concentrates a large amount of code and multiple responsibilities: total LOC = 714 across 11 classes with heavy concentration in a few classes (QRCodeEncoder: 266 LOC, WMC 57, nom 15; EncodeActivity: 159 LOC, WMC 21; VCardContactEncoder: 81 LOC, WMC 27). It contains encoder logic, contact/vCard/MECARD formatters and an activity, plus nested formatter classes, indicating multiple responsibilities rather than a single cohesive role. High complexity (WMCs), large class sizes and mixed responsibilities support the judgement that this package is excessively large and functions as a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.result",
+        "detection": true,
+        "justification": "The package contains 14 classes and 965 LOC, with a strong concentration of size and responsibility in a few classes. ResultHandler alone is 361 LOC with 43 methods (nom), WMC 80 and many external dependencies (HistoryManager, PreferencesActivity, ResultParser, CaptureActivity, ScanFromWebPageManager, etc.), indicating high complexity and many responsibilities. In addition AddressBookResultHandler (126 LOC, WMC 26) and CalendarResultHandler (104 LOC, WMC 18) further increase package size. The distribution shows a small number of very large, complex classes centralizing behavior for many result types, consistent with a God Component smell."
+    },
+    {
+        "package": "com.google.zxing.qrcode.decoder",
+        "detection": true,
+        "justification": "The package concentrates a large amount of code and responsibilities: 12 classes totaling 1,108 LOC with multiple very large/complex classes (DecodedBitStreamParser: 261 LOC, WMC 61; BitMatrixParser: 175 LOC, WMC 35; Version: 163 LOC, WMC 23; Decoder: 114 LOC). Several classes show high cyclomatic complexity and many methods, indicating multiple responsibilities packed into single types. The package also has non-trivial afferent/efferent coupling (Ce=7, Ca=7), suggesting it is a central, highly connected component. Together these facts indicate an excessive concentration of code and responsibilities consistent with the God Component smell."
+    },
+    {
+        "package": "com.google.zxing.integration.android",
+        "detection": true,
+        "justification": "The package contains only 2 classes but is heavily dominated by a single oversized class. IntentIntegrator accounts for 325 of 380 LOC (~85% of the package), has 34 methods (nom), 24 fields (nof), high complexity (WMC=61) and many public methods (nopm=27), while the other class (IntentResult) is small (55 LOC). The concentration of code, methods and complexity in one class indicates the component is excessively large and centralizes too much responsibility, consistent with a God Component smell."
+    },
+    {
+        "package": "com.google.zxing.datamatrix",
+        "detection": false,
+        "justification": "The package contains only 2 classes and a total of 233 LOC (DataMatrixReader: 95 LOC, DataMatrixWriter: 138 LOC). Neither the number of classes nor the overall LOC indicate an excessively large component. Class complexity (WMC 16 and 25) is moderate and the package coupling (Ce=5, Ca=5) does not by itself imply a single bloated component. The package responsibilities (reader and writer) are distinct and focused, so the available metrics do not support labeling this package as a God Component."
+    },
+    {
+        "package": "com.google.zxing.common.detector",
+        "detection": false,
+        "justification": "The package contains only 3 classes (num_classes=3) totaling 416 LOC, which is moderate and not excessively large for a component. The largest class, WhiteRectangleDetector, is 219 LOC and MonochromeRectangleDetector is 147 LOC while MathUtils is 50 LOC — these sizes, though non-trivial, do not by themselves indicate a single overwhelmingly large component dominating the package. Affected coupling metrics (Ce=9, Ca=9) show external dependencies but not extreme centralization. Based on the provided contextual data, the package does not meet the criteria for a God Component."
+    },
+    {
+        "package": "com.google.zxing.aztec.detector",
+        "detection": true,
+        "justification": "The package is dominated by a single class: Detector.java contains 402 LOC out of the package's 436 LOC (~92%), indicating functionality concentrated in one component. Detector also has high internal complexity (WMC = 48), many methods (nom = 20) and fields (nof = 11), and multiple external dependencies, while the package contains only 3 classes overall. These facts (large LOC concentrated in one class, high complexity and many members) support detection of a God Component."
+    },
+    {
+        "package": "com.google.zxing.multi",
+        "detection": false,
+        "justification": "The package contains only 3 classes and a total of 176 LOC, which is modest. The largest class, GenericMultipleBarcodeReader, is 103 LOC (wmc 24) while the others are 64 LOC and 9 LOC — no single class or the package as a whole is disproportionately large. The class count and LOC do not indicate an excessively large component, so the God Component smell is not detected."
+    },
+    {
+        "package": "com.google.zxing.aztec.encoder",
+        "detection": false,
+        "justification": "The package contains 7 classes totaling 750 LOC, with the majority of LOC concentrated in three cohesive encoder-related classes (Encoder: 320 LOC, WMC 65; HighLevelEncoder: 180 LOC, WMC 33; State: 130 LOC, WMC 28). The class count is small and the LOC concentration reflects algorithmic complexity within an encoder domain rather than an excessively large or sprawling component. Coupling indicators (Ce=6, Ca=6) are moderate. Given the focused responsibility (Aztec encoding) and the modest number of classes, the data do not support labeling this package a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.camera.open",
+        "detection": false,
+        "justification": "The package is small: num_classes = 3 and total LOC = 82. The largest class (OpenCameraInterface) is 51 LOC with WMC = 9; the other classes are 27 LOC (OpenCamera) and 4 LOC (CameraFacing). Coupling indicators are low (Ce = 1, Ca = 1) and there is no large aggregation of classes or extremely high LOC in a single component. Based on these metrics and the provided context, the package does not exhibit the excessive size characteristic of a God Component."
+    },
+    {
+        "package": "com.google.zxing.datamatrix.detector",
+        "detection": true,
+        "justification": "The package contains a single class (num_classes = 1) whose size equals the whole package (loc = 249). The Detector class itself has loc = 249, a high complexity (wmc = 32) and a relatively large number of methods (nom = 11), indicating many responsibilities concentrated in one type. Package-level coupling (Ce = 3, Ca = 3) and the class dependencies (several core detector/common classes) suggest this component plays a central role. Together, the concentrated LOC, high method/complexity counts, and single-class composition support that this package functions as a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.history",
+        "detection": false,
+        "justification": "The package contains 5 classes and 390 LOC, which is modest in size for a package. Although HistoryManager is relatively large (200 LOC, 13 methods, WMC=24) and depends on many classes (it centralizes history-related logic and is used by HistoryActivity and DBHelper), the remaining classes are small (HistoryActivity 104 LOC, HistoryItem 29 LOC, HistoryItemAdapter 33 LOC, DBHelper 24 LOC) and responsibilities are not entirely concentrated in a single oversized component. The package size and class count do not indicate an excessively large component overall; therefore, there is insufficient evidence to label the package itself a God Component (HistoryManager may warrant local refactoring, but that does not make the whole package a God Component)."
+    },
+    {
+        "package": "com.google.zxing.common",
+        "detection": true,
+        "justification": "The package holds 2,224 LOC across 17 classes with several very large and highly complex classes concentrated in the same component: BitMatrix (442 LOC, 31 methods, WMC 89), BitArray (279 LOC, 27 methods, WMC 58), MinimalECIInput (243 LOC, 13 methods, WMC 48), StringUtils (198 LOC, WMC 36), HybridBinarizer (145 LOC, WMC 33), GlobalHistogramBinarizer (139 LOC, WMC 29). This concentration of size and high WMC indicates multiple responsibilities are implemented inside the package and within single classes. The package also shows substantial coupling (Ce = 29, Ca = 29) and many external dependencies, suggesting it acts as a central hub. Taken together — large total LOC, several oversized/complex classes, and high coupling — these elements justify classifying com.google.zxing.common as a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.j2se",
+        "detection": true,
+        "justification": "The package aggregates 12 classes but a relatively large total size (1030 LOC) with several individually large/complex classes (DecodeWorker: 186 LOC, WMC 31; HtmlAssetTranslator: 151 LOC, WMC 26; CommandLineRunner: 118 LOC, WMC 26; MatrixToImageWriter: 111 LOC; BufferedImageLuminanceSource: 107 LOC). The package mixes multiple responsibilities (GUIRunner, command-line runner, encoding, decoding, image conversion, resource translation, web/chart integration) rather than a focused concern. Several classes show high cyclomatic complexity and many methods, indicating concentrated functionality and complexity. The package also depends on multiple other subsystems (com.google.zxing.multi, com.google.zxing.web, com.google.zxing.common, client.result), suggesting a central role. Taken together, these characteristics indicate the package is excessively large and does too many things, consistent with a God Component smell."
+    },
+    {
+        "package": "com.google.zxing.datamatrix.encoder",
+        "detection": true,
+        "justification": "The package contains 19 classes and a total of 2409 LOC, which is large for a single component and indicates concentrated size. Several classes are individually very large and complex (MinimalEncoder: 614 LOC, wmc 41; HighLevelEncoder: 371 LOC, wmc 73; MinimalEncoder.Edge: 338 LOC; C40Encoder: 170 LOC, wmc 36; DefaultPlacement: 153 LOC, wmc 26; SymbolInfo: 123 LOC, wmc 38; ErrorCorrection: 109 LOC; EdifactEncoder: 109 LOC). The package aggregates many distinct responsibilities (multiple encoder strategies, placement logic, symbol info, error correction) rather than a single cohesive responsibility. The combination of high total LOC, many large/complex classes, and multiple responsibilities supports detecting a God Component smell for this package."
+    },
+    {
+        "package": "com.google.zxing.maxicode",
+        "detection": false,
+        "justification": "The package contains only 1 class and a total of 56 LOC, which is small both in number of classes and size. The single class (MaxiCodeReader) has modest complexity (WMC=9, loc=56) and low coupling indicators (fanin=0, fanout=0 in class metrics; Ce=3, Ca=3 at package level). Given the limited LOC, single class, and no evidence of excessive size or class count, there is insufficient indication of a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.share",
+        "detection": false,
+        "justification": "The package contains 6 classes and 378 LOC — not an excessively large component in terms of number of classes or total LOC. Although ShareActivity is relatively large (184 LOC, WMC 36, 13 methods) and contributes ~50% of the package LOC, the remaining five classes are small (32–59 LOC each) with modest complexity. Package coupling (Ce=3, Ca=3) is low. Contextually, the size is driven by one activity rather than an overly large package with many classes, so the package itself does not qualify as a God Component."
+    },
+    {
+        "package": "com.google.zxing.multi.qrcode.detector",
+        "detection": false,
+        "justification": "The package contains only 3 classes and a total of 206 LOC, which is not excessively large for a component. The largest class, MultiFinderPatternFinder, is 163 LOC with WMC 30 indicating some complexity, but the remainder (MultiDetector 34 LOC, ModuleSizeComparator 9 LOC) keeps the package compact. There is no large number of classes or an overwhelmingly large LOC concentration to justify labeling this package a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.camera",
+        "detection": true,
+        "justification": "The package concentrates a large amount of code and complexity in a small number of classes: total package LOC = 881 across 7 classes, with CameraConfigurationUtils (344 LOC, WMC=71, nom=21) and CameraManager (245 LOC, WMC=38, nom=14) dominating the package size and complexity. CameraConfigurationManager is also sizeable (156 LOC). The high LOC and WMC values indicate large, complex classes that centralize behavior, i.e. responsibilities are concentrated rather than distributed. Low external coupling (Ce=2, Ca=2) further suggests functionality is bundled inside this package rather than delegated, supporting the detection of a God Component."
+    },
+    {
+        "package": "com.google.zxing.datamatrix.decoder",
+        "detection": true,
+        "justification": "The package has 1,102 LOC across only 8 classes, with a strong concentration of code in a few classes: DecodedBitStreamParser (432 LOC, WMC 103) and BitMatrixParser (372 LOC, WMC 71) together account for ~73% of the package LOC (and adding Version's 115 LOC brings the three to ~83%). These two classes also show very high complexity (WMC 103 and 71), indicating they are doing large, complex work. The package size is therefore driven by a small number of very large/complex classes rather than being evenly distributed, meeting the contextual definition of a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.clipboard",
+        "detection": false,
+        "justification": "The package contains a single class (num_classes = 1) with only 31 LOC, low complexity (wmc = 6), and limited dependencies (Ce = 2, Ca = 2, fanin = 0, fanout = 0). There is no evidence of an excessive number of classes or large size that would indicate a God Component; responsibilities appear limited to a small clipboard interface."
+    },
+    {
+        "package": "com.google.zxing.pdf417.decoder.ec",
+        "detection": false,
+        "justification": "The package contains 3 classes and a total of 396 LOC, which is modest in size. Individual class sizes are 192 LOC (ModulusPoly), 129 LOC (ErrorCorrection), and 75 LOC (ModulusGF); none are excessively large in the context provided. The class count (3) is low, and there is no indication of an overwhelmingly large component by LOC or number of classes. Therefore, the God Component smell is not detected."
+    },
+    {
+        "package": "com.google.zxing.multi.qrcode",
+        "detection": false,
+        "justification": "The package contains only 2 classes and 99 LOC overall (QRCodeMultiReader: 92 LOC, inner SAComparator: 7 LOC). Class-level complexity is moderate (QRCodeMultiReader wmc=16, nom=3) but the component is small in both number of classes and total lines of code. A God Component is characterized by an excessively large size (many classes or very high LOC); this package does not exhibit that, and its incoming/outgoing coupling (Ca=3, Ce=3) is modest, so there is insufficient evidence to label it a God Component."
+    },
+    {
+        "package": "com.google.zxing.pdf417.detector",
+        "detection": true,
+        "justification": "The package has only 2 classes and 284 LOC, but one class (Detector) contains 259 LOC (~91% of package LOC), 13 fields, 9 methods and a high complexity (WMC=42). The second class (PDF417DetectorResult) is small (25 LOC). The extreme LOC concentration and high class complexity indicate the package's functionality is dominated by a single, excessively large class, supporting detection of a God Component."
+    },
+    {
+        "package": "com.google.zxing.client.android.result.supplement",
+        "detection": false,
+        "justification": "The package contains 5 classes and 266 LOC, which is not excessively large for a single component. Although one class (SupplementalInfoRetriever) is relatively large (121 LOC, WMC 25, NOM 8) and accounts for ~45% of the package LOC—indicating a localized risk of a God Class—the overall package size and class count do not justify labeling the entire package as a God Component. Class-level metrics suggest refactoring attention on SupplementalInfoRetriever, but the package as a whole is not excessively large in LOC or number of classes."
+    },
+    {
+        "package": "com.google.zxing.qrcode.detector",
+        "detection": true,
+        "justification": "The package contains 1,072 LOC concentrated in 7 classes, but the distribution is highly skewed: FinderPatternFinder alone is 536 LOC (~50% of the package), with 22 methods and very high complexity (WMC=107). Detector (238 LOC, WMC=37) and AlignmentPatternFinder (195 LOC, WMC=33) are also large and complex. A few classes hold most of the code and complexity rather than responsibilities being evenly distributed, indicating an excessive size/complexity concentrated in a small number of classes. These factors (high LOC concentration, large method counts, and high WMC in the key classes) support identifying this package as exhibiting the God Component smell."
+    },
+    {
+        "package": "com.google.zxing.qrcode",
+        "detection": false,
+        "justification": "The package contains only 2 classes (num_classes=2) with a total of 204 LOC, split into QRCodeReader (loc=137, wmc=28) and QRCodeWriter (loc=67, wmc=13). The component is small in number of classes and modest in total size; dependencies (Ce=4, Ca=4) and lack of unusually high fan-in/fan-out do not indicate an excessively large or monolithic component. Therefore it does not meet the contextual criteria for a God Component."
+    },
+    {
+        "package": "com.google.zxing.aztec.decoder",
+        "detection": true,
+        "justification": "The package is overwhelmingly dominated by a single class: Decoder contains 319 of the package's 330 LOC (~97%), while the remaining two nested classes are tiny. Decoder shows high internal complexity (WMC=61), a large number of fields and methods (nof=10, nom=11), and encapsulates related nested types (Decoder.Table, Decoder.CorrectedBitsResult), indicating multiple responsibilities concentrated in one component. The package has only 3 classes overall but interacts with several external subsystems, suggesting the Decoder centralizes much functionality. These elements collectively indicate a God Component."
+    },
+    {
+        "package": "com.google.zxing.pdf417.encoder",
+        "detection": true,
+        "justification": "The package contains 9 classes but a very high total of 1069 LOC, with two classes dominating the package: PDF417HighLevelEncoder (595 LOC, 18 public methods, WMC 94) and PDF417 (234 LOC, 14 public methods, WMC 31). These two classes account for ~78% of the package LOC, indicating concentrated responsibility and excessive size/complexity in a small number of components. High WMC and large method counts suggest heavy internal complexity and potential multiple responsibilities, supporting the detection of a God Component at the package level."
+    }
+]
