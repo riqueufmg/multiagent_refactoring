@@ -1,0 +1,61 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.pdf417.decoder",
+  "detections": [
+    {
+      "class": "BarcodeValue",
+      "detection": false,
+      "justification": "Very small class (loc 39, nom 3, wmc 7) with few responsibilities; metrics and dependencies indicate a focused role (value holder used by scanners), so it appears adequately modularized."
+    },
+    {
+      "class": "BarcodeMetadata",
+      "detection": false,
+      "justification": "Compact data-holder (loc 32, nom 6, wmc 6) representing barcode metadata; low complexity and cohesive purpose indicate no evidence of insufficient modularization."
+    },
+    {
+      "class": "DecodedBitStreamParser",
+      "detection": true,
+      "justification": "Extremely large and complex (loc 479, nom 30, wmc 115) and depends on multiple decoding concerns and modes; this concentration of decoding logic across many methods and modes suggests multiple responsibilities that could be decomposed (parsing modes, ECI handling, data interpretation)."
+    },
+    {
+      "class": "DecodedBitStreamParser.Mode",
+      "detection": false,
+      "justification": "Tiny nested enum (loc 1) representing parsing modes; single, well-scoped responsibility—no modularization issue."
+    },
+    {
+      "class": "BoundingBox",
+      "detection": false,
+      "justification": "Moderate size (loc 117, nom 12, wmc 23) but represents a clear geometric abstraction (bounding box) with focused responsibilities; complexity appears appropriate for its role, indicating acceptable modularization."
+    },
+    {
+      "class": "DetectionResultRowIndicatorColumn",
+      "detection": true,
+      "justification": "Relatively large and complex for a column abstraction (loc 190, nom 9, wmc 45) and interacts with many decoder and metadata classes; the size and complexity imply it may aggregate multiple responsibilities (indicator parsing, metadata extraction, alignment), making it a candidate for decomposition."
+    },
+    {
+      "class": "PDF417ScanningDecoder",
+      "detection": true,
+      "justification": "Very large and complex central class (loc 455, nom 25, wmc 108) that coordinates scanning, error correction, codeword decoding and result assembly across many dependencies; this concentration of scanning and decoding behavior indicates multiple responsibilities that could be split into smaller cohesive components."
+    },
+    {
+      "class": "Codeword",
+      "detection": false,
+      "justification": "Small/concise representation (loc 50, nom 12, wmc 12) modeling a single concept (codeword) with limited responsibilities and clear dependencies—no sign of bloated interface or mixed responsibilities."
+    },
+    {
+      "class": "PDF417CodewordDecoder",
+      "detection": false,
+      "justification": "Focused decoder utility (loc 86, nom 6, wmc 17) that performs codeword decoding using math utilities; despite moderate complexity it has a single well-defined concern and does not appear to conflate unrelated responsibilities."
+    },
+    {
+      "class": "DetectionResultColumn",
+      "detection": false,
+      "justification": "Relatively small (loc 63, nom 8, wmc 16) and models a column in the detection result; responsibilities appear cohesive and limited, suggesting acceptable modularization."
+    },
+    {
+      "class": "DetectionResult",
+      "detection": true,
+      "justification": "Substantially sized aggregation (loc 238, nom 19, wmc 61) that manages columns, metadata and bounding operations; metric profile and its aggregating role suggest it groups multiple responsibilities (management, reconciliation, manipulation) that could be separated for clarity and easier maintenance."
+    }
+  ]
+}

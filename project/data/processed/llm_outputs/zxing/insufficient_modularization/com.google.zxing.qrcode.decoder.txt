@@ -1,0 +1,66 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.qrcode.decoder",
+  "detections": [
+    {
+      "class": "Mode",
+      "detection": false,
+      "justification": "Small class (loc 55) with few methods (nom 4, nopm 3). Although WMC is moderate (16), Mode models a focused concept (QR encoding modes) and has low coupling indicators; complexity appears inherent to the domain rather than an indicator of multiple responsibilities."
+    },
+    {
+      "class": "DecodedBitStreamParser",
+      "detection": true,
+      "justification": "Very large and complex: highest LOC (261) and very high cyclomatic complexity (WMC 61) with 9 methods. Handles multi-format parsing concerns and depends on many decoder-related types. These signs (size, high WMC, multiple responsibilities implied by dependencies) indicate it concentrates parsing logic that could be decomposed into smaller, focused parser components."
+    },
+    {
+      "class": "ErrorCorrectionLevel",
+      "detection": false,
+      "justification": "Small (loc 35) with few methods (nom 3, nopm 2) and low complexity (WMC 4). Represents a single abstraction (EC level) and its interface size is appropriate to the concept."
+    },
+    {
+      "class": "Decoder",
+      "detection": false,
+      "justification": "Moderate size (loc 114) and complexity (WMC 13, nom 7). Its responsibilities (error correction, data block handling, invoking parsers) align with a single decoding abstraction; metrics do not clearly show a mix of unrelated responsibilities that would warrant decomposition."
+    },
+    {
+      "class": "Version",
+      "detection": false,
+      "justification": "Relatively large (loc 163, nom 12, WMC 23) but models a rich domain concept (QR Code version, EC blocks) with nested types (ECBlocks, ECB). Low LCOM indicates cohesion; public method count (nopm 8) reflects the needed API for the concept rather than fragmented responsibilities."
+    },
+    {
+      "class": "Version.ECBlocks",
+      "detection": false,
+      "justification": "Very small helper/nested type (loc 27) closely tied to Version. It encapsulates a focused part of the Version abstraction and does not show signs of being a bloated multi-responsibility class."
+    },
+    {
+      "class": "Version.ECB",
+      "detection": false,
+      "justification": "Tiny nested class (loc 17) representing a single concept related to Version; no evidence of multiple responsibilities."
+    },
+    {
+      "class": "DataBlock",
+      "detection": false,
+      "justification": "Moderate size (loc 73) with a small set of methods (nom 4) and concentrated responsibilities around data block representation and handling; metrics do not indicate a bloated interface or mixed concerns."
+    },
+    {
+      "class": "BitMatrixParser",
+      "detection": true,
+      "justification": "Large and complex (loc 175, WMC 35, nom 8). It combines responsibilities for matrix parsing, format/version extraction and interacts with several decoder components. The size and complexity concentrated in one class suggest opportunities to split parsing, format interpretation and version extraction into smaller modules."
+    },
+    {
+      "class": "FormatInformation",
+      "detection": false,
+      "justification": "Moderate size (loc 76, nom 8, WMC 16) focused on format information concerns. LCOM and the nature of dependencies suggest cohesion around a single responsibility (format info), not a sign of insufficient modularization."
+    },
+    {
+      "class": "DataMask",
+      "detection": false,
+      "justification": "Contains multiple mask algorithms (nom 10) but these are conceptually related and typically implemented together; loc 84 and WMC 13 reflect algorithmic variations rather than mixed, unrelated responsibilities."
+    },
+    {
+      "class": "QRCodeDecoderMetaData",
+      "detection": false,
+      "justification": "Very small (loc 28, nom 3, WMC 4) and focused on decoder metadata. No indicators of excessive size or multiple unrelated responsibilities."
+    }
+  ]
+}

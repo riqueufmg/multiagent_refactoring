@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.pdf417",
+  "detections": [
+    {
+      "class": "PDF417Common",
+      "detection": false,
+      "justification": "Relatively small (loc 54) with few methods (nom 4, nopm 3) and moderate complexity (wmc 7). Appears to serve as a small utility/constants holder rather than a large, multi-responsibility abstraction, so there is no clear sign of inadequate decomposition at class level."
+    },
+    {
+      "class": "PDF417Reader",
+      "detection": false,
+      "justification": "Moderate size and responsibility (loc 73, nom 10) but shows reasonable cohesion (lcom 0.2) and acts as a coordinator between detector/decoder components. Complexity (wmc 15) is acceptable for a reader/coordinator role and does not indicate a single bloated abstraction that needs decomposition."
+    },
+    {
+      "class": "PDF417Writer",
+      "detection": true,
+      "justification": "High overall complexity concentrated in a small number of methods (loc 106, nom 5, wmc 21) indicating complex encoding logic is centralized in this class. The concentrated complexity and size suggest responsibilities that could be split into smaller encoder/utility classes to improve modularization."
+    },
+    {
+      "class": "PDF417ResultMetadata",
+      "detection": true,
+      "justification": "Large public interface and many operations (loc 120, nom 22, nopm 22) with non-trivial complexity (wmc 22) and moderate cohesion (lcom 0.5). The number of fields and public methods indicates a bloated abstraction that likely mixes responsibilities and would benefit from decomposition into smaller, more focused classes."
+    }
+  ]
+}

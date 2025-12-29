@@ -1,0 +1,41 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.client.android.camera",
+  "detections": [
+    {
+      "class": "CameraConfigurationUtils",
+      "detection": true,
+      "justification": "Very large utility class concentrated in one file: 344 LOC and 21 methods (about 39% of the package LOC) with a high complexity (WMC 71). The class centralizes many configuration-related operations rather than smaller, focused abstractions, indicating responsibilities that could be decomposed."
+    },
+    {
+      "class": "CameraConfigurationManager",
+      "detection": true,
+      "justification": "Moderately large and complex manager: 156 LOC with 12 methods and WMC 30. It depends on multiple camera and UI classes (CameraManager, CameraConfigurationUtils, PreferencesActivity, OpenCamera, etc.), suggesting it coordinates diverse concerns (configuration, preferences, camera state) that could be split into narrower, more cohesive classes."
+    },
+    {
+      "class": "PreviewCallback",
+      "detection": false,
+      "justification": "Small, focused class: 21 LOC, 3 methods and low complexity (WMC 4). Its narrow size and single responsibility (providing preview callbacks) indicate appropriate modularization."
+    },
+    {
+      "class": "AutoFocusManager",
+      "detection": false,
+      "justification": "Relatively small and focused: 85 LOC, 6 methods and moderate complexity (WMC 12). It encapsulates autofocus behavior and has a clear single responsibility, so it does not show signs of insufficient modularization."
+    },
+    {
+      "class": "AutoFocusManager.AutoFocusTask",
+      "detection": false,
+      "justification": "Tiny inner task class (11 LOC) tied to AutoFocusManager and clearly scoped to that single purpose, so it does not indicate insufficient modularization."
+    },
+    {
+      "class": "CameraManager",
+      "detection": true,
+      "justification": "Large, central manager with multiple responsibilities: 245 LOC, 14 methods, 17 fields and high complexity (WMC 38). It depends on and coordinates many components (ViewfinderView, CaptureActivityHandler, OpenCamera, AmbientLightManager, AutoFocusManager, etc.), concentrating orchestration and state management that could be split into smaller managers or helpers."
+    },
+    {
+      "class": "FrontLightMode",
+      "detection": false,
+      "justification": "Very small and specialized (19 LOC, 2 methods); it appears to encapsulate a single concern (front light behavior) and therefore does not exhibit insufficient modularization."
+    }
+  ]
+}

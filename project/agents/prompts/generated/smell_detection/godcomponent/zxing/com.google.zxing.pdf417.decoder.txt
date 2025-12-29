@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.pdf417.decoder", "metrics": {"num_classes": 11, "loc": 1750, "Ce": 6, "Ca": 6}, "classes": [{"package": "com.google.zxing.pdf417.decoder", "class": "BarcodeValue", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/BarcodeValue.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 0, "loc": 39, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn", "com.google.zxing.pdf417.PDF417Common"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "BarcodeMetadata", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/BarcodeMetadata.java", "metrics": {"nof": 5, "nopf": 0, "nom": 6, "nopm": 0, "loc": 32, "wmc": 6, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.DetectionResult", "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "DecodedBitStreamParser", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/DecodedBitStreamParser.java", "metrics": {"nof": 30, "nopf": 0, "nom": 8, "nopm": 0, "loc": 479, "wmc": 115, "nc": 0, "dit": 0, "lcom": 0.25, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.PDF417ResultMetadata", "com.google.zxing.common.ECIStringBuilder", "com.google.zxing.FormatException", "com.google.zxing.common.DecoderResult", "com.google.zxing.pdf417.decoder.DecodedBitStreamParser.Mode"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "DecodedBitStreamParser.Mode", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/DecodedBitStreamParser.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.DecodedBitStreamParser"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "BoundingBox", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/BoundingBox.java", "metrics": {"nof": 9, "nopf": 0, "nom": 12, "nopm": 0, "loc": 117, "wmc": 23, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.pdf417.decoder.DetectionResult", "com.google.zxing.common.BitMatrix", "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn", "com.google.zxing.pdf417.decoder.DetectionResultColumn"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "DetectionResultRowIndicatorColumn", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/DetectionResultRowIndicatorColumn.java", "metrics": {"nof": 1, "nopf": 0, "nom": 9, "nopm": 1, "loc": 190, "wmc": 45, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.PDF417Common", "com.google.zxing.ResultPoint", "com.google.zxing.pdf417.decoder.BarcodeMetadata", "com.google.zxing.pdf417.decoder.Codeword", "com.google.zxing.pdf417.decoder.BoundingBox", "com.google.zxing.pdf417.decoder.BarcodeValue"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "PDF417ScanningDecoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/PDF417ScanningDecoder.java", "metrics": {"nof": 4, "nopf": 0, "nom": 25, "nopm": 2, "loc": 455, "wmc": 108, "nc": 0, "dit": 0, "lcom": 0.16, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.PDF417Reader", "com.google.zxing.pdf417.decoder.Codeword", "com.google.zxing.pdf417.PDF417Common", "com.google.zxing.pdf417.decoder.DetectionResult", "com.google.zxing.FormatException", "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn", "com.google.zxing.pdf417.decoder.BoundingBox", "com.google.zxing.ChecksumException", "com.google.zxing.pdf417.decoder.DetectionResultColumn", "com.google.zxing.pdf417.decoder.PDF417CodewordDecoder", "com.google.zxing.pdf417.decoder.ec.ErrorCorrection", "com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.pdf417.decoder.BarcodeMetadata", "com.google.zxing.common.BitMatrix", "com.google.zxing.pdf417.decoder.DecodedBitStreamParser", "com.google.zxing.common.detector.MathUtils", "com.google.zxing.common.DecoderResult", "com.google.zxing.pdf417.decoder.BarcodeValue"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "Codeword", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/Codeword.java", "metrics": {"nof": 6, "nopf": 0, "nom": 12, "nopm": 1, "loc": 50, "wmc": 12, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.DetectionResultColumn", "com.google.zxing.pdf417.decoder.DetectionResult", "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "PDF417CodewordDecoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/PDF417CodewordDecoder.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 0, "loc": 86, "wmc": 17, "nc": 0, "dit": 0, "lcom": 0.3333333333333333, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.common.detector.MathUtils", "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.PDF417Common"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "DetectionResultColumn", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/DetectionResultColumn.java", "metrics": {"nof": 3, "nopf": 0, "nom": 8, "nopm": 1, "loc": 63, "wmc": 16, "nc": 1, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.Codeword", "com.google.zxing.pdf417.decoder.BoundingBox", "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.decoder.DetectionResult"]}, {"package": "com.google.zxing.pdf417.decoder", "class": "DetectionResult", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/DetectionResult.java", "metrics": {"nof": 5, "nopf": 0, "nom": 19, "nopm": 1, "loc": 238, "wmc": 61, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.PDF417Common", "com.google.zxing.pdf417.decoder.BarcodeMetadata", "com.google.zxing.pdf417.decoder.Codeword", "com.google.zxing.pdf417.decoder.DetectionResultColumn", "com.google.zxing.pdf417.decoder.BoundingBox"]}], "dependencies": ["com.google.zxing.pdf417", "com.google.zxing", "com.google.zxing.common", "com.google.zxing.pdf417.decoder.ec", "com.google.zxing.common.detector", "com.google.zxing.pdf417.encoder"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

@@ -1,0 +1,61 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.client.android.encode",
+  "detections": [
+    {
+      "class": "Formatter",
+      "detection": false,
+      "justification": "Very small class (LOC 12, WMC 1, NOM 1) with few responsibilities and low complexity; does not show signs of being a bloated abstraction."
+    },
+    {
+      "class": "VCardContactEncoder",
+      "detection": true,
+      "justification": "Relatively large and complex for its scope (LOC 81, NOM 5, WMC 27) and depends on field/formatter classes; high WMC indicates multiple responsibilities or complex logic that could be decomposed."
+    },
+    {
+      "class": "VCardTelDisplayFormatter",
+      "detection": false,
+      "justification": "Moderate size and complexity (LOC 40, NOM 4, WMC 9) and focused on a single formatting concern, suggesting adequate modularization."
+    },
+    {
+      "class": "ContactEncoder",
+      "detection": false,
+      "justification": "Moderate metrics (LOC 50, NOM 5, WMC 11) and limited dependencies; while it coordinates encoding, its size/complexity do not strongly indicate an undecomposed abstraction."
+    },
+    {
+      "class": "EncodeActivity",
+      "detection": true,
+      "justification": "Large Android activity (LOC 159, NOM 7, WMC 21) with substantial logic; activities that combine UI handling and encoding behavior can be signs of insufficient separation of concerns and may warrant refactoring."
+    },
+    {
+      "class": "QRCodeEncoder",
+      "detection": true,
+      "justification": "Very large and complex class (LOC 266, NOM 15, WMC 57) with many external dependencies and responsibilities related to parsing/encoding; metrics indicate a likely god-class that should be decomposed into smaller, cohesive abstractions."
+    },
+    {
+      "class": "VCardFieldFormatter",
+      "detection": false,
+      "justification": "Small, focused utility-like class (LOC 46, NOM 4, WMC 10) serving a single formatting role; does not appear to be an insufficiently modularized abstraction."
+    },
+    {
+      "class": "MECARDContactEncoder",
+      "detection": false,
+      "justification": "Relatively small (LOC 41, NOM 1, WMC 1) with nested formatter classes; the nesting suggests contained, cohesive functionality rather than an overlarge abstraction."
+    },
+    {
+      "class": "MECARDContactEncoder.MECARDFieldFormatter",
+      "detection": false,
+      "justification": "Very small nested helper (LOC 7, WMC 0) dedicated to a narrow formatting role; no evidence of bloated responsibility."
+    },
+    {
+      "class": "MECARDContactEncoder.MECARDTelDisplayFormatter",
+      "detection": false,
+      "justification": "Tiny nested formatter (LOC 6, WMC 0) focused on a single display concern; appropriately modular."
+    },
+    {
+      "class": "MECARDContactEncoder.MECARDNameDisplayFormatter",
+      "detection": false,
+      "justification": "Tiny nested formatter (LOC 6, WMC 0) with a narrow responsibility; does not exhibit insufficient modularization."
+    }
+  ]
+}

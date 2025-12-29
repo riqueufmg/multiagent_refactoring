@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+  "detections": [
+    {
+      "class": "ISandboxStage",
+      "detection": false,
+      "justification": "Very small abstraction (LOC 10) representing an interface-like role with few members (nom 8) and no internal state; minimal complexity and no evidence of multiple responsibilities or a bloated interface."
+    },
+    {
+      "class": "SandboxConfigStage",
+      "detection": true,
+      "justification": "Large class footprint (LOC 475) with many members (nof 16) and methods (nom 37) and high cyclomatic complexity (wmc 85). The size, breadth of methods and public surface suggest multiple responsibilities concentrated in one class, indicating insufficient decomposition."
+    },
+    {
+      "class": "VMLanguageConfigStage",
+      "detection": false,
+      "justification": "Moderate size (LOC 97) with a small number of methods (nom 9) and moderate complexity (wmc 16); low field count and limited dependencies imply a focused responsibility and no clear sign of a bloated abstraction."
+    },
+    {
+      "class": "SandboxStage",
+      "detection": true,
+      "justification": "Very large and complex class (LOC 451, nom 43, wmc 97) with many dependencies across subsystems (parser, UI, sandbox, process, util). The high method count and complexity combined with broad coupling indicate this class centralizes multiple responsibilities and would benefit from further decomposition."
+    },
+    {
+      "class": "EditorPane",
+      "detection": false,
+      "justification": "Moderate LOC (184) and method count (nom 19) with moderate complexity (wmc 36) and cohesion indicator (lcom 0.0). Dependencies are limited and focused on editing/UI concerns, suggesting a cohesive single responsibility rather than insufficient modularization."
+    },
+    {
+      "class": "VMLanguageList",
+      "detection": false,
+      "justification": "Small and simple (LOC 40, nom 4, wmc 8) with limited responsibilities and few dependencies; size and structure do not indicate inadequate decomposition."
+    }
+  ]
+}

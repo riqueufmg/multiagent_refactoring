@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.multi.qrcode.detector", "metrics": {"num_classes": 3, "loc": 206, "Ce": 3, "Ca": 3}, "classes": [{"package": "com.google.zxing.multi.qrcode.detector", "class": "MultiDetector", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/multi/qrcode/detector/MultiDetector.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 34, "wmc": 5, "nc": 0, "dit": 0, "lcom": 1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.ResultPointCallback", "com.google.zxing.NotFoundException", "com.google.zxing.multi.qrcode.detector.MultiFinderPatternFinder", "com.google.zxing.common.BitMatrix", "com.google.zxing.DecodeHintType", "com.google.zxing.common.DetectorResult", "com.google.zxing.qrcode.detector.FinderPatternInfo"]}, {"package": "com.google.zxing.multi.qrcode.detector", "class": "MultiFinderPatternFinder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/multi/qrcode/detector/MultiFinderPatternFinder.java", "metrics": {"nof": 7, "nopf": 0, "nom": 3, "nopm": 2, "loc": 163, "wmc": 30, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.ResultPointCallback", "com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.multi.qrcode.detector.MultiDetector", "com.google.zxing.qrcode.detector.FinderPattern", "com.google.zxing.common.BitMatrix", "com.google.zxing.DecodeHintType", "com.google.zxing.qrcode.detector.FinderPatternInfo"]}, {"package": "com.google.zxing.multi.qrcode.detector", "class": "MultiFinderPatternFinder.ModuleSizeComparator", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/multi/qrcode/detector/MultiFinderPatternFinder.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 9, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["com.google.zxing", "com.google.zxing.common", "com.google.zxing.qrcode.detector"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

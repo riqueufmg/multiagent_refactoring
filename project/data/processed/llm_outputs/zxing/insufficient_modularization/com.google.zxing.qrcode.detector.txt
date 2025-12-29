@@ -1,0 +1,41 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.qrcode.detector",
+  "detections": [
+    {
+      "class": "FinderPatternFinder",
+      "detection": true,
+      "justification": "Very large class (loc 536) with high complexity (WMC 107) and many methods (nom 22). It depends on many concepts (BitMatrix, ResultPointCallback, Detector, FinderPattern, FinderPatternInfo, decoding hints) and even contains a nested comparator class, indicating multiple responsibilities (scanning, pattern validation, sorting, heuristics) concentrated in one class. The size and complexity make it hard to understand and suggest it should be decomposed into smaller, more cohesive components."
+    },
+    {
+      "class": "FinderPatternFinder.EstimatedModuleComparator",
+      "detection": false,
+      "justification": "Very small nested helper (loc 8) with a single, well-scoped purpose (comparison). Its limited size and focused role indicate adequate modularization as a helper to FinderPatternFinder."
+    },
+    {
+      "class": "FinderPattern",
+      "detection": false,
+      "justification": "Small data/behavior holder (loc 42, nom 6, WMC 7) focused on representing a finder pattern. Low size and focused responsibility suggest it is adequately modularized."
+    },
+    {
+      "class": "AlignmentPatternFinder",
+      "detection": false,
+      "justification": "Moderate size (loc 195) and complexity (WMC 33) but few methods (nom 6) and dependencies, indicating a focused role (locating alignment patterns). The responsibilities appear cohesive, so insufficient modularization is not evident."
+    },
+    {
+      "class": "AlignmentPattern",
+      "detection": false,
+      "justification": "Very small class (loc 30, nom 3) with a single clear responsibility representing an alignment pattern. It is cohesive and does not show signs of being insufficiently modularized."
+    },
+    {
+      "class": "Detector",
+      "detection": false,
+      "justification": "Larger than some peers (loc 238, nom 14, WMC 37) but its responsibilities align with orchestrating detection (using FinderPattern, AlignmentPatternFinder, grid sampling, transforms). The size reflects its coordinating role rather than mixed unrelated responsibilities, so it does not clearly suffer from insufficient modularization."
+    },
+    {
+      "class": "FinderPatternInfo",
+      "detection": false,
+      "justification": "Small (loc 23, nom 4, WMC 4) and appears to encapsulate information about finder patterns. Its limited scope and low complexity indicate it is modular and cohesive."
+    }
+  ]
+}

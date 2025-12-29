@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.graphing",
+  "detections": [
+    {
+      "class": "TimeLineStage",
+      "detection": true,
+      "justification": "Relatively large size and complexity (loc ~200, WMC 36, 12 methods) combined with many domain dependencies (JITEvent, JITStats, Compilation, ParseUtil, IMetaMember, Tag, JITWatchUI) indicate the class handles multiple concerns (data parsing, event handling, UI concerns). Although cohesion metric is not high, the concentrated size and breadth of responsibilities suggest the abstraction has not been decomposed into smaller, focused classes."
+    },
+    {
+      "class": "AbstractGraphStage",
+      "detection": true,
+      "justification": "Acts as a large shared abstraction with many members (23 fields) and many operations (19 methods, loc ~199, WMC 30). As a single abstract stage holding substantial behavior and state used across graphing stages, it centralizes varied responsibilities (string/util handling, UI resize, parse utilities, tag handling) that could be split into smaller, more focused abstractions or helper components."
+    },
+    {
+      "class": "CodeCacheStage",
+      "detection": false,
+      "justification": "Moderate size (loc 106) with a small number of methods (5) and focused dependencies (CodeCacheEvent, UserInterfaceUtil, Tag, JITWatchUI). Its responsibilities appear narrow and UI-focused, indicating adequate modularization for its purpose."
+    },
+    {
+      "class": "HistoStage",
+      "detection": false,
+      "justification": "Small and focused (loc 85, 3 methods, WMC 7) with specific dependencies around histogram functionality (Histo, IHistoVisitable, IReadOnlyJITDataModel, UserInterfaceUtil). The limited scope and tight dependency set suggest it is properly modularized."
+    }
+  ]
+}

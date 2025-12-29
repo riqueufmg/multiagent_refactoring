@@ -63,8 +63,8 @@ class InsufficientModularizationDetector:
 
         llm_config = {
             "model_name": "gpt-5-mini",
-            "max_input_tokens": 10240,
-            "max_completion_tokens": 4096
+            "max_input_tokens": 307200,
+            "max_completion_tokens": 30720
         }
 
         llm_engine = GPTEngine(**llm_config)

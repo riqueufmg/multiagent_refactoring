@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.build.gradle.android",
+  "detections": [
+    {
+      "class": "ByteBuddyAndroidPlugin",
+      "detection": true,
+      "justification": "Very large class (loc=528) with many fields/roles (nof=24) and numerous embedded responsibilities (many inner classes and configuration/variant/dispatcher functions listed). The class aggregates plugin configuration, variant handling and transformation dispatch behavior, indicating a bloated interface and multiple responsibilities that should be split."
+    },
+    {
+      "class": "ByteBuddyLocalClassesEnhancerTask",
+      "detection": true,
+      "justification": "Large and complex task implementation (loc=313, nom=18, wmc=25) that also defines multiple nested helper classes (DefaultAndroidDescriptor, TargetForAndroidAppJarFile, ForAndroidAppOutputStream). High method count and cyclomatic complexity combined with nested types suggest it mixes orchestration, I/O handling and descriptor logic and would benefit from decomposition."
+    },
+    {
+      "class": "ByteBuddyAndroidService",
+      "detection": true,
+      "justification": "Substantial complexity for a service (loc=292, wmc=26) plus an inner State class (loc=101). The class has many dependencies and a high complexity score, indicating it likely coordinates diverse concerns (class file locating, type pooling, plugin lifecycle) and could be split into smaller, focused services."
+    },
+    {
+      "class": "ByteBuddyAsmClassVisitorFactory",
+      "detection": false,
+      "justification": "Small, narrowly scoped factory (loc=20, nom=2, wmc=2) with minimal dependencies. Size and low complexity indicate a focused single responsibility, not suffering from insufficient modularization."
+    },
+    {
+      "class": "Transformation",
+      "detection": false,
+      "justification": "Moderate size and complexity (loc=103, nom=10, wmc=11) but appears to represent a cohesive abstraction (transformation logic) with limited external dependencies. Metrics suggest a focused role rather than an overly broad one."
+    }
+  ]
+}

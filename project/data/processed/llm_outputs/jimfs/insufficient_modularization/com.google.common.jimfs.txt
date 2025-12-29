@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.common.jimfs",
+  "detections": [
+    {
+      "class": "FileSystemView",
+      "detection": true,
+      "justification": "Very large class (LOC 546) with many methods (nom 38) and very high complexity (WMC 84). The class depends on many different concerns (File, Options, PathService, RegularFile, Directory, SymbolicLink, Feature, FileSystemState, JimfsSecureDirectoryStream, JimfsFileStore) indicating it handles multiple responsibilities (view logic, deletion modes, attribute and directory handling, secure streams, store integration). The size, method count and wide dependency surface suggest responsibilities could be split into smaller, more cohesive abstractions."
+    },
+    {
+      "class": "JimfsPath",
+      "detection": true,
+      "justification": "Relatively large and complex (LOC 279, nom 42, WMC 71) and depends on varied services (Options, PathService, AbstractWatchService, JimfsFileSystem, Name). It appears to mix representation and many operations (normalization, watch-service interactions, filesystem integration). The combination of high method count, high complexity and cross-cutting dependencies suggests the class may be taking on multiple roles and would benefit from decomposition (e.g., separating path representation, normalization, and watch-related behavior)."
+    },
+    {
+      "class": "RegularFile",
+      "detection": true,
+      "justification": "Large implementation with substantial behavior (LOC 467, nom 43, WMC 81). It depends on utilities and storage concerns (Java8Compatibility, Util, File, HeapDisk) which implies it combines I/O semantics, storage/disk management and attribute handling in one place. The high method count and complexity concentrated in a single class indicate multiple responsibilities are concentrated and could be modularized into smaller abstractions (storage, I/O streams, attribute management, locking)."
+    },
+    {
+      "class": "File",
+      "detection": false,
+      "justification": "Moderate size and complexity (LOC 226, nom 34, WMC 42) with a focused dependency (DirectoryEntry). LCOM (0.382) indicates a reasonable level of cohesion. As a core domain abstraction it reasonably encapsulates file-related state and behavior without the extreme size/complexity or broad cross-cutting dependencies seen in the flagged classes, so it does not clearly suffer from insufficient modularization."
+    },
+    {
+      "class": "PathService",
+      "detection": false,
+      "justification": "Moderate class (LOC 191, nom 22, WMC 31) whose dependencies (JimfsPath, PathNormalization, PathMatchers, Configuration, Name, PathType) align with a single conceptual responsibility: path operations and normalization. The size and complexity are appropriate for that focused concern, suggesting acceptable modularization rather than an overloaded abstraction."
+    },
+    {
+      "class": "AttributeProvider",
+      "detection": false,
+      "justification": "Relatively small to medium (LOC 101, nom 16, WMC 18) and focused on attribute provision responsibilities with limited dependencies (FileLookup, File). The class size, method count and dependency scope indicate a single responsibility (providing attributes) rather than a bloated, multi-responsibility class."
+    }
+  ]
+}

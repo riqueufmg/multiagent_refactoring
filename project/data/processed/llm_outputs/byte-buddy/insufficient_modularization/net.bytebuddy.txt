@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy",
+  "detections": [
+    {
+      "class": "ByteBuddy",
+      "detection": true,
+      "justification": "Very large class (LOC 898) with many methods (nom 52) and high complexity (WMC 59) and many fields (nof 35). The class lists numerous and diverse dependencies and contains multiple inner types, indicating it concentrates many responsibilities instead of smaller cohesive abstractions. Moderate cohesion (LCOM ~0.42) combined with size and responsibility breadth suggests inadequate decomposition."
+    },
+    {
+      "class": "ClassFileVersion",
+      "detection": true,
+      "justification": "Substantially large (LOC 476) with many methods (nom 26) and notable complexity (WMC 34) plus many fields. It also contains several nested types (VersionLocator, Resolver, Resolved, Unresolved) and depends on varied concerns, implying multiple roles bundled into one class. Low/modest cohesion (LCOM ~0.19) supports that it could be split into clearer, smaller abstractions."
+    },
+    {
+      "class": "NamingStrategy",
+      "detection": false,
+      "justification": "Although large in lines (LOC 381) and having several nested strategy variants, it has very few core methods (nom 3) and low complexity (WMC 3). The structure appears to be a strategy holder with multiple small, focused nested classes (highly related responsibilities), and cohesion indicators (LCOM -1.0) do not indicate a bloated, multi-responsibility class; it is organized around a single concern (naming strategies)."
+    },
+    {
+      "class": "TypeCache",
+      "detection": false,
+      "justification": "Relatively large (LOC 369) and somewhat complex (WMC 20) but with a moderate number of methods (nom 8) and focused purpose (caching). It provides specific nested key/storage types (StorageKey, LookupKey, SimpleKey, WithInlineExpunction) which indicate internal decomposition of concerns rather than one monolithic responsibility. Cohesion (LCOM 0.25) and the explicit cache-related subtypes suggest it is modular enough for its domain role."
+    }
+  ]
+}

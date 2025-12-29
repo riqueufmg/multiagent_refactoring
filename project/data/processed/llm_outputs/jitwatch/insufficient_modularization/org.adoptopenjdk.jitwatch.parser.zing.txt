@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.parser.zing",
+  "detections": [
+    {
+      "class": "ZingLineType",
+      "detection": false,
+      "justification": "Very small class (loc=1, nom=0) with no methods and no complexity; it does not exhibit bloat or concentrated responsibilities and therefore does not show insufficient modularization."
+    },
+    {
+      "class": "ZingLogParser",
+      "detection": true,
+      "justification": "Relatively large and complex parser (loc=230, nom=12, wmc=43) with moderate cohesion (lcom=0.333) and several dependencies. High WMC and size indicate multiple responsibilities and complex control flow within a single class, making it a candidate for decomposition (e.g., splitting parsing stages or handlers)."
+    },
+    {
+      "class": "ZingLine",
+      "detection": true,
+      "justification": "Large class surface (loc=147, nom=34, nopm=33, wmc=34) with a very large public interface. Although measured cohesion is low (lcom=0.0), the sheer number of methods and public members suggests a bloated abstraction that likely bundles many responsibilities and could be split into smaller, more focused classes (data holder vs. parsing/processing helpers)."
+    }
+  ]
+}

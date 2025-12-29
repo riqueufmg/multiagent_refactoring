@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.jarscan.invokecount",
+  "detections": [
+    {
+      "class": "InvokeMethodCountMap",
+      "detection": false,
+      "justification": "Small class (loc 20) with only 2 methods and low complexity (wmc 4). LCOM 0.0 indicates high cohesion. Focused dependencies and no evidence of a bloated public interface (nopm 2). Appears to represent a single, well-scoped responsibility."
+    },
+    {
+      "class": "MethodCountMap",
+      "detection": true,
+      "justification": "Relatively larger for a single-responsibility utility (loc 36) with moderate complexity (wmc 6) and elevated lack-of-cohesion (LCOM 0.666), suggesting methods operate on different sets of fields/concerns. All methods are public (nopm 3) which hints at a broader interface than necessary for its size, indicating responsibilities that could be split into smaller, more cohesive classes."
+    },
+    {
+      "class": "InvokeCountOperation",
+      "detection": true,
+      "justification": "Higher complexity (wmc 10) despite modest size (loc 27) and multiple external responsibilities implied by dependencies on bytecode types, a map class and ParseUtil. The combination of bytecode parsing, counting and mapping behaviors concentrated in one class suggests it is doing multiple duties and would benefit from decomposition into smaller, focused classes."
+    }
+  ]
+}

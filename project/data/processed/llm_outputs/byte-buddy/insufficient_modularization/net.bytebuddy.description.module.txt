@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.description.module",
+  "detections": [
+    {
+      "class": "ModuleDescription",
+      "detection": true,
+      "justification": "Very large class file (loc: 931) with many fields (nof: 28) and multiple nested/related abstractions declared within the same top-level type (ModuleDescriptor, ForLoadedModule, Latent, Exports, Opens, Requires, Provides, Optional, etc.). The top-level class aggregates diverse responsibilities (descriptor handling, runtime-loaded module adaptation, metadata and nested element types) and depends on many external utilities, indicating a concentration of responsibilities that would benefit from further decomposition."
+    },
+    {
+      "class": "ModuleDescription.ForLoadedModule",
+      "detection": true,
+      "justification": "Substantial size (loc: 421) and heavy involvement with runtime/dispatch utilities (JavaDispatcher, AnnotationList, AccessControllerPlugin). Its size and external responsibilities suggest it handles both reflective/runtime concerns and module description logic, making it a candidate for splitting runtime adaptation logic from pure description concerns."
+    },
+    {
+      "class": "ModuleDescription.ModuleDescriptor",
+      "detection": false,
+      "justification": "Moderate size (loc: 157) and focused purpose (module descriptor representation). It appears to encapsulate descriptor-specific concerns rather than a wide mix of unrelated responsibilities, suggesting adequate modularization at the class level."
+    },
+    {
+      "class": "ModuleDescription.Latent",
+      "detection": false,
+      "justification": "Relatively small to moderate size (loc: 142) and appears to concentrate on constructing/representing latent module descriptions. Its scope seems cohesive and separated from other concerns, so it does not exhibit insufficient modularization by itself."
+    },
+    {
+      "class": "ModuleDescription.Exports",
+      "detection": false,
+      "justification": "Small (loc: 72) and focused on export-related behavior, relying on a limited set of dependencies. It represents a narrowly scoped concern and does not indicate a bloated interface or mixed responsibilities."
+    },
+    {
+      "class": "ModuleDescription.Requires",
+      "detection": false,
+      "justification": "Small (loc: 64) and focused on 'requires' semantics. The class size and focused dependency set imply cohesive responsibility and adequate modularization at the class level."
+    }
+  ]
+}

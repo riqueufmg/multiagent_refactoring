@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.multi", "metrics": {"num_classes": 3, "loc": 176, "Ce": 6, "Ca": 6}, "classes": [{"package": "com.google.zxing.multi", "class": "ByQuadrantReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/multi/ByQuadrantReader.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 4, "loc": 64, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.ResultPoint", "com.google.zxing.Result", "com.google.zxing.BinaryBitmap", "com.google.zxing.Reader"]}, {"package": "com.google.zxing.multi", "class": "GenericMultipleBarcodeReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/multi/GenericMultipleBarcodeReader.java", "metrics": {"nof": 4, "nopf": 0, "nom": 5, "nopm": 3, "loc": 103, "wmc": 24, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.Reader", "com.google.zxing.Result", "com.google.zxing.BinaryBitmap"]}, {"package": "com.google.zxing.multi", "class": "MultipleBarcodeReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/multi/MultipleBarcodeReader.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 0, "loc": 9, "wmc": 2, "nc": 1, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.web.DecodeServlet", "com.google.zxing.BinaryBitmap", "com.google.zxing.client.j2se.DecodeWorker"]}], "dependencies": ["com.google.zxing.pdf417", "com.google.zxing", "com.google.zxing.web", "com.google.zxing.client.j2se", "com.google.zxing.multi.qrcode", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

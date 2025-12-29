@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.launch", "metrics": {"num_classes": 2, "loc": 159, "Ce": 8, "Ca": 0}, "classes": [{"package": "org.adoptopenjdk.jitwatch.launch", "class": "LaunchHeadless", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/launch/LaunchHeadless.java", "metrics": {"nof": 11, "nopf": 0, "nom": 10, "nopm": 8, "loc": 152, "wmc": 30, "nc": 0, "dit": 2, "lcom": 0.4, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.parser.ILogParser", "org.adoptopenjdk.jitwatch.parser.ParserFactory", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.model.JITEvent", "org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.report.comparator.ScoreComparator", "org.adoptopenjdk.jitwatch.core.JITWatchConfig", "org.adoptopenjdk.jitwatch.treevisitor.TreeVisitor", "org.adoptopenjdk.jitwatch.report.suggestion.SuggestionWalker", "org.adoptopenjdk.jitwatch.parser.ParserType", "org.adoptopenjdk.jitwatch.inline.HeadlessInlineVisitor", "org.adoptopenjdk.jitwatch.util.HeadlessUtil"]}, {"package": "org.adoptopenjdk.jitwatch.launch", "class": "LaunchUI", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/launch/LaunchUI.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 7, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["org.adoptopenjdk.jitwatch.inline", "org.adoptopenjdk.jitwatch.core", "org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.report.suggestion", "org.adoptopenjdk.jitwatch.parser", "org.adoptopenjdk.jitwatch.report.comparator", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.treevisitor"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

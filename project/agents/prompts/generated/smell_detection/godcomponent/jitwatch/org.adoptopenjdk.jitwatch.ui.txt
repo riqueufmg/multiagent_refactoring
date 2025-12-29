@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.ui", "metrics": {"num_classes": 3, "loc": 199, "Ce": 1, "Ca": 3}, "classes": [{"package": "org.adoptopenjdk.jitwatch.ui", "class": "Dialogs", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/Dialogs.java", "metrics": {"nof": 2, "nopf": 0, "nom": 15, "nopm": 14, "loc": 183, "wmc": 21, "nc": 0, "dit": 0, "lcom": 0.2666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.ui.Dialogs.Response", "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.ui.Dialogs.Dialog"]}, {"package": "org.adoptopenjdk.jitwatch.ui", "class": "Dialogs.Response", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/Dialogs.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.ui", "class": "Dialogs.Dialog", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/Dialogs.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 15, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["org.adoptopenjdk.jitwatch.util"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

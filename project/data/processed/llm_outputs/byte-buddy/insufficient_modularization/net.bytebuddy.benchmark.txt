@@ -1,0 +1,46 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.benchmark",
+  "detections": [
+    {
+      "class": "TrivialClassCreationBenchmark",
+      "detection": false,
+      "justification": "Small size and surface area compared with peers: low LOC (79), few fields (3) and methods (8), moderate complexity (WMC 8) and no evidence of a bloated interface or multiple responsibilities."
+    },
+    {
+      "class": "StubInvocationBenchmark",
+      "detection": true,
+      "justification": "Relatively large implementation footprint for a benchmark: LOC 203 with many fields (14) but few cohesive methods (6). The combination of many fields and substantial size suggests multiple responsibilities or configuration state that could be decomposed."
+    },
+    {
+      "class": "ClassByExtensionBenchmark",
+      "detection": true,
+      "justification": "Large and feature-rich: high LOC (309), many fields (13) and methods (23), a large public method surface (nopm 20) and non-trivial complexity (WMC 25). This concentration of state and behavior indicates inadequate decomposition."
+    },
+    {
+      "class": "ClassByExtensionBenchmark.ByteBuddyProxyInterceptor",
+      "detection": false,
+      "justification": "Very small inner class (LOC 20) with no measured methods/fields; does not exhibit excessive size or a bloated interface."
+    },
+    {
+      "class": "ClassByExtensionBenchmark.ByteBuddyAccessInterceptor",
+      "detection": false,
+      "justification": "Very small inner class (LOC 22) with minimal measured structure; no sign of concentrated responsibilities or excessive complexity."
+    },
+    {
+      "class": "ClassByExtensionBenchmark.ByteBuddyPrefixInterceptor",
+      "detection": false,
+      "justification": "Very small inner class (LOC 16) with minimal structure; not indicative of insufficient modularization."
+    },
+    {
+      "class": "SuperClassInvocationBenchmark",
+      "detection": true,
+      "justification": "Substantial size (LOC 265) and many fields (16) despite a modest method count (8). The large body and statefulness suggest the class aggregates multiple concerns or extensive setup logic that would benefit from decomposition."
+    },
+    {
+      "class": "ClassByImplementationBenchmark",
+      "detection": true,
+      "justification": "Strong indicator of insufficient modularization: largest class in the package (LOC 370) with many fields (22) including many non-private (nopf 10), a very large method set (nom 32, nopm 29) and high complexity (WMC 66). The combination of size, exposed surface and complexity implies multiple responsibilities and a bloated interface."
+    }
+  ]
+}

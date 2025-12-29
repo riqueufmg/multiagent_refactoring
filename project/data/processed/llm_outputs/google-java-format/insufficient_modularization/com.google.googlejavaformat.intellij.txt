@@ -1,0 +1,56 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.googlejavaformat.intellij",
+  "detections": [
+    {
+      "class": "GoogleJavaFormatConfigurable",
+      "detection": true,
+      "justification": "Large class surface (nom=14, nopm=11) with high complexity (WMC=14) and LOC=73; mixes UI/configuration responsibilities and depends on settings/UI types, indicating multiple concerns that could be split into smaller cohesive classes."
+    },
+    {
+      "class": "GoogleJavaFormatImportOptimizer",
+      "detection": false,
+      "justification": "Small number of methods (nom=2) and focused dependencies on import/formatting utilities; appears to implement a single responsibility (import optimization) despite moderate complexity in implementation."
+    },
+    {
+      "class": "UiFormatterStyle",
+      "detection": false,
+      "justification": "Very small class (nom=4, LOC=19, WMC=4) with a narrow dependency on formatter options; likely a single cohesive abstraction."
+    },
+    {
+      "class": "Notifications",
+      "detection": false,
+      "justification": "Tiny utility-like class (LOC=10, nom=2, WMC=2) with a focused purpose (notifications) and no signs of multiple responsibilities."
+    },
+    {
+      "class": "JreConfigurationChecker",
+      "detection": false,
+      "justification": "Moderate size (nom=7, LOC=50, WMC=10) but conceptually a single concern (checking JRE configuration); no evidence it mixes unrelated responsibilities or holds a bloated interface."
+    },
+    {
+      "class": "GoogleJavaFormatSettings",
+      "detection": true,
+      "justification": "Relatively large settings class (nom=10, nopm=2, LOC=60, WMC=11) that contains/state inner classes and interacts with formatter options; combines state management, persistence, and option translation, suggesting multiple responsibilities that could be modularized."
+    },
+    {
+      "class": "GoogleJavaFormatSettings.EnabledState",
+      "detection": false,
+      "justification": "Trivial inner type (LOC=1) representing a single piece of state; too small to be suffering from insufficient modularization."
+    },
+    {
+      "class": "GoogleJavaFormatSettings.State",
+      "detection": false,
+      "justification": "Small state holder (LOC=22) intended to represent persisted settings; focused data class with limited behavior, not an indicator of insufficient modularization."
+    },
+    {
+      "class": "GoogleJavaFormatFormattingService",
+      "detection": true,
+      "justification": "Substantial class (nom=7, LOC=70, WMC=9) that orchestrates formatting, depends on multiple subsystems (Formatter, Builder, settings, notifications) and contains a nested formatting task; combines orchestration and task logic suggesting it could be split into clearer modules (service vs. task/worker)."
+    },
+    {
+      "class": "GoogleJavaFormatFormattingService.GoogleJavaFormatFormattingTask",
+      "detection": false,
+      "justification": "Small nested task class (LOC=33) with a narrow purpose tied to formatting execution; represents a focused unit of work rather than a bloated abstraction."
+    }
+  ]
+}

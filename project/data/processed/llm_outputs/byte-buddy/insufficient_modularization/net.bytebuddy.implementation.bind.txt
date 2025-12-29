@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bind",
+  "detections": [
+    {
+      "class": "MethodDelegationBinder",
+      "detection": true,
+      "justification": "Extremely large file (loc 777) that contains numerous nested/inner types and many distinct responsibilities (binding, resolution, invocation, ambiguity resolution, builders, processors). High number of fields (nof 28) and many dependencies indicate a concentration of responsibilities and a bloated abstraction that would benefit from decomposition into smaller, cohesive classes."
+    },
+    {
+      "class": "ArgumentTypeResolver",
+      "detection": true,
+      "justification": "Relatively large and complex (loc 203, wmc 15) with its own nested helper types (PrimitiveTypePrecedence, ParameterIndexToken). The high cyclomatic complexity and multiple nested concerns for resolving argument types suggest it encapsulates several responsibilities and could be split into clearer, smaller abstractions."
+    },
+    {
+      "class": "MethodNameEqualityResolver",
+      "detection": false,
+      "justification": "Small and focused (loc 20, nom 1, wmc 2) with a single clear responsibility (resolving method name equality) and minimal dependencies; it appears cohesive and appropriately modular."
+    },
+    {
+      "class": "ParameterLengthResolver",
+      "detection": false,
+      "justification": "Compact and single-purpose (loc 23, nom 1, wmc 3). The metrics and lack of nested complexity indicate it is a cohesive unit that does not exhibit signs of insufficient modularization."
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.client.android.camera", "metrics": {"num_classes": 7, "loc": 881, "Ce": 2, "Ca": 2}, "classes": [{"package": "com.google.zxing.client.android.camera", "class": "CameraConfigurationUtils", "file": "data/repositories/zxing/android-core/src/main/java/com/google/zxing/client/android/camera/CameraConfigurationUtils.java", "metrics": {"nof": 9, "nopf": 0, "nom": 21, "nopm": 14, "loc": 344, "wmc": 71, "nc": 0, "dit": 0, "lcom": 0.238095238095238, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.camera.CameraConfigurationManager"]}, {"package": "com.google.zxing.client.android.camera", "class": "CameraConfigurationManager", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/camera/CameraConfigurationManager.java", "metrics": {"nof": 8, "nopf": 0, "nom": 12, "nopm": 0, "loc": 156, "wmc": 30, "nc": 0, "dit": 0, "lcom": 0.1666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.camera.CameraManager", "com.google.zxing.client.android.camera.FrontLightMode", "com.google.zxing.client.android.camera.open.OpenCamera", "com.google.zxing.client.android.camera.CameraConfigurationUtils", "com.google.zxing.client.android.camera.open.CameraFacing", "com.google.zxing.client.android.camera.PreviewCallback", "com.google.zxing.client.android.PreferencesActivity"]}, {"package": "com.google.zxing.client.android.camera", "class": "PreviewCallback", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/camera/PreviewCallback.java", "metrics": {"nof": 3, "nopf": 0, "nom": 3, "nopm": 1, "loc": 21, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.camera.CameraManager", "com.google.zxing.client.android.camera.CameraConfigurationManager"]}, {"package": "com.google.zxing.client.android.camera", "class": "AutoFocusManager", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/camera/AutoFocusManager.java", "metrics": {"nof": 8, "nopf": 0, "nom": 6, "nopm": 1, "loc": 85, "wmc": 12, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.camera.CameraManager", "com.google.zxing.client.android.camera.AutoFocusManager.AutoFocusTask", "com.google.zxing.client.android.PreferencesActivity"]}, {"package": "com.google.zxing.client.android.camera", "class": "AutoFocusManager.AutoFocusTask", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/camera/AutoFocusManager.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 11, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.camera.AutoFocusManager"]}, {"package": "com.google.zxing.client.android.camera", "class": "CameraManager", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/camera/CameraManager.java", "metrics": {"nof": 17, "nopf": 0, "nom": 14, "nopm": 13, "loc": 245, "wmc": 38, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.ViewfinderView", "com.google.zxing.client.android.camera.PreviewCallback", "com.google.zxing.client.android.CaptureActivityHandler", "com.google.zxing.client.android.camera.open.OpenCamera", "com.google.zxing.client.android.CaptureActivity", "com.google.zxing.client.android.camera.CameraConfigurationManager", "com.google.zxing.client.android.AmbientLightManager", "com.google.zxing.client.android.camera.AutoFocusManager", "com.google.zxing.client.android.camera.open.OpenCameraInterface"]}, {"package": "com.google.zxing.client.android.camera", "class": "FrontLightMode", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/camera/FrontLightMode.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 19, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.AmbientLightManager", "com.google.zxing.client.android.camera.CameraConfigurationManager", "com.google.zxing.client.android.PreferencesActivity"]}], "dependencies": ["com.google.zxing.client.android.camera.open", "com.google.zxing.client.android"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

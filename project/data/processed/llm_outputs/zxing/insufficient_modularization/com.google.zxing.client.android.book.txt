@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.client.android.book",
+  "detections": [
+    {
+      "class": "SearchBookContentsActivity",
+      "detection": true,
+      "justification": "Large size and complexity (loc=190, wmc=15, nof=14) and contains an embedded NetworkTask. Mixes UI logic with network/search responsibilities (depends on HttpHelper, LocaleManager, Intents), indicating concentrated responsibilities and poor decomposition."
+    },
+    {
+      "class": "SearchBookContentsActivity.NetworkTask",
+      "detection": true,
+      "justification": "Substantial nested class (loc=94) that performs network-related work (depends on HttpHelper) inside the activity. Large inner class suggests a responsibility that should be modularized into a separate component."
+    },
+    {
+      "class": "SearchBookContentsAdapter",
+      "detection": false,
+      "justification": "Small and simple (loc=27, nom=2, wmc=4) with limited responsibilities and few methods; no evidence of a bloated interface or excessive complexity."
+    },
+    {
+      "class": "SearchBookContentsListItem",
+      "detection": true,
+      "justification": "Moderate size/complexity for a list item (loc=48, nom=4, wmc=8) and low cohesion (lcom=0.75), indicating multiple responsibilities within a single class and potential need to split concerns."
+    },
+    {
+      "class": "BrowseBookListener",
+      "detection": false,
+      "justification": "Small listener class (loc=28, nom=2, wmc=5) with focused responsibilities; no signs of excessive size or a bloated interface."
+    },
+    {
+      "class": "SearchBookContentsResult",
+      "detection": false,
+      "justification": "Relatively compact and cohesive (loc=35, nom=7, wmc=7, lcom≈0.29); appears to be a focused result/data holder rather than an overly large, multi-responsibility class."
+    }
+  ]
+}

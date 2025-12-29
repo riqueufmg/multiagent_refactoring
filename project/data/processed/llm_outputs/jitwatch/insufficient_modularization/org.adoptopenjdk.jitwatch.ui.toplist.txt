@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.toplist",
+  "detections": [
+    {
+      "class": "TopListStage",
+      "detection": true,
+      "justification": "TopListStage shows signs of concentrated responsibilities: relatively large size (loc 110) with 9 methods and 6 public methods (nopm 6), and a high cyclomatic/weight measure (wmc 16) indicating internal complexity. It depends on many different interfaces and concerns (model interfaces IMetaMember, IReadOnlyJITDataModel, UI listener IMemberSelectedListener, scoring ITopListScore, utility UserInterfaceUtil and the TopListWrapper), suggesting it coordinates UI, model and scoring logic. Although LCOM (0.222) indicates some cohesion, the combination of size, complexity, number of public methods and multiple cross-cutting dependencies supports that responsibilities could be further decomposed into smaller classes."
+    },
+    {
+      "class": "TopListWrapper",
+      "detection": false,
+      "justification": "TopListWrapper is small and focused: low size (loc 19), few methods (nom 4), low complexity (wmc 4) and perfect cohesion (lcom 0.0). It has minimal dependencies and appears to represent a single, well-scoped abstraction, so there is no evidence of insufficient modularization."
+    }
+  ]
+}

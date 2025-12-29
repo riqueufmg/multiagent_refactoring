@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.process.compiler", "metrics": {"num_classes": 7, "loc": 195, "Ce": 1, "Ca": 4}, "classes": [{"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "ICompiler", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/ICompiler.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 3, "wmc": 1, "nc": 6, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerKotlin", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerKotlin.java", "metrics": {"nof": 3, "nopf": 1, "nom": 2, "nopm": 2, "loc": 29, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerGroovy", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerGroovy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 28, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerJava", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerJava.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 31, "wmc": 6, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerJavaScript", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerJavaScript.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 28, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerJRuby", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerJRuby.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 28, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerScala", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerScala.java", "metrics": {"nof": 3, "nopf": 0, "nom": 4, "nopm": 3, "loc": 48, "wmc": 10, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}], "dependencies": ["org.adoptopenjdk.jitwatch.logger"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

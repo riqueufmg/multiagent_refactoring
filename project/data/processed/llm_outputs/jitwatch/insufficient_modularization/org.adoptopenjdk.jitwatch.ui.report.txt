@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.report",
+  "detections": [
+    {
+      "class": "ReportStage",
+      "detection": true,
+      "justification": "Contains the majority of package LOC (86 of 125), high cyclomatic complexity (WMC 19) and multiple methods/fields while depending on many unrelated builders and UI components (InliningRowBuilder, EliminatedAllocationRowBuilder, SuggestionRowBuilder, OptimisedLockRowBuilder, various cell classes, filters and UI proxies). It coordinates disparate responsibilities (building different report row types, UI cell handling, filtering and stage access), indicating concentrated responsibilities and coupling that suggest it should be split into smaller, cohesive classes."
+    },
+    {
+      "class": "ReportPackageFilter",
+      "detection": false,
+      "justification": "Small class (21 LOC) with low complexity (WMC 4), few methods and a focused dependency on ReportStage. Its size and single responsibility (package filtering) indicate adequate modularization."
+    },
+    {
+      "class": "AbstractReportRowBean",
+      "detection": false,
+      "justification": "Modest size (15 LOC), low complexity and serves as an abstract/base abstraction (DIT 1) for row beans. Its role as a small common base suggests cohesion rather than insufficient modularization."
+    },
+    {
+      "class": "IReportRowBean",
+      "detection": false,
+      "justification": "Minimal interface (2 LOC) with a single responsibility; too small to suffer from insufficient modularization."
+    },
+    {
+      "class": "ReportStageType",
+      "detection": false,
+      "justification": "Trivial/marker-like type (1 LOC), likely an enum or simple type with no methods or dependencies; not a candidate for insufficient modularization."
+    }
+  ]
+}

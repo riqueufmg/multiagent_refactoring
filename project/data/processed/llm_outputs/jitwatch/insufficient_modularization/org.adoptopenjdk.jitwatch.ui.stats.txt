@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.stats",
+  "detections": [
+    {
+      "class": "StatsTableBuilder",
+      "detection": false,
+      "justification": "Small class (loc 17) with only 2 methods (nom=2), low complexity (wmc=2), no external fan-in/fan-out and no listed dependencies. Responsibilities appear focused on building table elements rather than aggregating unrelated concerns."
+    },
+    {
+      "class": "StatsTableRow",
+      "detection": false,
+      "justification": "Compact, cohesive data/representation class (loc 15, nom=3, nopm=3, wmc=3, lcom=0.0) with no dependencies. Metrics indicate a single, well-scoped responsibility rather than a bloated abstraction."
+    },
+    {
+      "class": "StatsStage",
+      "detection": true,
+      "justification": "Disproportionately large/central within the package (loc 42 of package LOC 74) and depends on multiple external concerns (StatsTableBuilder, StatsTableRow, org.adoptopenjdk.jitwatch.model.JITStats, util.UserInterfaceUtil, ui.main.JITWatchUI). Although method count is modest (nom=3), the class appears to coordinate UI, model and utility responsibilities, concentrating cross-cutting functionality in one place — an indication of insufficient modularization."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.common.reedsolomon", "metrics": {"num_classes": 5, "loc": 530, "Ce": 8, "Ca": 8}, "classes": [{"package": "com.google.zxing.common.reedsolomon", "class": "ReedSolomonException", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/reedsolomon/ReedSolomonException.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 9, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.common.reedsolomon.ReedSolomonDecoder"]}, {"package": "com.google.zxing.common.reedsolomon", "class": "GenericGF", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/reedsolomon/GenericGF.java", "metrics": {"nof": 15, "nopf": 8, "nom": 12, "nopm": 4, "loc": 118, "wmc": 20, "nc": 0, "dit": 0, "lcom": 0.1666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.aztec.decoder.Decoder", "com.google.zxing.datamatrix.decoder.Decoder", "com.google.zxing.aztec.encoder.Encoder", "com.google.zxing.common.reedsolomon.ReedSolomonEncoder", "com.google.zxing.common.reedsolomon.ReedSolomonDecoder", "com.google.zxing.aztec.detector.Detector", "com.google.zxing.qrcode.decoder.Decoder", "com.google.zxing.qrcode.encoder.Encoder", "com.google.zxing.maxicode.decoder.Decoder", "com.google.zxing.common.reedsolomon.GenericGFPoly"]}, {"package": "com.google.zxing.common.reedsolomon", "class": "GenericGFPoly", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/reedsolomon/GenericGFPoly.java", "metrics": {"nof": 2, "nopf": 0, "nom": 12, "nopm": 1, "loc": 220, "wmc": 49, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.common.reedsolomon.GenericGF", "com.google.zxing.common.reedsolomon.ReedSolomonDecoder", "com.google.zxing.common.reedsolomon.ReedSolomonEncoder"]}, {"package": "com.google.zxing.common.reedsolomon", "class": "ReedSolomonEncoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/reedsolomon/ReedSolomonEncoder.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 2, "loc": 46, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.common.reedsolomon.GenericGF", "com.google.zxing.aztec.encoder.Encoder", "com.google.zxing.common.reedsolomon.GenericGFPoly"]}, {"package": "com.google.zxing.common.reedsolomon", "class": "ReedSolomonDecoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/reedsolomon/ReedSolomonDecoder.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 3, "loc": 137, "wmc": 25, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.aztec.decoder.Decoder", "com.google.zxing.common.reedsolomon.GenericGF", "com.google.zxing.common.reedsolomon.ReedSolomonException", "com.google.zxing.aztec.detector.Detector", "com.google.zxing.qrcode.decoder.Decoder", "com.google.zxing.datamatrix.decoder.Decoder", "com.google.zxing.maxicode.decoder.Decoder", "com.google.zxing.common.reedsolomon.GenericGFPoly"]}], "dependencies": ["com.google.zxing.qrcode.encoder", "com.google.zxing.aztec.detector", "com.google.zxing.aztec.decoder", "com.google.zxing.datamatrix.decoder", "com.google.zxing.pdf417.decoder.ec", "com.google.zxing.maxicode.decoder", "com.google.zxing.aztec.encoder", "com.google.zxing.qrcode.decoder"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

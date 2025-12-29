@@ -1,0 +1,56 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.googlejavaformat.java.javadoc",
+  "detections": [
+    {
+      "class": "JavadocFormatter",
+      "detection": true,
+      "justification": "Moderate LOC (99) with a high cyclomatic weight (WMC 40) and multiple methods (nom 8) indicates concentrated complex formatting logic; complexity suggests multiple responsibilities that could be split (formatting orchestration vs. low-level formatting helpers)."
+    },
+    {
+      "class": "NestingCounter",
+      "detection": false,
+      "justification": "Small and focused (loc 28, nom 6, wmc 8) with low complexity and clear single responsibility of tracking nesting, so no evidence of insufficient modularization."
+    },
+    {
+      "class": "JavadocLexer",
+      "detection": true,
+      "justification": "Very large and complex lexer (loc 375, nof 34 fields, nom 18 methods, WMC 81) which concentrates many fields and complex logic; likely mixes lexical state, token production, and error handling and would benefit from decomposition (state handlers, token factories)."
+    },
+    {
+      "class": "JavadocLexer.LexException",
+      "detection": false,
+      "justification": "Tiny exception type (loc 2) with single focused purpose, so not a modularization problem."
+    },
+    {
+      "class": "Token",
+      "detection": false,
+      "justification": "Small data/utility class (loc 60, nom 5, WMC 5) representing tokens; low complexity and cohesive responsibility, not exhibiting insufficient modularization."
+    },
+    {
+      "class": "Token.Type",
+      "detection": false,
+      "justification": "Small enum/inner type (loc 37) with a focused role; no signs of excessive size or mixed responsibilities."
+    },
+    {
+      "class": "JavadocWriter",
+      "detection": true,
+      "justification": "Relatively large writer (loc 247) with many methods (nom 36), substantial complexity (WMC 50) and multiple nested concerns (requested whitespace, auto-indent types present); likely combines formatting output, whitespace rules, and indent logic that could be modularized."
+    },
+    {
+      "class": "JavadocWriter.RequestedWhitespace",
+      "detection": false,
+      "justification": "Very small helper (loc 4) with a focused purpose; appropriate modularization."
+    },
+    {
+      "class": "JavadocWriter.AutoIndent",
+      "detection": false,
+      "justification": "Tiny helper (loc 1) representing a narrow concern; not a modularization issue."
+    },
+    {
+      "class": "CharStream",
+      "detection": false,
+      "justification": "Small utility (loc 35, nom 5, WMC 7) handling character stream concerns; focused responsibility and modest complexity indicate adequate modularization."
+    }
+  ]
+}

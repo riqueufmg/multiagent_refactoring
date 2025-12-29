@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.oned.rss", "metrics": {"num_classes": 6, "loc": 609, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.oned.rss", "class": "AbstractRSSReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/AbstractRSSReader.java", "metrics": {"nof": 10, "nopf": 0, "nom": 12, "nopm": 0, "loc": 104, "wmc": 22, "nc": 1, "dit": 0, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.NotFoundException", "com.google.zxing.common.detector.MathUtils"]}, {"package": "com.google.zxing.oned.rss", "class": "RSSUtils", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/RSSUtils.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 1, "loc": 64, "wmc": 14, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.RSS14Reader", "com.google.zxing.oned.rss.expanded.RSSExpandedReader"]}, {"package": "com.google.zxing.oned.rss", "class": "FinderPattern", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/FinderPattern.java", "metrics": {"nof": 3, "nopf": 0, "nom": 6, "nopm": 6, "loc": 32, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.expanded.ExpandedPair", "com.google.zxing.oned.rss.expanded.RSSExpandedReader", "com.google.zxing.ResultPoint", "com.google.zxing.oned.rss.RSS14Reader", "com.google.zxing.oned.rss.Pair"]}, {"package": "com.google.zxing.oned.rss", "class": "RSS14Reader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/RSS14Reader.java", "metrics": {"nof": 9, "nopf": 0, "nom": 11, "nopm": 3, "loc": 362, "wmc": 73, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.ResultPointCallback", "com.google.zxing.common.BitArray", "com.google.zxing.NotFoundException", "com.google.zxing.oned.rss.RSSUtils", "com.google.zxing.ResultPoint", "com.google.zxing.oned.rss.DataCharacter", "com.google.zxing.ResultMetadataType", "com.google.zxing.oned.rss.Pair", "com.google.zxing.DecodeHintType", "com.google.zxing.common.detector.MathUtils", "com.google.zxing.Result", "com.google.zxing.oned.rss.FinderPattern"]}, {"package": "com.google.zxing.oned.rss", "class": "DataCharacter", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/DataCharacter.java", "metrics": {"nof": 2, "nopf": 0, "nom": 6, "nopm": 6, "loc": 30, "wmc": 7, "nc": 1, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.expanded.ExpandedPair", "com.google.zxing.oned.rss.expanded.RSSExpandedReader", "com.google.zxing.oned.rss.RSS14Reader"]}, {"package": "com.google.zxing.oned.rss", "class": "Pair", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/Pair.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 0, "loc": 17, "wmc": 4, "nc": 0, "dit": 1, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.FinderPattern", "com.google.zxing.oned.rss.RSS14Reader"]}], "dependencies": ["com.google.zxing", "com.google.zxing.common.detector", "com.google.zxing.oned.rss.expanded", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

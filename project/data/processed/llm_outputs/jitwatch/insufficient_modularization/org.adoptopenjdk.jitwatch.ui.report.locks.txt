@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.report.locks",
+  "detections": [
+    {
+      "class": "OptimisedLockRowBuilder",
+      "detection": false,
+      "justification": "Focused responsibility: 8 methods, 69 LOC and WMC 8 indicate a moderate-sized class whose purpose (building rows) is consistent. It has no recorded external dependencies or fan-in/fan-out, suggesting it encapsulates a single concern rather than aggregating unrelated functionality."
+    },
+    {
+      "class": "OptimisedLockRowBean",
+      "detection": true,
+      "justification": "Likely mixes data and processing/reporting responsibilities: despite modest LOC (36) it has 7 methods and a relatively high WMC (10) for a 'Bean' class, plus dependencies on Report, Compilation and ReportType and a DIT of 2. These signs indicate behavior beyond a simple data holder and a concentration of responsibilities that could be split into a pure data model and separate reporting/processing components."
+    }
+  ]
+}

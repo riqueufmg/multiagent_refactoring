@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.client.android.result", "metrics": {"num_classes": 14, "loc": 965, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.client.android.result", "class": "ProductResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/ProductResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 5, "loc": 39, "wmc": 11, "nc": 0, "dit": 1, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.Result"]}, {"package": "com.google.zxing.client.android.result", "class": "ResultHandlerFactory", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/ResultHandlerFactory.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 1, "loc": 27, "wmc": 13, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ResultParser", "com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.android.CaptureActivity", "com.google.zxing.Result", "com.google.zxing.client.android.result.ResultHandler"]}, {"package": "com.google.zxing.client.android.result", "class": "EmailAddressResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/EmailAddressResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 5, "loc": 28, "wmc": 7, "nc": 0, "dit": 1, "lcom": 0.8, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.EmailAddressParsedResult"]}, {"package": "com.google.zxing.client.android.result", "class": "TextResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/TextResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 5, "loc": 32, "wmc": 9, "nc": 0, "dit": 1, "lcom": 0.8, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.Result"]}, {"package": "com.google.zxing.client.android.result", "class": "GeoResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/GeoResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 5, "loc": 28, "wmc": 7, "nc": 0, "dit": 1, "lcom": 0.8, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.GeoParsedResult"]}, {"package": "com.google.zxing.client.android.result", "class": "ISBNResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/ISBNResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 5, "loc": 32, "wmc": 9, "nc": 0, "dit": 1, "lcom": 0.8, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.ISBNParsedResult", "com.google.zxing.Result"]}, {"package": "com.google.zxing.client.android.result", "class": "ResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/ResultHandler.java", "metrics": {"nof": 13, "nopf": 1, "nom": 43, "nopm": 9, "loc": 361, "wmc": 80, "nc": 11, "dit": 0, "lcom": 0.1860465116279069, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.history.HistoryManager", "com.google.zxing.client.android.PreferencesActivity", "com.google.zxing.client.result.ResultParser", "com.google.zxing.client.android.result.ResultHandlerFactory", "com.google.zxing.client.android.LocaleManager", "com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.android.CaptureActivity", "com.google.zxing.client.android.Contents", "com.google.zxing.Result", "com.google.zxing.client.android.Intents", "com.google.zxing.client.android.result.ResultButtonListener", "com.google.zxing.client.android.ScanFromWebPageManager"]}, {"package": "com.google.zxing.client.android.result", "class": "URIResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/URIResultHandler.java", "metrics": {"nof": 2, "nopf": 0, "nom": 7, "nopm": 7, "loc": 50, "wmc": 14, "nc": 0, "dit": 1, "lcom": 0.8571428571428571, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.URIParsedResult", "com.google.zxing.client.android.LocaleManager"]}, {"package": "com.google.zxing.client.android.result", "class": "ResultButtonListener", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/ResultButtonListener.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 15, "wmc": 2, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.result.ResultHandler"]}, {"package": "com.google.zxing.client.android.result", "class": "SMSResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/SMSResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 6, "loc": 42, "wmc": 9, "nc": 0, "dit": 1, "lcom": 0.8333333333333334, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.SMSParsedResult", "com.google.zxing.client.result.ParsedResult"]}, {"package": "com.google.zxing.client.android.result", "class": "AddressBookResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/AddressBookResultHandler.java", "metrics": {"nof": 4, "nopf": 0, "nom": 8, "nopm": 6, "loc": 126, "wmc": 26, "nc": 0, "dit": 1, "lcom": 0.375, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.AddressBookParsedResult"]}, {"package": "com.google.zxing.client.android.result", "class": "TelResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/TelResultHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 6, "loc": 36, "wmc": 8, "nc": 0, "dit": 1, "lcom": 0.8333333333333334, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.TelParsedResult"]}, {"package": "com.google.zxing.client.android.result", "class": "WifiResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/WifiResultHandler.java", "metrics": {"nof": 2, "nopf": 0, "nom": 7, "nopm": 7, "loc": 45, "wmc": 9, "nc": 0, "dit": 1, "lcom": 0.8571428571428571, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.android.CaptureActivity", "com.google.zxing.client.result.WifiParsedResult"]}, {"package": "com.google.zxing.client.android.result", "class": "CalendarResultHandler", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/result/CalendarResultHandler.java", "metrics": {"nof": 2, "nopf": 0, "nom": 8, "nopm": 6, "loc": 104, "wmc": 18, "nc": 0, "dit": 1, "lcom": 0.625, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.result.ParsedResult", "com.google.zxing.client.result.CalendarParsedResult"]}], "dependencies": ["com.google.zxing", "com.google.zxing.client.android", "com.google.zxing.client.android.history", "com.google.zxing.client.result"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.aztec", "metrics": {"num_classes": 3, "loc": 161, "Ce": 5, "Ca": 5}, "classes": [{"package": "com.google.zxing.aztec", "class": "AztecDetectorResult", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/aztec/AztecDetectorResult.java", "metrics": {"nof": 4, "nopf": 0, "nom": 6, "nopm": 6, "loc": 32, "wmc": 6, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.aztec.decoder.Decoder", "com.google.zxing.ResultPoint", "com.google.zxing.common.BitMatrix", "com.google.zxing.aztec.AztecReader"]}, {"package": "com.google.zxing.aztec", "class": "AztecWriter", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/aztec/AztecWriter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 2, "loc": 54, "wmc": 13, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.EncodeHintType", "com.google.zxing.common.BitMatrix", "com.google.zxing.aztec.encoder.Encoder", "com.google.zxing.aztec.encoder.AztecCode"]}, {"package": "com.google.zxing.aztec", "class": "AztecReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/aztec/AztecReader.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 3, "loc": 75, "wmc": 11, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.ResultPointCallback", "com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.common.DecoderResult", "com.google.zxing.Result", "com.google.zxing.FormatException", "com.google.zxing.DecodeHintType", "com.google.zxing.BinaryBitmap", "com.google.zxing.aztec.detector.Detector", "com.google.zxing.ResultMetadataType", "com.google.zxing.aztec.AztecDetectorResult"]}], "dependencies": ["com.google.zxing.aztec.detector", "com.google.zxing.aztec.decoder", "com.google.zxing", "com.google.zxing.aztec.encoder", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

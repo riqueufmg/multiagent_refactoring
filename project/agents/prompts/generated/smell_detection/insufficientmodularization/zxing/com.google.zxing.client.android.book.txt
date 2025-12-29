@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.client.android.book", "metrics": {"num_classes": 6, "loc": 422, "Ce": 1, "Ca": 1}, "classes": [{"package": "com.google.zxing.client.android.book", "class": "SearchBookContentsAdapter", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/book/SearchBookContentsAdapter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 27, "wmc": 4, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.book.SearchBookContentsListItem", "com.google.zxing.client.android.book.SearchBookContentsResult"]}, {"package": "com.google.zxing.client.android.book", "class": "SearchBookContentsActivity", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/book/SearchBookContentsActivity.java", "metrics": {"nof": 14, "nopf": 0, "nom": 7, "nopm": 3, "loc": 190, "wmc": 15, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.HttpHelper", "com.google.zxing.client.android.LocaleManager", "com.google.zxing.client.android.book.SearchBookContentsActivity.NetworkTask", "com.google.zxing.client.android.book.BrowseBookListener", "com.google.zxing.client.android.Intents"]}, {"package": "com.google.zxing.client.android.book", "class": "SearchBookContentsActivity.NetworkTask", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/book/SearchBookContentsActivity.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 94, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.book.SearchBookContentsActivity", "com.google.zxing.client.android.HttpHelper"]}, {"package": "com.google.zxing.client.android.book", "class": "SearchBookContentsListItem", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/book/SearchBookContentsListItem.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 2, "loc": 48, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.75, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.book.SearchBookContentsAdapter", "com.google.zxing.client.android.book.SearchBookContentsResult"]}, {"package": "com.google.zxing.client.android.book", "class": "BrowseBookListener", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/book/BrowseBookListener.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 1, "loc": 28, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.book.SearchBookContentsActivity", "com.google.zxing.client.android.LocaleManager", "com.google.zxing.client.android.book.SearchBookContentsResult", "com.google.zxing.client.android.Intents"]}, {"package": "com.google.zxing.client.android.book", "class": "SearchBookContentsResult", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/book/SearchBookContentsResult.java", "metrics": {"nof": 5, "nopf": 0, "nom": 7, "nopm": 6, "loc": 35, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.2857142857142857, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.book.SearchBookContentsAdapter", "com.google.zxing.client.android.book.SearchBookContentsListItem", "com.google.zxing.client.android.book.BrowseBookListener"]}], "dependencies": ["com.google.zxing.client.android"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

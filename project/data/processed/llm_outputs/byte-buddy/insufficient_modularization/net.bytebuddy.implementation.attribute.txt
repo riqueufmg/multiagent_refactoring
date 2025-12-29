@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.attribute",
+  "detections": [
+    {
+      "class": "AnnotationAppender",
+      "detection": true,
+      "justification": "Very large implementation (LOC 556) with many fields/elements (nof 20) and multiple distinct inner types (Target, Default, OnType, OnField, OnMethod, OnMethodParameter, OnRecordComponent, ForTypeAnnotations). It depends on many concepts (TypeDescription, AnnotationDescription, AnnotationValueFilter, MethodDescription) and covers annotation appending for many different targets — indicating multiple responsibilities concentrated in one abstraction that would benefit from further decomposition."
+    },
+    {
+      "class": "MethodAttributeAppender",
+      "detection": true,
+      "justification": "Substantial size and breadth (LOC 338, nc 8) with numerous nested types and roles (Factory, Compound, ForInstrumentedMethod, Explicit, Target, OnMethod, OnMethodParameter, ForReceiverType). It handles multiple concerns around method-related attribute appending (methods, parameters, receiver types) suggesting a bloated interface and mixed responsibilities that should be split into more focused abstractions."
+    },
+    {
+      "class": "AnnotationAppender.ForTypeAnnotations",
+      "detection": true,
+      "justification": "Relatively large inner class (LOC 250, nof 12) that provides a sizeable, distinct implementation focused on type annotations and depends on TypeDescription, TypeList and AnnotationValueFilter. Its substantial independent logic within an enclosing AnnotationAppender signals insufficient decomposition — it reads like a separate responsibility that should be modularized further."
+    },
+    {
+      "class": "TypeAttributeAppender",
+      "detection": false,
+      "justification": "Moderate size (LOC 164) with a single main responsibility (nom 1, wmc 1) focused on appending type attributes and limited, small inner helper types. Dependencies are cohesive for its purpose (TypeDescription, AnnotationAppender, AnnotationValueFilter) and its interface and complexity appear appropriately scoped for its abstraction."
+    }
+  ]
+}

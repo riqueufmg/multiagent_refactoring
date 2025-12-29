@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.web", "metrics": {"num_classes": 15, "loc": 864, "Ce": 5, "Ca": 5}, "classes": [{"package": "com.google.zxing.web", "class": "HTTPSFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/HTTPSFilter.java", "metrics": {"nof": 1, "nopf": 0, "nom": 1, "nopm": 1, "loc": 17, "wmc": 2, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "LRUMap", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/LRUMap.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 0, "loc": 15, "wmc": 2, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.web.DoSTracker"]}, {"package": "com.google.zxing.web", "class": "DoSFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/DoSFilter.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 3, "loc": 56, "wmc": 10, "nc": 2, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.web.DoSTracker"]}, {"package": "com.google.zxing.web", "class": "TimeoutFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/TimeoutFilter.java", "metrics": {"nof": 3, "nopf": 0, "nom": 4, "nopm": 4, "loc": 43, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "WelcomeFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/WelcomeFilter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 8, "wmc": 1, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "ChartServlet", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/ChartServlet.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 0, "loc": 115, "wmc": 15, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.EncodeHintType", "com.google.zxing.common.BitMatrix", "com.google.zxing.web.ChartServletRequestParameters", "com.google.zxing.client.j2se.MatrixToImageWriter", "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"]}, {"package": "com.google.zxing.web", "class": "DecodeServlet", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/DecodeServlet.java", "metrics": {"nof": 9, "nopf": 0, "nom": 8, "nopm": 2, "loc": 349, "wmc": 41, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.ImageReader", "com.google.zxing.multi.MultipleBarcodeReader", "com.google.zxing.NotFoundException", "com.google.zxing.Reader", "com.google.zxing.ReaderException", "com.google.zxing.Result", "com.google.zxing.web.DoSTracker", "com.google.zxing.LuminanceSource", "com.google.zxing.DecodeHintType", "com.google.zxing.BinaryBitmap"]}, {"package": "com.google.zxing.web", "class": "OutputUtils", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/OutputUtils.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 1, "loc": 33, "wmc": 6, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "ChartDoSFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/ChartDoSFilter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 5, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "DoSTracker", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/DoSTracker.java", "metrics": {"nof": 5, "nopf": 0, "nom": 2, "nopm": 0, "loc": 85, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.web.DoSFilter", "com.google.zxing.web.DecodeServlet", "com.google.zxing.web.LRUMap"]}, {"package": "com.google.zxing.web", "class": "DoSTracker.TrackerTask", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/DoSTracker.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 50, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "AbstractFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/AbstractFilter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 2, "loc": 14, "wmc": 3, "nc": 2, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "DecodeDoSFilter", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/DecodeDoSFilter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 5, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.web", "class": "ChartServletRequestParameters", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/ChartServletRequestParameters.java", "metrics": {"nof": 6, "nopf": 0, "nom": 7, "nopm": 0, "loc": 38, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.decoder.ErrorCorrectionLevel", "com.google.zxing.web.ChartServlet"]}, {"package": "com.google.zxing.web", "class": "ServletContextLogHandler", "file": "data/repositories/zxing/zxingorg/src/main/java/com/google/zxing/web/ServletContextLogHandler.java", "metrics": {"nof": 1, "nopf": 0, "nom": 4, "nopm": 3, "loc": 31, "wmc": 6, "nc": 0, "dit": 0, "lcom": 0.75, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["com.google.zxing.multi", "com.google.zxing", "com.google.zxing.client.j2se", "com.google.zxing.qrcode.decoder", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

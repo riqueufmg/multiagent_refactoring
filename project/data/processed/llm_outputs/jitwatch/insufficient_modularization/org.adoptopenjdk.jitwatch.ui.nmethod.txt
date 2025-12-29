@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.nmethod",
+  "detections": [
+    {
+      "class": "NMethodInfo",
+      "detection": true,
+      "justification": "Relatively large implementation (154 LOC) with many methods (12) and a high WMC (15). The class directly depends on both model types (IMetaMember, Compilation) and UI concerns (IPrevNextCompilationListener, StringUtil), indicating mixed responsibilities (representation/logic + UI interaction). It has no subclasses (nc=0, dit=0), concentrating functionality rather than delegating or decomposing it, which suggests insufficient modularization."
+    },
+    {
+      "class": "AbstractNMethodStage",
+      "detection": false,
+      "justification": "Smaller (105 LOC) and structured as an abstract stage with 2 subclasses (nc=2, dit=1), indicating intended decomposition via inheritance. Cohesion is reasonable (LCOM≈0.18) and its dependencies (UI utilities, NMethodInfo, resize listener, JITWatchUI) match a stage/controller role. Although complexity (WMC=15) is non-trivial, the abstraction and clear separation of UI-stage responsibilities suggest adequate modularization."
+    }
+  ]
+}

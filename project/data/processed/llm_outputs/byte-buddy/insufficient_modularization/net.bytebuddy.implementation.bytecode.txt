@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bytecode",
+  "detections": [
+    {
+      "class": "StackManipulation",
+      "detection": true,
+      "justification": "Large source size (loc=209) and many nested / related inner types declared in the same compilation unit (Dispatcher, Size, Illegal, Trivial, AbstractBase, Compound, Simple). The class/file concentrates multiple abstractions and responsibilities (many variants of stack manipulation) rather than smaller, focused classes, indicating insufficient decomposition."
+    },
+    {
+      "class": "ByteCodeAppender",
+      "detection": true,
+      "justification": "Relatively large implementation (loc=131) with multiple nested types (Size, Compound, Simple) and a broad API surface (high number of collaborating types: nc=71). The file groups several distinct behaviors for bytecode appending instead of clearly separated, cohesive classes."
+    },
+    {
+      "class": "StackSize",
+      "detection": true,
+      "justification": "Non-trivial size (loc=111) with high complexity (wmc=21) and multiple methods (nom=9), suggesting multiple responsibilities related to stack sizing and calculations that could be split into clearer, smaller abstractions."
+    },
+    {
+      "class": "Duplication",
+      "detection": true,
+      "justification": "Large and complex (loc=134, wmc=16, nom=9) and declares a nested variant (WithFlip). The class implements several duplication-related behaviors in one place, indicating it bundles related but separable responsibilities."
+    },
+    {
+      "class": "Addition",
+      "detection": false,
+      "justification": "Small and focused (loc=46, nom=3, wmc=3) with a narrow dependency set and limited responsibilities; metrics indicate a cohesive single-purpose class rather than a bloated abstraction."
+    },
+    {
+      "class": "Throw",
+      "detection": false,
+      "justification": "Very small and specific (loc=20, nom=2, wmc=2) with no nested types and a focused role; does not show signs of excessive size or combined responsibilities."
+    }
+  ]
+}

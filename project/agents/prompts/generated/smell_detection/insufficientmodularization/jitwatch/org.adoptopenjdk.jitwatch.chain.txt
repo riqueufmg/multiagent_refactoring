@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.chain", "metrics": {"num_classes": 2, "loc": 228, "Ce": 3, "Ca": 2}, "classes": [{"package": "org.adoptopenjdk.jitwatch.chain", "class": "CompileNode", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/chain/CompileNode.java", "metrics": {"nof": 9, "nopf": 0, "nom": 19, "nopm": 17, "loc": 111, "wmc": 28, "nc": 0, "dit": 0, "lcom": 0.1578947368421052, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.model.IParseDictionary", "org.adoptopenjdk.jitwatch.model.Compilation", "org.adoptopenjdk.jitwatch.util.ParseUtil"]}, {"package": "org.adoptopenjdk.jitwatch.chain", "class": "CompileChainWalker", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/chain/CompileChainWalker.java", "metrics": {"nof": 4, "nopf": 0, "nom": 5, "nopm": 3, "loc": 117, "wmc": 18, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.LogParseException", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.model.IParseDictionary", "org.adoptopenjdk.jitwatch.chain.CompileNode", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.util.TooltipUtil", "org.adoptopenjdk.jitwatch.model.Compilation", "org.adoptopenjdk.jitwatch.compilation.CompilationUtil"]}], "dependencies": ["org.adoptopenjdk.jitwatch.compilation", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.util"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

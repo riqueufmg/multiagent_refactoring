@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.process.compiler", "metrics": {"num_classes": 7, "loc": 195, "Ce": 1, "Ca": 4}, "classes": [{"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "ICompiler", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/ICompiler.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 3, "wmc": 1, "nc": 6, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerKotlin", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerKotlin.java", "metrics": {"nof": 3, "nopf": 1, "nom": 2, "nopm": 2, "loc": 29, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerGroovy", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerGroovy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 28, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerJava", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerJava.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 31, "wmc": 6, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerJavaScript", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerJavaScript.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 28, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerJRuby", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerJRuby.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 2, "loc": 28, "wmc": 5, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.compiler", "class": "CompilerScala", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/compiler/CompilerScala.java", "metrics": {"nof": 3, "nopf": 0, "nom": 4, "nopm": 3, "loc": 48, "wmc": 10, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}], "dependencies": ["org.adoptopenjdk.jitwatch.logger"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

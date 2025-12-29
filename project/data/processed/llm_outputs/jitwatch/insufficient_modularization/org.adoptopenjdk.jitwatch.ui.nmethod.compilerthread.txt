@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.nmethod.compilerthread",
+  "detections": [
+    {
+      "class": "CompilerThreadStage",
+      "detection": true,
+      "justification": "Very large and complex class: loc=467, nom=28, wmc=77 and nof=17. The class holds many fields and methods and also defines nested types, depends on both UI and model packages, indicating it concentrates multiple responsibilities (UI presentation, data handling, plotting/queue counting). Despite a low LCOM value, the absolute size and high complexity suggest it has not been adequately decomposed and would benefit from separating concerns into smaller, focused classes."
+    },
+    {
+      "class": "CompilerThreadStage.PlotMode",
+      "detection": false,
+      "justification": "Trivial nested type with loc=1 and no measurable methods or complexity; clearly focused and small, not exhibiting signs of insufficient modularization."
+    },
+    {
+      "class": "CompilerThreadStage.QueueCounter",
+      "detection": false,
+      "justification": "Small helper class (loc=19, minimal complexity) with a narrow dependency on Compilation. Its size and focused purpose indicate it is already modular and does not suffer from insufficient modularization."
+    }
+  ]
+}

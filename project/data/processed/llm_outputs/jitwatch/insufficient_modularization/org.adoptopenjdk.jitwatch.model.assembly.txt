@@ -1,0 +1,61 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.model.assembly",
+  "detections": [
+    {
+      "class": "IAssemblyParser",
+      "detection": true,
+      "justification": "Interface exposes 11 methods (nom=11) and relatively high complexity (wmc=11) while depending on multiple assembly model types; the breadth of responsibilities (parsing, labels, methods, architecture concerns) suggests a bloated interface that could be split into smaller, focused interfaces."
+    },
+    {
+      "class": "AssemblyProcessor",
+      "detection": true,
+      "justification": "Large and complex class (loc=186, wmc=46) with many responsibilities and wide dependencies (meta model, parsers, utilities, package manager); moderate cohesion (lcom=0.25) combined with high complexity indicates it centralizes multiple concerns and would benefit from decomposition."
+    },
+    {
+      "class": "AssemblyMethod",
+      "detection": true,
+      "justification": "Relatively many methods for its size (nom=14, loc=73) and high complexity (wmc=20) with only moderate cohesion (lcom≈0.36); it bundles representation, parsing/formatting and block management behavior that could be separated into smaller abstractions."
+    },
+    {
+      "class": "AssemblyBlock",
+      "detection": false,
+      "justification": "Small class (loc=35) with a modest number of methods (nom=8) and moderate complexity (wmc=10); its focused dependencies and size indicate a single, cohesive responsibility (block-level behavior)."
+    },
+    {
+      "class": "AssemblyLabels",
+      "detection": false,
+      "justification": "Moderate size (loc=69) but few methods (nom=5), low cohesion concern (lcom=0.0) and focused dependencies related to labeling and assembly formatting — appears cohesive and focused rather than overly broad."
+    },
+    {
+      "class": "AssemblyReference",
+      "detection": true,
+      "justification": "Very large file (loc=216) with many fields (nof=16) and substantial complexity (wmc=32); though cohesion is not extremely poor (lcom≈0.18), the size and presence of nested handler logic indicate multiple responsibilities (reference handling, architecture specifics) that could be modularized."
+    },
+    {
+      "class": "AssemblyReference.AssemblyReferenceHandler",
+      "detection": false,
+      "justification": "Inner handler class is localized (loc=80) and appears specialized; as an inner helper it encapsulates a narrow responsibility rather than indicating broader modularization issues."
+    },
+    {
+      "class": "Architecture",
+      "detection": false,
+      "justification": "Very small abstraction (loc=19, nom=1) with focused responsibility; size and simplicity indicate it is already well modularized."
+    },
+    {
+      "class": "AssemblyInstruction",
+      "detection": false,
+      "justification": "Large and complex (loc=178, wmc=41, nom=15) but shows very high cohesion (lcom=0.0) and focused dependencies around instruction representation/formatting; its size appears driven by domain complexity rather than mixed responsibilities, so decomposition is not clearly required."
+    },
+    {
+      "class": "AssemblyUtil",
+      "detection": false,
+      "justification": "Small utility class (loc=36, nom=3) that coordinates parsers and architecture-specific types; although wmc is notable (12), its role as a utility/registry is focused and does not clearly indicate bundled, separable responsibilities."
+    },
+    {
+      "class": "AbstractAssemblyParser",
+      "detection": true,
+      "justification": "Abstract parser contains substantial logic (loc=138, wmc=32) with multiple dependencies on directives, processors and instruction/block classes; having only a few declared methods but high complexity suggests it centralizes diverse parsing behavior that could be split into smaller parser components or strategy objects."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.description.field",
+  "detections": [
+    {
+      "class": "FieldDescription",
+      "detection": true,
+      "justification": "Very large class (loc=509) far above the package average (1418 loc / 17 classes ≈ 83 loc). Declares many fields (nof=16) and coexists with multiple nested/related types in the same compilation unit (InGenericShape, InDefinedShape, AbstractBase, ForLoadedField, Latent, TypeSubstituting, Token, SignatureToken), indicating multiple responsibilities concentrated in one file. The high LOC and the number of contained subtypes suggest the abstraction has not been decomposed into smaller cohesive classes."
+    },
+    {
+      "class": "FieldList",
+      "detection": true,
+      "justification": "Relatively large class (loc=217) with multiple nested variants (AbstractBase, ForLoadedFields, Explicit, ForTokens, TypeSubstituting, Empty) defined in the same file. The class holds several fields (nof=7) and provides list-like functionality together with many specialized implementations, which indicates multiple responsibilities and variants bundled together instead of being modularized into separate cohesive classes/files."
+    },
+    {
+      "class": "FieldDescription.Token",
+      "detection": false,
+      "justification": "Moderate size (loc=102) and focused purpose (token representation). It appears as a specific nested type with limited metrics (nof=4, nom=0) and limited outward dependencies, suggesting a single responsibility and adequate modularization for its role as a token."
+    },
+    {
+      "class": "FieldList.ForLoadedFields",
+      "detection": false,
+      "justification": "Small, focused nested implementation (loc=35) with no method complexity (wmc=0) and no external fan-in/fan-out. It represents a specific variant and is sufficiently small and cohesive, so it does not indicate insufficient modularization on its own."
+    },
+    {
+      "class": "FieldList.Empty",
+      "detection": false,
+      "justification": "Very small class (loc=18) serving a single, clear purpose (empty list variant). Its small size and single responsibility indicate proper modularization for this narrow role."
+    }
+  ]
+}

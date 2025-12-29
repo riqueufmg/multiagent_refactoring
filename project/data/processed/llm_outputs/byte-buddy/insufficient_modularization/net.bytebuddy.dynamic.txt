@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.dynamic",
+  "detections": [
+    {
+      "class": "DynamicType",
+      "detection": true,
+      "justification": "Very large class (loc 4937) with many responsibilities and inner types (numerous nested/adaptive/adapter/definition classes listed under the same top-level class). High number of fields/members (nof 68) and many dependencies across unrelated subsystems (scaffold, loading, attribute appenders, matchers, implementation, etc.), indicating a concentration of concerns that would be better decomposed into smaller, cohesive abstractions (builder, writer, adapters, definitions separated)."
+    },
+    {
+      "class": "ClassFileLocator",
+      "detection": true,
+      "justification": "Large class file (loc 1670) containing many distinct nested implementations (ForClassLoader, ForInstrumentation, ForJarFile, ForFolder, ForModule, Dispatcher, ClassLoadingDelegate, etc.) with nof 43 meaning many members/variants co-located. It spans multiple responsibilities (class file location via many strategies, dispatching, loading delegation) and depends on varied subsystems (class loading strategy, Java module handling, dispatchers), suggesting insufficient decomposition of separate locator strategies into independent classes/files."
+    },
+    {
+      "class": "Nexus",
+      "detection": false,
+      "justification": "Relatively small and focused (loc 108, nof 6, nom 9) with limited responsibilities; metrics show concentrated functionality and it does not contain many nested types or an overly broad dependency list. Its size and cohesion indicate it is not suffering from insufficient modularization compared to much larger classes in the package."
+    }
+  ]
+}

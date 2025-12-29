@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.process.javap",
+  "detections": [
+    {
+      "class": "JavapProcess",
+      "detection": false,
+      "justification": "Relatively small and focused: 46 LOC, 4 methods, 2 fields and moderate complexity (WMC 9). No external fan-in/fan-out and LCOM 0.0 indicates cohesion. Metrics suggest a single, cohesive responsibility rather than a bloated abstraction."
+    },
+    {
+      "class": "ReflectionJavap",
+      "detection": true,
+      "justification": "Larger and more complex than its sibling: 94 LOC, 5 methods, 6 fields and higher complexity (WMC 12). It also depends on a classloader (DisposableURLClassLoader), which indicates it may combine reflection logic with class-loading concerns. The combination of greater size, more fields, higher complexity and mixed responsibilities suggests this class is not sufficiently decomposed."
+    }
+  ]
+}

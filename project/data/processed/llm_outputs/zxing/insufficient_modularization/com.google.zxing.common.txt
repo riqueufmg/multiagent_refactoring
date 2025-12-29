@@ -1,0 +1,91 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.common",
+  "detections": [
+    {
+      "class": "DetectorResult",
+      "detection": false,
+      "justification": "Very small class (loc 18) with few methods (nom 3) and low complexity (wmc 3); appears to be a simple data/transfer abstraction rather than a bloated abstraction."
+    },
+    {
+      "class": "ECIEncoderSet",
+      "detection": false,
+      "justification": "Moderate size (loc 110) and moderate complexity (nom 9, wmc 21) but focused on ECI encoder responsibilities and few external dependencies; does not present signs of multiple unrelated responsibilities."
+    },
+    {
+      "class": "BitSource",
+      "detection": false,
+      "justification": "Relatively small (loc 71, nom 5, wmc 11) with focused dependency on decoding parsers; complexity and size do not indicate an under-modularized responsibility concentration."
+    },
+    {
+      "class": "HybridBinarizer",
+      "detection": true,
+      "justification": "Relatively large and complex for its method count (loc 145, nom 7, wmc 33, nopm 3) suggesting heavy internal logic; elevated complexity concentrated in few methods indicates multiple responsibilities or internal branches that could be factored out (e.g., local vs global thresholding logic)."
+    },
+    {
+      "class": "MinimalECIInput",
+      "detection": true,
+      "justification": "Large class (loc 243) with many methods (nom 13), high complexity (wmc 48) and many public members (nopm 10), indicating a bloated abstraction that likely mixes concerns and would benefit from splitting into smaller, more cohesive components."
+    },
+    {
+      "class": "MinimalECIInput.InputEdge",
+      "detection": false,
+      "justification": "Very small inner class (loc 23, wmc 0) serving a narrow role related to MinimalECIInput; size and purpose do not indicate insufficient modularization on its own."
+    },
+    {
+      "class": "BitMatrix",
+      "detection": true,
+      "justification": "Very large and complex (loc 442, nom 31, nopm 29, wmc 89) with numerous dependencies across the codebase; the high method count, high complexity and wide usage suggest a bloated abstraction that concentrates many responsibilities and could be decomposed (e.g., separating storage, manipulation, I/O/representation, and utility operations)."
+    },
+    {
+      "class": "ECIStringBuilder",
+      "detection": false,
+      "justification": "Moderate size and complexity (loc 105, nom 12, wmc 18) but appears focused on building ECI-related strings; cohesion and metrics do not strongly indicate multiple unrelated responsibilities."
+    },
+    {
+      "class": "DefaultGridSampler",
+      "detection": false,
+      "justification": "Small utility-like implementation (loc 37, nom 2, wmc 7) delegating to transforms and BitMatrix; limited scope and size argue against insufficient modularization."
+    },
+    {
+      "class": "DecoderResult",
+      "detection": false,
+      "justification": "Acts as a result/data holder (loc 113, nom 20, wmc 20) with many accessors but cohesive purpose (encapsulating decode results for multiple readers); does not show clear signs of mixed responsibilities beyond data aggregation."
+    },
+    {
+      "class": "GlobalHistogramBinarizer",
+      "detection": true,
+      "justification": "Relatively high complexity for few methods (loc 139, nom 6, wmc 29) indicating substantial internal logic concentrated in a small public surface; this suggests internal responsibilities that could be modularized (e.g., histogram calculation, threshold selection, sampling) to reduce complexity."
+    },
+    {
+      "class": "GridSampler",
+      "detection": false,
+      "justification": "Moderate size and complexity (loc 107, nom 5, wmc 17) with a focused role (sampling/gridding) and references to perspective transforms and detectors; appears cohesive and purpose-specific."
+    },
+    {
+      "class": "PerspectiveTransform",
+      "detection": false,
+      "justification": "Relatively small and focused mathematical utility (loc 86, nom 8, wmc 11); responsibilities are narrow (coordinate transforms) and do not indicate insufficient modularization."
+    },
+    {
+      "class": "StringUtils",
+      "detection": true,
+      "justification": "Large file with high complexity despite few public methods (loc 198, nom 3, wmc 36, nopf 4) indicating dense, multi-path logic likely handling many charset/encoding cases; this concentration of varied logic in few methods suggests it mixes concerns and would benefit from decomposition (e.g., per-encoding handlers)."
+    },
+    {
+      "class": "BitArray",
+      "detection": true,
+      "justification": "Large and complex (loc 279, nom 27, nopm 24, wmc 58) with many dependencies across barcode formats; the wide method surface, high complexity and broad usage indicate multiple responsibilities (storage, bit operations, readers/writers support) that could be separated into more focused abstractions."
+    },
+    {
+      "class": "CharacterSetECI",
+      "detection": false,
+      "justification": "Small and focused (loc 64, nom 8, wmc 9) mapping character set ECI values; metrics and purpose suggest cohesion rather than a bloated abstraction."
+    },
+    {
+      "class": "ECIInput",
+      "detection": false,
+      "justification": "Small interface/abstraction (loc 44, nom 6, wmc 6) with a focused role relating to high-level encoding; size and simplicity do not indicate insufficient modularization."
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.ui.graphing", "metrics": {"num_classes": 4, "loc": 590, "Ce": 5, "Ca": 1}, "classes": [{"package": "org.adoptopenjdk.jitwatch.ui.graphing", "class": "TimeLineStage", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/graphing/TimeLineStage.java", "metrics": {"nof": 5, "nopf": 0, "nom": 12, "nopm": 3, "loc": 200, "wmc": 36, "nc": 0, "dit": 2, "lcom": 0.1666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.JITEvent", "org.adoptopenjdk.jitwatch.model.JITStats", "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.model.Compilation", "org.adoptopenjdk.jitwatch.util.ParseUtil", "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI"]}, {"package": "org.adoptopenjdk.jitwatch.ui.graphing", "class": "AbstractGraphStage", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/graphing/AbstractGraphStage.java", "metrics": {"nof": 23, "nopf": 0, "nom": 19, "nopm": 2, "loc": 199, "wmc": 30, "nc": 3, "dit": 1, "lcom": 0.1578947368421052, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.ui.resize.RateLimitedResizeListener", "org.adoptopenjdk.jitwatch.util.ParseUtil", "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI"]}, {"package": "org.adoptopenjdk.jitwatch.ui.graphing", "class": "CodeCacheStage", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/graphing/CodeCacheStage.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 3, "loc": 106, "wmc": 18, "nc": 0, "dit": 2, "lcom": 0.4, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.model.CodeCacheEvent", "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI", "org.adoptopenjdk.jitwatch.model.Tag"]}, {"package": "org.adoptopenjdk.jitwatch.ui.graphing", "class": "HistoStage", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/graphing/HistoStage.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 3, "loc": 85, "wmc": 7, "nc": 0, "dit": 2, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.histo.Histo", "org.adoptopenjdk.jitwatch.histo.IHistoVisitable", "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI"]}], "dependencies": ["org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.ui.resize", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.histo", "org.adoptopenjdk.jitwatch.ui.main"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

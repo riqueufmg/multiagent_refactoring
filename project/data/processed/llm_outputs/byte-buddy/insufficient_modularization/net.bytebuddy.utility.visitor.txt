@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.utility.visitor",
+  "detections": [
+    {
+      "class": "StackAwareMethodVisitor",
+      "detection": true,
+      "justification": "Very large size and high complexity: LOC=318, 24 methods (nom) with 19 public methods (nopm), and a very high WMC=84. The class is much larger and more complex than peers in the package, suggesting it concentrates multiple responsibilities (stack handling plus method visiting behavior) that could be split into smaller, focused abstractions."
+    },
+    {
+      "class": "LocalVariableAwareMethodVisitor",
+      "detection": false,
+      "justification": "Small and focused: LOC=34, 3 methods, WMC=8, low public surface (nopm=3). Metrics indicate a compact, single-responsibility utility that does not exhibit signs of a bloated interface or excessive internal complexity."
+    },
+    {
+      "class": "LineNumberPrependingMethodVisitor",
+      "detection": false,
+      "justification": "Small and cohesive: LOC=32, 3 methods, WMC=4, minimal public surface. The class appears limited in scope (single concern: prepending line numbers) and does not show size/complexity indicative of insufficient modularization."
+    },
+    {
+      "class": "ExceptionTableSensitiveMethodVisitor",
+      "detection": true,
+      "justification": "Substantial size and many methods: LOC=237 with 35 methods (nom) and 16 public methods (nopm), WMC=36. The class contains a large method count and considerable code volume for a method visitor, implying it likely mixes exception-table handling with other behaviors and would benefit from decomposition."
+    },
+    {
+      "class": "MetadataAwareClassVisitor",
+      "detection": true,
+      "justification": "Large and feature-rich: LOC=332, 39 methods (nom) with 14 public methods (nopm) and WMC=44. The class is the largest in the package and likely aggregates metadata handling and visiting logic; its size and method count indicate multiple responsibilities that could be separated into smaller, more cohesive classes."
+    },
+    {
+      "class": "ContextClassVisitor",
+      "detection": false,
+      "justification": "Small and narrowly scoped: LOC=40, 5 methods, WMC=6, limited public surface. Metrics indicate focused functionality (context-related visiting) without the large size or complexity that would suggest insufficient modularization."
+    }
+  ]
+}

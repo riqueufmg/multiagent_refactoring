@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.compilation",
+  "detections": [
+    {
+      "class": "CompilationUtil",
+      "detection": true,
+      "justification": "Very large class (loc=224) with high complexity (wmc=54) and many methods (nom=12, nopm=10). Moderate/low cohesion (lcom=0.333) and many dependencies across model and util types indicate multiple responsibilities (parsing, tag/compilation handling, utilities) concentrated in one place — a typical sign that the abstraction is not decomposed into smaller, cohesive classes."
+    },
+    {
+      "class": "AbstractCompilationWalker",
+      "detection": false,
+      "justification": "Small and focused (loc=11, nom=3, wmc=3) with low method count and simple responsibilities (visitor/walking support). Metrics do not indicate excessive size or mixed responsibilities."
+    },
+    {
+      "class": "AbstractCompilationVisitable",
+      "detection": false,
+      "justification": "Very small abstraction (loc=8, nom=1, wmc=2) likely representing a single responsibility. No signs of bloated interface or high complexity."
+    },
+    {
+      "class": "ICompilationVisitable",
+      "detection": false,
+      "justification": "Tiny interface (loc=3, nom=1) with a single role. No evidence of multiple responsibilities or excessive size."
+    }
+  ]
+}

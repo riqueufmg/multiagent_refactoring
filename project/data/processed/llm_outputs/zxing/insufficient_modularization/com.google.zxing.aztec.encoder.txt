@@ -1,0 +1,41 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.aztec.encoder",
+  "detections": [
+    {
+      "class": "SimpleToken",
+      "detection": false,
+      "justification": "Very small (loc 17), few methods (nom 3), low complexity (wmc 3) and LCOM 0.0 indicating cohesion; represents a focused, lightweight abstraction so there is no sign it needs further decomposition."
+    },
+    {
+      "class": "Encoder",
+      "detection": true,
+      "justification": "Very large and complex for the package (loc 320 — ~43% of package LOC), many methods (nom 15) and high cyclomatic complexity (wmc 65). Moderate cohesion (LCOM 0.4) and a broad set of dependencies (BitArray, BitMatrix, ReedSolomon, HighLevelEncoder, AztecWriter, AztecCode) indicate it concentrates multiple responsibilities (high-level encoding, error correction, matrix building). This concentration and size suggest the abstraction is insufficiently modularized."
+    },
+    {
+      "class": "AztecCode",
+      "detection": false,
+      "justification": "Moderate size (loc 56), moderate method count (nom 10) and low complexity (wmc 10) with reasonable cohesion (LCOM 0.5). Appears to be a data/representation holder collaborating with Encoder and writer rather than a bloated, multi-responsibility class."
+    },
+    {
+      "class": "HighLevelEncoder",
+      "detection": true,
+      "justification": "Relatively large (loc 180 — ~24% of package LOC) with substantial complexity (wmc 33) and many fields/methods (nof 11, nom 9). It interacts closely with State and Encoder and likely encodes multiple concerns (character set handling, state transitions, bitstream construction). Its size and role concentration indicate it would benefit from further decomposition."
+    },
+    {
+      "class": "Token",
+      "detection": false,
+      "justification": "Small (loc 17) with few methods (nom 5) and modest complexity (wmc 5). Although LCOM is higher (0.8), the class is small and likely models a compact part of the token hierarchy; it does not exhibit the excessive size or complexity typical of insufficient modularization."
+    },
+    {
+      "class": "BinaryShiftToken",
+      "detection": false,
+      "justification": "Small (loc 30), low-to-moderate complexity (wmc 7) and cohesive (LCOM 0.0). It appears to be a focused subclass of Token with a single responsibility, so no modularization issue is evident."
+    },
+    {
+      "class": "State",
+      "detection": true,
+      "justification": "Substantial size for a helper/utility within the encoder (loc 130 — ~17% of package LOC), many methods (nom 14) and notable complexity (wmc 28). It depends on Token and HighLevelEncoder and likely encapsulates multiple aspects of encoder state management and transitions. The concentration of behavior and nontrivial size suggests it should be decomposed or have responsibilities redistributed."
+    }
+  ]
+}

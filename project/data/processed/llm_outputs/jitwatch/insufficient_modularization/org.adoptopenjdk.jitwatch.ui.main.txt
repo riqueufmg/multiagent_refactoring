@@ -1,0 +1,66 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.main",
+  "detections": [
+    {
+      "class": "IPrevNextCompilationListener",
+      "detection": false,
+      "justification": "Very small interface: loc=4, nom=2, wmc=2, no fields; minimal responsibilities and no signs of a bloated interface or multiple concerns."
+    },
+    {
+      "class": "ICompilationChangeListener",
+      "detection": false,
+      "justification": "Tiny interface: loc=3, nom=1, wmc=1; single responsibility (listening for compilation changes), no evidence of insufficient decomposition."
+    },
+    {
+      "class": "NothingMountedStage",
+      "detection": false,
+      "justification": "Small UI stage: loc=44, nom=3, wmc=3; limited methods and low complexity indicating adequate modularization for its role."
+    },
+    {
+      "class": "ClassTree",
+      "detection": true,
+      "justification": "Relatively large and complex UI class: loc=192, nom=16, nopm=13, wmc=48. High complexity concentrated in one class with many responsibilities (tree management, UI interactions) suggesting it could be decomposed into smaller, focused components."
+    },
+    {
+      "class": "CompilationTableRow",
+      "detection": false,
+      "justification": "Moderate size: loc=71, nom=10, wmc=20, lcom=0.2. Although somewhat complex, it appears to represent a single UI row model with cohesive responsibilities and not an obvious candidate for further decomposition."
+    },
+    {
+      "class": "ClassMemberList",
+      "detection": true,
+      "justification": "Large and feature-rich UI component: loc=222, nom=27, nopm=15, wmc=45 with multiple external dependencies (IntrinsicFinder, JITWatchConfig, stage proxy). The class likely mixes rendering, event handling and data logic and would benefit from splitting responsibilities."
+    },
+    {
+      "class": "ClassMemberList.MetaMethodCell",
+      "detection": false,
+      "justification": "Very small nested class: loc=18, no methods reported; focused on a small piece of UI functionality and not a decomposition concern."
+    },
+    {
+      "class": "MainConfigStage",
+      "detection": true,
+      "justification": "Configuration stage with concentrated complexity: loc=122, nom=6, nopm=5, wmc=25 and many dependencies (file choosers, stage manager, logging). High method complexity and multiple external concerns indicate responsibilities that could be modularized."
+    },
+    {
+      "class": "IStageAccessProxy",
+      "detection": false,
+      "justification": "Small interface-like class: loc=10, nom=8, wmc=8. Serves as an access proxy and does not exhibit a bloated implementation or excessive responsibilities."
+    },
+    {
+      "class": "IMemberSelectedListener",
+      "detection": false,
+      "justification": "Minimal listener interface: loc=4, nom=2, wmc=2; single responsibility and appropriately small."
+    },
+    {
+      "class": "JITWatchUI",
+      "detection": true,
+      "justification": "Clear god-class candidate: very large and complex (loc=983, nom=79, nopm=59, nof=74, wmc=174) with a vast list of dependencies and many responsibilities (managing multiple stages, viewers, parsers, reports). This concentration of fields, methods and varied dependencies indicates insufficient modularization."
+    },
+    {
+      "class": "CompilationTableBuilder",
+      "detection": false,
+      "justification": "Small helper: loc=33, nom=2, wmc=2; limited scope and focused responsibility, not a modularization problem."
+    }
+  ]
+}

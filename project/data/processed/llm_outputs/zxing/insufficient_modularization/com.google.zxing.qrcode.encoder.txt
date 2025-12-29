@@ -1,0 +1,61 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.qrcode.encoder",
+  "detections": [
+    {
+      "class": "Encoder",
+      "detection": true,
+      "justification": "Very large implementation compared to peers (LOC 434) with many methods (nom 25) and very high cyclomatic/maintenance complexity (wmc 90). It depends on many collaborators and appears to concentrate multiple responsibilities (many dependencies) rather than delegating them, indicating inadequate decomposition."
+    },
+    {
+      "class": "MinimalEncoder",
+      "detection": true,
+      "justification": "Large class body (LOC 382) with many fields (nof 17) and substantial complexity (wmc 46). Presence of multiple nested helper types (VersionSize, Edge, ResultList, ResultNode) suggests attempts to pack related functionality in one top-level abstraction rather than separating into smaller focused classes, indicating insufficient modularization."
+    },
+    {
+      "class": "MinimalEncoder.VersionSize",
+      "detection": false,
+      "justification": "Very small (LOC 8) and appears to be a focused, supporting data abstraction for MinimalEncoder; size and role indicate adequate modularization at the class level."
+    },
+    {
+      "class": "MinimalEncoder.Edge",
+      "detection": false,
+      "justification": "Small helper (LOC 34) tightly scoped to MinimalEncoder logic; its limited size and focused dependencies suggest it is an appropriate decomposition rather than a sign of insufficient modularization."
+    },
+    {
+      "class": "MinimalEncoder.ResultList",
+      "detection": false,
+      "justification": "Contains a moderate amount of code (LOC 170) but exists as a dedicated nested type representing a specific responsibility (result management). Its separation from the main encoder logic is an indication of modularization rather than a single bloated class."
+    },
+    {
+      "class": "MinimalEncoder.ResultNode",
+      "detection": false,
+      "justification": "Relatively small (LOC 79) and appears to be a focused node/data structure supporting MinimalEncoder; represents proper decomposition into a helper abstraction."
+    },
+    {
+      "class": "BlockPair",
+      "detection": false,
+      "justification": "Very small (LOC 14) with few methods and fields, indicating a single, focused responsibility and appropriate modularization."
+    },
+    {
+      "class": "MaskUtil",
+      "detection": true,
+      "justification": "Moderate-to-large utility (LOC 161) with notable complexity (wmc 38) and a relatively higher lack-of-cohesion score compared to other classes (lcom 0.6667), suggesting it bundles multiple masking/utility behaviors that could be split into more focused components."
+    },
+    {
+      "class": "MatrixUtil",
+      "detection": true,
+      "justification": "Substantial size (LOC 226), many methods (nom 20) and high complexity (wmc 55) for a utility-like class. It depends on multiple encoder artifacts, indicating it may combine multiple responsibilities that would benefit from further decomposition."
+    },
+    {
+      "class": "ByteMatrix",
+      "detection": false,
+      "justification": "Relatively small (LOC 61) with a modest number of methods and fields; appears to be a focused data/utility type used by other classes, which indicates acceptable modularization."
+    },
+    {
+      "class": "QRCode",
+      "detection": false,
+      "justification": "Small to moderate size (LOC 72) with modest complexity and cohesion (lcom 0.0). It appears to represent a single abstraction (the QR code model) and does not show signs of being a bloated, multi-responsibility class."
+    }
+  ]
+}

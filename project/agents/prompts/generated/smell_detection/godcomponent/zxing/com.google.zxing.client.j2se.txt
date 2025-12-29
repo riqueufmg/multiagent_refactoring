@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.client.j2se", "metrics": {"num_classes": 12, "loc": 1030, "Ce": 5, "Ca": 5}, "classes": [{"package": "com.google.zxing.client.j2se", "class": "BufferedImageLuminanceSource", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/BufferedImageLuminanceSource.java", "metrics": {"nof": 4, "nopf": 0, "nom": 9, "nopm": 9, "loc": 107, "wmc": 16, "nc": 0, "dit": 0, "lcom": 0.3333333333333333, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.GUIRunner", "com.google.zxing.client.j2se.DecodeWorker"]}, {"package": "com.google.zxing.client.j2se", "class": "MatrixToImageWriter", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/MatrixToImageWriter.java", "metrics": {"nof": 1, "nopf": 0, "nom": 9, "nopm": 8, "loc": 111, "wmc": 13, "nc": 0, "dit": 0, "lcom": 0.2222222222222222, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.MatrixToImageConfig", "com.google.zxing.common.BitArray", "com.google.zxing.common.BitMatrix", "com.google.zxing.web.ChartServlet", "com.google.zxing.client.j2se.CommandLineEncoder"]}, {"package": "com.google.zxing.client.j2se", "class": "DecodeWorker", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/DecodeWorker.java", "metrics": {"nof": 6, "nopf": 0, "nom": 7, "nopm": 1, "loc": 186, "wmc": 31, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.ImageReader", "com.google.zxing.multi.MultipleBarcodeReader", "com.google.zxing.common.BitArray", "com.google.zxing.ResultPoint", "com.google.zxing.client.result.ResultParser", "com.google.zxing.Result", "com.google.zxing.client.j2se.DecoderConfig", "com.google.zxing.client.result.ParsedResult", "com.google.zxing.LuminanceSource", "com.google.zxing.MultiFormatReader", "com.google.zxing.common.BitMatrix", "com.google.zxing.client.j2se.CommandLineRunner", "com.google.zxing.BinaryBitmap", "com.google.zxing.client.j2se.BufferedImageLuminanceSource"]}, {"package": "com.google.zxing.client.j2se", "class": "HtmlAssetTranslator", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/HtmlAssetTranslator.java", "metrics": {"nof": 1, "nopf": 0, "nom": 7, "nopm": 1, "loc": 151, "wmc": 26, "nc": 0, "dit": 0, "lcom": 0.2857142857142857, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.StringsResourceTranslator"]}, {"package": "com.google.zxing.client.j2se", "class": "GUIRunner", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/GUIRunner.java", "metrics": {"nof": 2, "nopf": 0, "nom": 5, "nopm": 2, "loc": 68, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.ImageReader", "com.google.zxing.BinaryBitmap", "com.google.zxing.LuminanceSource", "com.google.zxing.Result", "com.google.zxing.client.j2se.BufferedImageLuminanceSource"]}, {"package": "com.google.zxing.client.j2se", "class": "MatrixToImageConfig", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/MatrixToImageConfig.java", "metrics": {"nof": 4, "nopf": 2, "nom": 6, "nopm": 4, "loc": 41, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.MatrixToImageWriter"]}, {"package": "com.google.zxing.client.j2se", "class": "EncoderConfig", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/EncoderConfig.java", "metrics": {"nof": 9, "nopf": 0, "nom": 0, "nopm": 0, "loc": 11, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.client.j2se.CommandLineEncoder"]}, {"package": "com.google.zxing.client.j2se", "class": "StringsResourceTranslator", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/StringsResourceTranslator.java", "metrics": {"nof": 7, "nopf": 0, "nom": 6, "nopm": 1, "loc": 138, "wmc": 20, "nc": 0, "dit": 0, "lcom": 0.3333333333333333, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.HtmlAssetTranslator"]}, {"package": "com.google.zxing.client.j2se", "class": "ImageReader", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/ImageReader.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 2, "loc": 38, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.web.DecodeServlet", "com.google.zxing.client.j2se.GUIRunner", "com.google.zxing.client.j2se.DecodeWorker"]}, {"package": "com.google.zxing.client.j2se", "class": "CommandLineEncoder", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/CommandLineEncoder.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 28, "wmc": 5, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.EncodeHintType", "com.google.zxing.common.BitMatrix", "com.google.zxing.client.j2se.MatrixToImageWriter", "com.google.zxing.client.j2se.EncoderConfig"]}, {"package": "com.google.zxing.client.j2se", "class": "DecoderConfig", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/DecoderConfig.java", "metrics": {"nof": 13, "nopf": 0, "nom": 1, "nopm": 0, "loc": 33, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.DecodeHintType", "com.google.zxing.client.j2se.CommandLineRunner", "com.google.zxing.client.j2se.DecodeWorker"]}, {"package": "com.google.zxing.client.j2se", "class": "CommandLineRunner", "file": "data/repositories/zxing/javase/src/main/java/com/google/zxing/client/j2se/CommandLineRunner.java", "metrics": {"nof": 0, "nopf": 0, "nom": 6, "nopm": 1, "loc": 118, "wmc": 26, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.j2se.DecoderConfig", "com.google.zxing.client.j2se.DecodeWorker"]}], "dependencies": ["com.google.zxing.multi", "com.google.zxing", "com.google.zxing.web", "com.google.zxing.client.result", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

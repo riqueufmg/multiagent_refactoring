@@ -1,0 +1,51 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bytecode.assign.reference",
+  "detections": [
+    {
+      "class": "ReferenceTypeAwareAssigner",
+      "detection": false,
+      "justification": "Small size (loc 24) and minimal interface (nom 1) with low complexity (wmc 4). Appears focused on a single responsibility and does not exhibit a bloated interface or excessive internal complexity."
+    },
+    {
+      "class": "GenericTypeAwareAssigner",
+      "detection": true,
+      "justification": "Large implementation surface (loc 360) and many related nested types concentrated in the same abstraction (multiple OfX inner classes plus a large visitor). The class aggregates handling for many distinct generic/type cases (manifest, simple, generic array, wildcard, parameterized, non-generic), indicating multiple responsibilities that could be separated into smaller, more cohesive classes."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.IsAssignableToVisitor",
+      "detection": true,
+      "justification": "Very large inner class (loc 336) that implements complex visitor logic. Its size and placement as an inner type suggest it encapsulates substantial, distinct behavior that would benefit from decomposition into smaller, independent components."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.OfManifestType",
+      "detection": false,
+      "justification": "Relatively small (loc 49) and scoped to a specific manifest-type concern. Its limited size and focused role suggest acceptable modularization."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.OfSimpleType",
+      "detection": false,
+      "justification": "Moderate, focused implementation (loc 61) dedicated to a single simple-type responsibility; does not show signs of a bloated interface or multiple unrelated concerns."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.OfGenericArray",
+      "detection": false,
+      "justification": "Small and narrowly scoped (loc 36), representing a specific array-case handler; appropriately modular for its concern."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.OfWildcard",
+      "detection": false,
+      "justification": "Relatively small (loc 72) and specialized for wildcard handling. While larger than some auxiliaries, it appears to have a focused responsibility rather than multiple unrelated ones."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.OfParameterizedType",
+      "detection": false,
+      "justification": "Very small (loc 19) and clearly focused on parameterized-type concerns; does not indicate insufficient modularization."
+    },
+    {
+      "class": "GenericTypeAwareAssigner.OfNonGenericType",
+      "detection": false,
+      "justification": "Very small (loc 19) and dedicated to non-generic-type handling, indicating a single, cohesive responsibility."
+    }
+  ]
+}

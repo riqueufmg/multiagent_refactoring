@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.oned.rss.expanded", "metrics": {"num_classes": 4, "loc": 726, "Ce": 7, "Ca": 7}, "classes": [{"package": "com.google.zxing.oned.rss.expanded", "class": "ExpandedRow", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/expanded/ExpandedRow.java", "metrics": {"nof": 2, "nopf": 0, "nom": 7, "nopm": 3, "loc": 36, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.expanded.RSSExpandedReader"]}, {"package": "com.google.zxing.oned.rss.expanded", "class": "RSSExpandedReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/expanded/RSSExpandedReader.java", "metrics": {"nof": 20, "nopf": 0, "nom": 21, "nopm": 2, "loc": 607, "wmc": 123, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.oned.rss.DataCharacter", "com.google.zxing.oned.rss.FinderPattern", "com.google.zxing.oned.rss.expanded.ExpandedRow", "com.google.zxing.common.BitArray", "com.google.zxing.oned.rss.RSSUtils", "com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder", "com.google.zxing.oned.rss.expanded.BitArrayBuilder", "com.google.zxing.oned.rss.expanded.ExpandedPair", "com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.common.detector.MathUtils", "com.google.zxing.Result", "com.google.zxing.ResultMetadataType"]}, {"package": "com.google.zxing.oned.rss.expanded", "class": "BitArrayBuilder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/expanded/BitArrayBuilder.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 0, "loc": 45, "wmc": 11, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.expanded.ExpandedPair", "com.google.zxing.oned.rss.expanded.RSSExpandedReader", "com.google.zxing.common.BitArray"]}, {"package": "com.google.zxing.oned.rss.expanded", "class": "ExpandedPair", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/oned/rss/expanded/ExpandedPair.java", "metrics": {"nof": 3, "nopf": 0, "nom": 8, "nopm": 3, "loc": 38, "wmc": 9, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.expanded.RSSExpandedReader", "com.google.zxing.oned.rss.expanded.BitArrayBuilder", "com.google.zxing.oned.rss.DataCharacter", "com.google.zxing.oned.rss.FinderPattern"]}], "dependencies": ["com.google.zxing.oned.rss", "com.google.zxing", "com.google.zxing.common.detector", "com.google.zxing.client.result", "com.google.zxing.oned.rss.expanded.decoders", "com.google.zxing.oned", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

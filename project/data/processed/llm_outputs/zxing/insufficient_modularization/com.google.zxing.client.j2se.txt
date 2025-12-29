@@ -1,0 +1,66 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.client.j2se",
+  "detections": [
+    {
+      "class": "BufferedImageLuminanceSource",
+      "detection": false,
+      "justification": "Moderate size (LOC 107) and method count (9) but moderate cohesion (LCOM 0.33) and limited external dependencies. The class appears focused on image-to-luminance concerns rather than multiple unrelated responsibilities, so available metrics do not strongly indicate insufficient modularization."
+    },
+    {
+      "class": "MatrixToImageWriter",
+      "detection": false,
+      "justification": "Has several methods (9) and moderate size (LOC 111, WMC 13) but its dependencies are consistent with a single responsibility (writing matrices to images). There is no strong sign of mixed responsibilities or a bloated interface in the provided data."
+    },
+    {
+      "class": "DecodeWorker",
+      "detection": true,
+      "justification": "Large and complex worker (LOC 186, WMC 31) with many responsibilities reflected in method count and broad dependencies (readers, parsers, decoders, results). The class concentrates decoding, parsing and coordination logic suggesting it mixes concerns that could be separated (decoding pipeline, result handling, I/O), indicating insufficient modularization."
+    },
+    {
+      "class": "HtmlAssetTranslator",
+      "detection": true,
+      "justification": "Relatively large translator (LOC 151, WMC 26, 7 methods) with nontrivial complexity for a translator role. Its size and complexity suggest it may be handling multiple translation/output tasks rather than a single cohesive responsibility, indicating candidate for decomposition."
+    },
+    {
+      "class": "GUIRunner",
+      "detection": false,
+      "justification": "Small driver class (LOC 68, WMC 5, 5 methods) with focused dependencies tied to GUI and image reading. Metrics imply a concentrated responsibility and do not point to a bloated or multifaceted abstraction."
+    },
+    {
+      "class": "MatrixToImageConfig",
+      "detection": false,
+      "justification": "Small configuration holder (LOC 41) used by matrix/image writer. It appears to represent configuration data and helper behavior rather than multiple unrelated responsibilities, so it does not show insufficient modularization."
+    },
+    {
+      "class": "EncoderConfig",
+      "detection": false,
+      "justification": "Very small data/config holder (LOC 11, many fields but no substantive behavior). It represents configuration rather than multiple responsibilities, so modularization is appropriate for its purpose."
+    },
+    {
+      "class": "StringsResourceTranslator",
+      "detection": true,
+      "justification": "Substantial translator class (LOC 138, WMC 20, 6 methods) coupled with HtmlAssetTranslator. Its size and complexity for resource translation suggest it may be combining multiple translation responsibilities (string management, asset wiring), making it a candidate for further decomposition."
+    },
+    {
+      "class": "ImageReader",
+      "detection": false,
+      "justification": "Small, focused reader (LOC 38, WMC 7, 3 methods) with a clear role (image input). Metrics indicate cohesion around reading responsibilities rather than a bloated interface."
+    },
+    {
+      "class": "CommandLineEncoder",
+      "detection": false,
+      "justification": "Small utility-like class (LOC 28, 2 methods). Its size and limited public surface make it unlikely to suffer from insufficient modularization based on the provided metrics."
+    },
+    {
+      "class": "DecoderConfig",
+      "detection": false,
+      "justification": "Appears to be a configuration/data holder (many fields, LOC 33, only 1 method). This pattern is appropriate for config and does not indicate a need to decompose into smaller classes."
+    },
+    {
+      "class": "CommandLineRunner",
+      "detection": true,
+      "justification": "Relatively large and complex runner (LOC 118, WMC 26, 6 methods) that coordinates configuration and decoding. The combined command-line parsing, configuration handling and decoding orchestration suggest multiple concerns concentrated in one class and thus insufficient modularization."
+    }
+  ]
+}

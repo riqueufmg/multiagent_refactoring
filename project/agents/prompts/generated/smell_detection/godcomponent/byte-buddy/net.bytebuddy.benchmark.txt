@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "net.bytebuddy.benchmark", "metrics": {"num_classes": 8, "loc": 1284, "Ce": 7, "Ca": 0}, "classes": [{"package": "net.bytebuddy.benchmark", "class": "TrivialClassCreationBenchmark", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/TrivialClassCreationBenchmark.java", "metrics": {"nof": 3, "nopf": 1, "nom": 8, "nopm": 6, "loc": 79, "wmc": 8, "nc": 1, "dit": 0, "lcom": 0.375, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.matcher.ElementMatchers", "net.bytebuddy.dynamic.scaffold.TypeValidation", "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"]}, {"package": "net.bytebuddy.benchmark", "class": "StubInvocationBenchmark", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/StubInvocationBenchmark.java", "metrics": {"nof": 14, "nopf": 0, "nom": 6, "nopm": 6, "loc": 203, "wmc": 6, "nc": 1, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.benchmark.specimen.ExampleInterface", "net.bytebuddy.benchmark.ClassByImplementationBenchmark"]}, {"package": "net.bytebuddy.benchmark", "class": "ClassByExtensionBenchmark", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/ClassByExtensionBenchmark.java", "metrics": {"nof": 13, "nopf": 1, "nom": 23, "nopm": 20, "loc": 309, "wmc": 25, "nc": 1, "dit": 0, "lcom": 0.1739130434782608, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.pool.TypePool", "net.bytebuddy.implementation.SuperMethodCall", "net.bytebuddy.benchmark.specimen.ExampleClass", "net.bytebuddy.matcher.ElementMatchers", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.dynamic.loading.ClassLoadingStrategy", "net.bytebuddy.implementation.MethodDelegation", "net.bytebuddy.dynamic.scaffold.TypeValidation"]}, {"package": "net.bytebuddy.benchmark", "class": "ClassByExtensionBenchmark.ByteBuddyProxyInterceptor", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/ClassByExtensionBenchmark.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 20, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.benchmark", "class": "ClassByExtensionBenchmark.ByteBuddyAccessInterceptor", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/ClassByExtensionBenchmark.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 22, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.benchmark", "class": "ClassByExtensionBenchmark.ByteBuddyPrefixInterceptor", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/ClassByExtensionBenchmark.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 16, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.benchmark", "class": "SuperClassInvocationBenchmark", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/SuperClassInvocationBenchmark.java", "metrics": {"nof": 16, "nopf": 0, "nom": 8, "nopm": 8, "loc": 265, "wmc": 8, "nc": 1, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.benchmark.ClassByExtensionBenchmark", "net.bytebuddy.benchmark.specimen.ExampleClass"]}, {"package": "net.bytebuddy.benchmark", "class": "ClassByImplementationBenchmark", "file": "data/repositories/byte-buddy/byte-buddy-benchmark/src/main/java/net/bytebuddy/benchmark/ClassByImplementationBenchmark.java", "metrics": {"nof": 22, "nopf": 10, "nom": 32, "nopm": 29, "loc": 370, "wmc": 66, "nc": 1, "dit": 0, "lcom": 0.6875, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.pool.TypePool", "net.bytebuddy.matcher.ElementMatchers", "net.bytebuddy.benchmark.specimen.ExampleInterface", "net.bytebuddy.dynamic.loading.ClassLoadingStrategy", "net.bytebuddy.implementation.StubMethod", "net.bytebuddy.dynamic.scaffold.TypeValidation"]}], "dependencies": ["net.bytebuddy.matcher", "net.bytebuddy.benchmark.specimen", "net.bytebuddy.implementation", "net.bytebuddy.dynamic.scaffold", "net.bytebuddy.description.type", "net.bytebuddy.pool", "net.bytebuddy.dynamic.loading"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

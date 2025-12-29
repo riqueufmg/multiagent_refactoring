@@ -1,0 +1,51 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.pdf417.encoder",
+  "detections": [
+    {
+      "class": "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder",
+      "detection": true,
+      "justification": "Very large size and complexity (LOC 595, WMC 94), many fields and methods (NOF 21, NOM 18). High cognitive load and many responsibilities (handles multiple encoding modes, ECI handling, interacts with Compaction and other encoder helpers). Metrics and role indicate this class is doing too much and should be decomposed."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.PDF417",
+      "detection": true,
+      "justification": "Relatively large and complex for a single class (LOC 234, WMC 31, NOM 14, NOPM 9) and depends on several encoder components (HighLevelEncoder, ErrorCorrection, BarcodeRow, BarcodeMatrix). Acts as an orchestrator with a bloated interface and mixed responsibilities — candidate for splitting into smaller cohesive classes."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.PDF417ErrorCorrection",
+      "detection": false,
+      "justification": "Moderate size and focused purpose (LOC 77, WMC 14, NOM 4). Appears to encapsulate a single responsibility (error correction) with limited methods and dependencies, indicating appropriate modularization."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.BarcodeMatrix",
+      "detection": false,
+      "justification": "Small, focused class (LOC 43, WMC 8, NOM 6) likely representing matrix storage/manipulation. Low complexity and cohesive purpose suggest it is appropriately modularized."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.Compaction",
+      "detection": false,
+      "justification": "Very small (LOC 4) with no reported methods; likely an enum or simple utility. Its minimal size and single responsibility indicate no insufficient modularization."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.BarcodeRow",
+      "detection": false,
+      "justification": "Small utility-like class (LOC 51, WMC 7, NOM 5) focused on row representation/manipulation. Low complexity and narrow responsibility support adequate modularization."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder.NoECIInput",
+      "detection": false,
+      "justification": "Nested helper with very small size (LOC 27, WMC 0, NOM 0) and single-purpose role. Its limited scope indicates appropriate decomposition."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.Dimensions",
+      "detection": false,
+      "justification": "Small data-holder type (LOC 28, WMC 5, NOM 5) with a focused role (dimension constraints). Metrics indicate cohesive, minimal responsibility."
+    },
+    {
+      "class": "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoderTestAdapter",
+      "detection": false,
+      "justification": "Tiny test adapter (LOC 10, WMC 2, NOM 2) used for testing internals. Its small, single-purpose nature means it does not suffer from insufficient modularization."
+    }
+  ]
+}

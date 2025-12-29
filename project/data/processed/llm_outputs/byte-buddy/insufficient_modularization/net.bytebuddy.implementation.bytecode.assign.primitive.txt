@@ -1,0 +1,66 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bytecode.assign.primitive",
+  "detections": [
+    {
+      "class": "PrimitiveBoxingDelegate",
+      "detection": false,
+      "justification": "Moderate size and complexity (loc=130, wmc=11, nom=3) with a single focused responsibility (boxing). Cohesion metric (lcom=0.67) is acceptable for a delegate; does not appear to aggregate many distinct responsibilities."
+    },
+    {
+      "class": "PrimitiveBoxingDelegate.BoxingStackManipulation",
+      "detection": false,
+      "justification": "Small, narrow helper (loc=29, wmc=0) with a single role; unlikely to suffer from insufficient modularization."
+    },
+    {
+      "class": "VoidAwareAssigner",
+      "detection": false,
+      "justification": "Small and simple (loc=33, wmc=5, nom=2) indicating a focused purpose; no evidence of aggregated responsibilities."
+    },
+    {
+      "class": "PrimitiveNarrowingDelegate",
+      "detection": true,
+      "justification": "Large and complex for a single class (loc=180, wmc=19, nof=10, nom=3) with low apparent reuse (fanin=0) and only moderate cohesion (lcom=0.67). Metrics suggest this class centralizes many narrowing behaviors and should be decomposed into smaller, more focused abstractions."
+    },
+    {
+      "class": "PrimitiveNarrowingDelegate.NarrowingStackManipulation",
+      "detection": false,
+      "justification": "Small helper type (loc=31, wmc=0) that appears to encapsulate a single concern; not a modularization problem itself."
+    },
+    {
+      "class": "PrimitiveUnboxingDelegate",
+      "detection": true,
+      "justification": "Very large and complex (loc=235, wmc=23, nom=6, nof=7) with only moderate cohesion (lcom=0.67). The size and complexity indicate multiple responsibilities related to unboxing are concentrated here and the class is a candidate for decomposition into smaller units."
+    },
+    {
+      "class": "PrimitiveUnboxingDelegate.ExplicitlyTypedUnboxingResponsible",
+      "detection": false,
+      "justification": "Relatively small (loc=45) and appears to represent a specific strategy/responsibility; does not indicate insufficient modularization."
+    },
+    {
+      "class": "PrimitiveUnboxingDelegate.UnboxingResponsible",
+      "detection": false,
+      "justification": "Very small (loc=13) interface/holder-like type with no complex behavior; not a modularization smell."
+    },
+    {
+      "class": "PrimitiveUnboxingDelegate.ImplicitlyTypedUnboxingResponsible",
+      "detection": false,
+      "justification": "Small (loc=23) focused helper/strategy; does not aggregate multiple responsibilities."
+    },
+    {
+      "class": "PrimitiveWideningDelegate",
+      "detection": true,
+      "justification": "Large and relatively complex (loc=178, wmc=19, nof=10, nom=3) with moderate cohesion (lcom=0.67). The metrics indicate it likely centralizes multiple widening behaviors and would benefit from further decomposition."
+    },
+    {
+      "class": "PrimitiveWideningDelegate.WideningStackManipulation",
+      "detection": false,
+      "justification": "Small helper (loc=29, wmc=0) encapsulating a narrow concern; not an insufficient modularization indicator."
+    },
+    {
+      "class": "PrimitiveTypeAwareAssigner",
+      "detection": false,
+      "justification": "Small and focused (loc=33, wmc=5, nom=2) coordinating behavior across delegates; size and complexity do not suggest an aggregation of many responsibilities."
+    }
+  ]
+}

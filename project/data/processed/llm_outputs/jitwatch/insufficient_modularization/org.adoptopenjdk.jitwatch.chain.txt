@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.chain",
+  "detections": [
+    {
+      "class": "CompileNode",
+      "detection": true,
+      "justification": "Relatively large and complex: 19 methods (nom), 9 fields, 111 LOC and high cyclomatic burden (WMC 28). It depends on multiple model and parsing interfaces and utilities, suggesting it combines parsing, model access and node responsibilities. The package contains only two classes, indicating this class centralizes much functionality for the chain. These characteristics (many methods, high complexity and many dependencies) indicate an abstraction that has not been sufficiently decomposed."
+    },
+    {
+      "class": "CompileChainWalker",
+      "detection": false,
+      "justification": "Smaller, focused surface: only 5 methods (nom) with modest size (117 LOC) and lower complexity (WMC 18). LCOM is 0.0 indicating high cohesion, and it primarily orchestrates traversal using CompileNode and model interfaces rather than accumulating diverse responsibilities. Metrics and dependencies suggest it is a coordinator rather than a bloated multi-responsibility class."
+    }
+  ]
+}

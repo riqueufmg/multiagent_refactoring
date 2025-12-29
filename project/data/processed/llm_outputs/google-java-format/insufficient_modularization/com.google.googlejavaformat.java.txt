@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.googlejavaformat.java",
+  "detections": [
+    {
+      "class": "JavaInputAstVisitor",
+      "detection": true,
+      "justification": "Extremely large size and complexity (loc: 3233, nom: 167, wmc: 560) with many nested types and many methods (nopm: 75). The class concentrates parsing/formatting logic across many concerns (numerous inner enums/types and wide dependency surface), indicating it has not been decomposed into smaller, cohesive abstractions."
+    },
+    {
+      "class": "JavaInput",
+      "detection": true,
+      "justification": "Substantial size and complexity for a single class (loc: 474, nom: 23, wmc: 64) and multiple responsibilities (tokenization, input handling, interaction with JavaOutput and JavacTokens). The combination of many methods and internal token types suggests it could be split into clearer components (token management, input traversal, utilities)."
+    },
+    {
+      "class": "JavaOutput",
+      "detection": true,
+      "justification": "Relatively large and complex output-related class (loc: 277, nom: 16, wmc: 63) with many methods and responsibilities (multiple nested types and interactions with formatting components). The high WMC relative to size indicates concentrated control logic that could be modularized (e.g., separate emission, formatting, and replacement concerns)."
+    },
+    {
+      "class": "ImportOrderer",
+      "detection": true,
+      "justification": "Large implementation focused on import ordering (loc: 370, nom: 17, wmc: 54) while also containing several related helper types. The class handles multiple subtasks (classification, grouping, indexing) suggesting opportunity to split responsibilities into smaller classes for clarity and maintainability."
+    },
+    {
+      "class": "Formatter",
+      "detection": false,
+      "justification": "Moderate size and complexity (loc: 128, nom: 10, wmc: 14) with a focused role coordinating formatting steps and clear dependencies. Metrics and cohesion (lcom: 0.4) indicate a single, well-defined responsibility rather than a bloated abstraction."
+    },
+    {
+      "class": "JavaFormatterOptions",
+      "detection": false,
+      "justification": "Small and cohesive configuration holder (loc: 52, nom: 6, wmc: 6, lcom: 0.666). It represents a clear single concern (formatter options) and does not exhibit signs of concentrated, mixed responsibilities that would indicate insufficient modularization."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "metrics": {"num_classes": 12, "loc": 959, "Ce": 6, "Ca": 0}, "classes": [{"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveBoxingDelegate", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveBoxingDelegate.java", "metrics": {"nof": 5, "nopf": 0, "nom": 3, "nopm": 2, "loc": 130, "wmc": 11, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.implementation.bytecode.StackSize", "net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.description.type.TypeDefinition", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.implementation.bytecode.assign.Assigner"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveBoxingDelegate.BoxingStackManipulation", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveBoxingDelegate.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 29, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.implementation.Implementation"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "VoidAwareAssigner", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/VoidAwareAssigner.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 33, "wmc": 5, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.implementation.bytecode.constant.DefaultValue", "net.bytebuddy.implementation.bytecode.Removal", "net.bytebuddy.implementation.bytecode.assign.Assigner"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveNarrowingDelegate", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveNarrowingDelegate.java", "metrics": {"nof": 10, "nopf": 0, "nom": 3, "nopm": 2, "loc": 180, "wmc": 19, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.description.type.TypeDefinition", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.implementation.bytecode.StackSize"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveNarrowingDelegate.NarrowingStackManipulation", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveNarrowingDelegate.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 31, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.implementation.bytecode.StackManipulation"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveUnboxingDelegate", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveUnboxingDelegate.java", "metrics": {"nof": 7, "nopf": 0, "nom": 6, "nopm": 4, "loc": 235, "wmc": 23, "nc": 0, "dit": 1, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.implementation.bytecode.assign.primitive.PrimitiveUnboxingDelegate.UnboxingResponsible", "net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.implementation.bytecode.StackSize", "net.bytebuddy.description.type.TypeDefinition", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.implementation.bytecode.assign.primitive.PrimitiveUnboxingDelegate.ExplicitlyTypedUnboxingResponsible", "net.bytebuddy.implementation.bytecode.assign.Assigner"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveUnboxingDelegate.ExplicitlyTypedUnboxingResponsible", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveUnboxingDelegate.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 45, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.implementation.bytecode.assign.primitive.PrimitiveUnboxingDelegate", "net.bytebuddy.implementation.bytecode.assign.Assigner", "net.bytebuddy.description.type.TypeDescription"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveUnboxingDelegate.UnboxingResponsible", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveUnboxingDelegate.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 13, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.implementation.bytecode.assign.Assigner"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveUnboxingDelegate.ImplicitlyTypedUnboxingResponsible", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveUnboxingDelegate.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 23, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.implementation.bytecode.assign.Assigner", "net.bytebuddy.description.type.TypeDescription"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveWideningDelegate", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveWideningDelegate.java", "metrics": {"nof": 10, "nopf": 0, "nom": 3, "nopm": 2, "loc": 178, "wmc": 19, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.description.type.TypeDefinition", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.implementation.bytecode.StackSize"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveWideningDelegate.WideningStackManipulation", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveWideningDelegate.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 29, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.implementation.Implementation", "net.bytebuddy.implementation.bytecode.StackManipulation"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.primitive", "class": "PrimitiveTypeAwareAssigner", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/primitive/PrimitiveTypeAwareAssigner.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 33, "wmc": 5, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.implementation.bytecode.assign.primitive.PrimitiveUnboxingDelegate", "net.bytebuddy.implementation.bytecode.assign.primitive.PrimitiveBoxingDelegate", "net.bytebuddy.implementation.bytecode.assign.Assigner", "net.bytebuddy.implementation.bytecode.assign.primitive.PrimitiveWideningDelegate"]}], "dependencies": ["net.bytebuddy.build", "net.bytebuddy.implementation.bytecode", "net.bytebuddy.implementation.bytecode.assign", "net.bytebuddy.implementation.bytecode.constant", "net.bytebuddy.implementation", "net.bytebuddy.description.type"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

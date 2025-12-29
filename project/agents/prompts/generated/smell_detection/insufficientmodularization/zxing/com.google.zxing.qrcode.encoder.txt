@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.qrcode.encoder", "metrics": {"num_classes": 11, "loc": 1641, "Ce": 6, "Ca": 6}, "classes": [{"package": "com.google.zxing.qrcode.encoder", "class": "Encoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/Encoder.java", "metrics": {"nof": 2, "nopf": 0, "nom": 25, "nopm": 3, "loc": 434, "wmc": 90, "nc": 0, "dit": 0, "lcom": 0.08, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MaskUtil", "com.google.zxing.common.StringUtils", "com.google.zxing.common.BitArray", "com.google.zxing.EncodeHintType", "com.google.zxing.qrcode.encoder.MatrixUtil", "com.google.zxing.qrcode.encoder.MinimalEncoder", "com.google.zxing.common.reedsolomon.GenericGF", "com.google.zxing.qrcode.decoder.Version", "com.google.zxing.qrcode.decoder.Mode", "com.google.zxing.qrcode.encoder.ByteMatrix", "com.google.zxing.qrcode.QRCodeWriter", "com.google.zxing.qrcode.encoder.QRCode", "com.google.zxing.common.CharacterSetECI", "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "MinimalEncoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MinimalEncoder.java", "metrics": {"nof": 17, "nopf": 0, "nom": 13, "nopm": 0, "loc": 382, "wmc": 46, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MinimalEncoder.ResultList", "com.google.zxing.common.ECIEncoderSet", "com.google.zxing.qrcode.encoder.MinimalEncoder.Edge", "com.google.zxing.qrcode.decoder.Mode", "com.google.zxing.qrcode.decoder.Version", "com.google.zxing.qrcode.encoder.MinimalEncoder.VersionSize", "com.google.zxing.qrcode.encoder.Encoder", "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "MinimalEncoder.VersionSize", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MinimalEncoder.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 8, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MinimalEncoder"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "MinimalEncoder.Edge", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MinimalEncoder.java", "metrics": {"nof": 6, "nopf": 0, "nom": 0, "nopm": 0, "loc": 34, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.decoder.Mode", "com.google.zxing.qrcode.encoder.MinimalEncoder"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "MinimalEncoder.ResultList", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MinimalEncoder.java", "metrics": {"nof": 6, "nopf": 0, "nom": 0, "nopm": 0, "loc": 170, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.decoder.Version", "com.google.zxing.qrcode.encoder.MinimalEncoder", "com.google.zxing.qrcode.decoder.Mode"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "MinimalEncoder.ResultNode", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MinimalEncoder.java", "metrics": {"nof": 4, "nopf": 0, "nom": 0, "nopm": 0, "loc": 79, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.decoder.Mode"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "BlockPair", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/BlockPair.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 2, "loc": 14, "wmc": 3, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.qrcode.encoder", "class": "MaskUtil", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MaskUtil.java", "metrics": {"nof": 4, "nopf": 0, "nom": 9, "nopm": 0, "loc": 161, "wmc": 38, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MatrixUtil", "com.google.zxing.qrcode.encoder.Encoder", "com.google.zxing.qrcode.encoder.ByteMatrix"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "MatrixUtil", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/MatrixUtil.java", "metrics": {"nof": 7, "nopf": 0, "nom": 20, "nopm": 0, "loc": 226, "wmc": 55, "nc": 0, "dit": 0, "lcom": 0.1, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MaskUtil", "com.google.zxing.common.BitArray", "com.google.zxing.qrcode.decoder.Version", "com.google.zxing.qrcode.encoder.ByteMatrix", "com.google.zxing.qrcode.encoder.QRCode", "com.google.zxing.qrcode.encoder.Encoder", "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "ByteMatrix", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/ByteMatrix.java", "metrics": {"nof": 3, "nopf": 0, "nom": 10, "nopm": 10, "loc": 61, "wmc": 15, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MaskUtil", "com.google.zxing.qrcode.encoder.MatrixUtil", "com.google.zxing.datamatrix.DataMatrixWriter", "com.google.zxing.qrcode.QRCodeWriter", "com.google.zxing.qrcode.encoder.QRCode", "com.google.zxing.qrcode.encoder.Encoder"]}, {"package": "com.google.zxing.qrcode.encoder", "class": "QRCode", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/qrcode/encoder/QRCode.java", "metrics": {"nof": 6, "nopf": 1, "nom": 13, "nopm": 13, "loc": 72, "wmc": 14, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.qrcode.encoder.MatrixUtil", "com.google.zxing.qrcode.decoder.Mode", "com.google.zxing.qrcode.decoder.Version", "com.google.zxing.qrcode.encoder.ByteMatrix", "com.google.zxing.qrcode.QRCodeWriter", "com.google.zxing.qrcode.encoder.Encoder", "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"]}], "dependencies": ["com.google.zxing.common.reedsolomon", "com.google.zxing", "com.google.zxing.qrcode", "com.google.zxing.qrcode.decoder", "com.google.zxing.datamatrix", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

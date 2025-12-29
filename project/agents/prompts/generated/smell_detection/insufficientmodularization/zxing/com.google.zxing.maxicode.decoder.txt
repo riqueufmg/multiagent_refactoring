@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.maxicode.decoder", "metrics": {"num_classes": 3, "loc": 228, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.maxicode.decoder", "class": "DecodedBitStreamParser", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/maxicode/decoder/DecodedBitStreamParser.java", "metrics": {"nof": 22, "nopf": 0, "nom": 10, "nopm": 0, "loc": 137, "wmc": 33, "nc": 0, "dit": 0, "lcom": 0.2, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.FormatException", "com.google.zxing.maxicode.decoder.Decoder"]}, {"package": "com.google.zxing.maxicode.decoder", "class": "Decoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/maxicode/decoder/Decoder.java", "metrics": {"nof": 4, "nopf": 0, "nom": 4, "nopm": 3, "loc": 62, "wmc": 12, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.ChecksumException", "com.google.zxing.maxicode.decoder.BitMatrixParser", "com.google.zxing.maxicode.MaxiCodeReader", "com.google.zxing.maxicode.decoder.DecodedBitStreamParser", "com.google.zxing.common.BitMatrix", "com.google.zxing.common.reedsolomon.GenericGF", "com.google.zxing.FormatException", "com.google.zxing.common.reedsolomon.ReedSolomonDecoder", "com.google.zxing.common.DecoderResult"]}, {"package": "com.google.zxing.maxicode.decoder", "class": "BitMatrixParser", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/maxicode/decoder/BitMatrixParser.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 0, "loc": 29, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.maxicode.decoder.Decoder", "com.google.zxing.common.BitMatrix"]}], "dependencies": ["com.google.zxing", "com.google.zxing.maxicode", "com.google.zxing.common.reedsolomon", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

@@ -1,0 +1,51 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.dynamic.scaffold.subclass",
+  "detections": [
+    {
+      "class": "SubclassImplementationTarget",
+      "detection": false,
+      "justification": "Moderate size (LOC 104) with a small number of methods (nom 5) and moderate complexity (WMC 5). Cohesion metric (LCOM 0.8) does not indicate a severely bloated or multi-responsibility class and its role appears focused on implementation target behavior."
+    },
+    {
+      "class": "SubclassImplementationTarget.OriginTypeResolver",
+      "detection": false,
+      "justification": "Very small helper nested type (LOC 26) with no public methods, acting as a focused resolver; no signs of aggregated responsibilities or excessive complexity."
+    },
+    {
+      "class": "SubclassImplementationTarget.Factory",
+      "detection": false,
+      "justification": "Small factory helper (LOC 27, single factory method) with narrow responsibility; metrics do not indicate a modularization problem."
+    },
+    {
+      "class": "ConstructorStrategy",
+      "detection": true,
+      "justification": "Large source footprint (LOC 256) and multiple nested strategy implementations grouped under the same abstraction (Default, WithMethodAttributeAppenderFactory, ForDefaultConstructor). The file-level size and the presence of several distinct strategy variants indicate concentrated responsibilities that would benefit from clearer decomposition into separate, smaller classes."
+    },
+    {
+      "class": "ConstructorStrategy.Default",
+      "detection": true,
+      "justification": "Substantial size for a single strategy implementation (LOC 158) with many external dependencies referenced. The large implementation suggests internal complexity that could be decomposed or moved to a dedicated top-level class rather than being embedded, improving modularity and maintainability."
+    },
+    {
+      "class": "ConstructorStrategy.WithMethodAttributeAppenderFactory",
+      "detection": false,
+      "justification": "Small, focused nested class (LOC 34) with a single, specific concern (method attribute appender factory); no indication of multiple unrelated responsibilities."
+    },
+    {
+      "class": "ConstructorStrategy.ForDefaultConstructor",
+      "detection": false,
+      "justification": "Moderate size (LOC 79) and focused purpose for handling default-constructor-specific behavior. Metrics do not show excessive complexity or a bloated interface that would demand further decomposition."
+    },
+    {
+      "class": "SubclassDynamicTypeBuilder",
+      "detection": false,
+      "justification": "Moderate size (LOC 106) with multiple methods (nom 6) and higher complexity (WMC 8) but a cohesion metric (LCOM 0.0) consistent with a focused builder role. Despite many dependencies typical for a builder, it appears to encapsulate a single responsibility (dynamic type construction)."
+    },
+    {
+      "class": "SubclassDynamicTypeBuilder.InstrumentableMatcher",
+      "detection": false,
+      "justification": "Very small nested matcher (LOC 22) with a single, well-scoped role; no evidence of aggregated responsibilities or excessive complexity."
+    }
+  ]
+}

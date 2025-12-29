@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.description.annotation",
+  "detections": [
+    {
+      "class": "AnnotationValue",
+      "detection": true,
+      "justification": "Very large implementation (loc=2457) with many fields (nof=42) and multiple nested/variant inner types listed in the same file (ForNonArrayType, ForConstant, ForArrayType, ForAnnotationDescription, ForEnumerationDescription, ForTypeDescription, ForDescriptionArray, ForMissingType, ForMismatchedType, ForMissingValue, WithUnknownConstant, WithIncompatibleRuntimeType, Loaded, PropertyDelegate, RenderingDispatcher, State, Sort, AbstractBase, ForUnresolvedProperty). The class accumulates many responsibilities (rendering, loading, type-specific handling, property delegation) and many external dependencies, indicating insufficient decomposition into smaller cohesive abstractions."
+    },
+    {
+      "class": "AnnotationDescription",
+      "detection": true,
+      "justification": "Substantially large (loc=1151) with many fields (nof=20) and methods (nom=10, wmc=10) and several nested classes (RenderingDispatcher, AnnotationInvocationHandler, AbstractBase, ForLoadedAnnotation, Latent, Loadable, Builder) bundled together. It has numerous dependencies and mixes representation, loading, invocation handler and builder functionality, suggesting a bloated interface and multiple responsibilities that could be modularized."
+    },
+    {
+      "class": "AnnotationList",
+      "detection": false,
+      "justification": "Moderate size (loc=307) with a focused role (list of annotations) and a small set of methods (nom=8, wmc=8). It leverages list/filter abstractions (FilterableList, TypeList) and contains only a few small inner variants (Explicit, ForLoadedAnnotations, Empty, AbstractBase) consistent with a cohesive collection abstraction rather than a single overly-bloated class."
+    }
+  ]
+}

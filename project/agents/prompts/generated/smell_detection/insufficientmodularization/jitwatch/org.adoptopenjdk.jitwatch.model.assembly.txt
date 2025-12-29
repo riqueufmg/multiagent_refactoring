@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.model.assembly", "metrics": {"num_classes": 11, "loc": 1047, "Ce": 4, "Ca": 8}, "classes": [{"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "IAssemblyParser", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/IAssemblyParser.java", "metrics": {"nof": 0, "nopf": 0, "nom": 11, "nopm": 0, "loc": 17, "wmc": 11, "nc": 1, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.assembly.AssemblyLabels", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction", "org.adoptopenjdk.jitwatch.model.assembly.Architecture"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyProcessor", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyProcessor.java", "metrics": {"nof": 10, "nopf": 0, "nom": 8, "nopm": 7, "loc": 186, "wmc": 46, "nc": 0, "dit": 0, "lcom": 0.25, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.MemberSignatureParts", "org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.model.MetaClass", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod", "org.adoptopenjdk.jitwatch.model.assembly.Architecture", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyUtil", "org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser", "org.adoptopenjdk.jitwatch.model.PackageManager"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyMethod", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyMethod.java", "metrics": {"nof": 7, "nopf": 0, "nom": 14, "nopm": 14, "loc": 73, "wmc": 20, "nc": 0, "dit": 0, "lcom": 0.3571428571428571, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyBlock", "org.adoptopenjdk.jitwatch.model.assembly.Architecture"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyBlock", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyBlock.java", "metrics": {"nof": 2, "nopf": 0, "nom": 8, "nopm": 8, "loc": 35, "wmc": 10, "nc": 0, "dit": 0, "lcom": 0.25, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyLabels", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyLabels.java", "metrics": {"nof": 5, "nopf": 0, "nom": 5, "nopm": 4, "loc": 69, "wmc": 14, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyUtil"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyReference", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyReference.java", "metrics": {"nof": 16, "nopf": 0, "nom": 11, "nopm": 3, "loc": 216, "wmc": 32, "nc": 0, "dit": 0, "lcom": 0.1818181818181818, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.assembly.AssemblyReference.AssemblyReferenceHandler", "org.adoptopenjdk.jitwatch.model.assembly.arm.MnemonicEntry", "org.adoptopenjdk.jitwatch.model.assembly.Architecture"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyReference.AssemblyReferenceHandler", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyReference.java", "metrics": {"nof": 9, "nopf": 0, "nom": 0, "nopm": 0, "loc": 80, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "Architecture", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/Architecture.java", "metrics": {"nof": 6, "nopf": 0, "nom": 1, "nopm": 1, "loc": 19, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.StringUtil"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyInstruction", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyInstruction.java", "metrics": {"nof": 8, "nopf": 0, "nom": 15, "nopm": 15, "loc": 178, "wmc": 41, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.assembly.AssemblyLabels", "org.adoptopenjdk.jitwatch.util.StringUtil"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AssemblyUtil", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AssemblyUtil.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 2, "loc": 36, "wmc": 12, "nc": 0, "dit": 0, "lcom": 1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser", "org.adoptopenjdk.jitwatch.model.assembly.arm.AssemblyParserARM", "org.adoptopenjdk.jitwatch.model.assembly.Architecture", "org.adoptopenjdk.jitwatch.model.assembly.x86.AssemblyParserX86"]}, {"package": "org.adoptopenjdk.jitwatch.model.assembly", "class": "AbstractAssemblyParser", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/model/assembly/AbstractAssemblyParser.java", "metrics": {"nof": 3, "nopf": 0, "nom": 4, "nopm": 4, "loc": 138, "wmc": 32, "nc": 2, "dit": 1, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.assembly.AssemblyLabels", "org.adoptopenjdk.jitwatch.model.assembly.x86.X86Directive", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyProcessor", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction", "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMDirective", "org.adoptopenjdk.jitwatch.model.assembly.AssemblyBlock", "org.adoptopenjdk.jitwatch.model.assembly.Architecture"]}], "dependencies": ["org.adoptopenjdk.jitwatch.model.assembly.arm", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.model.assembly.x86"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

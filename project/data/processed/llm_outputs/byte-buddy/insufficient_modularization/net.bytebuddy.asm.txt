@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.asm",
+  "detections": [
+    {
+      "class": "Advice",
+      "detection": true,
+      "justification": "The Advice class is extremely large and multi‑faceted: very high LOC (11101) and a very large number of members (nof 403) combined with many nested/related inner types (OffsetMapping, Dispatcher, Inlining, AssignReturned, StackMapFrameHandler, numerous For*/Factory/Resolved/Handler variants). It depends on a wide variety of concepts (readers, writers, bytecode generation, type resolution, handlers, dispatchers), indicating it concentrates many responsibilities (parsing/translation, mapping, dispatching, inlining, exception/stack handling, many offset mappings). This breadth and size make it hard to reason about and maintain, which is indicative of insufficient modularization."
+    },
+    {
+      "class": "AsmVisitorWrapper",
+      "detection": false,
+      "justification": "AsmVisitorWrapper shows a comparatively small footprint and focused responsibility: moderate LOC (510), few methods (nom 3) and low complexity (wmc 3). Its contained inner types are small, purpose‑specific adapters/wrappers (NoOp, AbstractBase, ForDeclaredFields, ForDeclaredMethods, FieldVisitorWrapper, MethodVisitorWrapper, DispatchingVisitor, Compound, Entry) that serve the single cohesive role of wrapping/dispatching ASM visitors. Dependencies are narrow and aligned with that single abstraction. These characteristics suggest cohesive design and sufficient modularization for its abstraction."
+    }
+  ]
+}

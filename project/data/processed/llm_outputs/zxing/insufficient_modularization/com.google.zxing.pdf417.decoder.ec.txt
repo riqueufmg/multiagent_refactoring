@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.pdf417.decoder.ec",
+  "detections": [
+    {
+      "class": "ModulusPoly",
+      "detection": true,
+      "justification": "ModulusPoly concentrates substantial size and complexity within the package: highest LOC (192) and highest WMC (46) among the three classes, with 13 methods. It represents nearly half of the package's LOC and exposes many operations related to polynomial arithmetic, suggesting multiple responsibilities (construction, arithmetic ops, utilities) that could be split into smaller, more focused abstractions. Its heavy mutual dependencies with ModulusGF and ErrorCorrection further indicate a central, bloated role rather than a narrowly scoped class."
+    },
+    {
+      "class": "ErrorCorrection",
+      "detection": false,
+      "justification": "Although ErrorCorrection has moderate complexity (LOC 129, WMC 23), it exposes a small public interface (few public methods/nopm = 2) and a modest number of methods overall (nom = 5), indicating a focused responsibility (the error-correction algorithm). LCOM = 0.0 suggests internal cohesion. Contextual judgment favors it being a cohesive algorithmic component rather than an insufficiently modular class."
+    },
+    {
+      "class": "ModulusGF",
+      "detection": false,
+      "justification": "ModulusGF is relatively small (LOC 75) with a limited number of fields and methods oriented around finite-field arithmetic (nom = 11, nof = 6). Its responsibilities (field arithmetic/lookup tables) are conceptually cohesive and narrowly scoped; while it is used by the other classes, its size and focused role do not indicate inadequate modularization in this package context."
+    }
+  ]
+}

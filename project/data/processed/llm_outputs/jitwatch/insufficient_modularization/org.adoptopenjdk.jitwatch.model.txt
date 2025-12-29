@@ -1,0 +1,46 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.model",
+  "detections": [
+    {
+      "class": "MemberSignatureParts",
+      "detection": true,
+      "justification": "Very large implementation (loc 462) with many methods (nom 29) and very high complexity (wmc 109). It depends on parsing/util utilities and bytecode classes and likely mixes parsing, representation and utility logic. Size and high complexity indicate multiple responsibilities that could be split (e.g., parsing, formatting, and representation concerns)."
+    },
+    {
+      "class": "AbstractMetaMember",
+      "detection": true,
+      "justification": "Substantial size and complexity (loc 311, nom 38, wmc 80) while being an abstract base used across different meta-member types. It also interacts with bytecode, assembly, compilation and utility classes, suggesting it consolidates diverse concerns (bytecode handling, assembly mapping, compilation metadata) that would benefit from decomposition into focused collaborators or smaller classes."
+    },
+    {
+      "class": "Compilation",
+      "detection": true,
+      "justification": "Large and complex (loc 280, nom 39, wmc 71) with many methods and responsibilities (interacts with tasks, assembly, compiler thread, tags and parsing utilities). The breadth of dependencies and high method/complexity counts suggest the class aggregates multiple roles (parsing, state tracking, event handling, assembly association) and could be modularized."
+    },
+    {
+      "class": "JITDataModel",
+      "detection": true,
+      "justification": "Central data model with substantial size and complexity (loc 228, nom 22, wmc 50) and many dependencies across the package (members, stats, events, classes, threads, tags, package manager, compilations). Its role as a coordinator plus breadth of responsibilities indicates risk of being a god-object that should be split into clearer subcomponents (storage, query, update, event handling)."
+    },
+    {
+      "class": "BCIOpcodeMap",
+      "detection": false,
+      "justification": "Tiny utility-like class (loc 3, nof 1, nom 0) with no evident complexity or multiple responsibilities. Metrics indicate a focused, single-purpose role that does not show signs of insufficient modularization."
+    },
+    {
+      "class": "EventType",
+      "detection": false,
+      "justification": "Very small and simple (loc 8, nom 2, wmc 2) with no complex dependencies; appears to represent an enum/typed value object and does not aggregate multiple responsibilities."
+    },
+    {
+      "class": "NumberedLine",
+      "detection": false,
+      "justification": "Small class (loc 20, nom 5, wmc 5) likely representing a simple data/utility concept. Metrics and lack of dependencies suggest it is cohesive and appropriately modular."
+    },
+    {
+      "class": "LogParseException",
+      "detection": false,
+      "justification": "Small exception-type class (loc 9, nom 2, wmc 2) with a single responsibility (error representation) and no indicators of bloated interface or mixed concerns."
+    }
+  ]
+}

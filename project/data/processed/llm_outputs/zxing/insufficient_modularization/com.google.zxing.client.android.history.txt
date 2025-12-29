@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.client.android.history",
+  "detections": [
+    {
+      "class": "HistoryItem",
+      "detection": false,
+      "justification": "Small data-holder class (loc 29, nom 3, wmc 5) with low complexity and high cohesion (lcom 0.0). Limited dependencies and few methods indicate a single, focused responsibility."
+    },
+    {
+      "class": "HistoryManager",
+      "detection": true,
+      "justification": "Large and complex class (loc 200, nom 13, nopm 8, wmc 24) with many dependencies across UI, persistence, and supplemental-info retrievers. The combination of high size, high complexity and many responsibilities (DBHelper, various ResultInfoRetrievers, UI activities/intents) indicates it aggregates multiple concerns and should be decomposed."
+    },
+    {
+      "class": "HistoryItemAdapter",
+      "detection": false,
+      "justification": "Small adapter with low complexity (loc 33, nom 2, wmc 4) and few responsibilities. Its limited surface and focused dependencies suggest adequate modularization."
+    },
+    {
+      "class": "DBHelper",
+      "detection": false,
+      "justification": "Small helper (loc 24, nom 3, wmc 3) whose higher field count likely represents constants/configuration rather than multiple responsibilities. Concentrated database-related role and modest complexity indicate acceptable modularization."
+    },
+    {
+      "class": "HistoryActivity",
+      "detection": false,
+      "justification": "UI controller of moderate size (loc 104, nom 9, wmc 17) but typical for an Activity. It delegates to HistoryManager and adapters; cohesion is high (lcom 0.0) and responsibilities appear UI-focused rather than a sign of an overly-bloated abstraction."
+    }
+  ]
+}

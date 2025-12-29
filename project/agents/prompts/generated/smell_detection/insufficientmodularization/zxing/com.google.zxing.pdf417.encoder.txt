@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.pdf417.encoder", "metrics": {"num_classes": 9, "loc": 1069, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.pdf417.encoder", "class": "PDF417ErrorCorrection", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/PDF417ErrorCorrection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 4, "nopm": 0, "loc": 77, "wmc": 14, "nc": 0, "dit": 0, "lcom": 0.75, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.encoder.PDF417"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "PDF417", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/PDF417.java", "metrics": {"nof": 14, "nopf": 0, "nom": 14, "nopm": 9, "loc": 234, "wmc": 31, "nc": 0, "dit": 0, "lcom": 0.1428571428571428, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.PDF417Writer", "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder", "com.google.zxing.pdf417.encoder.PDF417ErrorCorrection", "com.google.zxing.pdf417.encoder.BarcodeRow", "com.google.zxing.pdf417.encoder.Compaction", "com.google.zxing.pdf417.encoder.BarcodeMatrix"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "BarcodeMatrix", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/BarcodeMatrix.java", "metrics": {"nof": 4, "nopf": 0, "nom": 6, "nopm": 2, "loc": 43, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.encoder.BarcodeRow", "com.google.zxing.pdf417.encoder.PDF417"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "Compaction", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/Compaction.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 4, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.PDF417Writer", "com.google.zxing.pdf417.encoder.PDF417", "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder", "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoderTestAdapter"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "BarcodeRow", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/BarcodeRow.java", "metrics": {"nof": 2, "nopf": 0, "nom": 5, "nopm": 0, "loc": 51, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.encoder.BarcodeMatrix", "com.google.zxing.pdf417.encoder.PDF417"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "PDF417HighLevelEncoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/PDF417HighLevelEncoder.java", "metrics": {"nof": 21, "nopf": 0, "nom": 18, "nopm": 0, "loc": 595, "wmc": 94, "nc": 0, "dit": 0, "lcom": 0.1111111111111111, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.encoder.PDF417", "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoderTestAdapter", "com.google.zxing.pdf417.encoder.Compaction", "com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder.NoECIInput", "com.google.zxing.common.ECIInput", "com.google.zxing.common.CharacterSetECI"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "PDF417HighLevelEncoder.NoECIInput", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/PDF417HighLevelEncoder.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 27, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "Dimensions", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/Dimensions.java", "metrics": {"nof": 4, "nopf": 0, "nom": 5, "nopm": 5, "loc": 28, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.PDF417Writer"]}, {"package": "com.google.zxing.pdf417.encoder", "class": "PDF417HighLevelEncoderTestAdapter", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/encoder/PDF417HighLevelEncoderTestAdapter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 10, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.encoder.PDF417HighLevelEncoder", "com.google.zxing.pdf417.encoder.Compaction"]}], "dependencies": ["com.google.zxing", "com.google.zxing.pdf417", "com.google.zxing.pdf417.decoder", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

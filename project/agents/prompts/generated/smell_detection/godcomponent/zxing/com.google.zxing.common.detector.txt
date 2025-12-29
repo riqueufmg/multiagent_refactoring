@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.common.detector", "metrics": {"num_classes": 3, "loc": 416, "Ce": 9, "Ca": 9}, "classes": [{"package": "com.google.zxing.common.detector", "class": "WhiteRectangleDetector", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/detector/WhiteRectangleDetector.java", "metrics": {"nof": 9, "nopf": 0, "nom": 6, "nopm": 3, "loc": 219, "wmc": 41, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.common.BitMatrix", "com.google.zxing.common.detector.MathUtils", "com.google.zxing.datamatrix.detector.Detector"]}, {"package": "com.google.zxing.common.detector", "class": "MathUtils", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/detector/MathUtils.java", "metrics": {"nof": 0, "nopf": 0, "nom": 5, "nopm": 4, "loc": 50, "wmc": 6, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.oned.rss.AbstractRSSReader", "com.google.zxing.oned.rss.expanded.RSSExpandedReader", "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.PDF417Common", "com.google.zxing.ResultPoint", "com.google.zxing.oned.rss.RSS14Reader", "com.google.zxing.common.detector.WhiteRectangleDetector", "com.google.zxing.qrcode.detector.Detector", "com.google.zxing.aztec.detector.Detector", "com.google.zxing.pdf417.decoder.PDF417CodewordDecoder"]}, {"package": "com.google.zxing.common.detector", "class": "MonochromeRectangleDetector", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/common/detector/MonochromeRectangleDetector.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 2, "loc": 147, "wmc": 21, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.NotFoundException", "com.google.zxing.ResultPoint", "com.google.zxing.common.BitMatrix"]}], "dependencies": ["com.google.zxing.aztec.detector", "com.google.zxing.pdf417", "com.google.zxing.oned.rss", "com.google.zxing", "com.google.zxing.oned.rss.expanded", "com.google.zxing.pdf417.decoder", "com.google.zxing.qrcode.detector", "com.google.zxing.datamatrix.detector", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

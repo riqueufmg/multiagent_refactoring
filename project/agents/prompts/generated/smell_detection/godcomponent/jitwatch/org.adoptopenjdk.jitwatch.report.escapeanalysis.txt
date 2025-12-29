@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.report.escapeanalysis", "metrics": {"num_classes": 1, "loc": 65, "Ce": 3, "Ca": 0}, "classes": [{"package": "org.adoptopenjdk.jitwatch.report.escapeanalysis", "class": "AbstractEscapeAnalysisWalker", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/report/escapeanalysis/AbstractEscapeAnalysisWalker.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 3, "loc": 65, "wmc": 14, "nc": 2, "dit": 3, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.report.Report", "org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.bytecode.LineAnnotation", "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList", "org.adoptopenjdk.jitwatch.model.LogParseException", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder", "org.adoptopenjdk.jitwatch.report.ReportType", "org.adoptopenjdk.jitwatch.model.IParseDictionary", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations"]}], "dependencies": ["org.adoptopenjdk.jitwatch.report", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.model.bytecode"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bytecode.constant",
+  "detections": [
+    {
+      "class": "MethodConstant",
+      "detection": true,
+      "justification": "Very large class (LOC=388) with high complexity (WMC=20) and many methods (NOM=11). The file defines multiple inner types (CanCache, CanCacheIllegal, ForMethod, ForConstructor, PrivilegedLookup, CachedMethod, CachedConstructor) and mixes responsibilities such as method resolution, caching, privileged lookup and bytecode emission. This concentration of distinct concerns and high size/complexity indicates it has not been adequately decomposed."
+    },
+    {
+      "class": "IntegerConstant",
+      "detection": true,
+      "justification": "Relatively large and complex for its domain (LOC=155, WMC=14, NOM=5) and contains several nested helper types (SingleBytePush, TwoBytePush, ConstantPool). It handles multiple push strategies and constant-pool concerns within a single class, suggesting responsibilities that could be separated into smaller, focused abstractions."
+    },
+    {
+      "class": "ClassConstant",
+      "detection": true,
+      "justification": "Substantial size and complexity (LOC=139, WMC=13, NOM=4) and includes inner types (ForReferenceType) while dealing with class constant representation, class-file-version concerns and stack-size logic. The combination of multiple roles in one class suggests insufficient decomposition."
+    },
+    {
+      "class": "FloatConstant",
+      "detection": false,
+      "justification": "Modest size and complexity (LOC=83, WMC=7, NOM=4) with a focused responsibility (representing a float constant). LCOM=0.75 indicates reasonable cohesion and there are no multiple embedded responsibilities or numerous inner classes that would imply poor modularization."
+    },
+    {
+      "class": "FieldConstant",
+      "detection": false,
+      "justification": "Moderate size (LOC=88, WMC=7, NOM=5) but appears focused on field constant handling and related caching support. LCOM=0.4 and limited number of nested types imply cohesion around a single abstraction rather than multiple unrelated responsibilities."
+    }
+  ]
+}

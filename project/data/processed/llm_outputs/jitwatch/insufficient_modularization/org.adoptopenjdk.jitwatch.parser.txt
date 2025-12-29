@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.parser",
+  "detections": [
+    {
+      "class": "ParserType",
+      "detection": false,
+      "justification": "Very small class (loc 19) with few methods (nom 2) and no fields of concern. Minimal dependencies and low complexity indicate it is a simple, focused abstraction and not a candidate for further decomposition."
+    },
+    {
+      "class": "ParserFactory",
+      "detection": false,
+      "justification": "Small, focused factory (loc 12, nom 2, wmc 5). Its responsibility (creating parsers) is narrow and the class size/complexity do not indicate concentrated multiple responsibilities."
+    },
+    {
+      "class": "AbstractLogParser",
+      "detection": true,
+      "justification": "Large and complex implementation (loc 374, nom 35 methods, nof 17 fields, wmc 80) with many dependencies across model and util types. The class centralizes extensive parsing logic and interacts with many concerns (events, model updates, tag processing), indicating multiple responsibilities that should be split into smaller, more cohesive components."
+    },
+    {
+      "class": "ILogParseErrorListener",
+      "detection": false,
+      "justification": "Very small interface (loc 3, nom 1) representing a single responsibility (error listening). Its size and narrow purpose do not suggest insufficient modularization."
+    },
+    {
+      "class": "ILogParser",
+      "detection": false,
+      "justification": "Interface with a moderate number of methods (nom 12, loc 16) that defines the parser contract. While related implementations (notably AbstractLogParser) are large, the interface itself is a focused API and does not on its own indicate an inadequately decomposed abstraction."
+    }
+  ]
+}

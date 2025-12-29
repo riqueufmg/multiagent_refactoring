@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.agent",
+  "detections": [
+    {
+      "class": "ByteBuddyAgent",
+      "detection": true,
+      "justification": "Very large class/file (loc 1185) with many fields (nof 35) and methods (nom 28), high complexity (wmc 47) and a bloated public surface (nopm 21). Numerous inner types are declared in the same file, indicating multiple responsibilities and platform/strategy variations concentrated in one abstraction rather than being split into cohesive, smaller classes."
+    },
+    {
+      "class": "VirtualMachine",
+      "detection": true,
+      "justification": "Extremely large implementation (loc 2449) with many fields (nof 70) and numerous nested/platform-specific inner classes listed as dependencies. The class aggregates multiple platform dispatchers, connection strategies and factories in one unit, suggesting poor decomposition across responsibilities and a single monolithic abstraction that should be modularized."
+    },
+    {
+      "class": "Installer",
+      "detection": false,
+      "justification": "Relatively small and focused (loc 89, nom 5) with moderate complexity (wmc 10) and reasonable cohesion (lcom 0.6). It has a narrow responsibility and few dependencies, so available metrics do not indicate an insufficient modularization problem."
+    }
+  ]
+}

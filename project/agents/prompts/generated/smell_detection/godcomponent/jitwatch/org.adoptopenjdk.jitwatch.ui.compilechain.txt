@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.ui.compilechain", "metrics": {"num_classes": 2, "loc": 228, "Ce": 6, "Ca": 1}, "classes": [{"package": "org.adoptopenjdk.jitwatch.ui.compilechain", "class": "CompileChainStage", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/compilechain/CompileChainStage.java", "metrics": {"nof": 16, "nopf": 2, "nom": 13, "nopm": 4, "loc": 224, "wmc": 26, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.ui.main.IMemberSelectedListener", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.ui.compilechain.CompileChainStage.PlotNode", "org.adoptopenjdk.jitwatch.chain.CompileNode", "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI", "org.adoptopenjdk.jitwatch.ui.resize.RateLimitedResizeListener", "org.adoptopenjdk.jitwatch.chain.CompileChainWalker", "org.adoptopenjdk.jitwatch.ui.compilationchooser.CompilationChooser", "org.adoptopenjdk.jitwatch.model.Compilation", "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy"]}, {"package": "org.adoptopenjdk.jitwatch.ui.compilechain", "class": "CompileChainStage.PlotNode", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/compilechain/CompileChainStage.java", "metrics": {"nof": 2, "nopf": 2, "nom": 0, "nopm": 0, "loc": 4, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.chain", "org.adoptopenjdk.jitwatch.ui.resize", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.ui.compilationchooser", "org.adoptopenjdk.jitwatch.ui.main"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

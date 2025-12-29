@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.aztec.detector",
+  "detections": [
+    {
+      "class": "Detector",
+      "detection": true,
+      "justification": "Very large and complex class: 402 LOC out of the package's 436 LOC (dominates the package), WMC = 48 (high cyclomatic complexity), 20 methods (many responsibilities). It depends on many unrelated modules (reedsolomon, common.detector.MathUtils, GridSampler, BitMatrix, AztecReader, etc.), and defines nested helper classes (Point, CorrectedParameter), indicating multiple responsibilities concentrated in one abstraction. These factors indicate inadequate decomposition and a bloated abstraction."
+    },
+    {
+      "class": "Detector.Point",
+      "detection": false,
+      "justification": "Small, focused inner class: 20 LOC, no methods, minimal complexity and dependencies (only references the outer Detector). Appears to be a simple data holder tied to Detector rather than a large, separate responsibility that needs further decomposition."
+    },
+    {
+      "class": "Detector.CorrectedParameter",
+      "detection": false,
+      "justification": "Very small and narrowly scoped: 14 LOC, no methods, low complexity, and only used in context of Detector. Serves as a small helper/structure rather than an under-modularized abstraction."
+    }
+  ]
+}

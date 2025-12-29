@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.matcher",
+  "detections": [
+    {
+      "class": "ElementMatchers",
+      "detection": true,
+      "justification": "Extremely large utility: ~1785 LOC, ~198 methods (nom), and high complexity (wmc 207). The class aggregates a very large number of matcher factories/operations, indicating multiple responsibilities and a bloated interface that would benefit from decomposition into smaller, focused modules."
+    },
+    {
+      "class": "LatentMatcher",
+      "detection": true,
+      "justification": "Substantially large (240 LOC) with many related nested types (nc 12) and multiple responsibilities implied by numerous variants; size and nesting suggest it bundles diverse behavior that could be split into more focused classes."
+    },
+    {
+      "class": "ElementMatcher",
+      "detection": false,
+      "justification": "Serves as a core abstraction/interface with moderate size (182 LOC) and low complexity (wmc 1). Its nested junction/helper types implement the matcher contract; the structure appears cohesive for an abstraction rather than a single class doing too much."
+    },
+    {
+      "class": "StringMatcher",
+      "detection": false,
+      "justification": "Moderate size (132 LOC) but low complexity (wmc 3) and focused responsibility (string matching). The class appears cohesive and specialized rather than overly bloated."
+    },
+    {
+      "class": "ModifierMatcher",
+      "detection": false,
+      "justification": "Relatively contained (136 LOC, wmc 4) with a separated Mode nested type; responsibilities are focused on modifier-related matching and do not indicate excessive aggregation of unrelated concerns."
+    }
+  ]
+}

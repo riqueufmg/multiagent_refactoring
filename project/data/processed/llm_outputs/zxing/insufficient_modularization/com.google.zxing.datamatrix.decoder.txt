@@ -1,0 +1,46 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.datamatrix.decoder",
+  "detections": [
+    {
+      "class": "DecodedBitStreamParser",
+      "detection": true,
+      "justification": "Very large size and complexity (LOC 432, WMC 103, 11 methods). This single class contains the bulk of parsing logic for multiple decoding modes and ECI handling, concentrating a large portion of the package's functionality and LOC, indicating multiple responsibilities that could be split into smaller, more focused classes."
+    },
+    {
+      "class": "BitMatrixParser",
+      "detection": true,
+      "justification": "Very large and complex (LOC 372, WMC 71, 11 methods). It implements extensive bit-matrix parsing/mapping logic and occupies a large share of package LOC, suggesting it bundles many responsibilities that would benefit from decomposition (e.g., matrix navigation, codeword extraction, placement logic)."
+    },
+    {
+      "class": "Version",
+      "detection": false,
+      "justification": "Moderate size (LOC 115, WMC 15, 11 methods) but represents a cohesive abstraction (version metadata/EC blocks). Its responsibilities appear focused on version/EC block information rather than multiple unrelated concerns."
+    },
+    {
+      "class": "Decoder",
+      "detection": false,
+      "justification": "Relatively small and delegating (LOC 77, WMC 9, 4 methods). Acts as coordinator using other classes (BitMatrixParser, DecodedBitStreamParser, DataBlock) rather than containing sprawling functionality itself."
+    },
+    {
+      "class": "DataBlock",
+      "detection": false,
+      "justification": "Small, focused responsibility (LOC 67, WMC 13, 4 methods). Encapsulates data block structure and does not exhibit excessive size or mixed responsibilities."
+    },
+    {
+      "class": "DecodedBitStreamParser.Mode",
+      "detection": false,
+      "justification": "Tiny nested type (LOC 1) serving a single role (mode enumeration/representation); size and purpose are appropriately limited."
+    },
+    {
+      "class": "Version.ECBlocks",
+      "detection": false,
+      "justification": "Small helper/nested class (LOC 21) that encapsulates EC block grouping; responsibility is narrow and modular."
+    },
+    {
+      "class": "Version.ECB",
+      "detection": false,
+      "justification": "Very small helper type (LOC 17) with a single, focused role; not bloated."
+    }
+  ]
+}

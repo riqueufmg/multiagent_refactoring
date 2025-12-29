@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.compilechain",
+  "detections": [
+    {
+      "class": "CompileChainStage",
+      "detection": true,
+      "justification": "The class accounts for virtually the entire package (224 of 228 LOC) and exhibits signs of being a large, multi-responsibility component: 16 fields, 13 methods, and a relatively high cyclomatic/weight metric (WMC 26). It depends on many distinct subsystems (UI main, model, compile chain walker, compilation chooser, resize listener, util classes), suggesting it coordinates UI, model access, chain traversal, resizing and selection logic. Concentration of most package functionality in one class and wide-ranging dependencies indicate inadequate decomposition and a bloated abstraction that should be split into smaller, more focused classes."
+    },
+    {
+      "class": "CompileChainStage.PlotNode",
+      "detection": false,
+      "justification": "Very small nested helper (4 LOC, 2 fields, no methods) with minimal complexity and no external dependencies. Its narrow scope and size indicate it is appropriately modular and does not suffer from insufficient modularization."
+    }
+  ]
+}

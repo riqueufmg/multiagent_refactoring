@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.aztec",
+  "detections": [
+    {
+      "class": "AztecDetectorResult",
+      "detection": false,
+      "justification": "Small size (loc 32), low complexity (wmc 6), high cohesion (lcom 0.0) and acts primarily as a result/data holder with few dependencies. The class appears focused on a single responsibility and is not excessively bloated."
+    },
+    {
+      "class": "AztecWriter",
+      "detection": true,
+      "justification": "Relatively high complexity (wmc 13) and moderate size (loc 54) while exposing few methods (nom 4), suggesting large/multi‑purpose methods. Dependencies include encoder and aztec code types and BitMatrix, indicating it both prepares data and performs encoding/matrix assembly. These characteristics imply concentrated responsibilities and insufficient decomposition into smaller, more focused classes or helper components."
+    },
+    {
+      "class": "AztecReader",
+      "detection": true,
+      "justification": "Largest class in the package (loc 75) with notable complexity (wmc 11) and a wide set of dependencies (detector, result types, exceptions, callbacks, decode/format types). Although it has few declared methods (nom 3), the complexity and breadth of collaborators indicate it orchestrates detection, decoding, error handling and metadata assembly within the same abstraction, suggesting insufficient modularization and opportunities to split responsibilities."
+    }
+  ]
+}

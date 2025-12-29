@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.pdf417.decoder.ec", "metrics": {"num_classes": 3, "loc": 396, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.pdf417.decoder.ec", "class": "ModulusGF", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/ec/ModulusGF.java", "metrics": {"nof": 6, "nopf": 1, "nom": 11, "nopm": 0, "loc": 75, "wmc": 18, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.ec.ErrorCorrection", "com.google.zxing.pdf417.decoder.ec.ModulusPoly", "com.google.zxing.pdf417.PDF417Common"]}, {"package": "com.google.zxing.pdf417.decoder.ec", "class": "ErrorCorrection", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/ec/ErrorCorrection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 2, "loc": 129, "wmc": 23, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.ChecksumException", "com.google.zxing.pdf417.decoder.ec.ModulusPoly", "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder", "com.google.zxing.pdf417.decoder.ec.ModulusGF"]}, {"package": "com.google.zxing.pdf417.decoder.ec", "class": "ModulusPoly", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/ec/ModulusPoly.java", "metrics": {"nof": 2, "nopf": 0, "nom": 13, "nopm": 1, "loc": 192, "wmc": 46, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.ec.ModulusGF", "com.google.zxing.pdf417.decoder.ec.ErrorCorrection"]}], "dependencies": ["com.google.zxing", "com.google.zxing.common.reedsolomon", "com.google.zxing.pdf417", "com.google.zxing.pdf417.decoder"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

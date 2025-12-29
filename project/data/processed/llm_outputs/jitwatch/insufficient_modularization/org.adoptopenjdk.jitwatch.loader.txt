@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.loader",
+  "detections": [
+    {
+      "class": "BytecodeLoader",
+      "detection": true,
+      "justification": "Very large class (loc 541) with many methods (nom 25) and extremely high complexity (wmc 119). It depends on a wide range of bytecode, model and process classes, indicating it handles parsing, mapping, javap/reflection interactions and model construction. The combination of size, method count, high cyclomatic complexity and broad dependency surface strongly suggests multiple responsibilities that should be decomposed."
+    },
+    {
+      "class": "BytecodeLoader.BytecodeSection",
+      "detection": false,
+      "justification": "Trivial inner type (loc 1, no methods) with no dependencies and no complexity; does not exhibit symptoms of excessive responsibilities or size."
+    },
+    {
+      "class": "DisposableURLClassLoader",
+      "detection": false,
+      "justification": "Very small utility-like class (loc 10, nom 2, wmc 2) with minimal members and complexity, suggesting a single focused responsibility rather than insufficient modularization."
+    },
+    {
+      "class": "ResourceLoader",
+      "detection": false,
+      "justification": "Moderate size (loc 107) and complexity (wmc 23, nom 7) but far smaller and more focused than BytecodeLoader. Cohesion metric (lcom ~0.29) does not indicate severe lack of cohesion and its dependency set is limited, so it does not clearly suffer from insufficient modularization based on the provided data."
+    }
+  ]
+}

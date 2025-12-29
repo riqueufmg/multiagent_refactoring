@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.client.result",
+  "detections": [
+    {
+      "class": "VCardResultParser",
+      "detection": true,
+      "justification": "Very large and complex: LOC=284, WMC=61, NOM=11. The class has many parsing responsibilities (depends on AddressBookParsedResult and VEventResultParser) and high cognitive complexity, indicating multiple responsibilities concentrated in one class that should be decomposed."
+    },
+    {
+      "class": "ResultParser",
+      "detection": true,
+      "justification": "Centralized parsing logic with many methods and complexity: LOC=184, WMC=43, NOM=16, and many external dependencies. It likely implements multiple distinct parsing strategies in one place (wide interface and responsibilities), suggesting it should be split into smaller, focused parsers."
+    },
+    {
+      "class": "VINResultParser",
+      "detection": true,
+      "justification": "High complexity localized in one class: LOC=153, WMC=54, NOM=7. The substantial complexity and LOC indicate it encapsulates extensive validation/processing logic that could be modularized into smaller components (parsing, validation, formatting)."
+    },
+    {
+      "class": "URIParsedResult",
+      "detection": false,
+      "justification": "Small, focused data/result holder: LOC=51, WMC=9, NOM=7, LCOM=0.0. Metrics indicate a cohesive, limited-responsibility class representing a parsed URI rather than a bloated abstraction, so insufficient modularization is not indicated."
+    },
+    {
+      "class": "EmailAddressParsedResult",
+      "detection": false,
+      "justification": "Moderate size and cohesive: LOC=60, WMC=10, NOM=10, LCOM=0.3. This class appears to be a parsed-result data holder with focused responsibilities rather than a large, multi-responsibility parser, so it does not show insufficient modularization."
+    }
+  ]
+}

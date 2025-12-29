@@ -1,0 +1,46 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.dynamic.loading",
+  "detections": [
+    {
+      "class": "ClassInjector",
+      "detection": true,
+      "justification": "Very large class (LOC 2245) with many features (nof 61) and numerous inner types (UsingUnsafe, UsingReflection, UsingLookup, UsingInstrumentation, Dispatcher, Factory, etc.). It depends on many subsystems and mixes multiple injection strategies and platform-specific logic, indicating concentrated responsibilities that would be clearer and easier to maintain if split into smaller, cohesive components."
+    },
+    {
+      "class": "ByteArrayClassLoader",
+      "detection": true,
+      "justification": "Large implementation (LOC 1127) with many members (nof 32, nom 21) and multiple inner classes (SynchronizationStrategy, PersistenceHandler, ChildFirst, UrlDefinitionAction, ByteArrayUrlStreamHandler, etc.). It handles class loading mechanics, URL handling, persistence, synchronization and strategy selection, suggesting too many responsibilities for a single class and benefiting from decomposition."
+    },
+    {
+      "class": "ClassLoadingStrategy",
+      "detection": true,
+      "justification": "Substantial size (LOC 450, nof 21) and several nested strategy variants (Default, WrappingDispatcher, InjectionDispatcher, Configurable, UsingLookup, ForUnsafeInjection, etc.). The class encapsulates multiple loading strategies and glue logic, indicating a bloated abstraction that would be clearer if responsibilities were separated into distinct strategy classes or modules."
+    },
+    {
+      "class": "ModuleLayerFromSingleClassLoaderDecorator",
+      "detection": true,
+      "justification": "Large and complex (LOC 407, nof 17) with many inner types representing module system elements (ModuleFinder, ModuleLayer, ModuleDescriptor, SimpleModuleReference, SimpleModuleFinder, CreationAction, controller, etc.) and heavy dependencies. It aggregates multiple concerns related to module construction, representation and orchestration, suggesting it could be decomposed into smaller module-related abstractions."
+    },
+    {
+      "class": "MultipleParentClassLoader",
+      "detection": true,
+      "justification": "Moderately large (LOC 325) with non-trivial complexity (wmc 14) and supporting types (CompoundEnumeration, Builder). It manages composition of multiple parent class loaders and builder logic in the same abstraction, indicating multiple responsibilities that could be modularized (separate composition logic, enumeration utilities, and builder)."
+    },
+    {
+      "class": "ClassFilePostProcessor",
+      "detection": false,
+      "justification": "Small and focused (LOC 81, nof 4, nom 1) with a single clear responsibility: post-processing class files. Minimal dependencies and no large number of inner variants indicate acceptable modularization."
+    },
+    {
+      "class": "ClassLoaderDecorator",
+      "detection": false,
+      "justification": "Relatively small (LOC 70, nom 2) with a narrow role (decorating class loaders) and limited complexity. The presence of a NoOp inner type is consistent with strategy/variation patterns without indicating an overly bloated abstraction."
+    },
+    {
+      "class": "InjectionClassLoader",
+      "detection": false,
+      "justification": "Moderate size (LOC 107, nom 7, wmc 8) but a focused purpose: providing a class loader for injection with a small set of strategies. Its scope appears cohesive (strategy subtypes are limited) and does not exhibit the breadth of responsibilities seen in the larger classes above."
+    }
+  ]
+}

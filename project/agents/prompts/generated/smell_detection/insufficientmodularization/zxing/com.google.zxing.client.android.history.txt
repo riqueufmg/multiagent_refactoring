@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.client.android.history", "metrics": {"num_classes": 5, "loc": 390, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.client.android.history", "class": "HistoryItem", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/history/HistoryItem.java", "metrics": {"nof": 3, "nopf": 0, "nom": 3, "nopm": 2, "loc": 29, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.history.HistoryManager", "com.google.zxing.client.android.CaptureActivity", "com.google.zxing.client.android.history.HistoryItemAdapter", "com.google.zxing.Result"]}, {"package": "com.google.zxing.client.android.history", "class": "HistoryManager", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/history/HistoryManager.java", "metrics": {"nof": 9, "nopf": 0, "nom": 13, "nopm": 8, "loc": 200, "wmc": 24, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.BarcodeFormat", "com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever", "com.google.zxing.client.android.history.HistoryItem", "com.google.zxing.client.android.result.ResultHandler", "com.google.zxing.client.android.history.HistoryActivity", "com.google.zxing.client.android.result.supplement.ProductResultInfoRetriever", "com.google.zxing.client.android.result.supplement.TitleRetriever", "com.google.zxing.client.android.CaptureActivity", "com.google.zxing.client.android.result.supplement.BookResultInfoRetriever", "com.google.zxing.client.android.result.supplement.URIResultInfoRetriever", "com.google.zxing.Result", "com.google.zxing.client.android.history.DBHelper", "com.google.zxing.client.android.Intents", "com.google.zxing.client.android.PreferencesActivity"]}, {"package": "com.google.zxing.client.android.history", "class": "HistoryItemAdapter", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/history/HistoryItemAdapter.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 1, "loc": 33, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.history.HistoryActivity", "com.google.zxing.client.android.history.HistoryItem", "com.google.zxing.Result"]}, {"package": "com.google.zxing.client.android.history", "class": "DBHelper", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/history/DBHelper.java", "metrics": {"nof": 9, "nopf": 0, "nom": 3, "nopm": 2, "loc": 24, "wmc": 3, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.history.HistoryManager"]}, {"package": "com.google.zxing.client.android.history", "class": "HistoryActivity", "file": "data/repositories/zxing/android/src/com/google/zxing/client/android/history/HistoryActivity.java", "metrics": {"nof": 4, "nopf": 0, "nom": 9, "nopm": 5, "loc": 104, "wmc": 17, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.client.android.history.HistoryManager", "com.google.zxing.client.android.history.HistoryItemAdapter", "com.google.zxing.client.android.Intents"]}], "dependencies": ["com.google.zxing", "com.google.zxing.client.android.result.supplement", "com.google.zxing.client.android", "com.google.zxing.client.android.result"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

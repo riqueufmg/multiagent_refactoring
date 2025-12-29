@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.parser", "metrics": {"num_classes": 5, "loc": 424, "Ce": 3, "Ca": 6}, "classes": [{"package": "org.adoptopenjdk.jitwatch.parser", "class": "ParserType", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/parser/ParserType.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 2, "loc": 19, "wmc": 9, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.parser", "class": "ParserFactory", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/parser/ParserFactory.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 12, "wmc": 5, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.core.IJITListener", "org.adoptopenjdk.jitwatch.parser.ParserType", "org.adoptopenjdk.jitwatch.parser.ILogParser"]}, {"package": "org.adoptopenjdk.jitwatch.parser", "class": "AbstractLogParser", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/parser/AbstractLogParser.java", "metrics": {"nof": 17, "nopf": 0, "nom": 35, "nopm": 13, "loc": 374, "wmc": 80, "nc": 4, "dit": 1, "lcom": 0.0571428571428571, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.util.ClassUtil", "org.adoptopenjdk.jitwatch.model.Task", "org.adoptopenjdk.jitwatch.model.JITEvent", "org.adoptopenjdk.jitwatch.model.MetaClass", "org.adoptopenjdk.jitwatch.model.EventType", "org.adoptopenjdk.jitwatch.util.ParseUtil", "org.adoptopenjdk.jitwatch.model.JITDataModel", "org.adoptopenjdk.jitwatch.core.JITWatchConfig", "org.adoptopenjdk.jitwatch.core.TagProcessor", "org.adoptopenjdk.jitwatch.model.CompilerThread", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.parser.ILogParseErrorListener", "org.adoptopenjdk.jitwatch.core.IJITListener", "org.adoptopenjdk.jitwatch.model.Compilation", "org.adoptopenjdk.jitwatch.model.ParsedClasspath", "org.adoptopenjdk.jitwatch.model.SplitLog", "org.adoptopenjdk.jitwatch.model.CodeCacheEvent"]}, {"package": "org.adoptopenjdk.jitwatch.parser", "class": "ILogParseErrorListener", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/parser/ILogParseErrorListener.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 3, "wmc": 1, "nc": 4, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.parser", "class": "ILogParser", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/parser/ILogParser.java", "metrics": {"nof": 0, "nopf": 0, "nom": 12, "nopm": 0, "loc": 16, "wmc": 12, "nc": 1, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.core.JITWatchConfig", "org.adoptopenjdk.jitwatch.model.JITDataModel", "org.adoptopenjdk.jitwatch.parser.ILogParseErrorListener", "org.adoptopenjdk.jitwatch.model.ParsedClasspath", "org.adoptopenjdk.jitwatch.model.SplitLog"]}], "dependencies": ["org.adoptopenjdk.jitwatch.core", "org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.util"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

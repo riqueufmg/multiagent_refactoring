@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.multi.qrcode",
+  "detections": [
+    {
+      "class": "QRCodeMultiReader",
+      "detection": true,
+      "justification": "This class accounts for the vast majority of the package (92 of 99 LOC) and has a relatively high WMC (16), indicating concentrated complexity in a single abstraction. It depends on several unrelated types (DetectorResult, DecoderResult, Result, BinaryBitmap, etc.), suggesting it coordinates multiple responsibilities. The presence of an inner comparator class and relatively few named methods but large LOC implies methods are doing substantial work rather than functionality being split into smaller cohesive classes—characteristics of insufficient modularization."
+    },
+    {
+      "class": "QRCodeMultiReader.SAComparator",
+      "detection": false,
+      "justification": "Very small helper class (7 LOC) with negligible complexity; appears to be a focused, single-responsibility comparator used by the reader. Its small size and scoped role make it an appropriate internal component rather than a sign of insufficient modularization."
+    }
+  ]
+}

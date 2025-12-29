@@ -1,0 +1,56 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bytecode.collection",
+  "detections": [
+    {
+      "class": "CollectionFactory",
+      "detection": false,
+      "justification": "Small size (loc 16), low complexity (wmc 2) and few methods (nom 2); class appears focused and not bloated."
+    },
+    {
+      "class": "ArrayAccess",
+      "detection": true,
+      "justification": "Relatively large (loc 136) with high complexity (wmc 14) and multiple methods (nom 5); LCOM 1.0 indicates low cohesion and the presence of related nested types (Loader, Putter) suggests multiple responsibilities concentrated in one abstraction."
+    },
+    {
+      "class": "ArrayAccess.Loader",
+      "detection": false,
+      "justification": "Very small inner type (loc 12) with no measured methods or complexity; likely a simple collaborator rather than an overfull abstraction."
+    },
+    {
+      "class": "ArrayAccess.Putter",
+      "detection": false,
+      "justification": "Very small inner type (loc 12) with no measured methods or complexity; functions as a focused helper rather than a bloated class."
+    },
+    {
+      "class": "ArrayFactory",
+      "detection": true,
+      "justification": "Large class (loc 235) with high complexity (wmc 14) and many fields (nof 8); it declares several substantial nested types (ArrayCreator, ForPrimitiveType, ForReferenceType, ArrayStackManipulation), indicating many responsibilities are bundled together rather than decomposed."
+    },
+    {
+      "class": "ArrayFactory.ArrayCreator",
+      "detection": true,
+      "justification": "Substantial size for an inner class (loc 107) with multiple fields (nof 4); its large body within the enclosing ArrayFactory implies that significant functionality is implemented in a nested type instead of separate, cohesive classes."
+    },
+    {
+      "class": "ArrayFactory.ForPrimitiveType",
+      "detection": false,
+      "justification": "Moderate size (loc 64) but appears focused (no measured methods/complexity) and likely represents a narrow responsibility for primitive handling."
+    },
+    {
+      "class": "ArrayFactory.ForReferenceType",
+      "detection": false,
+      "justification": "Small inner type (loc 29) with minimal complexity; appears to be a focused helper for reference-type specialization."
+    },
+    {
+      "class": "ArrayFactory.ArrayStackManipulation",
+      "detection": false,
+      "justification": "Relatively small (loc 44) and likely encapsulates a single concern (stack manipulation) rather than multiple responsibilities."
+    },
+    {
+      "class": "ArrayLength",
+      "detection": false,
+      "justification": "Small (loc 20) with low complexity (wmc 2) and few methods (nom 2); appears cohesive and narrowly focused."
+    }
+  ]
+}

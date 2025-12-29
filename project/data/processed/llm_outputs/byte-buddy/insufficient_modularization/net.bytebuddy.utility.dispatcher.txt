@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.utility.dispatcher",
+  "detections": [
+    {
+      "class": "JavaDispatcher",
+      "detection": true,
+      "justification": "The top-level JavaDispatcher class is very large and complex: 1180 LOC and a high WMC (51). It declares many fields (nof 32) and contains numerous nested/subordinate classes (Dispatcher, DynamicClassLoader, Resolver, ForDefaultValue, OfPrimitiveArray, OfNonPrimitiveArray, ProxiedInvocationHandler, etc.), indicating multiple responsibilities concentrated in one abstraction. It depends on many unrelated components and embeds behavior that could be separated into smaller, focused classes, which is characteristic of insufficient modularization."
+    },
+    {
+      "class": "JavaDispatcher.NoOp",
+      "detection": false,
+      "justification": "NoOp is small and focused (12 LOC) with no reported complexity or many fields. Its limited size and single, likely cohesive responsibility suggest it is properly modularized and does not itself exhibit the bloated interface or excessive complexity associated with insufficient modularization."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing",
+  "detections": [
+    {
+      "class": "LuminanceSource",
+      "detection": true,
+      "justification": "Large public surface (12 methods, 11 public), substantial size (105 LOC) and non-trivial complexity (WMC 17). Acts as a broad abstraction with many public operations used by many components, indicating an interface that groups multiple responsibilities rather than narrower, more cohesive abstractions."
+    },
+    {
+      "class": "PlanarYUVLuminanceSource",
+      "detection": true,
+      "justification": "Relatively large concrete class (103 LOC) with many public methods (9 methods, 8 public) and high complexity (WMC 20) combined with low cohesion (LCOM 0.222). The metrics suggest it handles multiple concerns (pixel format handling, cropping/rotation, conversion, etc.) and would benefit from further decomposition."
+    },
+    {
+      "class": "BinaryBitmap",
+      "detection": true,
+      "justification": "Broad public API (11 methods, 11 public) and moderate size (95 LOC) with low cohesion (LCOM 0.0). It connects binarization and higher-level decoding consumers and has many dependents, suggesting it consolidates responsibilities that could be separated for clearer modularization."
+    },
+    {
+      "class": "Result",
+      "detection": true,
+      "justification": "Large exposed interface (14 methods, 14 public), significant complexity (WMC 19) and zero cohesion measure (LCOM 0.0) plus many external dependents. These signs indicate a bloated data/behavior holder combining multiple kinds of metadata and logic that could be split into smaller, focused abstractions."
+    },
+    {
+      "class": "MultiFormatReader",
+      "detection": true,
+      "justification": "Substantial size (126 LOC) with very high complexity (WMC 26). Although method count is modest, the complexity implies it orchestrates many decoding strategies and concerns. This coordination role appears to aggregate responsibilities that could be modularized into clearer strategy/handler components."
+    },
+    {
+      "class": "GrayscaleLuminanceSource",
+      "detection": false,
+      "justification": "Moderate size (89 LOC) and method count (8 methods, 7 public) with reasonable cohesion (LCOM 0.375). As a concrete subclass focused on grayscale conversion, its responsibilities appear focused and cohesive rather than overly broad."
+    },
+    {
+      "class": "RGBLuminanceSource",
+      "detection": false,
+      "justification": "Very small and simple (25 LOC, 2 methods, WMC 4). Metrics indicate a focused, single-purpose implementation rather than a bloated abstraction, so insufficient modularization is not indicated."
+    }
+  ]
+}

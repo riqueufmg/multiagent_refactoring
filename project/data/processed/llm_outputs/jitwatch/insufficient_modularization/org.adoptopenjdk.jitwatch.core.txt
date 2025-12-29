@@ -1,0 +1,51 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.core",
+  "detections": [
+    {
+      "class": "JITWatchConfig",
+      "detection": true,
+      "justification": "Very large class (loc 568) with many fields and methods (nof 59, nom 86) and very high complexity (wmc 142). Size and complexity indicate multiple responsibilities concentrated in one abstraction, making it hard to understand and maintain — a strong sign of insufficient modularization."
+    },
+    {
+      "class": "JITWatchConfig.TieredCompilation",
+      "detection": false,
+      "justification": "Tiny nested type (loc 1) with no methods/fields; represents a small, focused abstraction and does not exhibit signs of being insufficiently modularized."
+    },
+    {
+      "class": "JITWatchConfig.CompressedOops",
+      "detection": false,
+      "justification": "Very small nested type (loc 1) with no observable methods/fields; size and role do not indicate lack of modularization."
+    },
+    {
+      "class": "JITWatchConfig.BackgroundCompilation",
+      "detection": false,
+      "justification": "Minimal nested type (loc 1) with no methods/fields; not exhibiting excessive size or mixed responsibilities."
+    },
+    {
+      "class": "JITWatchConfig.OnStackReplacement",
+      "detection": false,
+      "justification": "Very small nested type (loc 1) without methods/fields; appropriate granularity for its likely role."
+    },
+    {
+      "class": "ErrorLog",
+      "detection": false,
+      "justification": "Small class (loc 28, nom 3, wmc 6) with limited responsibilities; metrics do not suggest a bloated or overly complex abstraction."
+    },
+    {
+      "class": "TagProcessor",
+      "detection": false,
+      "justification": "Moderate size (loc 170) and complexity (wmc 41) but relatively few methods (nom 6) and fields (nof 5). While somewhat complex, it appears focused on tag processing and does not exhibit the extreme size or broad interface typical of insufficient modularization."
+    },
+    {
+      "class": "JITWatchConstants",
+      "detection": true,
+      "justification": "Very large constants holder (loc 296) with an extremely high number of fields (nof 283, nopf 282) producing a bloated interface. Even if cohesive as constants, the sheer volume suggests it could be split by concern (groups of related constants) to improve modularity."
+    },
+    {
+      "class": "IJITListener",
+      "detection": false,
+      "justification": "Small interface (loc 5, nom 3) with a narrow responsibility (listening to events). Its size and focused role do not indicate insufficient modularization."
+    }
+  ]
+}

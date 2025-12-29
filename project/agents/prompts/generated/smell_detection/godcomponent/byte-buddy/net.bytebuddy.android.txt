@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "net.bytebuddy.android", "metrics": {"num_classes": 17, "loc": 2012, "Ce": 7, "Ca": 1}, "classes": [{"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 29, "nopf": 0, "nom": 3, "nopm": 1, "loc": 654, "wmc": 7, "nc": 3, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.utility.RandomString", "net.bytebuddy.android.AndroidClassLoadingStrategy.Conversion", "net.bytebuddy.android.AndroidClassLoadingStrategy.FileProcessor", "net.bytebuddy.android.AndroidClassLoadingStrategy.ForLegacyVm", "net.bytebuddy.android.AndroidClassLoadingStrategy.DexProcessor", "net.bytebuddy.android.AndroidClassLoadingStrategy.Disabled", "net.bytebuddy.android.AndroidClassLoadingStrategy.Dispatcher"]}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.FileProcessor", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 66, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Disabled", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 12, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.ForReadOnlyClassFile", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 44, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.DexProcessor", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 14, "nopf": 0, "nom": 0, "nopm": 0, "loc": 279, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Conversion", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 17, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.ForSdkCompiler", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 14, "nopf": 0, "nom": 0, "nopm": 0, "loc": 252, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Conversion", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 34, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Dispatcher", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 5, "nopf": 0, "nom": 0, "nopm": 0, "loc": 140, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Unavailable", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 28, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.ForLegacyVm", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 47, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.ForApi26LevelCompatibleVm", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 44, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Wrapping", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 36, "wmc": 0, "nc": 0, "dit": 2, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Injecting", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 5, "nopf": 0, "nom": 0, "nopm": 0, "loc": 172, "wmc": 0, "nc": 0, "dit": 2, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.Dispatcher", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 4, "nopf": 0, "nom": 0, "nopm": 0, "loc": 105, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.ForLegacyVm", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 27, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.android", "class": "AndroidClassLoadingStrategy.ForAndroidPVm", "file": "data/repositories/byte-buddy/byte-buddy-android/src/main/java/net/bytebuddy/android/AndroidClassLoadingStrategy.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 55, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["net.bytebuddy.dynamic", "net.bytebuddy.utility", "net.bytebuddy.matcher", "net.bytebuddy", "net.bytebuddy.implementation", "net.bytebuddy.description.type", "net.bytebuddy.dynamic.loading"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

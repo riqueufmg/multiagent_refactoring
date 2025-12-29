@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.common.reedsolomon",
+  "detections": [
+    {
+      "class": "ReedSolomonException",
+      "detection": false,
+      "justification": "Very small class (LOC 9) with a single method and very low complexity (WMC 1). No evidence of concentrated responsibilities or a bloated interface."
+    },
+    {
+      "class": "GenericGF",
+      "detection": true,
+      "justification": "Relatively large and stateful (LOC 118, 15 fields with 8 public), with a non-trivial method count (≈12) and moderate complexity (WMC 20). It exposes many fields/constants and is referenced by multiple decoder/encoder components, suggesting it aggregates several responsibilities that could be split (field definitions, factory/registry of presets, and operational behavior)."
+    },
+    {
+      "class": "GenericGFPoly",
+      "detection": true,
+      "justification": "Very large and complex for a single class (LOC 220, WMC 49, ~12 methods). It represents heavy polynomial arithmetic logic and takes up a large portion of package LOC (220/530), indicating an abstraction that likely could be decomposed into smaller, more focused classes or helpers (e.g., separate construction, arithmetic operations, and utility routines)."
+    },
+    {
+      "class": "ReedSolomonEncoder",
+      "detection": false,
+      "justification": "Small and focused (LOC 46, ~3 methods, WMC 8). Metrics indicate a compact implementation with limited responsibilities, not suggesting insufficient modularization."
+    },
+    {
+      "class": "ReedSolomonDecoder",
+      "detection": true,
+      "justification": "Moderately large and relatively complex (LOC 137, WMC 25) compared to other package classes. It implements multiple algorithmic steps (syndrome calculation, error locator/finders, correction) within one class, suggesting concentrated responsibilities that could be modularized into smaller collaborating classes or helpers."
+    }
+  ]
+}

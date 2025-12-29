@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.inline",
+  "detections": [
+    {
+      "class": "HeadlessInlineVisitor",
+      "detection": true,
+      "justification": "Relatively large class body (loc=144) with a moderate-to-high complexity (wmc=9) and many fields (nof=10) but few declared methods (nom=4), producing a state-rich, behavior-sparse abstraction. Cohesion is only moderate (lcom=0.5). It also contains two sizeable inner classes (InlineJournalVisitor loc=75 and InlineFailureInfo loc=32) in the same compilation unit, indicating multiple responsibilities bundled together rather than cleanly separated — signs that the abstraction would benefit from decomposition/extraction of responsibilities into smaller, focused classes."
+    },
+    {
+      "class": "HeadlessInlineVisitor.InlineJournalVisitor",
+      "detection": false,
+      "justification": "While non-trivial in size (loc=75), the metrics show low cyclomatic complexity (wmc=0) and very high cohesion (lcom=-1.0). As an inner visitor-type helper (dit=2) it appears focused on a single role (journal visiting) and is appropriately encapsulated as an inner class rather than indicating an under-modularized primary abstraction."
+    },
+    {
+      "class": "HeadlessInlineVisitor.InlineFailureInfo",
+      "detection": false,
+      "justification": "Small helper/data-holder sized class (loc=32, nof=4) with low complexity and very high cohesion (lcom=-1.0). It represents a narrow responsibility (failure info) and does not exhibit signs of being a bloated, multi-responsibility abstraction."
+    }
+  ]
+}

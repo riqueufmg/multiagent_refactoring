@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.jarscan",
+  "detections": [
+    {
+      "class": "JarScan",
+      "detection": true,
+      "justification": "Large size and complexity (303 LOC, WMC=60) with many methods/fields (14 methods, 12 fields) and direct dependencies on numerous operation classes (freq inline, sequence count, method size histo, allocation count, sequence search, invoke count, next instruction, instruction count, method length, etc.). This concentration of responsibilities and coordination of many distinct operations indicates a bloated abstraction that is not sufficiently decomposed, making it hard to understand and maintain."
+    },
+    {
+      "class": "IJarScanOperation",
+      "detection": false,
+      "justification": "Very small and focused interface (4 LOC, 2 methods, WMC=2) with a narrow purpose and low complexity. As a simple contract used by multiple operation implementations, it does not exhibit signs of insufficient modularization."
+    }
+  ]
+}

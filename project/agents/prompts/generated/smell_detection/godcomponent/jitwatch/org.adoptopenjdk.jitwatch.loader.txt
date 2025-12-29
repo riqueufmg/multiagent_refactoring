@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.loader", "metrics": {"num_classes": 4, "loc": 659, "Ce": 5, "Ca": 8}, "classes": [{"package": "org.adoptopenjdk.jitwatch.loader", "class": "BytecodeLoader", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/loader/BytecodeLoader.java", "metrics": {"nof": 3, "nopf": 0, "nom": 25, "nopm": 6, "loc": 541, "wmc": 119, "nc": 0, "dit": 0, "lcom": 0.12, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.bytecode.ClassBC", "org.adoptopenjdk.jitwatch.model.bytecode.BCParamConstant", "org.adoptopenjdk.jitwatch.model.bytecode.BCParamString", "org.adoptopenjdk.jitwatch.model.MetaClass", "org.adoptopenjdk.jitwatch.model.bytecode.BCParamNumeric", "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction", "org.adoptopenjdk.jitwatch.model.bytecode.IBytecodeParam", "org.adoptopenjdk.jitwatch.model.bytecode.InnerClassRelationship", "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry", "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode", "org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.loader.BytecodeLoader.BytecodeSection", "org.adoptopenjdk.jitwatch.model.bytecode.SourceMapper", "org.adoptopenjdk.jitwatch.process.javap.JavapProcess", "org.adoptopenjdk.jitwatch.model.MemberSignatureParts", "org.adoptopenjdk.jitwatch.process.javap.ReflectionJavap", "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry", "org.adoptopenjdk.jitwatch.model.bytecode.Opcode", "org.adoptopenjdk.jitwatch.model.bytecode.BCParamSwitch"]}, {"package": "org.adoptopenjdk.jitwatch.loader", "class": "BytecodeLoader.BytecodeSection", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/loader/BytecodeLoader.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.loader", "class": "DisposableURLClassLoader", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/loader/DisposableURLClassLoader.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 10, "wmc": 2, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.loader", "class": "ResourceLoader", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/loader/ResourceLoader.java", "metrics": {"nof": 1, "nopf": 0, "nom": 7, "nopm": 6, "loc": 107, "wmc": 23, "nc": 0, "dit": 0, "lcom": 0.2857142857142857, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.FileUtil", "org.adoptopenjdk.jitwatch.jvmlang.LanguageManager"]}], "dependencies": ["org.adoptopenjdk.jitwatch.process.javap", "org.adoptopenjdk.jitwatch.model.bytecode", "org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.jvmlang", "org.adoptopenjdk.jitwatch.model"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

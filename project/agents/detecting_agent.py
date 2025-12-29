@@ -11,11 +11,11 @@ from .smells_detection.unstable_dependency import UnstableDependencyDetector
 
 class DetectingAgent:
 
-    def __init__(self, project_name, classes_path, jar_path):
+    def __init__(self, project_name, classes_path):
         self.project_name = project_name
         self.output_path = f"{os.getenv("OUTPUT_PATH")}/metrics/{project_name}"
         self.project_path = f"{os.getenv("REPOSITORIES_PATH")}/{project_name}"
-        self.runner = DesigniteRunner(self.project_path, self.output_path, classes_path, jar_path)
+        self.runner = DesigniteRunner(self.project_path, self.output_path, classes_path)
 
     def collect_metrics(self):
         try:

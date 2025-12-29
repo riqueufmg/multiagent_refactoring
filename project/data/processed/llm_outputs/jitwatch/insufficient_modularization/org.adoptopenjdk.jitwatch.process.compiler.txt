@@ -1,0 +1,41 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.process.compiler",
+  "detections": [
+    {
+      "class": "ICompiler",
+      "detection": false,
+      "justification": "Very small interface (loc=3, nom=1) with no implementation code; serves as a narrow abstraction implemented by multiple concrete compilers (nc=6). Low complexity and no evidence of multiple responsibilities."
+    },
+    {
+      "class": "CompilerKotlin",
+      "detection": false,
+      "justification": "Small, focused implementation (loc=29, nom=2, wmc=5) with perfect cohesion (lcom=0.0) and no coupling signs (fanin/fanout=0). Appears to represent a single responsibility (Kotlin compilation)."
+    },
+    {
+      "class": "CompilerGroovy",
+      "detection": false,
+      "justification": "Compact and cohesive (loc=28, nom=2, wmc=5, lcom=0.0). Limited surface area and dependencies indicate a single, well-scoped responsibility."
+    },
+    {
+      "class": "CompilerJava",
+      "detection": false,
+      "justification": "Modest size and complexity (loc=31, nom=2, wmc=6) with high cohesion (lcom=0.0). Structure and metrics do not indicate a bloated or multi-responsibility class."
+    },
+    {
+      "class": "CompilerJavaScript",
+      "detection": false,
+      "justification": "Small implementation (loc=28, nom=2, wmc=5) and high cohesion (lcom=0.0). No sign of aggregated responsibilities or excessive interface."
+    },
+    {
+      "class": "CompilerJRuby",
+      "detection": false,
+      "justification": "Similar to other language-specific compilers (loc=28, nom=2, wmc=5, lcom=0.0). Focused on a single role; metrics do not suggest insufficient modularization."
+    },
+    {
+      "class": "CompilerScala",
+      "detection": true,
+      "justification": "Largest and most complex class in the package (loc=48, wmc=10) with more methods (nom=4, nopm=3) and noticeably lower cohesion (lcom=0.5). Relative to other language compilers it concentrates more logic and complexity, suggesting multiple responsibilities that could be decomposed."
+    }
+  ]
+}

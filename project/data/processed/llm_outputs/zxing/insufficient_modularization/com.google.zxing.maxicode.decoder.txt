@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.maxicode.decoder",
+  "detections": [
+    {
+      "class": "DecodedBitStreamParser",
+      "detection": true,
+      "justification": "Large size and complexity concentrated in one class: LOC=137 and WMC=33 indicate substantial internal logic; high number of fields (nof=22) and 10 methods (nom=10) suggest multiple responsibilities and internal state. Although LCOM=0.2 shows some cohesion, the class appears bloated and a likely candidate to be decomposed into smaller parser/helper classes to reduce complexity."
+    },
+    {
+      "class": "Decoder",
+      "detection": false,
+      "justification": "Moderate size and appears to act as an orchestrator/delegator: LOC=62, WMC=12, only 4 methods (nom=4) and few fields (nof=4). Dependencies show it delegates to BitMatrixParser and DecodedBitStreamParser and to reed-solomon utilities, indicating responsibilities are distributed rather than concentrated."
+    },
+    {
+      "class": "BitMatrixParser",
+      "detection": false,
+      "justification": "Small, focused utility: LOC=29, WMC=5, 2 methods (nom=2) and low field count (nof=2). Metrics indicate a narrowly scoped responsibility (parsing a BitMatrix), so it is sufficiently modular."
+    }
+  ]
+}

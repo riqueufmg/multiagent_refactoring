@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.description.method",
+  "detections": [
+    {
+      "class": "MethodDescription",
+      "detection": true,
+      "justification": "Very large class footprint (loc: 1695) with many members (nom: 29, nof: 35) and high complexity (wmc: 29). The source contains numerous nested/inner types sharing the same file (InGenericShape, InDefinedShape, AbstractBase, ForLoadedExecutable, ForLoadedConstructor, ForLoadedMethod, Latent, TypeInitializer, TypeSubstituting, Token, SignatureToken, TypeToken, etc.), indicating multiple responsibilities and conceptual concerns co-located. It also depends on many other types across the package and beyond, suggesting a bloated interface and difficulty isolating single responsibilities — consistent with insufficient modularization."
+    },
+    {
+      "class": "ParameterDescription",
+      "detection": true,
+      "justification": "Large and multifaceted class (loc: 899) with many fields/elements (nof: 33) and multiple related inner types (InGenericShape, InDefinedShape, AbstractBase, ForLoadedParameter, Parameter, OfMethod/Constructor/Legacy variants, Latent, TypeSubstituting, Token, TypeList, ParameterAnnotationSource). The class touches parameter representation, annotation sources, tokenization and loaded/reflection-backed variants, indicating concentration of diverse responsibilities that could be split into smaller, focused abstractions."
+    },
+    {
+      "class": "MethodList",
+      "detection": false,
+      "justification": "Moderate size (loc: 275) with a small number of core operations (nom: 4, wmc: 4) and a focused role as a list abstraction for methods. Nested types are limited and specialized (AbstractBase, ForLoadedMethods, Explicit, ForTokens, TypeSubstituting, Empty) that appear to support list variants rather than mixing unrelated responsibilities. Dependencies are limited and the class appears cohesive and focused, so it does not exhibit clear signs of insufficient modularization."
+    }
+  ]
+}

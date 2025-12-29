@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.oned.rss",
+  "detections": [
+    {
+      "class": "AbstractRSSReader",
+      "detection": false,
+      "justification": "Moderate size (LOC 104) and complexity (WMC 22) for a base/abstract reader. It has a reasonable number of methods (nom 12) and moderate cohesion (LCOM 0.5), indicating it likely encapsulates shared behavior rather than multiple unrelated responsibilities."
+    },
+    {
+      "class": "RSSUtils",
+      "detection": false,
+      "justification": "Utility-style class with small surface (nom 3) and modest LOC (64). Although WMC is 14, the limited number of methods and its role as a helper indicate focused responsibilities rather than a bloated abstraction."
+    },
+    {
+      "class": "FinderPattern",
+      "detection": false,
+      "justification": "Small data/structure class (LOC 32, WMC 7, nom 6) with focused dependencies. Metrics show it is lightweight and cohesive (LCOM 0.0), not indicative of insufficient modularization."
+    },
+    {
+      "class": "RSS14Reader",
+      "detection": true,
+      "justification": "Strong indication of insufficient modularization: very large (LOC 362), very high complexity (WMC 73), and many fields (nof 9). It depends on many other concerns (decoding, math utilities, result handling, finder patterns), suggesting multiple responsibilities concentrated in one class and a bloated implementation that would benefit from decomposition."
+    },
+    {
+      "class": "DataCharacter",
+      "detection": false,
+      "justification": "Very small and simple (LOC 30, WMC 7, nom 6) with focused purpose and dependencies. Metrics indicate a cohesive, narrowly scoped abstraction."
+    },
+    {
+      "class": "Pair",
+      "detection": false,
+      "justification": "Tiny helper/data class (LOC 17, WMC 4, nom 4, DIT 1) with focused role. Metrics do not show signs of excessive size or mixed responsibilities."
+    }
+  ]
+}

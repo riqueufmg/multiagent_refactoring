@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bind.annotation",
+  "detections": [
+    {
+      "class": "Binder",
+      "detection": true,
+      "justification": "The Binder implementation in FieldProxy.java exhibits signs of insufficient modularization: very large size (loc: 683), many fields (nof: 31) and methods (nom: 12) and high complexity (wmc: 27). It also exposes/contains many nested roles (FieldResolver, Factory, Duplex/Simplex, ForGetter/ForSetter, StaticFieldConstructor, InstanceFieldConstructor, AccessorProxy, multiple Appender/MethodCall variants) and depends on a wide variety of unrelated subsystems (dynamic type generation, bytecode manipulation, method/field descriptions, assigner, auxiliary proxies, etc.), indicating concentrated, diverse responsibilities and a bloated interface that would benefit from decomposition into smaller, cohesive abstractions."
+    },
+    {
+      "class": "Verifier",
+      "detection": false,
+      "justification": "Small, focused utility-like class: small size (loc: 19), few methods (nom: 2), low complexity (wmc: 2) and limited dependencies (annotation and method description + assigner). Metrics and dependency scope indicate a single, cohesive responsibility rather than a bloated abstraction."
+    }
+  ]
+}

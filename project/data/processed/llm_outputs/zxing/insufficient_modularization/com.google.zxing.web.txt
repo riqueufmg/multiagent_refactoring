@@ -1,0 +1,81 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.web",
+  "detections": [
+    {
+      "class": "HTTPSFilter",
+      "detection": false,
+      "justification": "Very small class (LOC 17, WMC 2, 1 method/1 field). Low complexity and limited responsibilities, no evidence of being a bloated abstraction."
+    },
+    {
+      "class": "LRUMap",
+      "detection": false,
+      "justification": "Small utility-like class (LOC 15, WMC 2, 2 methods). Size and complexity are low, appears focused on a single responsibility."
+    },
+    {
+      "class": "DoSFilter",
+      "detection": false,
+      "justification": "Moderate size (LOC 56, WMC 10, 4 methods) but not overly large or complex; responsibilities appear scoped to request filtering and DoS concerns."
+    },
+    {
+      "class": "TimeoutFilter",
+      "detection": false,
+      "justification": "Relatively small (LOC 43, WMC 7, 4 methods) and cohesive; no indications of excessive responsibilities or bloated interface."
+    },
+    {
+      "class": "WelcomeFilter",
+      "detection": false,
+      "justification": "Very small class (LOC 8, WMC 1, 1 method). Focused single responsibility, not a candidate for insufficient modularization."
+    },
+    {
+      "class": "ChartServlet",
+      "detection": true,
+      "justification": "Large and complex for a servlet (LOC 115, WMC 15) with multiple dependencies related to chart generation. Size and complexity suggest it mixes request handling and rendering responsibilities that could be decomposed (e.g., separate request parameter parsing, rendering, and image generation)."
+    },
+    {
+      "class": "DecodeServlet",
+      "detection": true,
+      "justification": "Very large and complex (LOC 349, WMC 41, 8 methods, 9 fields) with many dependencies. High LOC and complexity indicate multiple responsibilities (parsing input, decoding, error handling, DoS tracking) that would benefit from decomposition into smaller cohesive classes."
+    },
+    {
+      "class": "OutputUtils",
+      "detection": false,
+      "justification": "Small utility class (LOC 33, WMC 6, 3 methods). Focused on output concerns; size and cohesion do not indicate insufficient modularization."
+    },
+    {
+      "class": "ChartDoSFilter",
+      "detection": false,
+      "justification": "Very small (LOC 5) likely a marker or lightweight filter; no evidence of bloated responsibilities."
+    },
+    {
+      "class": "DoSTracker",
+      "detection": false,
+      "justification": "Moderate LOC (85) but low complexity (WMC 4) and few methods (2). Likely focused on tracking DoS data; not evidently a bloated, multi-responsibility abstraction."
+    },
+    {
+      "class": "DoSTracker.TrackerTask",
+      "detection": false,
+      "justification": "Inner task class (LOC 50) with low complexity; serves a specific background task responsibility rather than a large, multi-purpose abstraction."
+    },
+    {
+      "class": "AbstractFilter",
+      "detection": false,
+      "justification": "Small base class (LOC 14, 3 methods) intended for reuse; its size and role as an abstraction do not indicate insufficient modularization."
+    },
+    {
+      "class": "DecodeDoSFilter",
+      "detection": false,
+      "justification": "Very small (LOC 5) and likely a thin specialization; no sign of excessive responsibilities."
+    },
+    {
+      "class": "ChartServletRequestParameters",
+      "detection": false,
+      "justification": "Moderate size (LOC 38, WMC 7, 7 methods) but appears focused on parameter parsing/representation for chart servlet. Cohesive single responsibility, not a bloated abstraction."
+    },
+    {
+      "class": "ServletContextLogHandler",
+      "detection": false,
+      "justification": "Small utility/handler (LOC 31, WMC 6, 4 methods) with a focused purpose. Not indicative of insufficient modularization."
+    }
+  ]
+}

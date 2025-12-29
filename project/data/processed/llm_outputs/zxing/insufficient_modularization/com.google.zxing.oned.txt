@@ -1,0 +1,56 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.oned",
+  "detections": [
+    {
+      "class": "Code128Writer",
+      "detection": true,
+      "justification": "Very large class (loc 405) with high complexity (wmc 65) and many fields/members (nof 21). Contains multiple nested helper types and substantial encoding logic (multiple responsibilities) indicating a bloated abstraction that could be split into smaller, focused components (e.g., encoder, strategy, utilities)."
+    },
+    {
+      "class": "Code128Reader",
+      "detection": true,
+      "justification": "Large and complex reader (loc 326, wmc 79, nof 16). Handles a wide range of decoding logic and depends on many result/format concerns, suggesting concentrated responsibilities that would benefit from decomposition into smaller, cohesive classes (parsing, checksum, state machine)."
+    },
+    {
+      "class": "UPCEANReader",
+      "detection": true,
+      "justification": "Relatively large class (loc 279, wmc 40, nof 10, nom 13) with many dependencies and extension handling (extension support, manufacturer support, multiple writer/reader interactions). It aggregates multiple concerns (core decode, extensions, metadata) and appears to be doing more than a single cohesive role."
+    },
+    {
+      "class": "Code39Reader",
+      "detection": true,
+      "justification": "Substantial size and complexity (loc 254, wmc 52, nom 8, nof 7) with responsibilities including decoding, checksum/format handling and metadata production. The combination of high complexity and multiple responsibilities indicates poor decomposition."
+    },
+    {
+      "class": "Code93Reader",
+      "detection": true,
+      "justification": "Significant size/complexity (loc 221, wmc 47) and multiple responsibilities related to decoding and format/metadata handling. Its complexity suggests it could be split into helper components (e.g., pattern recognition, checksum, result assembly)."
+    },
+    {
+      "class": "OneDReader",
+      "detection": false,
+      "justification": "Moderate size (loc 196, wmc 32, nom 8) but represents a core abstract/base reader used by many concrete readers (nc 8). Its role is a shared abstraction; its size corresponds to shared behavior rather than a concentration of unrelated responsibilities, so it is reasonably modular for that purpose."
+    },
+    {
+      "class": "Code128Writer.MinimalEncoder",
+      "detection": false,
+      "justification": "Non-trivial nested helper (loc 160) but purpose-built for encoding optimization. Although sizeable, it is focused on a single concern (minimal encoding) and implemented as an internal component of Code128Writer, so splitting it out further is optional and not clearly required for modularization."
+    },
+    {
+      "class": "UPCEWriter",
+      "detection": false,
+      "justification": "Small and focused writer (loc 52, nom 2, wmc 8) with a narrow responsibility. Low size and cohesion indicate no insufficient modularization smell."
+    },
+    {
+      "class": "EAN13Writer",
+      "detection": false,
+      "justification": "Small writer class (loc 54, nom 2) with focused responsibility; its size and single-purpose nature do not indicate insufficient modularization."
+    },
+    {
+      "class": "UPCAWriter",
+      "detection": false,
+      "justification": "Very small utility writer (loc 16, nom 2) with a single, cohesive role; no signs of bloated responsibilities."
+    }
+  ]
+}

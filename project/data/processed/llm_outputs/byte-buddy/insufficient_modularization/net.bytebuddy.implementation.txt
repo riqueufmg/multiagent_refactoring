@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation",
+  "detections": [
+    {
+      "class": "MethodCall",
+      "detection": true,
+      "justification": "Very large implementation (loc 2648) with a very high number of features (nof 80, nom 42) and high complexity (wmc 58). The class encloses many distinct nested types and responsibilities (MethodLocator, ArgumentLoader/ArgumentProvider, TargetHandler, MethodInvoker, multiple 'For*' variants and factory/appenders), indicating aggregation of method resolution, argument provision, target handling and bytecode emission. The diversity of responsibilities and volume of code suggest the abstraction is not adequately decomposed into cohesive, smaller modules."
+    },
+    {
+      "class": "SuperMethodCall",
+      "detection": false,
+      "justification": "Small, focused abstraction (loc 109) with few methods (nom 4) and low complexity (wmc 4). It has few nested types and limited, directly related dependencies (termination handler, appender, bytecode related interfaces), indicating a single, cohesive responsibility (representing a super method invocation) and therefore does not exhibit signs of insufficient modularization."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.build.gradle",
+  "detections": [
+    {
+      "class": "AbstractByteBuddyTask",
+      "detection": true,
+      "justification": "Very large class (loc=474) with many methods (nom=32) and high complexity (wmc=50). It also declares many fields (nof=12) and has low cohesion (lcom=0.09375). The combination of size, method count and low cohesion indicates multiple responsibilities concentrated in one abstraction and suggests it should be decomposed into smaller, more focused classes."
+    },
+    {
+      "class": "AbstractByteBuddyTaskExtension",
+      "detection": true,
+      "justification": "Substantially large (loc=360) with many methods (nom=38) and high complexity (wmc=41). Cohesion is low (lcom=0.1316) and it depends on multiple other components. These metrics indicate the class carries diverse responsibilities and an overly broad interface, signaling insufficient modularization."
+    },
+    {
+      "class": "Transformation",
+      "detection": true,
+      "justification": "Relatively large (loc=221) with a notable method count (nom=12) and moderate-to-high complexity (wmc=22). Cohesion is low (lcom=0.1667) and it interacts with several external concepts (class file locators, plugins). This suggests the class bundles several responsibilities that could be split into more focused abstractions."
+    },
+    {
+      "class": "ByteBuddyPlugin",
+      "detection": false,
+      "justification": "Although the source size appears moderate (loc=314), the class has very low internal complexity (wmc=2) and very low method complexity; many nested types (nof=16) indicate it primarily acts as a coordinator/container for plugin-related nested configurations. The low complexity and role as an aggregator make it less indicative of poor modularization at the class level."
+    },
+    {
+      "class": "ByteBuddyTask",
+      "detection": false,
+      "justification": "Medium-sized (loc=172) with a moderate number of methods (nom=13) and complexity (wmc=15) but a higher cohesion than the flagged classes (lcom=0.2308). Its responsibilities appear bounded and it relies on specific supporting types (IncrementalResolver, Plugin), suggesting a focused task abstraction rather than an overly bloated one."
+    }
+  ]
+}

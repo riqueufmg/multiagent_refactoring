@@ -1,0 +1,56 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.triview",
+  "detections": [
+    {
+      "class": "ClassSearch",
+      "detection": false,
+      "justification": "Relatively small (loc 103) with 10 methods and 6 fields, LCOM 0.0 indicates good cohesion; limited dependencies. Size and cohesion suggest a focused responsibility rather than a bloated abstraction."
+    },
+    {
+      "class": "ILineListener",
+      "detection": false,
+      "justification": "Small interface (loc 8) representing a listener abstraction; minimal methods and no signs of concentrated unrelated responsibilities."
+    },
+    {
+      "class": "ILineListener.LineType",
+      "detection": false,
+      "justification": "Trivial nested type (loc 1) with no complexity or multiple responsibilities."
+    },
+    {
+      "class": "CompilationInfo",
+      "detection": false,
+      "justification": "Small (loc 95) with few methods (5) and focused dependencies (Compilation, UI util). Metrics show modest complexity (wmc 10) and high cohesion (LCOM 0.0), consistent with a single responsibility."
+    },
+    {
+      "class": "NoOpLineListener",
+      "detection": false,
+      "justification": "Tiny implementation (loc 12) of the listener interface, single focused role; no evidence of excessive size or multiple responsibilities."
+    },
+    {
+      "class": "TriViewPane",
+      "detection": false,
+      "justification": "Small UI component (loc 55, 8 methods) that appears to delegate to Viewer/TriView; size and cohesion indicate a focused responsibility rather than a bloated class."
+    },
+    {
+      "class": "Viewer",
+      "detection": true,
+      "justification": "Large and complex: loc 386, 42 methods, 24 fields, very high complexity (wmc 92). Many dependencies across parsing, UI, and configuration subsystems. Method and field counts plus complexity indicate multiple responsibilities and a potentially bloated interface that would benefit from decomposition."
+    },
+    {
+      "class": "TriView",
+      "detection": true,
+      "justification": "Clearly a hotspot for insufficient modularization: very large (loc 751), many fields (33) and methods (55), high cyclomatic complexity (wmc 173), many dependencies and public API surface (28 public methods). Low-to-moderate cohesion (LCOM ~0.13) and breadth of responsibilities (UI, navigation, bytecode, assembly, compilation handling) indicate it should be decomposed into smaller, cohesive abstractions."
+    },
+    {
+      "class": "TriViewNavigationStack",
+      "detection": false,
+      "justification": "Small utility-like class (loc 44, 5 methods) with focused purpose (navigation stack) and limited coupling; size and role do not indicate insufficient modularization."
+    },
+    {
+      "class": "InstructionLabel",
+      "detection": false,
+      "justification": "Very small UI element (loc 13, 3 methods) with narrow responsibility; metrics do not suggest a need for further decomposition."
+    }
+  ]
+}

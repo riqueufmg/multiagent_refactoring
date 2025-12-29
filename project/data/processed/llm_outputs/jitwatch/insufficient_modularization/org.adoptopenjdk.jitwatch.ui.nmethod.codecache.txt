@@ -1,0 +1,11 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.ui.nmethod.codecache",
+  "detections": [
+    {
+      "class": "CodeCacheLayoutStage",
+      "detection": true,
+      "justification": "Significant size and complexity: 291 LOC and WMC=46 indicate substantial implementation complexity. Many members and a broad interface: nof=20 fields, nom=18 methods with nopm=11 (likely many public methods) which suggests a bloated surface. Multiple responsibilities implied by dependencies to UI, model and codecache walker (interacts with IMetaMember, CodeCacheEvent, Compilation, CodeCacheWalkerResult and JITWatchUI) — suggests mixing layout, event handling and model-processing logic. Although LCOM is low (0.166), the combination of high LOC, high complexity and many fields/public methods points to inadequate decomposition and a candidate for splitting into smaller, more focused classes (e.g., separate layout, data-processing and UI-controller components)."
+    }
+  ]
+}

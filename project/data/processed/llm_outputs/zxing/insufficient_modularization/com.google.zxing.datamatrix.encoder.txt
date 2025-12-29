@@ -1,0 +1,101 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.datamatrix.encoder",
+  "detections": [
+    {
+      "class": "Encoder",
+      "detection": false,
+      "justification": "Very small class (LOC 4, WMC 2, nom 2) with minimal interface and no sign of concentrated responsibilities; does not appear bloated."
+    },
+    {
+      "class": "MinimalEncoder",
+      "detection": true,
+      "justification": "Very large implementation (LOC 614, WMC 41) with many methods (nom 13) and several inner types; size and complexity indicate multiple responsibilities concentrated in one abstraction despite some internal decomposition, suggesting inadequate modularization."
+    },
+    {
+      "class": "MinimalEncoder.Mode",
+      "detection": false,
+      "justification": "Tiny inner type (LOC 1) used to represent a mode; small and focused, not an instance of insufficient modularization."
+    },
+    {
+      "class": "MinimalEncoder.Edge",
+      "detection": true,
+      "justification": "Large inner type (LOC 338) with many fields (nof 9) and substantial code despite being nested; size concentrated inside an inner class indicates modularization boundaries may be misplaced."
+    },
+    {
+      "class": "MinimalEncoder.Result",
+      "detection": false,
+      "justification": "Moderately sized inner result holder (LOC 81) with limited interface (nom 0) — focused role and not an obvious modularization problem."
+    },
+    {
+      "class": "MinimalEncoder.Input",
+      "detection": false,
+      "justification": "Small supportive inner type (LOC 15) with narrow purpose; does not exhibit bloated responsibilities."
+    },
+    {
+      "class": "EncoderContext",
+      "detection": true,
+      "justification": "Relatively large state/coordinator (LOC 89, WMC 24) with many methods (nom 21) and dependencies on many encoder types; centralizes encoding state and operations, suggesting multiple responsibilities that could be split."
+    },
+    {
+      "class": "SymbolInfo",
+      "detection": true,
+      "justification": "High method count (nom 21), high complexity (WMC 38) and moderate size (LOC 123) while depending on error-correction, shape and writer concerns; indicates mixed responsibilities (symbol metadata, sizing, error info) that could be modularized."
+    },
+    {
+      "class": "DataMatrixSymbolInfo144",
+      "detection": false,
+      "justification": "Very small specialized subtype (LOC 11, nom 3) with narrow purpose; does not show signs of being insufficiently modularized."
+    },
+    {
+      "class": "EdifactEncoder",
+      "detection": false,
+      "justification": "Moderate size (LOC 109) and moderate complexity (WMC 21) but limited method count (nom 5) and focused dependency on encoding context; appears cohesive as an encoder variant."
+    },
+    {
+      "class": "HighLevelEncoder",
+      "detection": true,
+      "justification": "Large coordinator (LOC 371, WMC 73) with many methods (nom 21) and numerous dependencies on different encoder strategies; centralizes selection and control logic across encoders, indicating overloaded responsibilities that could be split into smaller abstractions."
+    },
+    {
+      "class": "ASCIIEncoder",
+      "detection": false,
+      "justification": "Small, focused encoder (LOC 52, nom 3) with limited responsibilities; does not demonstrate insufficient modularization."
+    },
+    {
+      "class": "Base256Encoder",
+      "detection": false,
+      "justification": "Small focused encoder (LOC 49, nom 3); limited surface and cohesive purpose."
+    },
+    {
+      "class": "C40Encoder",
+      "detection": true,
+      "justification": "Relatively large implementation (LOC 170, WMC 36) with several methods (nom 8); complexity suggests the encoder handles multiple sub-tasks and could be decomposed for clarity and maintainability."
+    },
+    {
+      "class": "ErrorCorrection",
+      "detection": false,
+      "justification": "Moderate size (LOC 109) but small number of methods (nom 3); while complexity exists (WMC 18), responsibilities appear focused on error correction logic rather than multiple unrelated concerns."
+    },
+    {
+      "class": "X12Encoder",
+      "detection": false,
+      "justification": "Small to moderate size (LOC 58, nom 4) and focused encoder responsibilities; does not show a bloated interface or multiple unrelated concerns."
+    },
+    {
+      "class": "DefaultPlacement",
+      "detection": true,
+      "justification": "Non-trivial size and complexity (LOC 153, WMC 26, nom 14) performing placement logic; concentration of placement and utility behavior in one class suggests potential for splitting placement algorithms and helpers into separate modules."
+    },
+    {
+      "class": "TextEncoder",
+      "detection": false,
+      "justification": "Small focused encoder (LOC 58, nom 2) with narrow responsibilities; unlikely to be insufficiently modularized."
+    },
+    {
+      "class": "SymbolShapeHint",
+      "detection": false,
+      "justification": "Very small type (LOC 4) likely used as an enumeration or simple hint holder; not indicative of modularization issues."
+    }
+  ]
+}

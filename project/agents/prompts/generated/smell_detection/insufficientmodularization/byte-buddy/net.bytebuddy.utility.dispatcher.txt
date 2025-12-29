@@ -1,0 +1,62 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Insufficient Modularization.
+
+Definition:
+Insufficient Modularization arises when a class represents an abstraction that has not been
+adequately decomposed, resulting in excessive size, complexity, or a bloated interface.
+Such classes are difficult to understand, maintain, and evolve, and often concentrate
+responsibilities that could be separated into smaller, more cohesive abstractions.
+
+# Constraints
+
+- Perform the analysis at the **class level**, even though the input is provided at the package level.
+- Use the package data only as contextual information to support class-level judgments.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Successful Output** are mandatory.
+- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "net.bytebuddy.utility.dispatcher", "metrics": {"num_classes": 19, "loc": 2788, "Ce": 6, "Ca": 8}, "classes": [{"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 32, "nopf": 1, "nom": 6, "nopm": 3, "loc": 1180, "wmc": 51, "nc": 0, "dit": 0, "lcom": 0.3333333333333333, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.utility.MethodComparator", "net.bytebuddy.utility.dispatcher.JavaDispatcher.ForDefaultValue", "net.bytebuddy.utility.dispatcher.JavaDispatcher.CreationAction", "net.bytebuddy.dynamic.scaffold.TypeWriter", "net.bytebuddy.utility.Invoker", "net.bytebuddy.ClassFileVersion", "net.bytebuddy.utility.dispatcher.JavaDispatcher.Dispatcher", "net.bytebuddy.utility.GraalImageCode", "net.bytebuddy.utility.dispatcher.JavaDispatcher.NoOp", "net.bytebuddy.asm.AsmVisitorWrapper", "net.bytebuddy.utility.dispatcher.JavaDispatcher.DynamicClassLoader", "net.bytebuddy.utility.dispatcher.JavaDispatcher.OfPrimitiveArray", "net.bytebuddy.description.method.MethodDescription", "net.bytebuddy.build.AccessControllerPlugin", "net.bytebuddy.utility.dispatcher.JavaDispatcher.Resolver"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.InvokerCreationAction", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 11, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.DirectInvoker", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 17, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.Dispatcher", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 15, "nopf": 0, "nom": 0, "nopm": 0, "loc": 501, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.method.MethodDescription"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForInstanceCheck", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 31, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForContainerCreation", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 31, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForDefaultValue", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 8, "nopf": 0, "nom": 0, "nopm": 0, "loc": 253, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.OfPrimitiveArray", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 60, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.OfNonPrimitiveArray", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 45, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForConstructor", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 42, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.method.MethodDescription"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForStaticMethod", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 40, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForNonStaticMethod", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 52, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForUnresolvedMethod", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 33, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.method.MethodDescription"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ProxiedInvocationHandler", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 73, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.DynamicClassLoader", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 7, "nopf": 0, "nom": 0, "nopm": 0, "loc": 244, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.dynamic.scaffold.TypeWriter", "net.bytebuddy.ClassFileVersion", "net.bytebuddy.asm.AsmVisitorWrapper", "net.bytebuddy.description.method.MethodDescription", "net.bytebuddy.utility.MethodComparator"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.Resolver", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 4, "nopf": 0, "nom": 0, "nopm": 0, "loc": 93, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.CreationAction", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 19, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.NoOp", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 12, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "net.bytebuddy.utility.dispatcher", "class": "JavaDispatcher.ForModuleSystem", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/utility/dispatcher/JavaDispatcher.java", "metrics": {"nof": 4, "nopf": 0, "nom": 0, "nopm": 0, "loc": 51, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin"]}], "dependencies": ["net.bytebuddy.utility", "net.bytebuddy.description.method", "net.bytebuddy.build", "net.bytebuddy", "net.bytebuddy.asm", "net.bytebuddy.dynamic.scaffold"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+  "smell": "Insufficient Modularization",
+  "package": "[package name]",
+  "detections": [
+    {
+      "class": "[class name]",
+      "detection": true,
+      "justification": "[Key elements that justify why this class suffers from insufficient modularization]"
+    },
+    {
+      "class": "[class name]",
+      "detection": false,
+      "justification": "[Key elements that justify why this class does not suffer from insufficient modularization]"
+    }
+  ]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect Insufficient Modularization with the available data."
+}
+```

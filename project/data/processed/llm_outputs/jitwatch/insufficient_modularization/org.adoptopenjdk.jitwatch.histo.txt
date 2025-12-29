@@ -1,0 +1,41 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.histo",
+  "detections": [
+    {
+      "class": "AbstractHistoVisitable",
+      "detection": false,
+      "justification": "Small size (18 LOC), modest method count (4) and low complexity (WMC 4). Serves as a lightweight abstraction/base (DIT 2) with no heavy fan-out or many dependencies, so it does not appear to concentrate multiple responsibilities."
+    },
+    {
+      "class": "NativeSizeHistoWalker",
+      "detection": false,
+      "justification": "Very small class (13 LOC, 2 methods) with low complexity (WMC 4) and focused dependencies; it appears to have a single, narrow responsibility."
+    },
+    {
+      "class": "IHistoVisitable",
+      "detection": false,
+      "justification": "Interface with minimal surface (3 LOC, 1 method). Too small and focused to indicate insufficient modularization."
+    },
+    {
+      "class": "AttributeNameHistoWalker",
+      "detection": false,
+      "justification": "Small and focused (22 LOC, 2 methods, WMC 4). Limited scope and low complexity indicate appropriate modularization."
+    },
+    {
+      "class": "Histo",
+      "detection": true,
+      "justification": "Relatively large and complex compared with package peers (77 LOC, 9 methods, WMC 15) with only moderate cohesion (LCOM ~0.33). Its size and complexity suggest it concentrates multiple responsibilities related to histogram management/behavior and could be decomposed into smaller, more focused abstractions."
+    },
+    {
+      "class": "InlineSizeHistoVisitable",
+      "detection": true,
+      "justification": "Largest and most complex class in the package (94 LOC, 5 methods, WMC 17) with moderate cohesion (LCOM 0.4) and many diverse dependencies (parsing, model, compilation utilities). The combination of high complexity, size and mixed responsibilities (visiting, parsing, computation) indicates it likely violates modularization and would benefit from decomposition."
+    },
+    {
+      "class": "CompileTimeHistoWalker",
+      "detection": false,
+      "justification": "Small and focused (12 LOC, 2 methods, WMC 4) with narrow dependencies; does not exhibit the size/complexity characteristics of insufficient modularization."
+    }
+  ]
+}

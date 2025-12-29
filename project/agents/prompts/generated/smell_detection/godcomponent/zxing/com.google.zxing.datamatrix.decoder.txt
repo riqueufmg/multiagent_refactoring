@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.datamatrix.decoder", "metrics": {"num_classes": 8, "loc": 1102, "Ce": 4, "Ca": 4}, "classes": [{"package": "com.google.zxing.datamatrix.decoder", "class": "DecodedBitStreamParser", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/DecodedBitStreamParser.java", "metrics": {"nof": 5, "nopf": 0, "nom": 11, "nopm": 0, "loc": 432, "wmc": 103, "nc": 0, "dit": 0, "lcom": 0.1818181818181818, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.common.ECIStringBuilder", "com.google.zxing.FormatException", "com.google.zxing.datamatrix.decoder.DecodedBitStreamParser.Mode", "com.google.zxing.common.BitSource", "com.google.zxing.datamatrix.decoder.Decoder"]}, {"package": "com.google.zxing.datamatrix.decoder", "class": "DecodedBitStreamParser.Mode", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/DecodedBitStreamParser.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.decoder.DecodedBitStreamParser"]}, {"package": "com.google.zxing.datamatrix.decoder", "class": "Decoder", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/Decoder.java", "metrics": {"nof": 1, "nopf": 0, "nom": 4, "nopm": 3, "loc": 77, "wmc": 9, "nc": 0, "dit": 0, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.DataMatrixReader", "com.google.zxing.ChecksumException", "com.google.zxing.datamatrix.decoder.Version", "com.google.zxing.common.BitMatrix", "com.google.zxing.common.reedsolomon.GenericGF", "com.google.zxing.datamatrix.decoder.DataBlock", "com.google.zxing.common.reedsolomon.ReedSolomonDecoder", "com.google.zxing.common.DecoderResult", "com.google.zxing.datamatrix.decoder.BitMatrixParser", "com.google.zxing.datamatrix.decoder.DecodedBitStreamParser"]}, {"package": "com.google.zxing.datamatrix.decoder", "class": "Version", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/Version.java", "metrics": {"nof": 12, "nopf": 0, "nom": 11, "nopm": 8, "loc": 115, "wmc": 15, "nc": 0, "dit": 0, "lcom": 0.1818181818181818, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.decoder.Version.ECBlocks", "com.google.zxing.FormatException", "com.google.zxing.datamatrix.decoder.DataBlock", "com.google.zxing.datamatrix.decoder.BitMatrixParser", "com.google.zxing.datamatrix.decoder.Decoder"]}, {"package": "com.google.zxing.datamatrix.decoder", "class": "Version.ECBlocks", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/Version.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 21, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.decoder.Version"]}, {"package": "com.google.zxing.datamatrix.decoder", "class": "Version.ECB", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/Version.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 17, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.zxing.datamatrix.decoder", "class": "DataBlock", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/DataBlock.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 0, "loc": 67, "wmc": 13, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.decoder.Version", "com.google.zxing.datamatrix.decoder.Decoder"]}, {"package": "com.google.zxing.datamatrix.decoder", "class": "BitMatrixParser", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/decoder/BitMatrixParser.java", "metrics": {"nof": 3, "nopf": 0, "nom": 11, "nopm": 0, "loc": 372, "wmc": 71, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.FormatException", "com.google.zxing.datamatrix.decoder.Version", "com.google.zxing.datamatrix.decoder.Decoder", "com.google.zxing.common.BitMatrix"]}], "dependencies": ["com.google.zxing", "com.google.zxing.datamatrix", "com.google.zxing.common.reedsolomon", "com.google.zxing.common"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```

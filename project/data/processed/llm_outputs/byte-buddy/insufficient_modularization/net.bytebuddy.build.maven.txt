@@ -1,0 +1,26 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.build.maven",
+  "detections": [
+    {
+      "class": "ByteBuddyMojo",
+      "detection": true,
+      "justification": "Very large class (loc=971) with high cyclomatic/weighted method complexity (wmc=38), many fields (nof=37, nopf=25) and numerous embedded inner types handling diverse concerns (transformers, logging, discovery, coordinate handling, filters). Concentrates multiple responsibilities and collaborators (many dependencies), indicating a bloated abstraction that should be decomposed."
+    },
+    {
+      "class": "Discovery",
+      "detection": false,
+      "justification": "Relatively small (loc=60) with moderate complexity (wmc=7, nom=7). Although cohesion metric (lcom≈0.86) suggests some dispersion, its size and limited external coupling do not indicate a clear insufficient modularization compared to the large, multi-responsibility ByteBuddyMojo."
+    },
+    {
+      "class": "ClassLoaderResolver",
+      "detection": false,
+      "justification": "Moderate size (loc=94), limited number of methods (nom=4) and fields (nof=5) with moderate complexity (wmc=8). Responsibilities appear focused (resolving class loaders) and dependencies are limited, so it does not exhibit signs of inadequate decomposition."
+    },
+    {
+      "class": "Transformation",
+      "detection": false,
+      "justification": "Small and focused (loc=40, nom=2, wmc=5) with clear single responsibility (plugin transformation) and low coupling. Metrics and role indicate appropriate modularization."
+    }
+  ]
+}

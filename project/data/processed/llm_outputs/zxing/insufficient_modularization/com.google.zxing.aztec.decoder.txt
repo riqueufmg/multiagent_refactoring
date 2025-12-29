@@ -1,0 +1,21 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "com.google.zxing.aztec.decoder",
+  "detections": [
+    {
+      "class": "Decoder",
+      "detection": true,
+      "justification": "Very large and complex: 319 LOC and WMC 61 with 11 methods and 10 fields. The class depends on multiple concerns (bit manipulation, error correction with ReedSolomon, format handling, conversion to DecoderResult and CharacterSetECI, and interaction with AztecDetectorResult), indicating concentrated responsibilities. Presence of nested types for small helper results and tables suggests functionality that could be split into smaller, more cohesive classes."
+    },
+    {
+      "class": "Decoder.Table",
+      "detection": false,
+      "justification": "Tiny (1 LOC), no methods/complexity and appears to be a small helper/enum-like nested type. Focused single responsibility and no sign of bloated interface or multiple concerns."
+    },
+    {
+      "class": "Decoder.CorrectedBitsResult",
+      "detection": false,
+      "justification": "Small (10 LOC) with few fields and no measured complexity; serves a focused role as a simple data/result holder for the Decoder, not exhibiting excessive size or mixed responsibilities."
+    }
+  ]
+}

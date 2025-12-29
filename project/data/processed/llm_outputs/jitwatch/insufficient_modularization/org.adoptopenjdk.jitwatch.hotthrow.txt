@@ -1,0 +1,16 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "org.adoptopenjdk.jitwatch.hotthrow",
+  "detections": [
+    {
+      "class": "HotThrowFinder",
+      "detection": true,
+      "justification": "Relatively large and complex behavior concentrated in a single class: 118 LOC with a high weighted method complexity (WMC=20) distributed over only 3 methods, indicating very complex methods. The class depends on many different concerns (parsing, model interfaces, bytecode exception tables, compilation utilities), suggesting it mixes responsibilities (log/parse handling, bytecode/exception analysis, compilation mapping). These facts indicate the abstraction is not adequately decomposed and likely should be split into smaller, focused classes."
+    },
+    {
+      "class": "HotThrowResult",
+      "detection": false,
+      "justification": "Small, focused holder of result-related functionality: 51 LOC, limited external coupling (depends only on IMetaMember), cohesive (LCOM=0.0) and likely encapsulates result state and accessors. Although method complexity exists (WMC=18 over 7 methods), the class appears to concentrate a single responsibility and does not show the wide mix of concerns seen in HotThrowFinder."
+    }
+  ]
+}

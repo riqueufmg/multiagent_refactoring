@@ -1,0 +1,36 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.implementation.bytecode.assign",
+  "detections": [
+    {
+      "class": "Assigner",
+      "detection": true,
+      "justification": "Relatively large (95 LOC, ~40% of package LOC) while declaring only a single public method (nom=1) and hosting multiple nested/related types (Typing, EqualTypesOnly, Refusing) and many children (nc=7). This indicates the abstraction aggregates multiple behaviors/implementations in one file/object rather than being decomposed into focused, smaller abstractions."
+    },
+    {
+      "class": "Assigner.Typing",
+      "detection": false,
+      "justification": "Moderate size (36 LOC) with no methods (nom=0) consistent with an enum or small strategy marker. It appears to represent a single, focused concern (typing mode) and is appropriately modularized."
+    },
+    {
+      "class": "Assigner.EqualTypesOnly",
+      "detection": false,
+      "justification": "Small and focused (26 LOC, no methods beyond expected overrides) with low complexity and specific responsibilities related to equal-type assignment; does not show signs of being a bloated, multi-responsibility class."
+    },
+    {
+      "class": "Assigner.Refusing",
+      "detection": false,
+      "justification": "Very small (13 LOC) and narrowly focused on refusing assignments; low complexity and cohesive responsibility indicate adequate modularization."
+    },
+    {
+      "class": "InstanceCheck",
+      "detection": false,
+      "justification": "Small class (34 LOC) with a small number of methods (nom=3) and low complexity (wmc=4). Cohesion (lcom=0.0) and limited dependencies suggest a focused responsibility and no evidence of excessive aggregation of concerns."
+    },
+    {
+      "class": "TypeCasting",
+      "detection": false,
+      "justification": "Small (34 LOC), limited methods (nom=3), moderate complexity (wmc=4) and reasonable cohesion (lcom≈0.67). It appears to implement a single responsibility (type casting) and is not overly large or multifaceted."
+    }
+  ]
+}

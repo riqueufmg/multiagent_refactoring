@@ -1,0 +1,91 @@
+{
+  "smell": "Insufficient Modularization",
+  "package": "net.bytebuddy.android",
+  "detections": [
+    {
+      "class": "AndroidClassLoadingStrategy",
+      "detection": true,
+      "justification": "Very large class (loc 654) with many fields (nof 29) and multiple nested strategy/utility classes declared in the same compilation unit. It centralizes many different responsibilities and implementations (numerous inner classes listed as dependencies), indicating a bloated abstraction that should be decomposed into separate, cohesive classes/files."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.FileProcessor",
+      "detection": false,
+      "justification": "Small, focused unit (loc 66) with minimal complexity and no methods/fields reported; appears to be a narrow responsibility and therefore not evidence of insufficient modularization by itself."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Disabled",
+      "detection": false,
+      "justification": "Very small (loc 12) and clearly focused; low complexity and likely a simple marker/strategy variant, not an indication of poor decomposition."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.ForReadOnlyClassFile",
+      "detection": false,
+      "justification": "Modest size (loc 44) and limited complexity (no methods/fields reported), suggesting a single, cohesive responsibility rather than an under-decomposed abstraction."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.DexProcessor",
+      "detection": true,
+      "justification": "Large implementation (loc 279) located as an inner class within the same file as AndroidClassLoadingStrategy. Its substantial size and placement inside a monolithic class file suggest responsibilities that could be modularized into a separate top-level class."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Conversion",
+      "detection": false,
+      "justification": "Small (loc 17) and limited in scope; does not by itself show insufficient modularization."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.ForSdkCompiler",
+      "detection": true,
+      "justification": "Significant size (loc 252) as an inner class of AndroidClassLoadingStrategy. Its large implementation within the same compilation unit contributes to concentration of responsibilities and indicates a candidate for extraction."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Conversion",
+      "detection": false,
+      "justification": "Relatively small (loc 34) and appears focused; not an indication of insufficient modularization on its own."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Dispatcher",
+      "detection": true,
+      "justification": "Substantial implementation size (loc 140) defined alongside many other strategy classes in the same file. Its complexity and co-location with many variants point to a lack of modular separation."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Unavailable",
+      "detection": false,
+      "justification": "Small (loc 28) and limited in scope; likely a simple, cohesive responsibility and not evidence of insufficient modularization."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.ForLegacyVm",
+      "detection": false,
+      "justification": "Small size (loc 47) with minimal reported complexity; appears cohesive and not a primary indicator of modularization issues."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.ForApi26LevelCompatibleVm",
+      "detection": false,
+      "justification": "Modest size (loc 44) and narrow scope; does not by itself indicate under-decomposition."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Wrapping",
+      "detection": false,
+      "justification": "Small (loc 36) and low complexity; likely a focused adapter/wrapper role, not a sign of insufficient modularization."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Injecting",
+      "detection": true,
+      "justification": "Relatively large inner class (loc 172) contained within the same large AndroidClassLoadingStrategy file. Its size and placement suggest concentrated responsibilities that could be separated into a dedicated class."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.Dispatcher",
+      "detection": true,
+      "justification": "Another Dispatcher entry with non-trivial size (loc 105) present in the same compilation unit. Multiple sizable dispatcher implementations inside one file indicate poor decomposition."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.ForLegacyVm",
+      "detection": false,
+      "justification": "Very small (loc 27) and limited in scope; does not show signs of insufficient modularization."
+    },
+    {
+      "class": "AndroidClassLoadingStrategy.ForAndroidPVm",
+      "detection": false,
+      "justification": "Moderate size (loc 55) and appears specialized; not sufficient evidence of under-decomposition by itself."
+    }
+  ]
+}

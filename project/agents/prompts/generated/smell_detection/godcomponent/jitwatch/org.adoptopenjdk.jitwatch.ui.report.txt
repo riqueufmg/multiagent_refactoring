@@ -1,0 +1,46 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition: when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.ui.report", "metrics": {"num_classes": 5, "loc": 125, "Ce": 9, "Ca": 1}, "classes": [{"package": "org.adoptopenjdk.jitwatch.ui.report", "class": "ReportStageType", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/report/ReportStageType.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.ui.report", "class": "IReportRowBean", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/report/IReportRowBean.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 1, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.ui.report", "class": "ReportPackageFilter", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/report/ReportPackageFilter.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 21, "wmc": 4, "nc": 0, "dit": 0, "lcom": 1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.ui.report.ReportStage"]}, {"package": "org.adoptopenjdk.jitwatch.ui.report", "class": "ReportStage", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/report/ReportStage.java", "metrics": {"nof": 6, "nopf": 0, "nom": 5, "nopm": 4, "loc": 86, "wmc": 19, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.ui.report.eliminatedallocation.EliminatedAllocationRowBuilder", "org.adoptopenjdk.jitwatch.ui.report.inlining.InliningRowBuilder", "org.adoptopenjdk.jitwatch.ui.report.cell.LinkedBCICell", "org.adoptopenjdk.jitwatch.core.JITWatchConstants", "org.adoptopenjdk.jitwatch.ui.report.ReportPackageFilter", "org.adoptopenjdk.jitwatch.ui.report.suggestion.SuggestionRowBuilder", "org.adoptopenjdk.jitwatch.ui.report.locks.OptimisedLockRowBuilder", "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil", "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI", "org.adoptopenjdk.jitwatch.ui.report.cell.MemberTableCell", "org.adoptopenjdk.jitwatch.ui.report.ReportStageType", "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy"]}, {"package": "org.adoptopenjdk.jitwatch.ui.report", "class": "AbstractReportRowBean", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/report/AbstractReportRowBean.java", "metrics": {"nof": 1, "nopf": 0, "nom": 4, "nopm": 4, "loc": 15, "wmc": 4, "nc": 4, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.report.Report"]}], "dependencies": ["org.adoptopenjdk.jitwatch.core", "org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.report", "org.adoptopenjdk.jitwatch.ui.report.suggestion", "org.adoptopenjdk.jitwatch.ui.report.locks", "org.adoptopenjdk.jitwatch.ui.report.eliminatedallocation", "org.adoptopenjdk.jitwatch.ui.report.cell", "org.adoptopenjdk.jitwatch.ui.report.inlining", "org.adoptopenjdk.jitwatch.ui.main"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect God Component with the available data."
+}
+```
