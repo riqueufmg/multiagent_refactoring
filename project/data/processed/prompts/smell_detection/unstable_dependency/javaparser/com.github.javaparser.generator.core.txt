@@ -1,0 +1,36 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Unstable Dependency.
+
+Definition:
+This smell arises when a component depends on other less stable components. Stable Dependencies Principle states that the dependencies between packages should be in the direction of the stability of packages. Hence, a package should only depend on packages that are more stable than itself. An unstable dependency architecture smell occurs when this principle is not followed.
+
+# Constraints
+
+- Perform the analysis at the **package level** and evaluate each package individually.
+- When assessing each package, consider outgoing dependencies and incoming dependencies
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Output** are mandatory.
+
+# Input
+
+The following metrics and dependencies, including incoming and outgoing dependencies, are available for each package:
+
+```json
+{"analyzed_package": {"package": "com.github.javaparser.generator.core", "metrics": {"num_classes": 1, "loc": 48, "Ce": 2, "Ca": 0}, "dependencies": ["com.github.javaparser.utils", "com.github.javaparser"]}, "outgoing_dependencies": [{"package": "com.github.javaparser.utils", "metrics": {"num_classes": 34, "loc": 2501, "Ce": 10, "Ca": 35}, "dependencies": ["com.github.javaparser.ast.visitor", "com.github.javaparser.ast", "com.github.javaparser.ast.body", "com.github.javaparser.ast.expr", "com.github.javaparser.ast.nodeTypes", "com.github.javaparser", "com.github.javaparser.ast.type", "com.github.javaparser.ast.stmt", "com.github.javaparser.printer", "com.github.javaparser.ast.comments"]}, {"package": "com.github.javaparser", "metrics": {"num_classes": 54, "loc": 18663, "Ce": 16, "Ca": 38}, "dependencies": ["com.github.javaparser.utils", "com.github.javaparser.ast.validator.postprocessors", "com.github.javaparser.quality", "com.github.javaparser.ast", "com.github.javaparser.ast.body", "com.github.javaparser.ast.expr", "com.github.javaparser.resolution", "com.github.javaparser.printer.lexicalpreservation", "com.github.javaparser.ast.modules", "com.github.javaparser.javadoc", "com.github.javaparser.ast.type", "com.github.javaparser.ast.stmt", "com.github.javaparser.printer", "com.github.javaparser.ast.validator", "com.github.javaparser.ast.comments", "com.github.javaparser.javadoc.description"]}], "incoming_dependencies": []}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+"package": "[package_name]",
+"detection": false,
+"justification": "[Reasons for the detection result, citing the elements that justify the decision]"
+}
+```

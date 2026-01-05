@@ -1,42 +1,42 @@
 [
     {
-        "package": "org.jsoup.examples",
-        "detection": false,
-        "justification": "org.jsoup.examples has Ca=0, Ce=4 (stability S=0.0). It depends on org.jsoup.select (S=0.5), org.jsoup.nodes (S=0.5625), org.jsoup (S≈0.615) and org.jsoup.helper (S=0.6) — all are more stable than org.jsoup.examples. No unstable dependency."
-    },
-    {
-        "package": "org.jsoup",
+        "package": "org.jsoup.nodes",
         "detection": true,
-        "justification": "org.jsoup has Ca=8, Ce=5 (S≈0.615). It depends on org.jsoup.parser (Ca=7, Ce=8, S≈0.467) and org.jsoup.safety (Ca=3, Ce=5, S=0.375) as well as org.jsoup.nodes (S=0.5625) and org.jsoup.helper (S=0.6) which are all equal-or-less stable; several dependencies (parser, safety) are less stable than org.jsoup. (Dependency 'org.jsoup.integration' has no metrics available and was ignored.)"
+        "justification": "org.jsoup.nodes has instability I = Ce/(Ce+Ca) = 5/(5+7) = 0.4167. It depends on these packages: org.jsoup.select (Ce=5,Ca=4,I=0.5556) -> I_dep > I_pkg (violates Stable Dependencies Principle); org.jsoup.internal (Ce=4,Ca=5,I=0.4444) -> I_dep > I_pkg (violates); org.jsoup.helper (Ce=5,Ca=7,I=0.4167) -> I_dep = I_pkg (not more stable, violates); org.jsoup.parser (Ce=6,Ca=6,I=0.5000) -> I_dep > I_pkg (violates); org.jsoup (Ce=4,Ca=7,I=0.3636) -> I_dep < I_pkg (ok). Because multiple outgoing dependencies are less or equally stable than org.jsoup.nodes, the Unstable Dependency smell is detected."
     },
     {
         "package": "org.jsoup.internal",
         "detection": true,
-        "justification": "org.jsoup.internal has Ca=7, Ce=4 (S≈0.636). It depends on org.jsoup.nodes (S=0.5625), org.jsoup.parser (S≈0.467), org.jsoup (S≈0.615) and org.jsoup.helper (S=0.6) — all listed dependencies have lower stability than org.jsoup.internal, so it depends on less stable packages."
+        "justification": "org.jsoup.internal has Ce=4, Ca=5 -> instability I = 4/(4+5) = 0.444. Among its outgoing dependencies: org.jsoup.parser (Ce=6, Ca=6 -> I=6/(6+6)=0.500), org.jsoup.nodes (I≈0.417), org.jsoup.helper (I≈0.417), org.jsoup (I≈0.364). Because org.jsoup.internal depends on org.jsoup.parser which has a higher instability (0.500 > 0.444), org.jsoup.internal depends on a less stable package, violating the Stable Dependencies Principle and indicating an Unstable Dependency smell."
     },
     {
-        "package": "org.jsoup.safety",
-        "detection": false,
-        "justification": "org.jsoup.safety has Ca=3, Ce=5 (S=0.375). It depends on org.jsoup.parser (S≈0.467), org.jsoup (S≈0.615), org.jsoup.internal (S≈0.636), org.jsoup.nodes (S=0.5625) and org.jsoup.helper (S=0.6) — all are more stable than org.jsoup.safety. No unstable dependency."
-    },
-    {
-        "package": "org.jsoup.nodes",
+        "package": "org.jsoup",
         "detection": true,
-        "justification": "org.jsoup.nodes has Ca=9, Ce=7 (S=0.5625). It depends on org.jsoup.parser (S≈0.467) and org.jsoup.select (S=0.5), which are less stable than org.jsoup.nodes, while other dependencies are more stable. Presence of dependencies with lower stability (parser, select) indicates unstable dependency."
+        "justification": "org.jsoup has Ce=4 and Ca=7 -> Instability I = 4/(4+7) = 0.364. All outgoing dependencies are less stable (higher I) than org.jsoup: org.jsoup.safety (Ce=5, Ca=2 -> I=5/7=0.714), org.jsoup.nodes (Ce=5, Ca=7 -> I=5/12=0.417), org.jsoup.helper (Ce=5, Ca=7 -> I=0.417), org.jsoup.parser (Ce=6, Ca=6 -> I=6/12=0.5). Because org.jsoup depends on packages with higher instability than itself, it violates the Stable Dependencies Principle and exhibits the Unstable Dependency smell."
     },
     {
         "package": "org.jsoup.helper",
         "detection": true,
-        "justification": "org.jsoup.helper has Ca=9, Ce=6 (S=0.6). It depends on org.jsoup.parser (S≈0.467), org.jsoup.select (S=0.5) and org.jsoup.nodes (S=0.5625) which are less stable than org.jsoup.helper. This dependence on less stable packages signals an unstable dependency."
+        "justification": "org.jsoup.helper has Ce=5, Ca=7 => instability I=5/(5+7)=0.4167. Outgoing dependencies and their instabilities: org.jsoup.select (Ce=5, Ca=4 => I=5/9=0.5556), org.jsoup.internal (Ce=4, Ca=5 => I=4/9=0.4444), org.jsoup (Ce=4, Ca=7 => I=4/11=0.3636), org.jsoup.parser (Ce=6, Ca=6 => I=6/12=0.5000), org.jsoup.nodes (Ce=5, Ca=7 => I=5/12=0.4167). The Stable Dependencies Principle is violated for dependencies whose I > 0.4167: org.jsoup.select (0.5556), org.jsoup.internal (0.4444) and org.jsoup.parser (0.5000) are less stable than org.jsoup.helper, so org.jsoup.helper depends on less stable packages. Incoming dependencies (org.jsoup.examples, org.jsoup, org.jsoup.internal, org.jsoup.safety, org.jsoup.nodes, org.jsoup.select, org.jsoup.parser) include both more-stable and less-stable packages but do not mitigate the fact that multiple outgoing dependencies violate the stability direction. Therefore the Unstable Dependency smell is detected."
+    },
+    {
+        "package": "org.jsoup.examples",
+        "detection": false,
+        "justification": "org.jsoup.examples has Ce=4 and Ca=0 (Instability I = 4/(4+0) = 1.0). Its outgoing dependencies are: org.jsoup.nodes (Ce=5, Ca=7, I = 5/12 ≈ 0.4167), org.jsoup.helper (Ce=5, Ca=7, I ≈ 0.4167), org.jsoup.select (Ce=5, Ca=4, I = 5/9 ≈ 0.5556), and org.jsoup (Ce=4, Ca=7, I = 4/11 ≈ 0.3636). All dependent packages have lower instability values (are more stable) than org.jsoup.examples, so the package depends on more stable components and follows the Stable Dependencies Principle. There are no incoming dependencies to org.jsoup.examples. Therefore an Unstable Dependency smell is not detected."
     },
     {
         "package": "org.jsoup.select",
-        "detection": true,
-        "justification": "org.jsoup.select has Ca=5, Ce=5 (S=0.5). It depends on org.jsoup.parser (S≈0.467), which is less stable than org.jsoup.select; other dependencies are more stable. The dependency on parser (less stable) constitutes an unstable dependency."
+        "detection": false,
+        "justification": "org.jsoup.select has Ce=5 and Ca=4 (instability I = 5/(4+5) = 0.556). Its outgoing dependencies have instabilities: org.jsoup.internal (Ce=4, Ca=5, I=0.444), org.jsoup (Ce=4, Ca=7, I=0.364), org.jsoup.helper (Ce=5, Ca=7, I=0.417), org.jsoup.parser (Ce=6, Ca=6, I=0.500), org.jsoup.nodes (Ce=5, Ca=7, I=0.417). All outgoing dependencies have lower instability (are more stable) than org.jsoup.select, and incoming coupling (Ca=4) shows other packages depend on it. Because org.jsoup.select depends only on packages with lower instability, the Stable Dependencies Principle is not violated; no Unstable Dependency smell detected."
+    },
+    {
+        "package": "org.jsoup.safety",
+        "detection": false,
+        "justification": "Instability I = Ce / (Ce + Ca). org.jsoup.safety: Ce=5, Ca=2 => I=5/7 ≈ 0.714. Outgoing dependencies: org.jsoup.internal (Ce=4, Ca=5 => I≈0.444), org.jsoup (Ce=4, Ca=7 => I≈0.364), org.jsoup.helper (Ce=5, Ca=7 => I≈0.417), org.jsoup.parser (Ce=6, Ca=6 => I=0.5), org.jsoup.nodes (Ce=5, Ca=7 => I≈0.417). All outgoing dependencies have lower instability (are more stable) than org.jsoup.safety (0.714), so the package depends on more stable packages (complies with the Stable Dependencies Principle). Incoming dependencies (org.jsoup I≈0.364, org.jsoup.parser I=0.5) are also more stable. Therefore no Unstable Dependency smell is detected for org.jsoup.safety."
     },
     {
         "package": "org.jsoup.parser",
         "detection": true,
-        "justification": "org.jsoup.parser has Ca=7, Ce=8 (S≈0.467). It depends on org.jsoup.safety (Ca=3, Ce=5, S=0.375), which is less stable than org.jsoup.parser, while other dependencies are more stable. The presence of a dependency on safety (lower stability) indicates an unstable dependency."
+        "justification": "org.jsoup.parser has Ce=6 and Ca=6 (Instability I = 6/(6+6) = 0.500). Among its outgoing dependencies, org.jsoup.select (Ce=5, Ca=4, I = 5/(5+4) = 0.556) and org.jsoup.safety (Ce=5, Ca=2, I = 5/(5+2) = 0.714) have higher instability than org.jsoup.parser. Depending on these less-stable packages violates the Stable Dependencies Principle. (Other outgoing dependencies: org.jsoup.internal I=0.444, org.jsoup I=0.364, org.jsoup.helper I=0.417, org.jsoup.nodes I=0.417 are more stable.) Therefore an Unstable Dependency smell is detected for org.jsoup.parser."
     }
 ]

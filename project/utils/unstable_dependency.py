@@ -26,14 +26,11 @@ class UnstableDependencyComparison:
                 print(f"Warning: Ignoring invalid file: {file}")
                 continue
 
-            detections = content.get("detections", [])
-            for entry in detections:
-                pkg = entry.get("package")
-                consolidated.append({
-                    "package": pkg,
-                    "detection": entry.get("detection"),
-                    "justification": entry.get("justification"),
-                })
+            consolidated.append({
+                "package": content.get("package"),
+                "detection": content.get("detection"),
+                "justification": content.get("justification"),
+            })
 
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(consolidated, f, indent=4, ensure_ascii=False)

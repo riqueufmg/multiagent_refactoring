@@ -1,77 +1,77 @@
 [
     {
+        "package": "org.apache.commons.io.file.spi",
+        "detection": false,
+        "justification": "No unstable dependency detected: the package has no outgoing dependencies (Ce = 0, outgoing_dependencies = []) and no incoming dependencies (Ca = 0). Because it does not depend on other packages, it cannot depend on less-stable components, so the Stable Dependencies Principle is not violated."
+    },
+    {
+        "package": "org.apache.commons.io.filefilter",
+        "detection": true,
+        "justification": "org.apache.commons.io.filefilter has Ce=4 and Ca=3 -> instability I = 4/(4+3) = 0.571. One of its outgoing dependencies, org.apache.commons.io.output, has Ce=6 and Ca=4 -> I = 6/(6+4) = 0.600, which is less stable (higher instability) than org.apache.commons.io.filefilter. This violates the Stable Dependencies Principle (a package should only depend on packages more stable than itself), so an unstable dependency is detected. Other outgoing dependencies (org.apache.commons.io.file I=0.417, org.apache.commons.io.function I=0.222, org.apache.commons.io I=0.353) are more stable and do not violate the principle. Incoming dependencies include org.apache.commons.io (I=0.353), org.apache.commons.io.file (I=0.417) and org.apache.commons.io.monitor (Ce=5,Ca=0 -> I=1.0), but the outgoing dependency to org.apache.commons.io.output is sufficient to mark this package as having an unstable dependency."
+    },
+    {
         "package": "org.apache.commons.io",
         "detection": true,
-        "justification": "Package Ce=7, Ca=14 (Instability ≈ 0.333). It depends on packages with higher instability: org.apache.commons.io.file (Ce=6, Ca=8, I≈0.429), org.apache.commons.io.output (Ce=6, Ca=6, I=0.5), org.apache.commons.io.filefilter (Ce=5, Ca=3, I=0.625), org.apache.commons.io.input (Ce=8, Ca=5, I≈0.615). These dependencies are less stable (higher I) than org.apache.commons.io, so the package has unstable dependencies. (Note: some dependencies like org.apache.commons.io.test are not present in the provided metrics and were not considered.)"
+        "justification": "org.apache.commons.io has Ca=11 and Ce=6 (stability I = 11/(11+6) ≈ 0.647). Several of its outgoing dependencies are less stable (lower I) than 0.647, creating unstable dependencies: org.apache.commons.io.filefilter (Ca=3, Ce=4, I=3/7 ≈ 0.429), org.apache.commons.io.input (Ca=3, Ce=7, I=3/10 = 0.300), org.apache.commons.io.file (Ca=7, Ce=5, I=7/12 ≈ 0.583), org.apache.commons.io.output (Ca=4, Ce=6, I=4/10 = 0.400). Two outgoing dependencies are more stable (no issue): org.apache.commons.io.file.attribute (Ca=4, Ce=0, I=1.000) and org.apache.commons.io.function (Ca=7, Ce=2, I=7/9 ≈ 0.778). Because org.apache.commons.io depends on multiple packages with lower stability, it violates the Stable Dependencies Principle -> unstable dependency detected."
+    },
+    {
+        "package": "org.apache.commons.io.build",
+        "detection": true,
+        "justification": "org.apache.commons.io.build has Ce=4, Ca=2 -> instability I = 4/(4+2) = 0.667. One of its outgoing dependencies, org.apache.commons.io.input, has Ce=7, Ca=3 -> I = 7/(7+3) = 0.700, which is less stable (higher instability) than org.apache.commons.io.build. This violates the Stable Dependencies Principle (a package should depend only on more stable packages). Other outgoing dependencies are more stable (org.apache.commons.io.file I=0.417, org.apache.commons.io.function I=0.222, org.apache.commons.io I=0.353). Note also org.apache.commons.io.input lists org.apache.commons.io.build among its dependencies (cyclic dependency), which further exacerbates the unstable dependency issue."
     },
     {
         "package": "org.apache.commons.io.function",
         "detection": true,
-        "justification": "Package Ce=2, Ca=7 (Instability ≈ 0.222). It depends on org.apache.commons.io.file (I≈0.429) and org.apache.commons.io (I≈0.333), both of which are less stable (higher I) than this package, indicating unstable dependencies."
-    },
-    {
-        "package": "org.apache.commons.io.input",
-        "detection": true,
-        "justification": "Package Ce=8, Ca=5 (Instability ≈ 0.615). Among its dependencies, org.apache.commons.io.build has Ce=4, Ca=2 (I≈0.667) which is less stable (higher I) than org.apache.commons.io.input. Depending on a less stable package (build) constitutes an unstable dependency."
-    },
-    {
-        "package": "org.apache.commons.io.input.buffer",
-        "detection": false,
-        "justification": "Package Ce=1, Ca=0 (Instability = 1.0). Its only listed dependency with metrics is org.apache.commons.io (I≈0.333), which is more stable (lower I) than this package. No dependency with higher instability is present, so no unstable dependency detected."
-    },
-    {
-        "package": "org.apache.commons.io.file",
-        "detection": true,
-        "justification": "Package Ce=6, Ca=8 (Instability ≈ 0.429). It depends on org.apache.commons.io.output (I=0.5) and org.apache.commons.io.filefilter (I≈0.625), both of which are less stable (higher I) than org.apache.commons.io.file, indicating unstable dependencies."
-    },
-    {
-        "package": "org.apache.commons.io.file.spi",
-        "detection": false,
-        "justification": "Package Ce=0, Ca=0 (no couplings). It has no outgoing dependencies in the provided data, so there is no unstable dependency to detect."
-    },
-    {
-        "package": "org.apache.commons.io.file.attribute",
-        "detection": false,
-        "justification": "Package Ce=0, Ca=4 (Instability = 0.0). It has no outgoing dependencies in the provided data, so it cannot have unstable dependencies."
-    },
-    {
-        "package": "org.apache.commons.io.monitor",
-        "detection": false,
-        "justification": "Package Ce=6, Ca=0 (Instability = 1.0). Its dependencies with metrics (e.g., file I≈0.429, filefilter I≈0.625, comparator I≈0.667, core io I≈0.333) are all more stable (lower I) than monitor. The dependency direction is toward more stable packages, so no unstable dependency detected."
-    },
-    {
-        "package": "org.apache.commons.io.comparator",
-        "detection": false,
-        "justification": "Package Ce=2, Ca=1 (Instability ≈ 0.667). Its dependency org.apache.commons.io (I≈0.333) is more stable (lower I) than comparator, so no unstable dependency is present."
-    },
-    {
-        "package": "org.apache.commons.io.output",
-        "detection": true,
-        "justification": "Package Ce=6, Ca=6 (Instability = 0.5). It depends on org.apache.commons.io.build (I≈0.667) and org.apache.commons.io.input (I≈0.615), both of which are less stable (higher I) than output, indicating unstable dependencies."
-    },
-    {
-        "package": "org.apache.commons.io.channels",
-        "detection": false,
-        "justification": "Package Ce=2, Ca=0 (Instability = 1.0). Its dependencies with metrics (org.apache.commons.io.function I≈0.222, org.apache.commons.io I≈0.333) are more stable (lower I) than channels, so no unstable dependency detected."
-    },
-    {
-        "package": "org.apache.commons.io.charset",
-        "detection": false,
-        "justification": "Package Ce=0, Ca=2 (Instability = 0.0). It has no outgoing dependencies in the provided data, therefore no unstable dependency."
-    },
-    {
-        "package": "org.apache.commons.io.build",
-        "detection": false,
-        "justification": "Package Ce=4, Ca=2 (Instability ≈ 0.667). Its dependencies (file I≈0.429, function I≈0.222, input I≈0.615, core io I≈0.333) are all more stable (lower I) than build, so dependency directions respect stability and no unstable dependency is detected."
+        "justification": "Instability of org.apache.commons.io.function = Ce/(Ca+Ce) = 2/(7+2) = 0.222. Outgoing dependencies: org.apache.commons.io.file (Ce=5, Ca=7, I=5/(5+7)=0.417) and org.apache.commons.io (Ce=6, Ca=11, I=6/(6+11)=0.353). Both outgoing packages have higher instability than org.apache.commons.io.function (0.417 > 0.222 and 0.353 > 0.222), so the package depends on less stable components — this violates the Stable Dependencies Principle and indicates an Unstable Dependency smell."
     },
     {
         "package": "org.apache.commons.io.serialization",
         "detection": false,
-        "justification": "Package Ce=1, Ca=0 (Instability = 1.0). Its dependency org.apache.commons.io (I≈0.333) is more stable (lower I), so there is no unstable dependency."
+        "justification": "The analyzed package has Ce=1 and Ca=0 (instability I = 0.0). Its only outgoing dependency is org.apache.commons.io which has Ce=6 and Ca=11 (instability I ≈ 0.647). Since the package depends on a more stable package (0.647 > 0.0), the Stable Dependencies Principle is respected and there is no Unstable Dependency smell. Additionally, there are no incoming dependencies to the analyzed package."
     },
     {
-        "package": "org.apache.commons.io.filefilter",
+        "package": "org.apache.commons.io.file.attribute",
         "detection": false,
-        "justification": "Package Ce=5, Ca=3 (Instability = 0.625). Its dependencies with metrics (file I≈0.429, output I=0.5, function I≈0.222, core io I≈0.333) are all more stable (lower I) than filefilter, so no unstable dependency detected."
+        "justification": "The package has Ce=0 and Ca=4 giving stability I = 1.0 (very stable). It has no outgoing dependencies. Incoming dependencies come from org.apache.commons.io (I≈0.647), org.apache.commons.io.input (I=0.3), org.apache.commons.io.file (I≈0.583) and org.apache.commons.io.monitor (I=0.0). Because the package does not depend on less stable packages (it has no efferent couplings) and is more stable than its dependents, the Stable Dependency Principle is satisfied and no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "org.apache.commons.io.file",
+        "detection": true,
+        "justification": "Analyzed package org.apache.commons.io.file has Ce=5, Ca=7 -> instability I = 5/(5+7) = 0.4167. It has outgoing dependencies to: org.apache.commons.io.filefilter (Ce=4, Ca=3 -> I=4/7 = 0.5714) and org.apache.commons.io.output (Ce=6, Ca=4 -> I=6/10 = 0.6000), both of which are less stable (higher I) than org.apache.commons.io.file. Depending on these more unstable packages violates the Stable Dependencies Principle, so an Unstable Dependency smell is detected. Other outgoing dependencies (org.apache.commons.io I=0.3529, org.apache.commons.io.file.attribute I=0.0000, org.apache.commons.io.function I=0.2222) are more stable and do not cause the violation."
+    },
+    {
+        "package": "org.apache.commons.io.output",
+        "detection": true,
+        "justification": "Analyzed package org.apache.commons.io.output has Ce=6, Ca=4 -> instability I=4/(4+6)=0.40. Outgoing dependencies: org.apache.commons.io.input (Ce=7, Ca=3, I=0.30), org.apache.commons.io (Ce=6, Ca=11, I≈0.65), org.apache.commons.io.file (Ce=5, Ca=7, I≈0.58), org.apache.commons.io.build (Ce=4, Ca=2, I≈0.33), org.apache.commons.io.charset (Ce=0, Ca=2, I=1.00), org.apache.commons.io.function (Ce=2, Ca=7, I≈0.78). The Stable Dependencies Principle requires depending only on packages more stable than the depender. org.apache.commons.io.output depends on org.apache.commons.io.input (I=0.30) and org.apache.commons.io.build (I≈0.33), both less stable than org.apache.commons.io.output (I=0.40). Incoming dependencies (packages depending on this package) include org.apache.commons.io (I≈0.65), org.apache.commons.io.input (I=0.30), org.apache.commons.io.file (I≈0.58), org.apache.commons.io.filefilter (Ce=4, Ca=3, I≈0.43). Despite some incoming more-stable packages, the presence of outgoing dependencies with lower stability (input and build) constitutes an unstable dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.monitor",
+        "detection": false,
+        "justification": "org.apache.commons.io.monitor has Ca=0, Ce=5 -> stability I=0.0. Its outgoing dependencies have higher stability: org.apache.commons.io.filefilter (Ca=3, Ce=4 -> I≈0.4286), org.apache.commons.io (Ca=11, Ce=6 -> I≈0.6471), org.apache.commons.io.comparator (Ca=1, Ce=1 -> I=0.5), org.apache.commons.io.file (Ca=7, Ce=5 -> I≈0.5833), org.apache.commons.io.file.attribute (Ca=4, Ce=0 -> I=1.0). Because all depended-on packages are more stable than org.apache.commons.io.monitor, the Unstable Dependency smell is not present."
+    },
+    {
+        "package": "org.apache.commons.io.input.buffer",
+        "detection": false,
+        "justification": "Analyzed package org.apache.commons.io.input.buffer has Ce=1 and Ca=0, giving instability I = 0/(0+1) = 0. Its sole outgoing dependency is org.apache.commons.io which has Ce=6 and Ca=11, giving instability I = 11/(11+6) ≈ 0.647. Because the analyzed package (I=0) depends on a more stable package (I≈0.647) and there are no incoming dependencies (Ca=0), the Stable Dependencies Principle is not violated; therefore the Unstable Dependency smell is not detected."
+    },
+    {
+        "package": "org.apache.commons.io.channels",
+        "detection": false,
+        "justification": "Analyzed package org.apache.commons.io.channels has Ce=2 and Ca=0 -> instability I = 2/(0+2) = 1.0 (maximally unstable). Outgoing dependencies: org.apache.commons.io.function (Ce=2, Ca=7 -> I = 2/(2+7) = 0.222), org.apache.commons.io (Ce=6, Ca=11 -> I = 6/(6+11) = 0.353). Both outgoing dependencies have lower instability (are more stable) than the analyzed package. There are no incoming dependencies (Ca=0). Because the package depends only on more stable packages, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.input",
+        "detection": false,
+        "justification": "Analyzed package org.apache.commons.io.input has Ce=7 and Ca=3 -> instability I = 7/(7+3) = 0.70. All outgoing dependencies are more stable (have lower instability): org.apache.commons.io I=6/(6+11)=0.353, org.apache.commons.io.file I=5/(5+7)=0.417, org.apache.commons.io.file.attribute I=0/(0+4)=0.000, org.apache.commons.io.build I=4/(4+2)=0.667, org.apache.commons.io.charset I=0/(0+2)=0.000, org.apache.commons.io.function I=2/(2+7)=0.222, org.apache.commons.io.output I=6/(6+4)=0.600. Since every outgoing dependency has instability < 0.70, the Stable Dependencies Principle is respected and there is no Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.comparator",
+        "detection": false,
+        "justification": "Analyzed package metrics: Ce=1, Ca=1 -> Instability I=Ce/(Ca+Ce)=1/2=0.5. Outgoing dependency org.apache.commons.io: Ce=6, Ca=11 -> I=6/17≈0.353. Since the analyzed package depends on org.apache.commons.io which has lower instability (more stable) than org.apache.commons.io.comparator, the dependency direction follows the Stable Dependencies Principle. There is an incoming dependency from org.apache.commons.io.monitor (Ce=5, Ca=0 -> I=1.0, unstable) but it is an incoming dependency (other package depends on org.apache.commons.io.comparator) and does not constitute an unstable dependency of this package. Therefore no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "org.apache.commons.io.charset",
+        "detection": false,
+        "justification": "org.apache.commons.io.charset has Ce=0 and Ca=2 => stability I=2/(2+0)=1.0 (very stable). It has no outgoing dependencies (does not depend on other packages) and two incoming dependencies: org.apache.commons.io.input (Ce=7, Ca=3 => I=3/10=0.3) and org.apache.commons.io.output (Ce=6, Ca=4 => I=4/10=0.4). Those less-stable packages depend on this more-stable package, which follows the Stable Dependencies Principle. Therefore there is no Unstable Dependency smell for this package."
     }
 ]

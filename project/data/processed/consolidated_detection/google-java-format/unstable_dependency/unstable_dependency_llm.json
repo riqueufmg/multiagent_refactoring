@@ -1,27 +1,27 @@
 [
     {
-        "package": "com.google.googlejavaformat.java",
+        "package": "com.google.googlejavaformat.intellij",
         "detection": false,
-        "justification": "Package Ce=2, Ca=2 (instability ≈ 0.5). It depends on com.google.googlejavaformat.java.javadoc (Ce=0, Ca=1, instability=0.0) and com.google.googlejavaformat (Ce=0, Ca=1, instability=0.0). Both dependencies are more stable (lower instability) than this package, so the Stable Dependencies Principle is respected."
+        "justification": "com.google.googlejavaformat.intellij has Ce=1 and Ca=0 => instability I = 0/(0+1) = 0 (very unstable). Its sole outgoing dependency is com.google.googlejavaformat.java which has Ce=2 and Ca=2 => instability I = 2/(2+2) = 0.5 (more stable). There are no incoming dependencies to com.google.googlejavaformat.intellij (Ca=0). Because the package depends on a more stable package (0.5 > 0), the Stable Dependencies Principle is respected and no Unstable Dependency smell is detected."
     },
     {
-        "package": "com.google.googlejavaformat",
+        "package": "com.google.googlejavaformat.java",
         "detection": false,
-        "justification": "Package Ce=0, Ca=1 (instability=0.0). It has no outgoing dependencies, so it cannot violate the Stable Dependencies Principle."
+        "justification": "Analyzed package has Ce=2, Ca=2 (Instability I=2/(2+2)=0.5). Its outgoing dependencies: com.google.googlejavaformat.java.javadoc (Ce=0, Ca=1, I=0.0) and com.google.googlejavaformat (Ce=0, Ca=1, I=0.0) are more stable (I=0.0 < 0.5). Incoming dependents: com.google.googlejavaformat.java.filer (Ce=1, Ca=0, I=1.0) and com.google.googlejavaformat.intellij (Ce=1, Ca=0, I=1.0) are less stable and depend on this package, which is the correct stability direction. Therefore there is no unstable dependency (package does not depend on less stable packages)."
     },
     {
         "package": "com.google.googlejavaformat.java.filer",
         "detection": false,
-        "justification": "Package Ce=1, Ca=0 (instability=1.0). It depends on com.google.googlejavaformat.java (Ce=2, Ca=2, instability≈0.5), which is more stable than this package. The dependency direction is from less stable to more stable, so no unstable dependency smell."
+        "justification": "The analyzed package has Ce=1 and Ca=0 -> instability I = Ce/(Ca+Ce) = 1/(0+1) = 1.0 (highly unstable). Its outgoing dependency com.google.googlejavaformat.java has Ce=2 and Ca=2 -> instability I = 2/(2+2) = 0.5 (more stable). Because the package depends on a more stable package (I 1.0 -> I 0.5), it does not violate the Stable Dependencies Principle. Incoming dependencies are empty (Ca=0), so there is no evidence of an unstable dependency smell."
+    },
+    {
+        "package": "com.google.googlejavaformat",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce = 0) and one incoming dependency (Ca = 1). Because Ce = 0 and Ca = 1 its instability I = 0/(0+1) = 0 (maximally stable). The only incoming dependency is from com.google.googlejavaformat.java (Ce = 2, Ca = 2, instability = 2/(2+2) = 0.5). The analyzed package does not depend on any less-stable packages (no outgoing deps), and the dependency direction (com.google.googlejavaformat.java -> com.google.googlejavaformat) is from a less stable package to a more stable one, which conforms to the Stable Dependencies Principle; therefore there is no Unstable Dependency smell."
     },
     {
         "package": "com.google.googlejavaformat.java.javadoc",
         "detection": false,
-        "justification": "Package Ce=0, Ca=1 (instability=0.0). It has no outgoing dependencies, so it does not depend on less stable packages."
-    },
-    {
-        "package": "com.google.googlejavaformat.intellij",
-        "detection": false,
-        "justification": "Package Ce=1, Ca=0 (instability=1.0). It depends on com.google.googlejavaformat.java (instability≈0.5), which is more stable than this package. The dependency follows the stability direction, so no smell detected."
+        "justification": "com.google.googlejavaformat.java.javadoc has no outgoing dependencies (outgoing_dependencies = [], Ce = 0) and a single incoming dependency (Ca = 1). Its instability I = Ce/(Ce+Ca) = 0/(0+1) = 0, indicating maximal stability. Since the package does not depend on any other packages, it cannot depend on less stable packages, so the Unstable Dependency smell is not present."
     }
 ]

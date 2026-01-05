@@ -10,53 +10,27 @@ This smell arises when a component depends on other less stable components. Stab
 # Constraints
 
 - Perform the analysis at the **package level** and evaluate each package individually.
-- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+- When assessing each package, consider outgoing dependencies and incoming dependencies
 - Give the answer exactly in the structure defined in the **#Successful Output** section.
 - Do not include comments, explanations, or text outside the defined output format.
-- All fields in the **#Successful Output** are mandatory.
-- Only perform the analysis if the provided data are sufficient; otherwise, follow the **#Unsuccessful Output** format.
+- All fields in the **#Output** are mandatory.
 
 # Input
 
-The following metrics and dependencies are available at package level:
+The following metrics and dependencies, including incoming and outgoing dependencies, are available for each package:
 
 ```json
 {INPUT_DATA}
 ```
 
-# Successful Output
+# Output
 
 Provide the output in this structure:
 
 ```json
 {
-  "smell": "Unstable Dependency",
-  "detections": [
-    {
-      "package": "[package_name]",
-      "detection": false,
-      "justification": "[Reasons for the detection result, citing the elements that justify the decision]"
-    },
-    {
-      "package": "[package_name]",
-      "detection": true,
-      "justification": "[Reasons for the detection result, citing the elements that justify the decision]"
-    },
-    {
-      "package": "[package_name]",
-      "detection": false,
-      "justification": "[Reasons for the detection result, citing the elements that justify the decision]"
-    }
-  ]
-}
-```
-
-# Unsucessfull Output
-
-If the available data are insufficient to detect this smell, return:
-
-```json
-{
-    "message": "It is impossible to detect {SMELL_NAME} with the available data."
+"package": "[package_name]",
+"detection": false,
+"justification": "[Reasons for the detection result, citing the elements that justify the decision]"
 }
 ```

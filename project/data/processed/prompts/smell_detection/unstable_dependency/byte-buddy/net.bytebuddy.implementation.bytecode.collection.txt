@@ -1,0 +1,36 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Unstable Dependency.
+
+Definition:
+This smell arises when a component depends on other less stable components. Stable Dependencies Principle states that the dependencies between packages should be in the direction of the stability of packages. Hence, a package should only depend on packages that are more stable than itself. An unstable dependency architecture smell occurs when this principle is not followed.
+
+# Constraints
+
+- Perform the analysis at the **package level** and evaluate each package individually.
+- When assessing each package, consider outgoing dependencies and incoming dependencies
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Output** are mandatory.
+
+# Input
+
+The following metrics and dependencies, including incoming and outgoing dependencies, are available for each package:
+
+```json
+{"analyzed_package": {"package": "net.bytebuddy.implementation.bytecode.collection", "metrics": {"num_classes": 10, "loc": 675, "Ce": 4, "Ca": 1}, "dependencies": ["net.bytebuddy.description.type", "net.bytebuddy.build", "net.bytebuddy.implementation.bytecode", "net.bytebuddy.implementation"]}, "outgoing_dependencies": [{"package": "net.bytebuddy.description.type", "metrics": {"num_classes": 175, "loc": 33551, "Ce": 16, "Ca": 32}, "dependencies": ["net.bytebuddy.utility.dispatcher", "net.bytebuddy.utility", "net.bytebuddy.matcher", "net.bytebuddy.dynamic", "net.bytebuddy.asm", "net.bytebuddy.dynamic.scaffold", "net.bytebuddy.description.module", "net.bytebuddy.dynamic.loading", "net.bytebuddy.description.method", "net.bytebuddy.implementation.bytecode", "net.bytebuddy.build", "net.bytebuddy", "net.bytebuddy.description.field", "net.bytebuddy.description", "net.bytebuddy.description.annotation", "net.bytebuddy.implementation"]}, {"package": "net.bytebuddy.build", "metrics": {"num_classes": 131, "loc": 21284, "Ce": 19, "Ca": 36}, "dependencies": ["net.bytebuddy.dynamic", "net.bytebuddy.dynamic.scaffold", "net.bytebuddy.implementation.bytecode.assign", "net.bytebuddy.dynamic.loading", "net.bytebuddy.description.method", "net.bytebuddy.description.annotation", "net.bytebuddy.implementation", "net.bytebuddy.dynamic.scaffold.subclass", "net.bytebuddy.matcher", "net.bytebuddy.description.field", "net.bytebuddy.description.type", "net.bytebuddy.description.modifier", "net.bytebuddy.pool", "net.bytebuddy.utility", "net.bytebuddy.asm", "net.bytebuddy.utility.dispatcher", "net.bytebuddy.dynamic.scaffold.inline", "net.bytebuddy", "net.bytebuddy.implementation.attribute"]}, {"package": "net.bytebuddy.implementation.bytecode", "metrics": {"num_classes": 27, "loc": 1514, "Ce": 4, "Ca": 22}, "dependencies": ["net.bytebuddy.description.type", "net.bytebuddy.build", "net.bytebuddy.description.method", "net.bytebuddy.implementation"]}, {"package": "net.bytebuddy.implementation", "metrics": {"num_classes": 264, "loc": 32056, "Ce": 23, "Ca": 25}, "dependencies": ["net.bytebuddy.dynamic", "net.bytebuddy.dynamic.scaffold", "net.bytebuddy.implementation.bytecode.assign", "net.bytebuddy.dynamic.loading", "net.bytebuddy.description.method", "net.bytebuddy.description.annotation", "net.bytebuddy.dynamic.scaffold.subclass", "net.bytebuddy.matcher", "net.bytebuddy.implementation.bind", "net.bytebuddy.implementation.bytecode.member", "net.bytebuddy.description.field", "net.bytebuddy.description.enumeration", "net.bytebuddy.description.type", "net.bytebuddy.description.modifier", "net.bytebuddy.utility", "net.bytebuddy.implementation.bind.annotation", "net.bytebuddy.implementation.bytecode", "net.bytebuddy.description", "net.bytebuddy.implementation.bytecode.constant", "net.bytebuddy.implementation.auxiliary", "net.bytebuddy.build", "net.bytebuddy", "net.bytebuddy.implementation.attribute"]}], "incoming_dependencies": [{"package": "net.bytebuddy.implementation.bind.annotation", "metrics": {"num_classes": 97, "loc": 7068, "Ce": 20, "Ca": 3}, "dependencies": ["net.bytebuddy.dynamic", "net.bytebuddy.dynamic.scaffold", "net.bytebuddy.implementation.bytecode.assign", "net.bytebuddy.dynamic.loading", "net.bytebuddy.description.method", "net.bytebuddy.description.annotation", "net.bytebuddy.implementation", "net.bytebuddy.dynamic.scaffold.subclass", "net.bytebuddy.matcher", "net.bytebuddy.implementation.bind", "net.bytebuddy.implementation.bytecode.member", "net.bytebuddy.description.field", "net.bytebuddy.description.type", "net.bytebuddy.description.modifier", "net.bytebuddy.utility", "net.bytebuddy.implementation.bytecode", "net.bytebuddy.implementation.bytecode.constant", "net.bytebuddy.implementation.auxiliary", "net.bytebuddy.implementation.bytecode.collection", "net.bytebuddy.build"]}]}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+"package": "[package_name]",
+"detection": false,
+"justification": "[Reasons for the detection result, citing the elements that justify the decision]"
+}
+```

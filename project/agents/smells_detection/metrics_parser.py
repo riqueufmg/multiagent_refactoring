@@ -111,7 +111,7 @@ class MetricsParser:
                 afferent[target_pkg] += 1
         return dict(afferent)
 
-    @staticmethod
+    '''@staticmethod
     def attach_dependencies(packages, package_dependencies, class_dependencies):
         package_index = {pkg["package"]: pkg for pkg in packages}
         valid_classes = {f'{pkg["package"]}.{cls["class"]}' for pkg in packages for cls in pkg["classes"]}
@@ -124,6 +124,35 @@ class MetricsParser:
                 package_index[source_pkg]["metrics"]["Ce"] = len(deps)
 
         afferent_coupling = MetricsParser.calculate_afferent_coupling(package_dependencies)
+
+        for pkg_name, pkg in package_index.items():
+            pkg["metrics"]["Ca"] = afferent_coupling.get(pkg_name, 0)
+
+        for pkg in packages:
+            for cls_obj in pkg["classes"]:
+                class_name = f'{pkg["package"]}.{cls_obj["class"]}'
+                raw_deps = class_dependencies.get(class_name, [])
+                cls_obj["dependencies"] = [dep for dep in raw_deps if dep in valid_classes]
+
+        return packages'''
+    
+    @staticmethod
+    def attach_dependencies(packages, package_dependencies, class_dependencies):
+        package_index = {pkg["package"]: pkg for pkg in packages}
+        
+        valid_classes = {f'{pkg["package"]}.{cls["class"]}' for pkg in packages for cls in pkg["classes"]}
+
+        for source_pkg, targets in package_dependencies.items():
+            if source_pkg in package_index:
+                valid_targets = [t for t in targets if t in package_index]  # somente pacotes válidos
+                package_index[source_pkg]["dependencies"] = valid_targets
+                package_index[source_pkg]["metrics"]["Ce"] = len(valid_targets)
+
+        afferent_coupling = defaultdict(int)
+        for source_pkg, targets in package_dependencies.items():
+            for target_pkg in targets:
+                if target_pkg in package_index and source_pkg in package_index:
+                    afferent_coupling[target_pkg] += 1
 
         for pkg_name, pkg in package_index.items():
             pkg["metrics"]["Ca"] = afferent_coupling.get(pkg_name, 0)
