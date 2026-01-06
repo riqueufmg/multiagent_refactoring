@@ -2,10 +2,9 @@
 
 You are a software engineering expert in software refactoring.
 
-Your task is to detect the smell: God Component
+Your task is to detect the smell: {SMELL_NAME}
 
-Definition:
-God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+Definition: {SMELL_DEFINITION}
 
 # Constraints
 
@@ -29,9 +28,19 @@ Provide the output in this structure:
 
 ```json
 {
-    "smell": "God Component",
+    "smell": "{SMELL_NAME}",
     "package": [package name],
     "detection": [true/false],
     "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
+
+# Unsucessfull Output
+
+If the available data are insufficient to detect this smell, return:
+
+```json
+{
+    "message": "It is impossible to detect {SMELL_NAME} with the available data."
 }
 ```

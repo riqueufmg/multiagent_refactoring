@@ -8,7 +8,7 @@ class OpenRouterEngine:
     def __init__(
         self,
         model: str,
-        max_input_tokens: int = 200_000,
+        max_input_tokens: int = 100_000,
         max_output_tokens: int = 4096,
         temperature: float = 0.2
     ):

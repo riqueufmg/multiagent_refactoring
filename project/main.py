@@ -11,53 +11,61 @@ def main():
 
     ## TODO: create a csv file with all projects and loop over it
     projects_list = [
+        #{
+        #    "project_name": "byte-buddy",
+        #    "classes_path": "data/repositories/byte-buddy/byte-buddy-agent/target;data/repositories/byte-buddy/byte-buddy-android/target;data/repositories/byte-buddy/byte-buddy-android-test/target;data/repositories/byte-buddy/byte-buddy-benchmark/target;data/repositories/byte-buddy/byte-buddy-dep/target;data/repositories/byte-buddy/byte-buddy-gradle-plugin/target;data/repositories/byte-buddy/byte-buddy-maven-plugin/target"
+        #},
+        #{
+        #    "project_name": "commons-io",
+        #    "classes_path": "data/repositories/commons-io/target"
+        #},
         {
-            "project_name": "jsoup",
-            "classes_path": "data/repositories/jsoup/target/classes"
+            "project_name": "commons-lang",
+            "classes_path": "data/repositories/commons-lang/target"
         },
+        #{
+        #    "project_name": "google-java-format",
+        #    "classes_path": "data/repositories/google-java-format/core/target"
+        #},
         {
-            "project_name": "zxing",
-            "classes_path": "data/repositories/zxing/target;data/repositories/zxing/core/target;data/repositories/zxing/javase/target"
+            "project_name": "gson",
+            "classes_path": "data/repositories/gson/metrics/target;data/repositories/gson/test-jpms/target;data/repositories/gson/test-graal-native-image/target;data/repositories/gson/gson/target;data/repositories/gson/extras/target;data/repositories/gson/test-shrinker/target;data/repositories/gson/target;data/repositories/gson/proto/target"
         },
-        {
-            "project_name": "byte-buddy",
-            "classes_path": "data/repositories/byte-buddy/byte-buddy-agent/target;data/repositories/byte-buddy/byte-buddy-android/target;data/repositories/byte-buddy/byte-buddy-android-test/target;data/repositories/byte-buddy/byte-buddy-benchmark/target;data/repositories/byte-buddy/byte-buddy-dep/target;data/repositories/byte-buddy/byte-buddy-gradle-plugin/target;data/repositories/byte-buddy/byte-buddy-maven-plugin/target"
-        },
-        {
-            "project_name": "google-java-format",
-            "classes_path": "data/repositories/google-java-format/core/target"
-        },
-        {
-            "project_name": "jimfs",
-            "classes_path": "data/repositories/jimfs/jimfs/target"
-        },
-        {
-            "project_name": "jitwatch",
-            "classes_path": "data/repositories/jitwatch/core/target;data/repositories/jitwatch/ui/target"
-        },
-        {
-            "project_name": "commons-io",
-            "classes_path": "data/repositories/commons-io/target"
-        },
-        {
-            "project_name": "javaparser",
-            "classes_path": "data/repositories/javaparser/javaparser-core/target;data/repositories/javaparser/javaparser-core-generators/target;data/repositories/javaparser/javaparser-core-metamodel-generator/target;data/repositories/javaparser/javaparser-core-serialization/target;data/repositories/javaparser/javaparser-core-testing/target;data/repositories/javaparser/javaparser-core-testing-bdd/target;data/repositories/javaparser/javaparser-symbol-solver-core/target;data/repositories/javaparser/javaparser-symbol-solver-testing/target;"
-        },
+        #{
+        #    "project_name": "jsoup",
+        #    "classes_path": "data/repositories/jsoup/target/classes"
+        #},
+        #{
+        #    "project_name": "javaparser",
+        #    "classes_path": "data/repositories/javaparser/javaparser-core/target;data/repositories/javaparser/javaparser-core-generators/target;data/repositories/javaparser/javaparser-core-metamodel-generator/target;data/repositories/javaparser/javaparser-core-serialization/target;data/repositories/javaparser/javaparser-core-testing/target;data/repositories/javaparser/javaparser-core-testing-bdd/target;data/repositories/javaparser/javaparser-symbol-solver-core/target;data/repositories/javaparser/javaparser-symbol-solver-testing/target;"
+        #},
+        #{
+        #    "project_name": "jimfs",
+        #    "classes_path": "data/repositories/jimfs/jimfs/target"
+        #},
+        #{
+        #    "project_name": "jitwatch",
+        #    "classes_path": "data/repositories/jitwatch/core/target;data/repositories/jitwatch/ui/target"
+        #},
+        #{
+        #    "project_name": "zxing",
+        #    "classes_path": "data/repositories/zxing/target;data/repositories/zxing/core/target;data/repositories/zxing/javase/target"
+        #},
     ]
 
     smells_list = [
-        #{
-        #    "smell_name": "God Component",
-        #    "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
-        #},
-        #{
-        #    "smell_name": "Insufficient Modularization",
-        #    "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
-        #},
-        #{
-        #    "smell_name": "Unstable Dependency",
-        #    "smell_definition": "This smell occurs when a package depends on other packages that are less stable than itself, violating the Stable Dependencies Principle."
-        #},
+        {
+            "smell_name": "God Component",
+            "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
+        },
+        {
+            "smell_name": "Unstable Dependency",
+            "smell_definition": "This smell occurs when a package depends on other packages that are less stable than itself, violating the Stable Dependencies Principle."
+        },
+        {
+            "smell_name": "Insufficient Modularization",
+            "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
+        },
     ]
     
     ## Loop over projects
@@ -71,7 +79,6 @@ def main():
 
         ## Loop over smells
         for smell in smells_list:
-            break
             # 3. Generate Prompts
             list_of_prompt_files = detector.generate_prompts(**smell)
 
@@ -81,16 +88,16 @@ def main():
         ## 5. Consolidate results
 
         ## 5.1 God Component
-        #consolidator = GodComponentComparison(project_data['project_name'])
-        #output_file = consolidator.consolidate_llm_outputs(project_data["project_name"])
-        #output_file = consolidator.consolidate_designite_outputs(project_data["project_name"])
-        #print(f"Consolidated file created at: {output_file}")
+        consolidator = GodComponentComparison(project_data['project_name'])
+        output_file = consolidator.consolidate_llm_outputs(project_data["project_name"])
+        output_file = consolidator.consolidate_designite_outputs(project_data["project_name"])
+        print(f"Consolidated file created at: {output_file}")
 
-        #llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/godcomponent_llm.json"
-        #designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/godcomponent_designite.json"
+        llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/godcomponent_llm.json"
+        designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/godcomponent_designite.json"
 
-        #output_file = consolidator.generate_metrics_file(llm_file, designite_file)
-        #print(f"Metrics file created at: {output_file}")
+        output_file = consolidator.generate_metrics_file(llm_file, designite_file)
+        print(f"Metrics file created at: {output_file}")
 
         ## 5.2 Unstable Dependency
         ud_consolidator = UnstableDependencyComparison(project_data['project_name'])
@@ -105,16 +112,16 @@ def main():
         print(f"Metrics file created at: {output_file}")
         
         ## 5.3 Insufficient Modularization
-        #im_consolidator = InsufficientModularizationComparison(project_data['project_name'])
-        #output_file = im_consolidator.consolidate_llm_outputs()
-        #output_file = im_consolidator.consolidate_designite_outputs(project_data["project_name"])
-        #print(f"Consolidated file created at: {output_file}")
+        im_consolidator = InsufficientModularizationComparison(project_data['project_name'])
+        output_file = im_consolidator.consolidate_llm_outputs()
+        output_file = im_consolidator.consolidate_designite_outputs(project_data["project_name"])
+        print(f"Consolidated file created at: {output_file}")
 
-        #llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/insufficient_modularization/insufficient_modularization_llm.json"
-        #designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/insufficient_modularization/insufficient_modularization_designite.json"
+        llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/insufficient_modularization/insufficient_modularization_llm.json"
+        designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/insufficient_modularization/insufficient_modularization_designite.json"
 
-        #output_file = im_consolidator.generate_metrics_file(llm_file, designite_file)
-        #print(f"Metrics file created at: {output_file}")
+        output_file = im_consolidator.generate_metrics_file(llm_file, designite_file)
+        print(f"Metrics file created at: {output_file}")
 
 if __name__ == "__main__":
     main()
