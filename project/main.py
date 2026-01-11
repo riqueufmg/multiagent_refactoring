@@ -4,6 +4,7 @@ from agents.detecting_agent import DetectingAgent
 from utils.god_component_comparison import GodComponentComparison
 from utils.unstable_dependency import UnstableDependencyComparison
 from utils.insufficient_modularization import InsufficientModularizationComparison
+from utils.hublike_modularization import HublikeModularizationComparison
 
 def main():
 
@@ -97,48 +98,31 @@ def main():
             for engine in engines:
                 detector.detect(smell["smell_name"], list_of_prompt_files, engine)
 
-        ## 5. Consolidate results
-
-        ## 5.1 God Component
+        smell_classes_map = {
+            "God Component": GodComponentComparison,
+            "Unstable Dependency": UnstableDependencyComparison,
+            "Insufficient Modularization": InsufficientModularizationComparison,
+            "Hublike Modularization": HublikeModularizationComparison,
+        }
 
         for engine in engines:
-            consolidator = GodComponentComparison(project_data['project_name'], engine)
-            output_file = consolidator.consolidate_llm_outputs(project_data["project_name"])
-            output_file = consolidator.consolidate_designite_outputs(project_data["project_name"])
-            print(f"Consolidated file created at: {output_file}")
+            for smell in smells_list:
+                smell_name = smell["smell_name"]
+                SmellClass = smell_classes_map[smell_name]
+                consolidator = SmellClass(project_data['project_name'], engine)
 
-            llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/{engine}/godcomponent_llm.json"
-            designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/{engine}/godcomponent_designite.json"
+                # Consolidação LLM e Designite
+                llm_file = consolidator.consolidate_llm_outputs(project_data['project_name'])
+                designite_file = consolidator.consolidate_designite_outputs(project_data['project_name'])
+                print(f"[{smell_name}][{engine}] Consolidated file created at: {llm_file}")
 
-            output_file = consolidator.generate_metrics_file(llm_file, designite_file)
-            print(f"Metrics file created at: {output_file}")
+                # Ajusta caminhos finais com engine
+                base_path = f"data/processed/consolidated_detection/{project_data['project_name']}/{smell_name.lower().replace(' ', '_')}/{engine}"
+                llm_file_path = f"{base_path}/{smell_name.lower().replace(' ', '_')}_llm.json"
+                designite_file_path = f"{base_path}/{smell_name.lower().replace(' ', '_')}_designite.json"
 
-        ## 5.2 Unstable Dependency
-        ud_consolidator = UnstableDependencyComparison(project_data['project_name'])
-        output_file = ud_consolidator.consolidate_llm_outputs(project_data["project_name"])
-        output_file = ud_consolidator.consolidate_designite_outputs(project_data["project_name"])
-        print(f"Consolidated file created at: {output_file}")
-
-        llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/unstable_dependency/unstable_dependency_llm.json"
-        designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/unstable_dependency/unstable_dependency_designite.json"
-
-        output_file = ud_consolidator.generate_metrics_file(llm_file, designite_file)
-        print(f"Metrics file created at: {output_file}")
-        
-        ## 5.3 Insufficient Modularization
-        im_consolidator = InsufficientModularizationComparison(project_data['project_name'])
-        output_file = im_consolidator.consolidate_llm_outputs()
-        output_file = im_consolidator.consolidate_designite_outputs(project_data["project_name"])
-        print(f"Consolidated file created at: {output_file}")
-
-        llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/insufficient_modularization/insufficient_modularization_llm.json"
-        designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/insufficient_modularization/insufficient_modularization_designite.json"
-
-        output_file = im_consolidator.generate_metrics_file(llm_file, designite_file)
-        print(f"Metrics file created at: {output_file}")
-
-        ## 5.4 Hub-like Modularization
-        
+                metrics_file = consolidator.generate_metrics_file(llm_file_path, designite_file_path)
+                print(f"[{smell_name}][{engine}] Metrics file created at: {metrics_file}")
 
 if __name__ == "__main__":
     main()

@@ -42,7 +42,7 @@ class GodComponentComparison:
             / self.engine
         )
         output_dir.mkdir(parents=True, exist_ok=True)
-        output_file = output_dir / "godcomponent_llm.json"
+        output_file = output_dir / "god_component_llm.json"
 
         if not project_path.exists():
             raise FileNotFoundError(f"Path not found: {project_path}")
@@ -83,7 +83,7 @@ class GodComponentComparison:
             / self.engine
         )
         output_dir.mkdir(parents=True, exist_ok=True)
-        output_file = output_dir / "godcomponent_designite.json"
+        output_file = output_dir / "god_component_designite.json"
 
         if not csv_file.exists():
             raise FileNotFoundError(f"File not found: {csv_file}")

@@ -4,8 +4,9 @@ import re
 from pathlib import Path
 
 class HublikeModularizationComparison:
-    def __init__(self, project_name, base_path="data/processed/"):
+    def __init__(self, project_name, engine, base_path="data/processed/"):
         self.project_name = project_name
+        self.engine = engine
         self.base_path = Path(base_path)
 
     def safe_load_json(self, text: str):
@@ -23,10 +24,10 @@ class HublikeModularizationComparison:
 
         return None
 
-    def consolidate_llm_outputs(self):
-        project_path = self.base_path / "llm_outputs" / self.project_name / "hublike_modularization"
+    def consolidate_llm_outputs(self, project_name: str):
+        project_path = self.base_path / "llm_outputs" / project_name / "hublike_modularization" / self.engine
 
-        output_dir = self.base_path / "consolidated_detection" / self.project_name / "hublike_modularization"
+        output_dir = self.base_path / "consolidated_detection" / project_name / "hublike_modularization" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "hublike_modularization_llm.json"
 
@@ -60,9 +61,9 @@ class HublikeModularizationComparison:
 
         return output_file
 
-    def consolidate_designite_outputs(self, project_name: str, base_path="data/processed/"):
-        csv_file = Path(base_path) / "metrics" / project_name / "DesignSmells.csv"
-        output_dir = Path(base_path) / "consolidated_detection" / project_name / "hublike_modularization"
+    def consolidate_designite_outputs(self, project_name: str):
+        csv_file = self.base_path / "metrics" / project_name / "DesignSmells.csv"
+        output_dir = self.base_path / "consolidated_detection" / project_name / "hublike_modularization" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "hublike_modularization_designite.json"
 
@@ -153,7 +154,7 @@ class HublikeModularizationComparison:
             }
         }
 
-        output_dir = self.base_path / "consolidated_detection" / self.project_name / "hublike_modularization"
+        output_dir = self.base_path / "consolidated_detection" / self.project_name / "hublike_modularization" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "hublike_modularization_metrics.json"
 

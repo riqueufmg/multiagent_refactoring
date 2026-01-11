@@ -3,10 +3,10 @@ import csv
 import re
 from pathlib import Path
 
-
 class InsufficientModularizationComparison:
-    def __init__(self, project_name, base_path="data/processed/"):
+    def __init__(self, project_name, engine, base_path="data/processed/"):
         self.project_name = project_name
+        self.engine = engine
         self.base_path = Path(base_path)
 
     def safe_load_json(self, text: str):
@@ -24,19 +24,21 @@ class InsufficientModularizationComparison:
 
         return None
 
-    def consolidate_llm_outputs(self):
+    def consolidate_llm_outputs(self, project_name: str):
         project_path = (
             self.base_path
             / "llm_outputs"
-            / self.project_name
+            / project_name
             / "insufficient_modularization"
+            / self.engine
         )
 
         output_dir = (
             self.base_path
             / "consolidated_detection"
-            / self.project_name
+            / project_name
             / "insufficient_modularization"
+            / self.engine
         )
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "insufficient_modularization_llm.json"
@@ -60,7 +62,6 @@ class InsufficientModularizationComparison:
                 continue
 
             cls_full_name = content.get("class")
-
             consolidated.append({
                 "identifier": cls_full_name,
                 "detection": content.get("detection"),
@@ -79,6 +80,7 @@ class InsufficientModularizationComparison:
             / "consolidated_detection"
             / project_name
             / "insufficient_modularization"
+            / self.engine
         )
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "insufficient_modularization_designite.json"
@@ -87,7 +89,6 @@ class InsufficientModularizationComparison:
             raise FileNotFoundError(f"File not found: {csv_file}")
 
         temp_dict = {}
-
         with open(csv_file, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -95,7 +96,6 @@ class InsufficientModularizationComparison:
                     pkg = row.get("Package")
                     cls_name = row.get("Class")
                     identifier = f"{pkg}.{cls_name}"
-
                     if identifier not in temp_dict:
                         temp_dict[identifier] = {
                             "identifier": identifier,
@@ -152,7 +152,6 @@ class InsufficientModularizationComparison:
 
     def generate_metrics_file(self, llm_file: str, designite_file: str):
         confusion_matrix = self.compute_confusion_matrix(llm_file, designite_file)
-
         TP = confusion_matrix["TP"]
         TN = confusion_matrix["TN"]
         FP = confusion_matrix["FP"]
@@ -178,6 +177,7 @@ class InsufficientModularizationComparison:
             / "consolidated_detection"
             / self.project_name
             / "insufficient_modularization"
+            / self.engine
         )
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "insufficient_modularization_metrics.json"

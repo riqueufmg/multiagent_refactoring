@@ -3,10 +3,10 @@ import csv
 import re
 from pathlib import Path
 
-
 class UnstableDependencyComparison:
-    def __init__(self, project_name, base_path="data/processed/"):
+    def __init__(self, project_name, engine, base_path="data/processed/"):
         self.project_name = project_name
+        self.engine = engine
         self.base_path = Path(base_path)
 
     def safe_load_json(self, text: str):
@@ -25,9 +25,9 @@ class UnstableDependencyComparison:
         return None
 
     def consolidate_llm_outputs(self, project_name: str):
-        project_path = self.base_path / "llm_outputs" / project_name / "unstable_dependency"
+        project_path = self.base_path / "llm_outputs" / project_name / "unstable_dependency" / self.engine
 
-        output_dir = self.base_path / "consolidated_detection" / project_name / "unstable_dependency"
+        output_dir = self.base_path / "consolidated_detection" / project_name / "unstable_dependency" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "unstable_dependency_llm.json"
 
@@ -60,9 +60,9 @@ class UnstableDependencyComparison:
 
         return output_file
 
-    def consolidate_designite_outputs(self, project_name: str, base_path="data/processed/"):
-        csv_file = Path(base_path) / "metrics" / project_name / "ArchitectureSmells.csv"
-        output_dir = Path(base_path) / "consolidated_detection" / project_name / "unstable_dependency"
+    def consolidate_designite_outputs(self, project_name: str):
+        csv_file = self.base_path / "metrics" / project_name / "ArchitectureSmells.csv"
+        output_dir = self.base_path / "consolidated_detection" / project_name / "unstable_dependency" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "unstable_dependency_designite.json"
 
@@ -97,13 +97,9 @@ class UnstableDependencyComparison:
         for entry in data:
             detected = entry.get("detection", False)
             pkg = entry.get("package")
-
             if isinstance(pkg, list):
-                if len(pkg) == 1:
-                    package_dict[pkg[0]] = detected
-                else:
-                    for p in pkg:
-                        package_dict[p] = detected
+                for p in pkg:
+                    package_dict[p] = detected
             else:
                 package_dict[pkg] = detected
 
@@ -159,7 +155,7 @@ class UnstableDependencyComparison:
             }
         }
 
-        output_dir = self.base_path / "consolidated_detection" / self.project_name / "unstable_dependency"
+        output_dir = self.base_path / "consolidated_detection" / self.project_name / "unstable_dependency" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "unstable_dependency_metrics.json"
 
