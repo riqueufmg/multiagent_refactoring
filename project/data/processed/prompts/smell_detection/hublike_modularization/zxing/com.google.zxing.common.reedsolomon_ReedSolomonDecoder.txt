@@ -1,0 +1,141 @@
+##CONTEXT_SIZE=1186
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.common.reedsolomon",
+    "class": "ReedSolomonDecoder",
+    "dependencies": [
+      "com.google.zxing.common.reedsolomon.GenericGFPoly",
+      "com.google.zxing.common.reedsolomon.GenericGF",
+      "com.google.zxing.common.reedsolomon.ReedSolomonException"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.common.reedsolomon",
+      "class": "GenericGFPoly",
+      "dependencies": [
+        "com.google.zxing.common.reedsolomon.GenericGF"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common.reedsolomon",
+      "class": "GenericGF",
+      "dependencies": [
+        "com.google.zxing.common.reedsolomon.GenericGFPoly"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common.reedsolomon",
+      "class": "ReedSolomonException",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.maxicode.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.maxicode.decoder.BitMatrixParser",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.maxicode.decoder.DecodedBitStreamParser",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.qrcode.decoder.DataBlock",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.qrcode.decoder.BitMatrixParser",
+        "com.google.zxing.qrcode.decoder.Version",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder",
+        "com.google.zxing.qrcode.decoder.DecodedBitStreamParser"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.datamatrix.decoder.BitMatrixParser",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.datamatrix.decoder.Version",
+        "com.google.zxing.datamatrix.decoder.DecodedBitStreamParser",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder",
+        "com.google.zxing.datamatrix.decoder.DataBlock"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec.detector",
+      "class": "Detector",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.aztec.detector.Detector.CorrectedParameter",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.GridSampler",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.aztec.detector.Detector.Point",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.common.CharacterSetECI",
+        "com.google.zxing.aztec.AztecDetectorResult",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.aztec.decoder.Decoder.Table",
+        "com.google.zxing.aztec.decoder.Decoder.CorrectedBitsResult",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

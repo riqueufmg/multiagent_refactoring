@@ -5,7 +5,7 @@ You are a software engineering expert in software refactoring.
 Your task is to detect the smell: Unstable Dependency.
 
 Definition:
-This smell arises when a component depends on other less stable components. Stable Dependencies Principle states that the dependencies between packages should be in the direction of the stability of packages. Hence, a package should only depend on packages that are more stable than itself. An unstable dependency architecture smell occurs when this principle is not followed.
+Unstable Dependency arises when a component depends on other less stable components. Stable Dependencies Principle states that the dependencies between packages should be in the direction of the stability of packages. Hence, a package should only depend on packages that are more stable than itself. An unstable dependency architecture smell occurs when this principle is not followed.
 
 # Constraints
 

@@ -1,0 +1,65 @@
+##CONTEXT_SIZE=434
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.maxicode.decoder",
+    "class": "BitMatrixParser",
+    "dependencies": [
+      "com.google.zxing.common.BitMatrix"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.common",
+      "class": "BitMatrix",
+      "dependencies": [
+        "com.google.zxing.common.BitArray"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.maxicode.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.maxicode.decoder.BitMatrixParser",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.maxicode.decoder.DecodedBitStreamParser",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

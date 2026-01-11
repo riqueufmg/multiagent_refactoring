@@ -1,0 +1,235 @@
+##CONTEXT_SIZE=2054
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.loading",
+    "class": "PackageDefinitionStrategy",
+    "dependencies": [
+      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Trivial",
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.NonSealing",
+      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.SealBaseLocator",
+      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Undefined",
+      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Definition"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "PackageDefinitionStrategy.Trivial",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "PackageDefinitionStrategy.NonSealing",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "PackageDefinitionStrategy.SealBaseLocator",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "PackageDefinitionStrategy.Undefined",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "PackageDefinitionStrategy.Definition",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ByteArrayClassLoader",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.SynchronizationStrategy",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.Initializable",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.CreationAction",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.EmptyEnumeration",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.ForLegacyVm",
+        "net.bytebuddy.utility.GraalImageCode",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.PersistenceHandler",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassFilePostProcessor",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.PackageLookupStrategy",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.Dispatcher",
+        "net.bytebuddy.ClassFileVersion"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ByteArrayClassLoader.ClassDefinitionAction",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ByteArrayClassLoader.ChildFirst",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.dynamic.loading.ClassFilePostProcessor",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassLoadingStrategy",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.WrappingDispatcher",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Configurable"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassLoadingStrategy.Default",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassLoadingStrategy.InjectionDispatcher",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassLoadingStrategy.WrappingDispatcher",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassInjector",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.ClassInjector.AccessResolver",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Windows32BitFunctionMapper",
+        "net.bytebuddy.dynamic.loading.ClassInjector.UsingUnsafe",
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Lookup",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Initializable",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Default",
+        "net.bytebuddy.dynamic.loading.ClassInjector.CreationAction",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ClassInjector.MethodHandles",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Dispatcher",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.dynamic.loading.ClassInjector.System",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Jvm",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Target",
+        "net.bytebuddy.dynamic.ClassFileLocator"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassInjector.UsingReflection",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

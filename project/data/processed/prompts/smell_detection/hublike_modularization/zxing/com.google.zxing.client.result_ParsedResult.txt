@@ -1,0 +1,220 @@
+##CONTEXT_SIZE=1667
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.result",
+    "class": "ParsedResult",
+    "dependencies": [
+      "com.google.zxing.client.result.ParsedResultType"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ParsedResultType",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.j2se",
+      "class": "DecodeWorker",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.LuminanceSource",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.multi.MultipleBarcodeReader",
+        "com.google.zxing.client.j2se.BufferedImageLuminanceSource",
+        "com.google.zxing.client.j2se.ImageReader",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.client.j2se.DecoderConfig",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.MultiFormatReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ProductResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ResultHandlerFactory",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.result.ResultHandler",
+        "com.google.zxing.client.android.CaptureActivity",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.ResultParser"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "EmailAddressResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.EmailAddressParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "TextResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "GeoResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.GeoParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ISBNResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.ISBNParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ResultHandler",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.android.PreferencesActivity",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.client.android.LocaleManager"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "URIResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.LocaleManager",
+        "com.google.zxing.client.result.URIParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "SMSResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.SMSParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "AddressBookResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.AddressBookParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "TelResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.TelParsedResult",
+        "com.google.zxing.client.result.ParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "WifiResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.android.CaptureActivity",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.WifiParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "CalendarResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.CalendarParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result.supplement",
+      "class": "SupplementalInfoRetriever",
+      "dependencies": [
+        "com.google.zxing.client.android.result.supplement.ProductResultInfoRetriever",
+        "com.google.zxing.client.android.result.supplement.BookResultInfoRetriever",
+        "com.google.zxing.client.android.result.supplement.TitleRetriever",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.ProductParsedResult",
+        "com.google.zxing.client.android.history.HistoryManager",
+        "com.google.zxing.client.android.result.supplement.URIResultInfoRetriever"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.encode",
+      "class": "QRCodeEncoder",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.encode.ContactEncoder",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

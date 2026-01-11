@@ -1,0 +1,66 @@
+##CONTEXT_SIZE=625
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.resolution.typeinference",
+    "class": "BoundSet.Processor",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference",
+      "class": "BoundSet",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.constraintformulas.TypeSameAsType",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariable",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.BoundSet.Processor",
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.bounds.SameAsBound",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.ConstraintFormulaSet",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.BoundSet.VariableDependency",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.constraintformulas.TypeSubtypeOfType",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.Instantiation",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InstantiationSet",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.bounds.SubtypeOfBound",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.bounds.CapturesBound",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.TypeHelper",
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.Bound",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.Substitution",
+        "com.github.javaparser.utils.Pair"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

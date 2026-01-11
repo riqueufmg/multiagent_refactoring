@@ -1,0 +1,141 @@
+##CONTEXT_SIZE=905
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.result",
+    "class": "ParsedResultType",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "GeoParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "VINParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "TelParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "TextParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ExpandedProductParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "EmailAddressParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ProductParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "SMSParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "WifiParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "URIParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.client.result.URIResultParser",
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ISBNParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "CalendarParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "AddressBookParsedResult",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResultType"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

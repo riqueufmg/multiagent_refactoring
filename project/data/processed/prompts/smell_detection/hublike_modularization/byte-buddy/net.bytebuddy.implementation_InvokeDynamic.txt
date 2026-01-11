@@ -1,0 +1,698 @@
+##CONTEXT_SIZE=6753
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.implementation",
+    "class": "InvokeDynamic",
+    "dependencies": [
+      "net.bytebuddy.description.method.ParameterDescription",
+      "net.bytebuddy.dynamic.scaffold.FieldLocator",
+      "net.bytebuddy.implementation.InvokeDynamic.ForInterceptedMethod",
+      "net.bytebuddy.implementation.InvokeDynamic.InvocationProvider",
+      "net.bytebuddy.description.enumeration.EnumerationDescription",
+      "net.bytebuddy.implementation.InvokeDynamic.ForField",
+      "net.bytebuddy.matcher.ElementMatchers",
+      "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+      "net.bytebuddy.dynamic.scaffold.MethodGraph",
+      "net.bytebuddy.implementation.InvokeDynamic.ForInterceptedMethodParameters",
+      "net.bytebuddy.description.type.TypeDescription",
+      "net.bytebuddy.utility.JavaConstant",
+      "net.bytebuddy.implementation.bytecode.constant.NullConstant",
+      "net.bytebuddy.implementation.InvokeDynamic.NameProvider",
+      "net.bytebuddy.implementation.Implementation",
+      "net.bytebuddy.implementation.InvokeDynamic.ForInterceptedMethodInstanceAndParameters",
+      "net.bytebuddy.implementation.InvokeDynamic.Resolved",
+      "net.bytebuddy.implementation.InvokeDynamic.ForMethodParameter",
+      "net.bytebuddy.implementation.InvokeDynamic.Target",
+      "net.bytebuddy.description.method.MethodDescription",
+      "net.bytebuddy.utility.JavaType",
+      "net.bytebuddy.implementation.bytecode.StackManipulation",
+      "net.bytebuddy.implementation.InvokeDynamic.ReturnTypeProvider",
+      "net.bytebuddy.description.type.TypeList",
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+      "net.bytebuddy.description.method.MethodList",
+      "net.bytebuddy.implementation.InvokeDynamic.TerminationHandler",
+      "net.bytebuddy.description.annotation.AnnotationValue",
+      "net.bytebuddy.description.field.FieldDescription",
+      "net.bytebuddy.implementation.InvokeDynamic.ArgumentProvider",
+      "net.bytebuddy.implementation.InvokeDynamic.WithImplicitArguments",
+      "net.bytebuddy.utility.ConstantValue",
+      "net.bytebuddy.description.type.TypeDefinition",
+      "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+      "net.bytebuddy.implementation.InvokeDynamic.WithImplicitTarget",
+      "net.bytebuddy.implementation.bytecode.assign.Assigner",
+      "net.bytebuddy.implementation.InvokeDynamic.WithImplicitType"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "ParameterDescription",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.ParameterDescription.InGenericShape",
+        "net.bytebuddy.description.method.ParameterDescription.InDefinedShape",
+        "net.bytebuddy.description.method.ParameterDescription.ParameterAnnotationSource",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.ParameterDescription.Parameter",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.method.ParameterDescription.Token",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.ParameterList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "FieldLocator",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.FieldLocator.Resolution",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.FieldLocator.Illegal",
+        "net.bytebuddy.description.field.FieldList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ForInterceptedMethod",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.InvocationProvider",
+      "dependencies": [
+        "net.bytebuddy.dynamic.scaffold.FieldLocator",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.bytecode.constant.NullConstant",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.ConstantValue",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.JavaConstant"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.enumeration",
+      "class": "EnumerationDescription",
+      "dependencies": [
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ForField",
+      "dependencies": [
+        "net.bytebuddy.dynamic.scaffold.FieldLocator",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.matcher",
+      "class": "ElementMatchers",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.matcher.MethodSortMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.matcher.CachingMatcher",
+        "net.bytebuddy.matcher.ModifierMatcher",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.matcher.StringMatcher",
+        "net.bytebuddy.matcher.BooleanMatcher",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.matcher.NullMatcher",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "InstrumentedType",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.dynamic.TargetType",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType.Default",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.implementation.LoadedTypeInitializer",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.type.TypeVariableToken",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType.Factory",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.annotation.AnnotationList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "MethodGraph",
+      "dependencies": [
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJVMMethod",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonizer",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJavaMethod",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.NodeList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Node",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Empty",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Compiler",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Detached",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Directional",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Resolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonized",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Entry",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Sort",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Linked",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Merger",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Unresolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Key",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ForInterceptedMethodParameters",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeDescription",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeDescription.AnnotationStripper",
+        "net.bytebuddy.dynamic.TargetType",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedParameterizedType",
+        "net.bytebuddy.description.type.TypeDescription.RenderingDelegate",
+        "net.bytebuddy.description.type.TypeDescription.ForTypeVariableBoundType",
+        "net.bytebuddy.description.type.TypeDescription.FormalTypeVariable",
+        "net.bytebuddy.description.type.TypeDescription.AnnotationReader",
+        "net.bytebuddy.description.type.TypeDescription.Builder",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.description.type.TypeDescription.OfTypeVariable",
+        "net.bytebuddy.description.annotation.AnnotationSource",
+        "net.bytebuddy.description.type.TypeDescription.Delegator",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.description.type.TypeDescription.NoOp",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.type.TypeDescription.Assigner",
+        "net.bytebuddy.description.type.TypeDescription.OfGenericArray",
+        "net.bytebuddy.description.type.TypeDescription.LazyProjection",
+        "net.bytebuddy.description.type.TypeDescription.Reifying",
+        "net.bytebuddy.description.type.TypeDescription.Substitutor",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription.Dispatcher",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.type.TypeDescription.AbstractBase",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDescription.ForLoadedRecordComponent",
+        "net.bytebuddy.description.type.TypeDescription.ParameterAssigner",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedWildcardType",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.type.TypeDescription.Visitor",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.type.TypeDescription.Simple",
+        "net.bytebuddy.utility.FieldComparator",
+        "net.bytebuddy.description.type.TypeDescription.Generic",
+        "net.bytebuddy.description.type.TypeDescription.TypeErasing",
+        "net.bytebuddy.description.type.TypeDescription.WithLazyNavigation",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.type.TypeDescription.OfParameterizedType",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedTypeVariable",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.type.TypeDescription.ClassLoadingDelegate",
+        "net.bytebuddy.description.type.TypeDescription.OfWildcardType",
+        "net.bytebuddy.description.type.TypeDescription.ForLoadedType",
+        "net.bytebuddy.description.type.TypeDescription.OfNonGenericType",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeDescription.WithEagerNavigation",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedType",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "JavaConstant",
+      "dependencies": [
+        "net.bytebuddy.utility.JavaConstant.OfTrivialValue",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.utility.JavaConstant.OfDynamicConstantDesc",
+        "net.bytebuddy.utility.JavaConstant.Dispatcher",
+        "net.bytebuddy.utility.JavaConstant.MethodType",
+        "net.bytebuddy.utility.JavaConstant.HandleType",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.JavaConstant.OfClassDesc",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaConstant.Visitor",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.utility.JavaConstant.Lookup",
+        "net.bytebuddy.utility.JavaConstant.OfMethodTypeDesc",
+        "net.bytebuddy.utility.JavaConstant.OfDirectMethodHandleDesc",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.utility.JavaConstant.MethodHandle",
+        "net.bytebuddy.utility.JavaConstant.OfMethodHandleDesc",
+        "net.bytebuddy.utility.JavaConstant.Simple",
+        "net.bytebuddy.utility.JavaConstant.MethodHandles",
+        "net.bytebuddy.utility.JavaConstant.MethodHandleInfo",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.utility.JavaConstant.ForKind"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode.constant",
+      "class": "NullConstant",
+      "dependencies": [
+        "net.bytebuddy.implementation.Implementation"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.NameProvider",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "Implementation",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.implementation.Implementation.SpecialMethodInvocation",
+        "net.bytebuddy.implementation.Implementation.Illegal",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.implementation.Implementation.ExtractableView",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph",
+        "net.bytebuddy.implementation.Implementation.FrameGeneration",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.implementation.Implementation.DefaultMethodInvocation",
+        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.implementation.Implementation.Target",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.Implementation.Dispatcher",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.implementation.Implementation.Composable",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.implementation.Implementation.Context",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.implementation.Implementation.Compound",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.method.ParameterList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ForInterceptedMethodInstanceAndParameters",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.Resolved",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ForMethodParameter",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.Target",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodDescription",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.description.method.MethodDescription.Executable",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.MethodDescription.InDefinedShape",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.method.MethodDescription.Token",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.method.MethodDescription.TypeToken",
+        "net.bytebuddy.description.method.ParameterList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "JavaType",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.utility.JavaType.LatentTypeWithSimpleName",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode",
+      "class": "StackManipulation",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation.Size",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.implementation.bytecode.StackManipulation.Dispatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ReturnTypeProvider",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeList",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList.OfLoadedInterfaceTypes",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.type.TypeList.Generic",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeVariableToken",
+        "net.bytebuddy.description.type.TypeList.OfConstructorExceptionTypes",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeList.OfMethodExceptionTypes",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodList",
+      "dependencies": [
+        "net.bytebuddy.utility.ConstructorComparator",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.MethodComparator",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.TerminationHandler",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.annotation",
+      "class": "AnnotationValue",
+      "dependencies": [
+        "net.bytebuddy.description.annotation.AnnotationValue.ForArrayType",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.annotation.AnnotationValue.PropertyDelegate",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.description.annotation.AnnotationValue.ForNonArrayType",
+        "net.bytebuddy.description.annotation.AnnotationValue.ForMissingType",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.description.annotation.AnnotationValue.State",
+        "net.bytebuddy.description.annotation.AnnotationValue.Loaded",
+        "net.bytebuddy.description.annotation.AnnotationValue.RenderingDispatcher",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.annotation.AnnotationValue.Sort",
+        "net.bytebuddy.description.annotation.AnnotationValue.ForIncompatibleType",
+        "net.bytebuddy.description.annotation.AnnotationValue.AbstractBase"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldDescription",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.field.FieldDescription.InDefinedShape",
+        "net.bytebuddy.description.field.FieldDescription.SignatureToken"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.ArgumentProvider",
+      "dependencies": [
+        "net.bytebuddy.dynamic.scaffold.FieldLocator",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.bytecode.constant.NullConstant",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.ConstantValue",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.JavaConstant"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.WithImplicitArguments",
+      "dependencies": [
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "ConstantValue",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.JavaConstant"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeDefinition",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeDefinition.AnnotatedType",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.description.type.TypeDefinition.Sort",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.field.FieldList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode",
+      "class": "ByteCodeAppender",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender.Size",
+        "net.bytebuddy.description.method.MethodDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.WithImplicitTarget",
+      "dependencies": [
+        "net.bytebuddy.implementation.InvokeDynamic",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode.assign",
+      "class": "Assigner",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.assign.Assigner.Typing",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.bytecode.assign.reference.GenericTypeAwareAssigner",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.bytecode.assign.reference.ReferenceTypeAwareAssigner"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.WithImplicitType",
+      "dependencies": [
+        "net.bytebuddy.dynamic.scaffold.FieldLocator",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic.WithImplicitTarget",
+      "dependencies": [
+        "net.bytebuddy.implementation.InvokeDynamic",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

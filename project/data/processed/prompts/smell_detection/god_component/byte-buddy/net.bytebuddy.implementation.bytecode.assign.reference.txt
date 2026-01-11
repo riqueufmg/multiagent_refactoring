@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "net.bytebuddy.implementation.bytecode.assign.reference", "metrics": {"num_classes": 9, "loc": 976, "Ce": 5, "Ca": 1}, "classes": [{"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "ReferenceTypeAwareAssigner", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/ReferenceTypeAwareAssigner.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 24, "wmc": 4, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.implementation.bytecode.assign.TypeCasting", "net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.implementation.bytecode.StackManipulation"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 5, "nopf": 0, "nom": 1, "nopm": 1, "loc": 360, "wmc": 4, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.description.type.TypeList", "net.bytebuddy.implementation.bytecode.StackManipulation", "net.bytebuddy.implementation.bytecode.assign.TypeCasting"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.IsAssignableToVisitor", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 5, "nopf": 0, "nom": 0, "nopm": 0, "loc": 336, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.description.type.TypeList"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.OfManifestType", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 49, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.type.TypeDescription"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.OfSimpleType", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 61, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.description.type.TypeList"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.OfGenericArray", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 36, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.OfWildcard", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 72, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.build.HashCodeAndEqualsPlugin", "net.bytebuddy.description.type.TypeDescription", "net.bytebuddy.description.type.TypeList"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.OfParameterizedType", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 19, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription"]}, {"package": "net.bytebuddy.implementation.bytecode.assign.reference", "class": "GenericTypeAwareAssigner.OfNonGenericType", "file": "data/repositories/byte-buddy/byte-buddy-dep/src/main/java/net/bytebuddy/implementation/bytecode/assign/reference/GenericTypeAwareAssigner.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 19, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["net.bytebuddy.description.type.TypeDescription"]}], "dependencies": ["net.bytebuddy.build", "net.bytebuddy.implementation.bytecode.assign", "net.bytebuddy.implementation", "net.bytebuddy.description.type", "net.bytebuddy.implementation.bytecode"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

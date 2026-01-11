@@ -1,0 +1,90 @@
+##CONTEXT_SIZE=679
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.resolution.declarations",
+    "class": "ResolvedDeclaration",
+    "dependencies": [
+      "com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration",
+      "com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration",
+      "com.github.javaparser.resolution.declarations.ResolvedEnumConstantDeclaration",
+      "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+      "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+      "com.github.javaparser.resolution.declarations.ResolvedTypePatternDeclaration"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedFieldDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedParameterDeclaration",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedEnumConstantDeclaration",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedTypeDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedInterfaceDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedEnumDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedClassDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedRecordDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedMethodDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedTypePatternDeclaration",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

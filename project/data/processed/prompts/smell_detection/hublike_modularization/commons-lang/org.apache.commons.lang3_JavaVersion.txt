@@ -1,0 +1,100 @@
+##CONTEXT_SIZE=644
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3",
+    "class": "JavaVersion",
+    "dependencies": [
+      "org.apache.commons.lang3.math.NumberUtils",
+      "org.apache.commons.lang3.RegExUtils",
+      "org.apache.commons.lang3.SystemProperties"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.lang3.math",
+      "class": "NumberUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "RegExUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "SystemProperties",
+      "dependencies": [
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.function.Suppliers"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "SystemUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.Strings",
+        "org.apache.commons.lang3.JavaVersion",
+        "org.apache.commons.lang3.SystemProperties",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "TimeZones",
+      "dependencies": [
+        "org.apache.commons.lang3.JavaVersion",
+        "org.apache.commons.lang3.SystemProperties"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "FieldUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.reflect.MemberUtils",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.JavaVersion",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.SystemUtils"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

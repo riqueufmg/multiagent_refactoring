@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.googlejavaformat.java.javadoc", "metrics": {"num_classes": 10, "loc": 888, "Ce": 0, "Ca": 1}, "classes": [{"package": "com.google.googlejavaformat.java.javadoc", "class": "JavadocFormatter", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/JavadocFormatter.java", "metrics": {"nof": 5, "nopf": 0, "nom": 8, "nopm": 1, "loc": 99, "wmc": 40, "nc": 0, "dit": 0, "lcom": 0.25, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.javadoc.JavadocLexer", "com.google.googlejavaformat.java.javadoc.Token", "com.google.googlejavaformat.java.javadoc.JavadocWriter"]}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "NestingCounter", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/NestingCounter.java", "metrics": {"nof": 1, "nopf": 0, "nom": 6, "nopm": 0, "loc": 28, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "JavadocLexer", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/JavadocLexer.java", "metrics": {"nof": 34, "nopf": 0, "nom": 18, "nopm": 0, "loc": 375, "wmc": 81, "nc": 0, "dit": 0, "lcom": 0.2777777777777778, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.javadoc.Token", "com.google.googlejavaformat.java.javadoc.JavadocLexer.LexException", "com.google.googlejavaformat.java.javadoc.NestingCounter", "com.google.googlejavaformat.java.javadoc.CharStream"]}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "JavadocLexer.LexException", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/JavadocLexer.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "Token", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/Token.java", "metrics": {"nof": 2, "nopf": 0, "nom": 5, "nopm": 1, "loc": 60, "wmc": 5, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.javadoc.Token.Type"]}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "Token.Type", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/Token.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 37, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "JavadocWriter", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/JavadocWriter.java", "metrics": {"nof": 14, "nopf": 0, "nom": 36, "nopm": 1, "loc": 247, "wmc": 50, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.javadoc.JavadocWriter.AutoIndent", "com.google.googlejavaformat.java.javadoc.Token", "com.google.googlejavaformat.java.javadoc.NestingCounter", "com.google.googlejavaformat.java.javadoc.JavadocFormatter", "com.google.googlejavaformat.java.javadoc.JavadocWriter.RequestedWhitespace"]}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "JavadocWriter.RequestedWhitespace", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/JavadocWriter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 4, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "JavadocWriter.AutoIndent", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/JavadocWriter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.java.javadoc", "class": "CharStream", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/javadoc/CharStream.java", "metrics": {"nof": 2, "nopf": 0, "nom": 5, "nopm": 0, "loc": 35, "wmc": 7, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": []}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.github.javaparser.symbolsolver.declarations.common", "metrics": {"num_classes": 1, "loc": 55, "Ce": 7, "Ca": 0}, "classes": [{"package": "com.github.javaparser.symbolsolver.declarations.common", "class": "MethodDeclarationCommonLogic", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/declarations/common/MethodDeclarationCommonLogic.java", "metrics": {"nof": 2, "nopf": 0, "nom": 5, "nopm": 2, "loc": 55, "wmc": 13, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.resolution.MethodUsage", "com.github.javaparser.resolution.logic.InferenceContext", "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration", "com.github.javaparser.resolution.types.ResolvedType", "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration", "com.github.javaparser.resolution.Context", "com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration", "com.github.javaparser.resolution.TypeSolver"]}], "dependencies": ["com.github.javaparser.resolution.declarations", "com.github.javaparser.symbolsolver.reflectionmodel", "com.github.javaparser.resolution", "com.github.javaparser.resolution.types", "com.github.javaparser.symbolsolver.core.resolution", "com.github.javaparser.resolution.logic", "com.github.javaparser.symbolsolver.logic"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

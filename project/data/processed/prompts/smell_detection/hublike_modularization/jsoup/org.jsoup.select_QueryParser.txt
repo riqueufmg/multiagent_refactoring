@@ -1,0 +1,158 @@
+##CONTEXT_SIZE=950
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.select",
+    "class": "QueryParser",
+    "dependencies": [
+      "org.jsoup.select.NodeEvaluator",
+      "org.jsoup.select.Selector",
+      "org.jsoup.select.StructuralEvaluator",
+      "org.jsoup.select.CombiningEvaluator",
+      "org.jsoup.internal.StringUtil",
+      "org.jsoup.select.Evaluator",
+      "org.jsoup.internal.Normalizer",
+      "org.jsoup.parser.TokenQueue",
+      "org.jsoup.helper.Regex",
+      "org.jsoup.helper.Validate"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.select",
+      "class": "NodeEvaluator",
+      "dependencies": [
+        "org.jsoup.helper.Regex",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.nodes.LeafNode"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "Selector",
+      "dependencies": [
+        "org.jsoup.select.Collector",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.parser.TokenQueue",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.select.QueryParser"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "StructuralEvaluator",
+      "dependencies": [
+        "org.jsoup.nodes.LeafNode",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.internal.SoftPool"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "CombiningEvaluator",
+      "dependencies": [
+        "org.jsoup.select.Evaluator"
+      ]
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "StringUtil",
+      "dependencies": [
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.internal.StringUtil.StringJoiner"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "Evaluator",
+      "dependencies": [
+        "org.jsoup.nodes.LeafNode",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.helper.Regex",
+        "org.jsoup.parser.ParseSettings"
+      ]
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "Normalizer",
+      "dependencies": [
+        "org.jsoup.nodes.Attribute",
+        "org.jsoup.nodes.Document"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "TokenQueue",
+      "dependencies": [
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.internal.StringUtil"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "Regex",
+      "dependencies": [
+        "org.jsoup.helper.Regex.Matcher",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.helper.Re2jRegex"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "Validate",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.select",
+      "class": "Selector",
+      "dependencies": [
+        "org.jsoup.select.Collector",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.parser.TokenQueue",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.select.QueryParser"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

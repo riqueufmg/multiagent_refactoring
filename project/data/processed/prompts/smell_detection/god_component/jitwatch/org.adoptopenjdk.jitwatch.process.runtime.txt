@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.process.runtime", "metrics": {"num_classes": 7, "loc": 229, "Ce": 3, "Ca": 2}, "classes": [{"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "RuntimeJRuby", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/RuntimeJRuby.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 4, "loc": 32, "wmc": 7, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "RuntimeJavaScript", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/RuntimeJavaScript.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 4, "loc": 32, "wmc": 7, "nc": 0, "dit": 2, "lcom": 0.75, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "RuntimeJava", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/RuntimeJava.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 4, "loc": 48, "wmc": 10, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "RuntimeGroovy", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/RuntimeGroovy.java", "metrics": {"nof": 3, "nopf": 0, "nom": 6, "nopm": 5, "loc": 45, "wmc": 9, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "IRuntime", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/IRuntime.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 3, "loc": 5, "wmc": 3, "nc": 6, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}, {"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "RuntimeKotlin", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/RuntimeKotlin.java", "metrics": {"nof": 3, "nopf": 0, "nom": 4, "nopm": 4, "loc": 35, "wmc": 7, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.process.compiler.CompilerKotlin", "org.adoptopenjdk.jitwatch.logger.ILogListener", "org.adoptopenjdk.jitwatch.loader.ResourceLoader"]}, {"package": "org.adoptopenjdk.jitwatch.process.runtime", "class": "RuntimeScala", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/process/runtime/RuntimeScala.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 4, "loc": 32, "wmc": 7, "nc": 0, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.logger.ILogListener"]}], "dependencies": ["org.adoptopenjdk.jitwatch.logger", "org.adoptopenjdk.jitwatch.loader", "org.adoptopenjdk.jitwatch.process.compiler"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,81 @@
+##CONTEXT_SIZE=672
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3.function",
+    "class": "FailableBooleanSupplier",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "Functions",
+      "dependencies": [
+        "org.apache.commons.lang3.Functions.FailableSupplier",
+        "org.apache.commons.lang3.Functions.FailableBiConsumer",
+        "org.apache.commons.lang3.Functions.FailableConsumer",
+        "org.apache.commons.lang3.function.FailableBooleanSupplier",
+        "org.apache.commons.lang3.Functions.FailableFunction",
+        "org.apache.commons.lang3.Functions.FailableCallable",
+        "org.apache.commons.lang3.Functions.FailableRunnable",
+        "org.apache.commons.lang3.Functions.FailablePredicate",
+        "org.apache.commons.lang3.Functions.FailableBiFunction",
+        "org.apache.commons.lang3.Functions.FailableBiPredicate"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.function",
+      "class": "Failable",
+      "dependencies": [
+        "org.apache.commons.lang3.function.FailableDoubleSupplier",
+        "org.apache.commons.lang3.function.FailableShortSupplier",
+        "org.apache.commons.lang3.function.FailableIntSupplier",
+        "org.apache.commons.lang3.function.FailableIntConsumer",
+        "org.apache.commons.lang3.function.FailableBiConsumer",
+        "org.apache.commons.lang3.function.FailableCallable",
+        "org.apache.commons.lang3.function.FailableRunnable",
+        "org.apache.commons.lang3.function.FailableBooleanSupplier",
+        "org.apache.commons.lang3.function.FailableLongSupplier",
+        "org.apache.commons.lang3.function.FailableConsumer",
+        "org.apache.commons.lang3.function.FailableLongConsumer",
+        "org.apache.commons.lang3.function.FailableDoubleConsumer",
+        "org.apache.commons.lang3.function.FailableBiFunction",
+        "org.apache.commons.lang3.function.FailableFunction",
+        "org.apache.commons.lang3.function.FailableDoubleBinaryOperator",
+        "org.apache.commons.lang3.function.FailableBiPredicate",
+        "org.apache.commons.lang3.function.FailableSupplier",
+        "org.apache.commons.lang3.function.FailablePredicate"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

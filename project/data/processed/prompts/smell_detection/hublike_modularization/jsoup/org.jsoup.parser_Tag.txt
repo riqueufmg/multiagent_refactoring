@@ -1,0 +1,279 @@
+##CONTEXT_SIZE=1814
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.parser",
+    "class": "Tag",
+    "dependencies": [
+      "org.jsoup.parser.TokeniserState",
+      "org.jsoup.parser.ParseSettings",
+      "org.jsoup.parser.TagSet"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.parser",
+      "class": "TokeniserState",
+      "dependencies": [
+        "org.jsoup.parser.Tokeniser",
+        "org.jsoup.parser.Token",
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.nodes.DocumentType"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "ParseSettings",
+      "dependencies": [
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.Attributes"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "TagSet",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.internal.SharedConstants"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Element",
+      "dependencies": [
+        "org.jsoup.nodes.Printer",
+        "org.jsoup.select.NodeVisitor",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.select.NodeFilter",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.nodes.DataNode",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.nodes.Attribute",
+        "org.jsoup.helper.Regex",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.parser.Tag",
+        "org.jsoup.nodes.CDataNode",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.parser.TokenQueue",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.select.Collector",
+        "org.jsoup.select.Nodes",
+        "org.jsoup.nodes.Element.NodeList",
+        "org.jsoup.select.Selector",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.NodeUtils",
+        "org.jsoup.nodes.TextNode"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "PseudoTextElement",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "FormElement",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.Connection",
+        "org.jsoup.Jsoup",
+        "org.jsoup.helper.Validate"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Printer",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.nodes.Entities",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.LeafNode",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.nodes.NodeUtils",
+        "org.jsoup.nodes.TextNode"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Printer.Pretty",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.nodes.Entities"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "Tokeniser",
+      "dependencies": [
+        "org.jsoup.parser.TokenData",
+        "org.jsoup.parser.Token",
+        "org.jsoup.parser.Tag",
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Entities",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.parser.TreeBuilder",
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.TokeniserState"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "HtmlTreeBuilderState",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.parser.Token",
+        "org.jsoup.nodes.DocumentType",
+        "org.jsoup.parser.HtmlTreeBuilderState.Constants",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.parser.TreeBuilder",
+        "org.jsoup.parser.HtmlTreeBuilder",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.parser.TokeniserState",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "TreeBuilder",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.parser.Token",
+        "org.jsoup.parser.TagSet",
+        "org.jsoup.select.NodeVisitor",
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.parser.Tokeniser",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "HtmlTreeBuilder",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.parser.Token",
+        "org.jsoup.nodes.CDataNode",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.parser.HtmlTreeBuilderState",
+        "org.jsoup.nodes.FormElement",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.DataNode",
+        "org.jsoup.nodes.TextNode",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.parser.TokeniserState",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "XmlTreeBuilder",
+      "dependencies": [
+        "org.jsoup.nodes.DocumentType",
+        "org.jsoup.nodes.Entities",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.DataNode",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.parser.Token",
+        "org.jsoup.parser.TagSet",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.parser.Tag",
+        "org.jsoup.nodes.CDataNode",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.nodes.LeafNode",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.XmlDeclaration",
+        "org.jsoup.nodes.TextNode",
+        "org.jsoup.parser.TokeniserState"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "TagSet",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.internal.SharedConstants"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

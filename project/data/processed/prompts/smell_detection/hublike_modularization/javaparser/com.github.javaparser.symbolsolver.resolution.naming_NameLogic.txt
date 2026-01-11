@@ -1,0 +1,177 @@
+##CONTEXT_SIZE=1558
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.resolution.naming",
+    "class": "NameLogic",
+    "dependencies": [
+      "com.github.javaparser.symbolsolver.resolution.naming.NameRole",
+      "com.github.javaparser.resolution.model.SymbolReference",
+      "com.github.javaparser.ast.expr.FieldAccessExpr",
+      "com.github.javaparser.resolution.TypeSolver",
+      "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+      "com.github.javaparser.symbolsolver.resolution.naming.NameCategory",
+      "com.github.javaparser.ast.Node",
+      "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+      "com.github.javaparser.resolution.Context",
+      "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+      "com.github.javaparser.symbolsolver.resolution.naming.NameLogic.PredicateOnParentAndChild"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.naming",
+      "class": "NameRole",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.resolution.model",
+      "class": "SymbolReference",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "FieldAccessExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.resolution.declarations.ResolvedValueDeclaration",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.FieldAccessExprMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution",
+      "class": "TypeSolver",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.UnsolvedSymbolException"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "JavaParserFactory",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.stmt.ForEachStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.naming",
+      "class": "NameCategory",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "Node",
+      "dependencies": [
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.ast.Node.ObserverRegistrationMode",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.Node.TreeTraversal",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.visitor.EqualsVisitor",
+        "com.github.javaparser.metamodel.NodeMetaModel",
+        "com.github.javaparser.ast.visitor.HashCodeVisitor",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.ast.Node.Parsedness",
+        "com.github.javaparser.ast.DataKey",
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.ast.observer.PropagatingAstObserver",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.printer.ConfigurablePrinter"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedReferenceTypeDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution",
+      "class": "Context",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.Value",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedTypeDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedInterfaceDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedEnumDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedClassDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedRecordDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.naming",
+      "class": "NameLogic.PredicateOnParentAndChild",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

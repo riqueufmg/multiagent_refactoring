@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.datamatrix", "metrics": {"num_classes": 2, "loc": 233, "Ce": 5, "Ca": 0}, "classes": [{"package": "com.google.zxing.datamatrix", "class": "DataMatrixReader", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/DataMatrixReader.java", "metrics": {"nof": 2, "nopf": 0, "nom": 5, "nopm": 3, "loc": 95, "wmc": 16, "nc": 0, "dit": 0, "lcom": 0.4, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.decoder.Decoder", "com.google.zxing.ResultPoint", "com.google.zxing.ResultMetadataType", "com.google.zxing.BarcodeFormat", "com.google.zxing.common.DetectorResult", "com.google.zxing.common.DecoderResult", "com.google.zxing.NotFoundException", "com.google.zxing.Result", "com.google.zxing.DecodeHintType", "com.google.zxing.common.BitMatrix", "com.google.zxing.BinaryBitmap"]}, {"package": "com.google.zxing.datamatrix", "class": "DataMatrixWriter", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/datamatrix/DataMatrixWriter.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 2, "loc": 138, "wmc": 25, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.datamatrix.encoder.MinimalEncoder", "com.google.zxing.qrcode.encoder.ByteMatrix", "com.google.zxing.datamatrix.encoder.SymbolShapeHint", "com.google.zxing.BarcodeFormat", "com.google.zxing.Dimension", "com.google.zxing.EncodeHintType", "com.google.zxing.datamatrix.encoder.HighLevelEncoder", "com.google.zxing.datamatrix.encoder.DefaultPlacement", "com.google.zxing.datamatrix.encoder.SymbolInfo", "com.google.zxing.datamatrix.encoder.ErrorCorrection", "com.google.zxing.common.BitMatrix"]}], "dependencies": ["com.google.zxing.datamatrix.encoder", "com.google.zxing", "com.google.zxing.common", "com.google.zxing.datamatrix.decoder", "com.google.zxing.qrcode.encoder"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

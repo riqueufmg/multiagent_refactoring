@@ -1,0 +1,329 @@
+##CONTEXT_SIZE=2625
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.matcher",
+    "class": "FilterableList",
+    "dependencies": [
+      "net.bytebuddy.matcher.ElementMatcher"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.matcher",
+      "class": "ElementMatcher",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.SafeVarargsPlugin"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "MethodGraph",
+      "dependencies": [
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJVMMethod",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonizer",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJavaMethod",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.NodeList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Node",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Empty",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Compiler",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Detached",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Directional",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Resolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonized",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Entry",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Sort",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Linked",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Merger",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Unresolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Key",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "MethodGraph.NodeList",
+      "dependencies": [
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "RecordComponentList",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "RecordComponentList.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "RecordComponentList.Empty",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.RecordComponentDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeList",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList.OfLoadedInterfaceTypes",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.type.TypeList.Generic",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeVariableToken",
+        "net.bytebuddy.description.type.TypeList.OfConstructorExceptionTypes",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeList.OfMethodExceptionTypes",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeList.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeList.Empty",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeList.Generic",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeVariableToken",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.annotation",
+      "class": "AnnotationList",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.annotation",
+      "class": "AnnotationList.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.annotation",
+      "class": "AnnotationList.Empty",
+      "dependencies": [
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ByteCodeElement",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ByteCodeElement.Token",
+      "dependencies": [
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ByteCodeElement.TokenList",
+      "dependencies": [
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldList",
+      "dependencies": [
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldList.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldList.Empty",
+      "dependencies": [
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodList",
+      "dependencies": [
+        "net.bytebuddy.utility.ConstructorComparator",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.MethodComparator",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodList.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodList.Empty",
+      "dependencies": [
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "ParameterList",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.method.ParameterList.Executable",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "ParameterList.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "ParameterList.Empty",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,151 @@
+##CONTEXT_SIZE=1359
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.ui.triview",
+    "class": "Viewer",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.util.ParseUtil",
+      "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+      "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+      "org.adoptopenjdk.jitwatch.model.IMetaMember",
+      "org.adoptopenjdk.jitwatch.util.StringUtil",
+      "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+      "org.adoptopenjdk.jitwatch.ui.triview.NoOpLineListener"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.util",
+      "class": "ParseUtil",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.model.PackageManager",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.util.ClassUtil",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview",
+      "class": "ILineListener",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener.LineType"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.main",
+      "class": "IStageAccessProxy",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "IMetaMember",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.util",
+      "class": "StringUtil",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.core",
+      "class": "JITWatchConfig",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.model.ParsedClasspath",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.CompressedOops",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.BackgroundCompilation",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.TieredCompilation",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.OnStackReplacement"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview",
+      "class": "NoOpLineListener",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.viewer",
+      "class": "AbstractTextViewerStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "org.adoptopenjdk.jitwatch.ui.triview.Viewer",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.viewer",
+      "class": "JournalViewerStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.ui.triview.Viewer"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview",
+      "class": "TriViewPane",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.TriView",
+        "org.adoptopenjdk.jitwatch.ui.triview.Viewer",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview",
+      "class": "InstructionLabel",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.Viewer"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

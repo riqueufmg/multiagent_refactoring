@@ -1,0 +1,106 @@
+##CONTEXT_SIZE=800
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.pdf417.decoder",
+    "class": "DetectionResult",
+    "dependencies": [
+      "com.google.zxing.pdf417.decoder.DetectionResultColumn",
+      "com.google.zxing.pdf417.PDF417Common",
+      "com.google.zxing.pdf417.decoder.BarcodeMetadata",
+      "com.google.zxing.pdf417.decoder.BoundingBox",
+      "com.google.zxing.pdf417.decoder.Codeword"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "DetectionResultColumn",
+      "dependencies": [
+        "com.google.zxing.pdf417.decoder.BoundingBox",
+        "com.google.zxing.pdf417.decoder.Codeword"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417",
+      "class": "PDF417Common",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "BarcodeMetadata",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "BoundingBox",
+      "dependencies": [
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "Codeword",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "PDF417ScanningDecoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.pdf417.decoder.DetectionResultColumn",
+        "com.google.zxing.pdf417.decoder.BarcodeValue",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.pdf417.PDF417Common",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.pdf417.decoder.DecodedBitStreamParser",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn",
+        "com.google.zxing.pdf417.decoder.BarcodeMetadata",
+        "com.google.zxing.pdf417.decoder.ec.ErrorCorrection",
+        "com.google.zxing.pdf417.decoder.BoundingBox",
+        "com.google.zxing.pdf417.decoder.PDF417CodewordDecoder",
+        "com.google.zxing.pdf417.decoder.DetectionResult",
+        "com.google.zxing.pdf417.decoder.Codeword"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,303 @@
+##CONTEXT_SIZE=2190
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson",
+    "class": "GsonBuilder",
+    "dependencies": [
+      "com.google.gson.ReflectionAccessFilter",
+      "com.google.gson.LongSerializationPolicy",
+      "com.google.gson.TypeAdapterFactory",
+      "com.google.gson.internal.sql.SqlTypesSupport",
+      "com.google.gson.FieldNamingStrategy",
+      "com.google.gson.ToNumberStrategy",
+      "com.google.gson.FormattingStyle",
+      "com.google.gson.FieldNamingPolicy",
+      "com.google.gson.internal.bind.TreeTypeAdapter",
+      "com.google.gson.Strictness",
+      "com.google.gson.internal.Excluder",
+      "com.google.gson.reflect.TypeToken",
+      "com.google.gson.internal.bind.DefaultDateTypeAdapter",
+      "com.google.gson.ExclusionStrategy",
+      "com.google.gson.Gson"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.gson",
+      "class": "ReflectionAccessFilter",
+      "dependencies": [
+        "com.google.gson.ReflectionAccessFilter.FilterResult",
+        "com.google.gson.internal.ReflectionAccessFilterHelper"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "LongSerializationPolicy",
+      "dependencies": [
+        "com.google.gson.JsonElement",
+        "com.google.gson.JsonNull"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "TypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.sql",
+      "class": "SqlTypesSupport",
+      "dependencies": [
+        "com.google.gson.internal.sql.SqlTimestampTypeAdapter",
+        "com.google.gson.internal.sql.SqlTimeTypeAdapter",
+        "com.google.gson.internal.sql.SqlDateTypeAdapter",
+        "com.google.gson.TypeAdapterFactory"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "FieldNamingStrategy",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.gson",
+      "class": "ToNumberStrategy",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "FormattingStyle",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.gson",
+      "class": "FieldNamingPolicy",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "TreeTypeAdapter",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.internal.bind.TreeTypeAdapter.GsonContextImpl",
+        "com.google.gson.JsonDeserializer",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.JsonElement",
+        "com.google.gson.JsonSerializer",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "Strictness",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.gson.internal",
+      "class": "Excluder",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.FieldAttributes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.reflect.ReflectionHelper",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.ExclusionStrategy",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.google.gson.reflect",
+      "class": "TypeToken",
+      "dependencies": [
+        "com.google.gson.internal.TroubleshootingGuide",
+        "com.google.gson.internal.GsonTypes"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "DefaultDateTypeAdapter",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.Gson",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.internal.JavaVersion",
+        "com.google.gson.internal.bind.util.ISO8601Utils",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.internal.bind.DefaultDateTypeAdapter.DateType",
+        "com.google.gson.internal.PreJava9DateFormatProvider",
+        "com.google.gson.TypeAdapter"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "ExclusionStrategy",
+      "dependencies": [
+        "com.google.gson.FieldAttributes"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "Gson",
+      "dependencies": [
+        "com.google.gson.internal.bind.ArrayTypeAdapter",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.internal.bind.NumberTypeAdapter",
+        "com.google.gson.internal.bind.TypeAdapters",
+        "com.google.gson.internal.GsonBuildConfig",
+        "com.google.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory",
+        "com.google.gson.JsonElement",
+        "com.google.gson.internal.bind.JsonTreeWriter",
+        "com.google.gson.JsonIOException",
+        "com.google.gson.FieldNamingPolicy",
+        "com.google.gson.internal.sql.SqlTypesSupport",
+        "com.google.gson.FieldNamingStrategy",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.ToNumberPolicy",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.GsonBuilder",
+        "com.google.gson.ToNumberStrategy",
+        "com.google.gson.Strictness",
+        "com.google.gson.internal.Excluder",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.JsonSyntaxException",
+        "com.google.gson.internal.bind.ObjectTypeAdapter",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.bind.DefaultDateTypeAdapter",
+        "com.google.gson.LongSerializationPolicy",
+        "com.google.gson.Gson.FutureTypeAdapter",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.FormattingStyle",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.JsonNull"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.gson",
+      "class": "Gson",
+      "dependencies": [
+        "com.google.gson.internal.bind.ArrayTypeAdapter",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.internal.bind.NumberTypeAdapter",
+        "com.google.gson.internal.bind.TypeAdapters",
+        "com.google.gson.internal.GsonBuildConfig",
+        "com.google.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory",
+        "com.google.gson.JsonElement",
+        "com.google.gson.internal.bind.JsonTreeWriter",
+        "com.google.gson.JsonIOException",
+        "com.google.gson.FieldNamingPolicy",
+        "com.google.gson.internal.sql.SqlTypesSupport",
+        "com.google.gson.FieldNamingStrategy",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.ToNumberPolicy",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.GsonBuilder",
+        "com.google.gson.ToNumberStrategy",
+        "com.google.gson.Strictness",
+        "com.google.gson.internal.Excluder",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.JsonSyntaxException",
+        "com.google.gson.internal.bind.ObjectTypeAdapter",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.bind.DefaultDateTypeAdapter",
+        "com.google.gson.LongSerializationPolicy",
+        "com.google.gson.Gson.FutureTypeAdapter",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.FormattingStyle",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.JsonNull"
+      ]
+    },
+    {
+      "package": "com.google.gson.graph",
+      "class": "GraphAdapterBuilder",
+      "dependencies": [
+        "com.google.gson.GsonBuilder",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.graph.GraphAdapterBuilder.Element",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.InstanceCreator",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.graph.GraphAdapterBuilder.Factory",
+        "com.google.gson.JsonElement",
+        "com.google.gson.TypeAdapter"
+      ]
+    },
+    {
+      "package": "com.example",
+      "class": "NoSerializedNameMain",
+      "dependencies": [
+        "com.google.gson.GsonBuilder",
+        "com.example.NoSerializedNameMain.TestClassHasArgsConstructor",
+        "com.example.NoSerializedNameMain.TestClassNoArgsConstructor",
+        "com.example.NoSerializedNameMain.TestClassNotAbstract",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.example",
+      "class": "Main",
+      "dependencies": [
+        "com.example.ClassWithNamedFields",
+        "com.google.gson.GsonBuilder",
+        "com.example.ClassWithNoArgsConstructor",
+        "com.example.ClassWithSerializedName",
+        "com.example.ClassWithHasArgsConstructor",
+        "com.example.InterfaceWithImplementation",
+        "com.example.ClassWithUnreferencedHasArgsConstructor",
+        "com.example.EnumClass",
+        "com.example.TestExecutor",
+        "com.example.EnumClassWithSerializedName",
+        "com.google.gson.reflect.TypeToken",
+        "com.example.ClassWithUnreferencedNoArgsConstructor",
+        "com.google.gson.Gson"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,632 @@
+##CONTEXT_SIZE=5528
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.utils",
+    "class": "SourceRoot",
+    "dependencies": [
+      "com.github.javaparser.ParserConfiguration",
+      "com.github.javaparser.utils.CodeGenerationUtils",
+      "com.github.javaparser.utils.SourceRoot.VisitFileCallback",
+      "com.github.javaparser.utils.SourceRoot.Callback",
+      "com.github.javaparser.ast.CompilationUnit",
+      "com.github.javaparser.JavaParser",
+      "com.github.javaparser.utils.SourceRoot.ParallelParse",
+      "com.github.javaparser.utils.Log",
+      "com.github.javaparser.ParseResult"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser",
+      "class": "ParserConfiguration",
+      "dependencies": [
+        "com.github.javaparser.LineEndingProcessingProvider",
+        "com.github.javaparser.ast.validator.Validator",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ParserConfiguration.LanguageLevel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ParseResult",
+        "com.github.javaparser.Providers",
+        "com.github.javaparser.ast.validator.postprocessors.PostProcessors",
+        "com.github.javaparser.UnicodeEscapeProcessingProvider"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "CodeGenerationUtils",
+      "dependencies": [
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "SourceRoot.VisitFileCallback",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "SourceRoot.Callback",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "CompilationUnit",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.ast.body.AnnotationDeclaration",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.CompilationUnit.Storage",
+        "com.github.javaparser.utils.ClassUtils",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ParseStart",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.metamodel.CompilationUnitMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "JavaParser",
+      "dependencies": [
+        "com.github.javaparser.ParserConfiguration",
+        "com.github.javaparser.Provider",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.ast.stmt.Statement",
+        "com.github.javaparser.CommentsInserter",
+        "com.github.javaparser.ast.comments.LineComment",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.GeneratedJavaParser",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.comments.CommentsCollection",
+        "com.github.javaparser.ast.body.BodyDeclaration",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ParseException",
+        "com.github.javaparser.ParseStart",
+        "com.github.javaparser.Providers",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.ParseResult"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "SourceRoot.ParallelParse",
+      "dependencies": [
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "Log",
+      "dependencies": [
+        "com.github.javaparser.utils.Log.Adapter"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "ParseResult",
+      "dependencies": [
+        "com.github.javaparser.ast.comments.CommentsCollection",
+        "com.github.javaparser.Problem",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "SourceRoot.ParallelParse",
+      "dependencies": [
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "demo",
+      "class": "Main",
+      "dependencies": [
+        "com.github.javaparser.utils.ParserCollectionStrategy",
+        "com.github.javaparser.utils.ProjectRoot",
+        "demo.Main.Callback",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "demo",
+      "class": "Main.Callback",
+      "dependencies": [
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.metamodel",
+      "class": "MetaModelGenerator",
+      "dependencies": [
+        "com.github.javaparser.ParserConfiguration",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.printer.configuration.DefaultConfigurationOption",
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.printer.DefaultPrettyPrinter",
+        "com.github.javaparser.printer.configuration.DefaultPrinterConfiguration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.generator.metamodel.NodeMetaModelGenerator",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.metamodel",
+      "class": "NodeMetaModelGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.utils.CodeGenerationUtils",
+        "com.github.javaparser.generator.metamodel.InitializePropertyMetaModelsStatementsGenerator",
+        "com.github.javaparser.generator.metamodel.MetaModelGenerator",
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.ast.body.ConstructorDeclaration",
+        "com.github.javaparser.ast.body.BodyDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.generator.metamodel.InitializeConstructorParametersStatementsGenerator",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.generator.metamodel.AstTypeAnalysis",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator",
+      "class": "AbstractGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.stmt.Statement",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.CallableDeclaration",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.utils.SourceRoot",
+        "com.github.javaparser.ParseResult"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator",
+      "class": "CompilationUnitGenerator",
+      "dependencies": [
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator",
+      "class": "Generator",
+      "dependencies": [
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.CallableDeclaration",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator",
+      "class": "NodeGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator",
+      "class": "VisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core",
+      "class": "CoreGenerator",
+      "dependencies": [
+        "com.github.javaparser.ParserConfiguration",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.utils.Log",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "NoCommentEqualsVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "GenericVisitorWithDefaultsGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "ObjectIdentityHashCodeVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "ModifierVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.utils.SeparatedItemStringBuilder",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.PropertyMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "HashCodeVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.utils.SeparatedItemStringBuilder",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "VoidVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "GenericListVisitorAdapterGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "VoidVisitorAdapterGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "GenericVisitorAdapterGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "GenericVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "NoCommentHashCodeVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.utils.SeparatedItemStringBuilder",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "CloneVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.utils.SeparatedItemStringBuilder",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "VoidVisitorWithDefaultsGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "ObjectIdentityEqualsVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.visitor",
+      "class": "EqualsVisitorGenerator",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.quality",
+      "class": "NotNullGenerator",
+      "dependencies": [
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.body.ConstructorDeclaration",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.utils.SourceRoot",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "NodeModifierGenerator",
+      "dependencies": [
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.utils.SourceRoot",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "RemoveMethodGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.PropertyMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "AcceptGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "PropertyGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.body.EnumConstantDeclaration",
+        "com.github.javaparser.generator.core.utils.CodeUtils",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.PropertyMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "TypeCastingGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "MainConstructorGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.body.ConstructorDeclaration",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.utils.SeparatedItemStringBuilder",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "CloneGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "GetMetaModelGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.node",
+      "class": "ReplaceMethodGenerator",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.metamodel.PropertyMetaModel",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.other",
+      "class": "BndGenerator",
+      "dependencies": [
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.generator.core.other",
+      "class": "TokenKindGenerator",
+      "dependencies": [
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.expr.IntegerLiteralExpr",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.EnumConstantDeclaration",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.ast.stmt.SwitchEntry",
+        "com.github.javaparser.utils.SourceRoot"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

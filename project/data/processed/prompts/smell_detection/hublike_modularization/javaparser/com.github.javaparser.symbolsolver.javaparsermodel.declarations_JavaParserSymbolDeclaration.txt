@@ -1,0 +1,527 @@
+##CONTEXT_SIZE=5672
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarations",
+    "class": "JavaParserSymbolDeclaration",
+    "dependencies": [
+      "com.github.javaparser.ast.body.Parameter",
+      "com.github.javaparser.resolution.Navigator",
+      "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserTypePatternDeclaration",
+      "com.github.javaparser.resolution.TypeSolver",
+      "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration",
+      "com.github.javaparser.ast.expr.TypePatternExpr",
+      "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserParameterDeclaration",
+      "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+      "com.github.javaparser.ast.Node",
+      "com.github.javaparser.ast.body.VariableDeclarator",
+      "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+      "com.github.javaparser.ast.expr.MethodCallExpr",
+      "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "Parameter",
+      "dependencies": [
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.ParameterMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution",
+      "class": "Navigator",
+      "dependencies": [
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.body.ConstructorDeclaration",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.ast.stmt.ReturnStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarations",
+      "class": "JavaParserTypePatternDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution",
+      "class": "TypeSolver",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.UnsolvedSymbolException"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarations",
+      "class": "JavaParserVariableDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "TypePatternExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.TypePatternExprMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarations",
+      "class": "JavaParserParameterDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.resolution.types.ResolvedArrayType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "JavaParserFactory",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.stmt.ForEachStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "Node",
+      "dependencies": [
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.ast.Node.ObserverRegistrationMode",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.Node.TreeTraversal",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.visitor.EqualsVisitor",
+        "com.github.javaparser.metamodel.NodeMetaModel",
+        "com.github.javaparser.ast.visitor.HashCodeVisitor",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.ast.Node.Parsedness",
+        "com.github.javaparser.ast.DataKey",
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.ast.observer.PropagatingAstObserver",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.printer.ConfigurablePrinter"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "VariableDeclarator",
+      "dependencies": [
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.nodeTypes.NodeWithVariables",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.resolution.declarations.ResolvedValueDeclaration",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.VariableDeclaratorMetaModel",
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "JavaParserFacade",
+      "dependencies": [
+        "com.github.javaparser.ast.body.ConstructorDeclaration",
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserEnumDeclaration",
+        "com.github.javaparser.symbolsolver.JavaSymbolSolver",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.resolution.SymbolSolver",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.resolution.Solver",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.expr.ThisExpr",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserAnonymousClassDeclaration",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.ast.body.AnnotationDeclaration",
+        "com.github.javaparser.ast.expr.BinaryExpr",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.TypeExtractor",
+        "com.github.javaparser.ast.expr.TypeExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.FailureHandler",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.resolution.logic.ConstructorResolutionLogic",
+        "com.github.javaparser.resolution.model.LambdaArgumentTypePlaceholder",
+        "com.github.javaparser.ast.expr.ObjectCreationExpr",
+        "com.github.javaparser.resolution.MethodUsage",
+        "com.github.javaparser.ast.DataKey",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.resolution.logic.MethodResolutionLogic",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.type.VoidType",
+        "com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration",
+        "com.github.javaparser.ast.type.WildcardType",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserTypeVariableDeclaration",
+        "com.github.javaparser.ast.expr.MethodReferenceExpr",
+        "com.github.javaparser.ast.type.PrimitiveType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "MethodCallExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.metamodel.MethodCallExprMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarations",
+      "class": "JavaParserFieldDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.body.EnumConstantDeclaration",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "TypeExtractor",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.promotion.ConditionalExprResolver",
+        "com.github.javaparser.resolution.promotion.ConditionalExprHandler",
+        "com.github.javaparser.ast.expr.NullLiteralExpr",
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.resolution.logic.FunctionalInterfaceLogic",
+        "com.github.javaparser.resolution.types.ResolvedVoidType",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.expr.LongLiteralExpr",
+        "com.github.javaparser.symbolsolver.resolution.SymbolSolver",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.ast.expr.AssignExpr",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.LeastUpperBoundLogic",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.resolution.Solver",
+        "com.github.javaparser.resolution.logic.InferenceContext",
+        "com.github.javaparser.ast.expr.IntegerLiteralExpr",
+        "com.github.javaparser.ast.expr.DoubleLiteralExpr",
+        "com.github.javaparser.ast.expr.BooleanLiteralExpr",
+        "com.github.javaparser.ast.expr.ThisExpr",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.expr.CastExpr",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+        "com.github.javaparser.ast.expr.BinaryExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.resolution.model.typesystem.NullType",
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.ast.expr.CharLiteralExpr",
+        "com.github.javaparser.ast.expr.InstanceOfExpr",
+        "com.github.javaparser.ast.expr.ArrayAccessExpr",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.expr.TypeExpr",
+        "com.github.javaparser.ast.expr.SuperExpr",
+        "com.github.javaparser.resolution.model.typesystem.LazyType",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.expr.ArrayCreationExpr",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.expr.ConditionalExpr",
+        "com.github.javaparser.ast.expr.EnclosedExpr",
+        "com.github.javaparser.ast.expr.ClassExpr",
+        "com.github.javaparser.ast.expr.ObjectCreationExpr",
+        "com.github.javaparser.resolution.MethodUsage",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.ast.expr.StringLiteralExpr",
+        "com.github.javaparser.resolution.logic.MethodResolutionLogic",
+        "com.github.javaparser.ast.type.VoidType",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.resolution.types.ResolvedPrimitiveType",
+        "com.github.javaparser.ast.expr.TextBlockLiteralExpr",
+        "com.github.javaparser.ast.expr.MethodReferenceExpr",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.resolution.types.ResolvedArrayType",
+        "com.github.javaparser.ast.type.PrimitiveType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarators",
+      "class": "ParameterSymbolDeclarator",
+      "dependencies": [
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarators",
+      "class": "FieldSymbolDeclarator",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.resolution.TypeSolver"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarators",
+      "class": "TypePatternSymbolDeclarator",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.resolution.TypeSolver"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarators",
+      "class": "VariableSymbolDeclarator",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.resolution.TypeSolver"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "InstanceOfExprContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.ast.expr.InstanceOfExpr",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserTypePatternDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "ForEachStatementContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.StatementContext",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.stmt.ForEachStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "BlockStmtContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "TryWithResourceContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedValueDeclaration",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.StatementContext",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.stmt.TryStmt",
+        "com.github.javaparser.resolution.model.Value"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "ForStatementContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.StatementContext",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "AbstractJavaParserContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.MethodUsage",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserTypePatternDeclaration"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

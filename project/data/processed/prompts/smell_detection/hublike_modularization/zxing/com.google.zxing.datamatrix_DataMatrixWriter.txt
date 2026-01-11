@@ -1,0 +1,128 @@
+##CONTEXT_SIZE=917
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.datamatrix",
+    "class": "DataMatrixWriter",
+    "dependencies": [
+      "com.google.zxing.qrcode.encoder.ByteMatrix",
+      "com.google.zxing.datamatrix.encoder.MinimalEncoder",
+      "com.google.zxing.common.BitMatrix",
+      "com.google.zxing.BarcodeFormat",
+      "com.google.zxing.Dimension",
+      "com.google.zxing.datamatrix.encoder.SymbolInfo",
+      "com.google.zxing.datamatrix.encoder.ErrorCorrection",
+      "com.google.zxing.datamatrix.encoder.DefaultPlacement",
+      "com.google.zxing.datamatrix.encoder.SymbolShapeHint",
+      "com.google.zxing.datamatrix.encoder.HighLevelEncoder",
+      "com.google.zxing.EncodeHintType"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.qrcode.encoder",
+      "class": "ByteMatrix",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.datamatrix.encoder",
+      "class": "MinimalEncoder",
+      "dependencies": [
+        "com.google.zxing.datamatrix.encoder.MinimalEncoder.Mode",
+        "com.google.zxing.datamatrix.encoder.MinimalEncoder.Input",
+        "com.google.zxing.datamatrix.encoder.SymbolShapeHint",
+        "com.google.zxing.datamatrix.encoder.HighLevelEncoder",
+        "com.google.zxing.datamatrix.encoder.MinimalEncoder.Result",
+        "com.google.zxing.datamatrix.encoder.MinimalEncoder.Edge"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common",
+      "class": "BitMatrix",
+      "dependencies": [
+        "com.google.zxing.common.BitArray"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "BarcodeFormat",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "Dimension",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.datamatrix.encoder",
+      "class": "SymbolInfo",
+      "dependencies": [
+        "com.google.zxing.datamatrix.encoder.SymbolShapeHint",
+        "com.google.zxing.Dimension"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix.encoder",
+      "class": "ErrorCorrection",
+      "dependencies": [
+        "com.google.zxing.datamatrix.encoder.SymbolInfo"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix.encoder",
+      "class": "DefaultPlacement",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.datamatrix.encoder",
+      "class": "SymbolShapeHint",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.datamatrix.encoder",
+      "class": "HighLevelEncoder",
+      "dependencies": [
+        "com.google.zxing.datamatrix.encoder.EncoderContext",
+        "com.google.zxing.Dimension",
+        "com.google.zxing.datamatrix.encoder.Encoder",
+        "com.google.zxing.datamatrix.encoder.C40Encoder",
+        "com.google.zxing.datamatrix.encoder.SymbolShapeHint"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "EncodeHintType",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

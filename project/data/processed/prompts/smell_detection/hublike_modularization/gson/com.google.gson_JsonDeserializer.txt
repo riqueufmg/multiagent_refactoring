@@ -1,0 +1,112 @@
+##CONTEXT_SIZE=722
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson",
+    "class": "JsonDeserializer",
+    "dependencies": [
+      "com.google.gson.JsonElement",
+      "com.google.gson.JsonDeserializationContext",
+      "com.google.gson.JsonParseException"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.gson",
+      "class": "JsonElement",
+      "dependencies": [
+        "com.google.gson.JsonArray",
+        "com.google.gson.JsonNull",
+        "com.google.gson.JsonObject",
+        "com.google.gson.Strictness",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.JsonPrimitive"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "JsonDeserializationContext",
+      "dependencies": [
+        "com.google.gson.JsonElement",
+        "com.google.gson.JsonParseException"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "JsonParseException",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "TreeTypeAdapter",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.internal.bind.TreeTypeAdapter.GsonContextImpl",
+        "com.google.gson.JsonDeserializer",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.JsonElement",
+        "com.google.gson.JsonSerializer",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "TreeTypeAdapter.SingleTypeFactory",
+      "dependencies": [
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.JsonDeserializer",
+        "com.google.gson.JsonSerializer"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "JsonAdapterAnnotationTypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.JsonDeserializer",
+        "com.google.gson.Gson",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.internal.bind.TreeTypeAdapter",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.JsonSerializer",
+        "com.google.gson.TypeAdapter"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,83 @@
+##CONTEXT_SIZE=549
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.android.book",
+    "class": "SearchBookContentsActivity",
+    "dependencies": [
+      "com.google.zxing.client.android.HttpHelper",
+      "com.google.zxing.client.android.Intents",
+      "com.google.zxing.client.android.book.SearchBookContentsActivity.NetworkTask",
+      "com.google.zxing.client.android.LocaleManager"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "HttpHelper",
+      "dependencies": [
+        "com.google.zxing.client.android.HttpHelper.ContentType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "Intents",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.client.android.book",
+      "class": "SearchBookContentsActivity.NetworkTask",
+      "dependencies": [
+        "com.google.zxing.client.android.HttpHelper"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "LocaleManager",
+      "dependencies": [
+        "com.google.zxing.client.android.PreferencesActivity"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.android.book",
+      "class": "BrowseBookListener",
+      "dependencies": [
+        "com.google.zxing.client.android.book.SearchBookContentsActivity",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.client.android.LocaleManager",
+        "com.google.zxing.client.android.book.SearchBookContentsResult"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

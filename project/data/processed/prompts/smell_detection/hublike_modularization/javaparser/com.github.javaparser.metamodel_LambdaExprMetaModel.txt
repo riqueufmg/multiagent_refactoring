@@ -1,0 +1,204 @@
+##CONTEXT_SIZE=2262
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.metamodel",
+    "class": "LambdaExprMetaModel",
+    "dependencies": [
+      "com.github.javaparser.metamodel.PropertyMetaModel"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.metamodel",
+      "class": "PropertyMetaModel",
+      "dependencies": [
+        "com.github.javaparser.utils.CodeGenerationUtils",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.Node"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "LambdaExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.LambdaExprMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.metamodel",
+      "class": "JavaParserMetaModel",
+      "dependencies": [
+        "com.github.javaparser.metamodel.CastExprMetaModel",
+        "com.github.javaparser.metamodel.MethodReferenceExprMetaModel",
+        "com.github.javaparser.metamodel.EmptyStmtMetaModel",
+        "com.github.javaparser.metamodel.ModuleDeclarationMetaModel",
+        "com.github.javaparser.metamodel.ContinueStmtMetaModel",
+        "com.github.javaparser.metamodel.FieldAccessExprMetaModel",
+        "com.github.javaparser.metamodel.CommentMetaModel",
+        "com.github.javaparser.metamodel.CompactConstructorDeclarationMetaModel",
+        "com.github.javaparser.metamodel.RecordPatternExprMetaModel",
+        "com.github.javaparser.metamodel.NameMetaModel",
+        "com.github.javaparser.metamodel.TypePatternExprMetaModel",
+        "com.github.javaparser.metamodel.UnionTypeMetaModel",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.metamodel.NormalAnnotationExprMetaModel",
+        "com.github.javaparser.metamodel.LineCommentMetaModel",
+        "com.github.javaparser.metamodel.InitializerDeclarationMetaModel",
+        "com.github.javaparser.metamodel.SwitchExprMetaModel",
+        "com.github.javaparser.metamodel.AssertStmtMetaModel",
+        "com.github.javaparser.metamodel.TypeExprMetaModel",
+        "com.github.javaparser.metamodel.TypeDeclarationMetaModel",
+        "com.github.javaparser.ast.expr.BinaryExpr",
+        "com.github.javaparser.metamodel.WhileStmtMetaModel",
+        "com.github.javaparser.metamodel.ModifierMetaModel",
+        "com.github.javaparser.metamodel.PackageDeclarationMetaModel",
+        "com.github.javaparser.metamodel.AnnotationDeclarationMetaModel",
+        "com.github.javaparser.metamodel.UnparsableStmtMetaModel",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.metamodel.JavadocCommentMetaModel",
+        "com.github.javaparser.metamodel.LambdaExprMetaModel",
+        "com.github.javaparser.metamodel.MemberValuePairMetaModel",
+        "com.github.javaparser.metamodel.LocalClassDeclarationStmtMetaModel",
+        "com.github.javaparser.metamodel.BreakStmtMetaModel",
+        "com.github.javaparser.ast.stmt.SwitchEntry",
+        "com.github.javaparser.metamodel.LocalRecordDeclarationStmtMetaModel",
+        "com.github.javaparser.metamodel.TypeMetaModel",
+        "com.github.javaparser.metamodel.ThisExprMetaModel",
+        "com.github.javaparser.metamodel.VoidTypeMetaModel",
+        "com.github.javaparser.metamodel.MarkdownCommentMetaModel",
+        "com.github.javaparser.metamodel.MarkerAnnotationExprMetaModel",
+        "com.github.javaparser.metamodel.DoubleLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.ModuleExportsDirectiveMetaModel",
+        "com.github.javaparser.metamodel.UnaryExprMetaModel",
+        "com.github.javaparser.metamodel.CompilationUnitMetaModel",
+        "com.github.javaparser.ast.expr.AssignExpr",
+        "com.github.javaparser.metamodel.ConstructorDeclarationMetaModel",
+        "com.github.javaparser.metamodel.ModuleUsesDirectiveMetaModel",
+        "com.github.javaparser.metamodel.ComponentPatternExprMetaModel",
+        "com.github.javaparser.metamodel.IfStmtMetaModel",
+        "com.github.javaparser.metamodel.ConditionalExprMetaModel",
+        "com.github.javaparser.metamodel.PropertyMetaModel",
+        "com.github.javaparser.metamodel.ExpressionMetaModel",
+        "com.github.javaparser.metamodel.ArrayInitializerExprMetaModel",
+        "com.github.javaparser.metamodel.ThrowStmtMetaModel",
+        "com.github.javaparser.metamodel.CatchClauseMetaModel",
+        "com.github.javaparser.metamodel.ObjectCreationExprMetaModel",
+        "com.github.javaparser.metamodel.ForEachStmtMetaModel",
+        "com.github.javaparser.metamodel.IntegerLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.ModuleDirectiveMetaModel",
+        "com.github.javaparser.metamodel.SwitchEntryMetaModel",
+        "com.github.javaparser.metamodel.PatternExprMetaModel",
+        "com.github.javaparser.metamodel.WildcardTypeMetaModel",
+        "com.github.javaparser.metamodel.BlockCommentMetaModel",
+        "com.github.javaparser.metamodel.SuperExprMetaModel",
+        "com.github.javaparser.metamodel.StatementMetaModel",
+        "com.github.javaparser.metamodel.UnknownTypeMetaModel",
+        "com.github.javaparser.metamodel.ParameterMetaModel",
+        "com.github.javaparser.metamodel.MethodDeclarationMetaModel",
+        "com.github.javaparser.metamodel.ModuleOpensDirectiveMetaModel",
+        "com.github.javaparser.metamodel.PrimitiveTypeMetaModel",
+        "com.github.javaparser.metamodel.ArrayAccessExprMetaModel",
+        "com.github.javaparser.metamodel.ArrayCreationExprMetaModel",
+        "com.github.javaparser.metamodel.ClassOrInterfaceDeclarationMetaModel",
+        "com.github.javaparser.metamodel.InstanceOfExprMetaModel",
+        "com.github.javaparser.metamodel.ArrayTypeMetaModel",
+        "com.github.javaparser.metamodel.SingleMemberAnnotationExprMetaModel",
+        "com.github.javaparser.metamodel.AnnotationMemberDeclarationMetaModel",
+        "com.github.javaparser.metamodel.SimpleNameMetaModel",
+        "com.github.javaparser.metamodel.LiteralStringValueExprMetaModel",
+        "com.github.javaparser.metamodel.YieldStmtMetaModel",
+        "com.github.javaparser.metamodel.ImportDeclarationMetaModel",
+        "com.github.javaparser.metamodel.TextBlockLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.ForStmtMetaModel",
+        "com.github.javaparser.metamodel.NodeMetaModel",
+        "com.github.javaparser.metamodel.EnumDeclarationMetaModel",
+        "com.github.javaparser.metamodel.VariableDeclarationExprMetaModel",
+        "com.github.javaparser.metamodel.FieldDeclarationMetaModel",
+        "com.github.javaparser.metamodel.TryStmtMetaModel",
+        "com.github.javaparser.metamodel.TypeParameterMetaModel",
+        "com.github.javaparser.metamodel.CallableDeclarationMetaModel",
+        "com.github.javaparser.metamodel.ArrayCreationLevelMetaModel",
+        "com.github.javaparser.metamodel.VariableDeclaratorMetaModel",
+        "com.github.javaparser.metamodel.CharLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.EnumConstantDeclarationMetaModel",
+        "com.github.javaparser.metamodel.SwitchStmtMetaModel",
+        "com.github.javaparser.metamodel.NullLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.NameExprMetaModel",
+        "com.github.javaparser.ast.type.PrimitiveType",
+        "com.github.javaparser.metamodel.MethodCallExprMetaModel",
+        "com.github.javaparser.metamodel.AssignExprMetaModel",
+        "com.github.javaparser.metamodel.DoStmtMetaModel",
+        "com.github.javaparser.metamodel.ClassOrInterfaceTypeMetaModel",
+        "com.github.javaparser.metamodel.VarTypeMetaModel",
+        "com.github.javaparser.metamodel.AnnotationExprMetaModel",
+        "com.github.javaparser.metamodel.ExpressionStmtMetaModel",
+        "com.github.javaparser.metamodel.ClassExprMetaModel",
+        "com.github.javaparser.metamodel.LabeledStmtMetaModel",
+        "com.github.javaparser.metamodel.ModuleRequiresDirectiveMetaModel",
+        "com.github.javaparser.metamodel.BinaryExprMetaModel",
+        "com.github.javaparser.metamodel.SynchronizedStmtMetaModel",
+        "com.github.javaparser.metamodel.ReferenceTypeMetaModel",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.metamodel.RecordDeclarationMetaModel",
+        "com.github.javaparser.metamodel.LongLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.EnclosedExprMetaModel",
+        "com.github.javaparser.metamodel.BooleanLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.ExplicitConstructorInvocationStmtMetaModel",
+        "com.github.javaparser.metamodel.ReceiverParameterMetaModel",
+        "com.github.javaparser.metamodel.LiteralExprMetaModel",
+        "com.github.javaparser.metamodel.BlockStmtMetaModel",
+        "com.github.javaparser.metamodel.StringLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.MatchAllPatternExprMetaModel",
+        "com.github.javaparser.metamodel.ModuleProvidesDirectiveMetaModel",
+        "com.github.javaparser.metamodel.ReturnStmtMetaModel",
+        "com.github.javaparser.metamodel.TraditionalJavadocCommentMetaModel",
+        "com.github.javaparser.metamodel.IntersectionTypeMetaModel",
+        "com.github.javaparser.metamodel.BodyDeclarationMetaModel"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

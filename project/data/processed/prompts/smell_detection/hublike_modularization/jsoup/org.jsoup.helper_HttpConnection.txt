@@ -1,0 +1,275 @@
+##CONTEXT_SIZE=1706
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.helper",
+    "class": "HttpConnection",
+    "dependencies": [
+      "org.jsoup.helper.RequestAuthenticator",
+      "org.jsoup.helper.HttpConnection.Response",
+      "org.jsoup.helper.DataUtil",
+      "org.jsoup.Progress",
+      "org.jsoup.helper.HttpConnection.Request",
+      "org.jsoup.nodes.Document",
+      "org.jsoup.helper.RequestExecutor",
+      "org.jsoup.Connection",
+      "org.jsoup.helper.Validate",
+      "org.jsoup.helper.AuthenticationHandler",
+      "org.jsoup.parser.Parser",
+      "org.jsoup.internal.ControllableInputStream"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.helper",
+      "class": "RequestAuthenticator",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator.Context"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection.Response",
+      "dependencies": [
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.helper.RequestExecutor",
+        "org.jsoup.Connection",
+        "org.jsoup.helper.AuthenticationHandler",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "DataUtil",
+      "dependencies": [
+        "org.jsoup.internal.SimpleStreamReader",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.XmlDeclaration",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.helper.DataUtil.CharsetDoc",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.StreamParser",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    },
+    {
+      "package": "org.jsoup",
+      "class": "Progress",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection.Request",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.Progress",
+        "org.jsoup.Connection",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Document",
+      "dependencies": [
+        "org.jsoup.nodes.DocumentType",
+        "org.jsoup.nodes.Entities",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.nodes.Document.Syntax",
+        "org.jsoup.Jsoup",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.select.Elements",
+        "org.jsoup.Connection",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.nodes.FormElement",
+        "org.jsoup.nodes.XmlDeclaration",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.nodes.Document.OutputSettings",
+        "org.jsoup.nodes.Document.QuirksMode",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "RequestExecutor",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup",
+      "class": "Connection",
+      "dependencies": [
+        "org.jsoup.Connection.Method",
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.Connection.Response",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.Progress",
+        "org.jsoup.Connection.Request",
+        "org.jsoup.Connection.KeyVal",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "Validate",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "AuthenticationHandler",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.helper.AuthenticationHandler.AuthShim"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "Parser",
+      "dependencies": [
+        "org.jsoup.parser.TagSet",
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.parser.TreeBuilder",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.parser.HtmlTreeBuilder",
+        "org.jsoup.parser.Tokeniser",
+        "org.jsoup.parser.XmlTreeBuilder",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings"
+      ]
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "ControllableInputStream",
+      "dependencies": [
+        "org.jsoup.helper.Validate",
+        "org.jsoup.internal.SimpleBufferedInput",
+        "org.jsoup.Progress"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup",
+      "class": "Jsoup",
+      "dependencies": [
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.safety.Cleaner",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.safety.Safelist",
+        "org.jsoup.Connection",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "FormElement",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.Connection",
+        "org.jsoup.Jsoup",
+        "org.jsoup.helper.Validate"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "CookieUtil",
+      "dependencies": [
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.Connection",
+        "org.jsoup.internal.StringUtil"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "UrlConnectionExecutor",
+      "dependencies": [
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.Connection",
+        "org.jsoup.helper.AuthenticationHandler"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection.Request",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.Progress",
+        "org.jsoup.Connection",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection.Response",
+      "dependencies": [
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.helper.RequestExecutor",
+        "org.jsoup.Connection",
+        "org.jsoup.helper.AuthenticationHandler",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpClientExecutor",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.Connection"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

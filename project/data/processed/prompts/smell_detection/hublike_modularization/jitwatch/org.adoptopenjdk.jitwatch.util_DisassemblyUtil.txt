@@ -1,0 +1,108 @@
+##CONTEXT_SIZE=1044
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.util",
+    "class": "DisassemblyUtil",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.util.OSUtil"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.util",
+      "class": "OSUtil",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.OSUtil.OperatingSystem",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.sandbox",
+      "class": "Sandbox",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.jvmlang.LanguageManager",
+        "org.adoptopenjdk.jitwatch.logger.ILogListener",
+        "org.adoptopenjdk.jitwatch.process.runtime.IRuntime",
+        "org.adoptopenjdk.jitwatch.process.compiler.ICompiler",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.ISandboxStage",
+        "org.adoptopenjdk.jitwatch.parser.ILogParser",
+        "org.adoptopenjdk.jitwatch.util.FileUtil",
+        "org.adoptopenjdk.jitwatch.util.DisassemblyUtil",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.process.IExternalProcess",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+      "class": "SandboxConfigStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener",
+        "org.adoptopenjdk.jitwatch.util.DisassemblyUtil",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.VMLanguageList",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.ui.filechooser.FileChooserList"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+      "class": "SandboxStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.jvmlang.LanguageManager",
+        "org.adoptopenjdk.jitwatch.ui.Dialogs",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.util.NetUtil",
+        "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.SandboxConfigStage",
+        "org.adoptopenjdk.jitwatch.parser.ILogParser",
+        "org.adoptopenjdk.jitwatch.ui.stage.StageManager",
+        "org.adoptopenjdk.jitwatch.util.DisassemblyUtil",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.EditorPane",
+        "org.adoptopenjdk.jitwatch.sandbox.Sandbox",
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "org.adoptopenjdk.jitwatch.process.IExternalProcess"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

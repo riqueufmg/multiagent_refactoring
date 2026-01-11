@@ -54,10 +54,10 @@ def main():
     ]
 
     smells_list = [
-        {
-            "smell_name": "God Component",
-            "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
-        },
+        #{
+        #    "smell_name": "God Component",
+        #    "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
+        #},
         #{
         #    "smell_name": "Unstable Dependency",
         #    "smell_definition": "This smell occurs when a package depends on other packages that are less stable than itself, violating the Stable Dependencies Principle."
@@ -66,6 +66,15 @@ def main():
         #    "smell_name": "Insufficient Modularization",
         #    "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
         #},
+        {
+            "smell_name": "Hublike Modularization",
+            "smell_definition": "when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.",
+        }
+    ]
+
+    engines = [
+        "gpt",
+        #"deepseek"
     ]
     
     ## Loop over projects
@@ -83,22 +92,24 @@ def main():
             list_of_prompt_files = detector.generate_prompts(**smell)
 
             # 4. Detect Smells
-            #detector.detect(smell["smell_name"], list_of_prompt_files, "gpt")
-            detector.detect(smell["smell_name"], list_of_prompt_files, "deepseek")
-
+            for engine in engines:
+                detector.detect(smell["smell_name"], list_of_prompt_files, engine)
+        continue
         ## 5. Consolidate results
 
         ## 5.1 God Component
-        consolidator = GodComponentComparison(project_data['project_name'])
-        output_file = consolidator.consolidate_llm_outputs(project_data["project_name"])
-        output_file = consolidator.consolidate_designite_outputs(project_data["project_name"])
-        print(f"Consolidated file created at: {output_file}")
 
-        llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/godcomponent_llm.json"
-        designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/godcomponent_designite.json"
+        for engine in engines:
+            consolidator = GodComponentComparison(project_data['project_name'], engine)
+            output_file = consolidator.consolidate_llm_outputs(project_data["project_name"])
+            output_file = consolidator.consolidate_designite_outputs(project_data["project_name"])
+            print(f"Consolidated file created at: {output_file}")
 
-        output_file = consolidator.generate_metrics_file(llm_file, designite_file)
-        print(f"Metrics file created at: {output_file}")
+            llm_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/{engine}/godcomponent_llm.json"
+            designite_file = f"data/processed/consolidated_detection/{project_data['project_name']}/god_component/{engine}/godcomponent_designite.json"
+
+            output_file = consolidator.generate_metrics_file(llm_file, designite_file)
+            print(f"Metrics file created at: {output_file}")
 
         ## 5.2 Unstable Dependency
         ud_consolidator = UnstableDependencyComparison(project_data['project_name'])

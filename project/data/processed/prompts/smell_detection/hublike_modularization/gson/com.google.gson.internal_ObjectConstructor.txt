@@ -1,0 +1,154 @@
+##CONTEXT_SIZE=1125
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson.internal",
+    "class": "ObjectConstructor",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.gson.internal",
+      "class": "ConstructorConstructor",
+      "dependencies": [
+        "com.google.gson.internal.UnsafeAllocator",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.InstanceCreator",
+        "com.google.gson.internal.GsonTypes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.reflect.ReflectionHelper",
+        "com.google.gson.internal.TroubleshootingGuide",
+        "com.google.gson.internal.ReflectionAccessFilterHelper"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "MapTypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.internal.bind.TypeAdapters",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.internal.bind.MapTypeAdapterFactory.Adapter",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.GsonTypes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.JsonReaderInternalAccess",
+        "com.google.gson.internal.bind.TypeAdapterRuntimeTypeWrapper",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "MapTypeAdapterFactory.Adapter",
+      "dependencies": [
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.JsonReaderInternalAccess",
+        "com.google.gson.TypeAdapter"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "CollectionTypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.GsonTypes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.bind.TypeAdapterRuntimeTypeWrapper",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.bind.CollectionTypeAdapterFactory.Adapter",
+        "com.google.gson.Gson"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "CollectionTypeAdapterFactory.Adapter",
+      "dependencies": [
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.TypeAdapter"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "ReflectiveTypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory",
+        "com.google.gson.internal.ReflectionAccessFilterHelper",
+        "com.google.gson.internal.Primitives",
+        "com.google.gson.Gson",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.FieldNamingStrategy",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.reflect.ReflectionHelper",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.internal.TroubleshootingGuide",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.internal.GsonTypes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.Excluder",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.BoundField",
+        "com.google.gson.JsonParseException",
+        "com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.FieldsData"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "ReflectiveTypeAdapterFactory.FieldReflectionAdapter",
+      "dependencies": [
+        "com.google.gson.internal.ObjectConstructor"
+      ]
+    },
+    {
+      "package": "com.google.gson.graph",
+      "class": "GraphAdapterBuilder",
+      "dependencies": [
+        "com.google.gson.GsonBuilder",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.graph.GraphAdapterBuilder.Element",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.InstanceCreator",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.graph.GraphAdapterBuilder.Factory",
+        "com.google.gson.JsonElement",
+        "com.google.gson.TypeAdapter"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

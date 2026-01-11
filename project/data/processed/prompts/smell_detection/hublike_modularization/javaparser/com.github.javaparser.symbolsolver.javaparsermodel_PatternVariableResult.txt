@@ -1,0 +1,134 @@
+##CONTEXT_SIZE=1256
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+    "class": "PatternVariableResult",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "PatternVariableVisitor",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.InstanceOfExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.expr.EnclosedExpr",
+        "com.github.javaparser.ast.expr.BinaryExpr"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "ConditionalExprContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.expr.ConditionalExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "WhileStatementContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.stmt.WhileStmt",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "BinaryExprContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.ast.expr.BinaryExpr"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "IfStatementContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.stmt.IfStmt",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "ForStatementContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.StatementContext",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "DoStatementContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.stmt.DoStmt",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

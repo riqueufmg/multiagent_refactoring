@@ -1,0 +1,97 @@
+##CONTEXT_SIZE=854
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.toplist",
+    "class": "StaleTaskToplistVisitable",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+      "org.adoptopenjdk.jitwatch.model.Task",
+      "org.adoptopenjdk.jitwatch.compilation.CompilationUtil",
+      "org.adoptopenjdk.jitwatch.model.IMetaMember"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "IReadOnlyJITDataModel",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.PackageManager",
+        "org.adoptopenjdk.jitwatch.model.CompilerThread",
+        "org.adoptopenjdk.jitwatch.model.JITStats",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "Task",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.ParseDictionary"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.compilation",
+      "class": "CompilationUtil",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.Task",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.compilation.ICompilationVisitable"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "IMetaMember",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

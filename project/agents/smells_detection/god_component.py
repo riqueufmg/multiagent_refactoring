@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 import os
 
-from agents.llm_inference.llm_engine import LLMInferenceEngine
 from agents.llm_inference.gpt_engine import GPTEngine
 from agents.llm_inference.deepseek_engine import DeepSeekEngine
 
@@ -94,9 +93,9 @@ class GodComponentDetector:
     def detect_deepseek(self, list_of_prompt_files):
 
         llm_config = {
-            "model_name": "deepseek-reasoner",  # ou deepseek-chat
+            "model_name": "deepseek-chat",
             "max_input_tokens": 100000,
-            "max_completion_tokens": 30720,
+            "max_completion_tokens": 8192,
         }
 
         llm_engine = DeepSeekEngine(**llm_config)

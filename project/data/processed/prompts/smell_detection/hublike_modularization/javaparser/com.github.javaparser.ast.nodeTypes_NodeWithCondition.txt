@@ -1,0 +1,96 @@
+##CONTEXT_SIZE=894
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.ast.nodeTypes",
+    "class": "NodeWithCondition",
+    "dependencies": [
+      "com.github.javaparser.ast.expr.Expression"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "Expression",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NullLiteralExpr",
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.ast.expr.LiteralStringValueExpr",
+        "com.github.javaparser.ast.expr.LongLiteralExpr",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.AssignExpr",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.ast.expr.BooleanLiteralExpr",
+        "com.github.javaparser.ast.expr.DoubleLiteralExpr",
+        "com.github.javaparser.ast.expr.IntegerLiteralExpr",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.expr.NormalAnnotationExpr",
+        "com.github.javaparser.ast.expr.CastExpr",
+        "com.github.javaparser.ast.expr.ThisExpr",
+        "com.github.javaparser.ast.expr.RecordPatternExpr",
+        "com.github.javaparser.ast.expr.MatchAllPatternExpr",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.expr.BinaryExpr",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.metamodel.ExpressionMetaModel",
+        "com.github.javaparser.ast.expr.LiteralExpr",
+        "com.github.javaparser.ast.expr.MarkerAnnotationExpr",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.expr.CharLiteralExpr",
+        "com.github.javaparser.ast.expr.SingleMemberAnnotationExpr",
+        "com.github.javaparser.ast.expr.InstanceOfExpr",
+        "com.github.javaparser.ast.expr.ArrayAccessExpr",
+        "com.github.javaparser.ast.expr.SuperExpr",
+        "com.github.javaparser.ast.expr.TypeExpr",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.expr.ArrayCreationExpr",
+        "com.github.javaparser.ast.expr.SwitchExpr",
+        "com.github.javaparser.ast.expr.ConditionalExpr",
+        "com.github.javaparser.ast.expr.EnclosedExpr",
+        "com.github.javaparser.ast.expr.ClassExpr",
+        "com.github.javaparser.ast.expr.PatternExpr",
+        "com.github.javaparser.ast.expr.ObjectCreationExpr",
+        "com.github.javaparser.ast.expr.StringLiteralExpr",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.expr.TextBlockLiteralExpr",
+        "com.github.javaparser.ast.expr.MethodReferenceExpr",
+        "com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

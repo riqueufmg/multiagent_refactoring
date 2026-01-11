@@ -1,0 +1,68 @@
+##CONTEXT_SIZE=496
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+    "class": "EnclosedExprContext",
+    "dependencies": [
+      "com.github.javaparser.ast.expr.EnclosedExpr",
+      "com.github.javaparser.resolution.TypeSolver"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "EnclosedExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.EnclosedExprMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution",
+      "class": "TypeSolver",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.UnsolvedSymbolException"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

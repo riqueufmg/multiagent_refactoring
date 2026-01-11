@@ -1,0 +1,162 @@
+##CONTEXT_SIZE=1490
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.model.assembly",
+    "class": "AssemblyProcessor",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+      "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+      "org.adoptopenjdk.jitwatch.model.IMetaMember",
+      "org.adoptopenjdk.jitwatch.model.PackageManager",
+      "org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser",
+      "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+      "org.adoptopenjdk.jitwatch.util.StringUtil",
+      "org.adoptopenjdk.jitwatch.model.assembly.AssemblyUtil",
+      "org.adoptopenjdk.jitwatch.model.MetaClass"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "Architecture",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.StringUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "MemberSignatureParts",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.util.StringUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "IMetaMember",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "PackageManager",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MetaPackage",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "IAssemblyParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyLabels",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "AssemblyMethod",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyBlock",
+        "org.adoptopenjdk.jitwatch.util.StringUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.util",
+      "class": "StringUtil",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "AssemblyUtil",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.assembly.x86.AssemblyParserX86",
+        "org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.AssemblyParserARM"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "MetaClass",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MetaPackage",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.loader.BytecodeLoader"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.parser.hotspot",
+      "class": "HotSpotLogParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.NumberedLine",
+        "org.adoptopenjdk.jitwatch.util.VmVersionDetector",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.core.IJITListener",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyProcessor"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "AbstractAssemblyParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMDirective",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyProcessor",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyLabels",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyBlock",
+        "org.adoptopenjdk.jitwatch.model.assembly.x86.X86Directive"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

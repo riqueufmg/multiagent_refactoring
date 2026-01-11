@@ -1,0 +1,87 @@
+##CONTEXT_SIZE=524
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.internal",
+    "class": "SoftPool",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.internal",
+      "class": "SimpleBufferedInput",
+      "dependencies": [
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate"
+      ]
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "StringUtil",
+      "dependencies": [
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.internal.StringUtil.StringJoiner"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "StructuralEvaluator",
+      "dependencies": [
+        "org.jsoup.nodes.LeafNode",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.internal.SoftPool"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "StructuralEvaluator.Has",
+      "dependencies": [
+        "org.jsoup.internal.SoftPool"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "CharacterReader",
+      "dependencies": [
+        "org.jsoup.parser.CharacterReader.CharPredicate",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.TokeniserState"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,65 @@
+##CONTEXT_SIZE=517
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.implementation",
+    "class": "FieldAccessor.ForBeanProperty",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "FieldAccessor",
+      "dependencies": [
+        "net.bytebuddy.dynamic.scaffold.FieldLocator",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.FieldAccessor.FieldLocation",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.implementation.FieldAccessor.Prepared",
+        "net.bytebuddy.implementation.FieldAccessor.OfReferenceValue",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.implementation.FieldAccessor.TerminationHandler",
+        "net.bytebuddy.implementation.FieldAccessor.ForSetter",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.FieldAccessor.ForBeanProperty",
+        "net.bytebuddy.utility.ConstantValue",
+        "net.bytebuddy.implementation.FieldAccessor.OwnerTypeLocatable",
+        "net.bytebuddy.implementation.FieldAccessor.FieldNameExtractor",
+        "net.bytebuddy.implementation.FieldAccessor.AssignerConfigurable"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

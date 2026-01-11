@@ -1,0 +1,115 @@
+##CONTEXT_SIZE=798
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3.time",
+    "class": "TimeZones",
+    "dependencies": [
+      "org.apache.commons.lang3.JavaVersion",
+      "org.apache.commons.lang3.SystemProperties"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "JavaVersion",
+      "dependencies": [
+        "org.apache.commons.lang3.math.NumberUtils",
+        "org.apache.commons.lang3.RegExUtils",
+        "org.apache.commons.lang3.SystemProperties"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "SystemProperties",
+      "dependencies": [
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.function.Suppliers"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "FastTimeZone",
+      "dependencies": [
+        "org.apache.commons.lang3.time.TimeZones"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "DateUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.time.TimeZones",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.time.DateUtils.ModifyType",
+        "org.apache.commons.lang3.time.FastDateParser"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "FastDateParser",
+      "dependencies": [
+        "org.apache.commons.lang3.time.TimeZones",
+        "org.apache.commons.lang3.time.FastDateParser.ISO8601TimeZoneStrategy",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.time.FastDateParser.StrategyParser",
+        "org.apache.commons.lang3.time.FastDateParser.StrategyAndWidth",
+        "org.apache.commons.lang3.time.FastDateParser.Strategy"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "FastDateParser.TimeZoneStrategy",
+      "dependencies": [
+        "org.apache.commons.lang3.time.TimeZones"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "AbstractFormatCache",
+      "dependencies": [
+        "org.apache.commons.lang3.time.AbstractFormatCache.ArrayKey",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.time.TimeZones"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "GmtTimeZone",
+      "dependencies": [
+        "org.apache.commons.lang3.time.TimeZones"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

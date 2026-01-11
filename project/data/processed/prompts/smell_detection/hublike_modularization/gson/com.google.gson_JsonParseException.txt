@@ -1,0 +1,132 @@
+##CONTEXT_SIZE=911
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson",
+    "class": "JsonParseException",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.gson",
+      "class": "JsonStreamParser",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.JsonParseException",
+        "com.google.gson.Strictness",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.JsonElement"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "JsonDeserializer",
+      "dependencies": [
+        "com.google.gson.JsonElement",
+        "com.google.gson.JsonDeserializationContext",
+        "com.google.gson.JsonParseException"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "ToNumberPolicy",
+      "dependencies": [
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.internal.NumberLimits",
+        "com.google.gson.JsonParseException"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "JsonDeserializationContext",
+      "dependencies": [
+        "com.google.gson.JsonElement",
+        "com.google.gson.JsonParseException"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal",
+      "class": "Streams",
+      "dependencies": [
+        "com.google.gson.internal.Streams.CurrentWrite",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.JsonParseException",
+        "com.google.gson.internal.bind.JsonElementTypeAdapter",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.JsonNull",
+        "com.google.gson.JsonElement"
+      ]
+    },
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "ReflectiveTypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory",
+        "com.google.gson.internal.ReflectionAccessFilterHelper",
+        "com.google.gson.internal.Primitives",
+        "com.google.gson.Gson",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.FieldNamingStrategy",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.reflect.ReflectionHelper",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.internal.TroubleshootingGuide",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.internal.GsonTypes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.Excluder",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.BoundField",
+        "com.google.gson.JsonParseException",
+        "com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.FieldsData"
+      ]
+    },
+    {
+      "package": "com.google.gson.protobuf",
+      "class": "ProtoTypeAdapter",
+      "dependencies": [
+        "com.google.gson.JsonSerializationContext",
+        "com.google.gson.JsonArray",
+        "com.google.gson.JsonDeserializationContext",
+        "com.google.gson.JsonObject",
+        "com.google.gson.JsonParseException",
+        "com.google.gson.protobuf.ProtoTypeAdapter.EnumSerialization",
+        "com.google.gson.protobuf.ProtoTypeAdapter.Builder",
+        "com.google.gson.JsonElement"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

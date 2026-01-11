@@ -1,0 +1,249 @@
+##CONTEXT_SIZE=2464
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy",
+    "class": "ByteBuddy.EnumerationImplementation",
+    "dependencies": [
+      "net.bytebuddy.dynamic.TargetType",
+      "net.bytebuddy.implementation.bytecode.StackManipulation",
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+      "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+      "net.bytebuddy.description.field.FieldDescription",
+      "net.bytebuddy.description.type.TypeDescription",
+      "net.bytebuddy.implementation.bytecode.Duplication"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic",
+      "class": "TargetType",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode",
+      "class": "StackManipulation",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation.Size",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.implementation.bytecode.StackManipulation.Dispatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode.member",
+      "class": "MethodReturn",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.implementation.bytecode.StackSize"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldDescription",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.field.FieldDescription.InDefinedShape",
+        "net.bytebuddy.description.field.FieldDescription.SignatureToken"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "TypeDescription",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeDescription.AnnotationStripper",
+        "net.bytebuddy.dynamic.TargetType",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedParameterizedType",
+        "net.bytebuddy.description.type.TypeDescription.RenderingDelegate",
+        "net.bytebuddy.description.type.TypeDescription.ForTypeVariableBoundType",
+        "net.bytebuddy.description.type.TypeDescription.FormalTypeVariable",
+        "net.bytebuddy.description.type.TypeDescription.AnnotationReader",
+        "net.bytebuddy.description.type.TypeDescription.Builder",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.description.type.TypeDescription.OfTypeVariable",
+        "net.bytebuddy.description.annotation.AnnotationSource",
+        "net.bytebuddy.description.type.TypeDescription.Delegator",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.description.type.TypeDescription.NoOp",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.type.TypeDescription.Assigner",
+        "net.bytebuddy.description.type.TypeDescription.OfGenericArray",
+        "net.bytebuddy.description.type.TypeDescription.LazyProjection",
+        "net.bytebuddy.description.type.TypeDescription.Reifying",
+        "net.bytebuddy.description.type.TypeDescription.Substitutor",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription.Dispatcher",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.type.TypeDescription.AbstractBase",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDescription.ForLoadedRecordComponent",
+        "net.bytebuddy.description.type.TypeDescription.ParameterAssigner",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedWildcardType",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.type.TypeDescription.Visitor",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.type.TypeDescription.Simple",
+        "net.bytebuddy.utility.FieldComparator",
+        "net.bytebuddy.description.type.TypeDescription.Generic",
+        "net.bytebuddy.description.type.TypeDescription.TypeErasing",
+        "net.bytebuddy.description.type.TypeDescription.WithLazyNavigation",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.type.TypeDescription.OfParameterizedType",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedTypeVariable",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.type.TypeDescription.ClassLoadingDelegate",
+        "net.bytebuddy.description.type.TypeDescription.OfWildcardType",
+        "net.bytebuddy.description.type.TypeDescription.ForLoadedType",
+        "net.bytebuddy.description.type.TypeDescription.OfNonGenericType",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeDescription.WithEagerNavigation",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedType",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode",
+      "class": "Duplication",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.implementation.bytecode.Duplication.WithFlip"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy",
+      "class": "ByteBuddy",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.dynamic.TargetType",
+        "net.bytebuddy.implementation.bytecode.member.MethodVariableAccess",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.ByteBuddy.RecordConstructorStrategy",
+        "net.bytebuddy.dynamic.scaffold.MethodRegistry",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.utility.AsmClassReader",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.ByteBuddy.RecordObjectMethod",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.dynamic.Transformer",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassWriter",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.ByteBuddy.EnumerationImplementation",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.implementation.attribute.AnnotationRetention",
+        "net.bytebuddy.matcher.LatentMatcher",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.VisibilityBridgeStrategy",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.implementation.bytecode.Duplication",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.NamingStrategy",
+        "net.bytebuddy.description.modifier.EnumerationState",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.description.modifier.TypeManifestation",
+        "net.bytebuddy.dynamic.scaffold.ClassWriterStrategy",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.implementation.SuperMethodCall",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

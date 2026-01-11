@@ -1,0 +1,69 @@
+##CONTEXT_SIZE=419
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.internal",
+    "class": "SimpleStreamReader",
+    "dependencies": [
+      "org.jsoup.helper.Validate"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.helper",
+      "class": "Validate",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.helper",
+      "class": "DataUtil",
+      "dependencies": [
+        "org.jsoup.internal.SimpleStreamReader",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.XmlDeclaration",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.helper.DataUtil.CharsetDoc",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.StreamParser",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

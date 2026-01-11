@@ -1,0 +1,96 @@
+##CONTEXT_SIZE=733
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.googlejavaformat.java.javadoc",
+    "class": "JavadocFormatter",
+    "dependencies": [
+      "com.google.googlejavaformat.java.javadoc.JavadocLexer",
+      "com.google.googlejavaformat.java.javadoc.Token",
+      "com.google.googlejavaformat.java.javadoc.JavadocWriter"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.googlejavaformat.java.javadoc",
+      "class": "JavadocLexer",
+      "dependencies": [
+        "com.google.googlejavaformat.java.javadoc.CharStream",
+        "com.google.googlejavaformat.java.javadoc.NestingCounter",
+        "com.google.googlejavaformat.java.javadoc.Token",
+        "com.google.googlejavaformat.java.javadoc.JavadocLexer.LexException"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.java.javadoc",
+      "class": "Token",
+      "dependencies": [
+        "com.google.googlejavaformat.java.javadoc.Token.Type"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.java.javadoc",
+      "class": "JavadocWriter",
+      "dependencies": [
+        "com.google.googlejavaformat.java.javadoc.NestingCounter",
+        "com.google.googlejavaformat.java.javadoc.JavadocWriter.AutoIndent",
+        "com.google.googlejavaformat.java.javadoc.Token",
+        "com.google.googlejavaformat.java.javadoc.JavadocFormatter",
+        "com.google.googlejavaformat.java.javadoc.JavadocWriter.RequestedWhitespace"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "JavaCommentsHelper",
+      "dependencies": [
+        "com.google.googlejavaformat.Newlines",
+        "com.google.googlejavaformat.CommentsHelper",
+        "com.google.googlejavaformat.java.Formatter",
+        "com.google.googlejavaformat.java.javadoc.JavadocFormatter",
+        "com.google.googlejavaformat.java.JavaFormatterOptions"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.java.javadoc",
+      "class": "JavadocWriter",
+      "dependencies": [
+        "com.google.googlejavaformat.java.javadoc.NestingCounter",
+        "com.google.googlejavaformat.java.javadoc.JavadocWriter.AutoIndent",
+        "com.google.googlejavaformat.java.javadoc.Token",
+        "com.google.googlejavaformat.java.javadoc.JavadocFormatter",
+        "com.google.googlejavaformat.java.javadoc.JavadocWriter.RequestedWhitespace"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

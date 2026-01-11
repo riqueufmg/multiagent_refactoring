@@ -1,0 +1,134 @@
+##CONTEXT_SIZE=1170
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.description.modifier",
+    "class": "SyntheticState",
+    "dependencies": [
+      "net.bytebuddy.description.modifier.ModifierContributor"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.description.modifier",
+      "class": "ModifierContributor",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.modifier.ModifierContributor.ForModule"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.build",
+      "class": "CachedReturnPlugin",
+      "dependencies": [
+        "net.bytebuddy.description.modifier.SyntheticState",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.asm.Advice",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.description.modifier.FieldPersistence",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.dynamic.ClassFileLocator"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.auxiliary",
+      "class": "AuxiliaryType",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.modifier.SyntheticState",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.MethodAccessorFactory",
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.ClassFileVersion"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ModifierReviewable",
+      "dependencies": [
+        "net.bytebuddy.description.modifier.RequiredPhase",
+        "net.bytebuddy.description.modifier.SyntheticState",
+        "net.bytebuddy.description.modifier.MethodManifestation",
+        "net.bytebuddy.description.modifier.SynchronizationState",
+        "net.bytebuddy.description.modifier.FieldPersistence",
+        "net.bytebuddy.description.modifier.Openness",
+        "net.bytebuddy.description.modifier.ProvisioningState",
+        "net.bytebuddy.description.modifier.Transitivity",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.description.modifier.Mandate",
+        "net.bytebuddy.description.modifier.EnumerationState",
+        "net.bytebuddy.description.modifier.MethodStrictness",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.modifier.ParameterManifestation",
+        "net.bytebuddy.description.modifier.FieldManifestation",
+        "net.bytebuddy.description.modifier.TypeManifestation"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ModifierReviewable.AbstractBase",
+      "dependencies": [
+        "net.bytebuddy.description.modifier.RequiredPhase",
+        "net.bytebuddy.description.modifier.SyntheticState",
+        "net.bytebuddy.description.modifier.MethodManifestation",
+        "net.bytebuddy.description.modifier.SynchronizationState",
+        "net.bytebuddy.description.modifier.FieldPersistence",
+        "net.bytebuddy.description.modifier.Openness",
+        "net.bytebuddy.description.modifier.ProvisioningState",
+        "net.bytebuddy.description.modifier.Transitivity",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.description.modifier.Mandate",
+        "net.bytebuddy.description.modifier.EnumerationState",
+        "net.bytebuddy.description.modifier.MethodStrictness",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.modifier.ParameterManifestation",
+        "net.bytebuddy.description.modifier.FieldManifestation",
+        "net.bytebuddy.description.modifier.TypeManifestation"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,145 @@
+##CONTEXT_SIZE=1182
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.common.jimfs",
+    "class": "WatchServiceConfiguration",
+    "dependencies": [
+      "com.google.common.jimfs.FileSystemView",
+      "com.google.common.jimfs.PathService",
+      "com.google.common.jimfs.AbstractWatchService"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.common.jimfs",
+      "class": "FileSystemView",
+      "dependencies": [
+        "com.google.common.jimfs.FileLookup",
+        "com.google.common.jimfs.Options",
+        "com.google.common.jimfs.PathService",
+        "com.google.common.jimfs.Name",
+        "com.google.common.jimfs.JimfsFileStore",
+        "com.google.common.jimfs.Feature",
+        "com.google.common.jimfs.DirectoryEntry",
+        "com.google.common.jimfs.JimfsSecureDirectoryStream",
+        "com.google.common.jimfs.FileSystemView.DeleteMode",
+        "com.google.common.jimfs.RegularFile",
+        "com.google.common.jimfs.FileSystemState",
+        "com.google.common.jimfs.AttributeCopyOption",
+        "com.google.common.jimfs.Directory",
+        "com.google.common.jimfs.File",
+        "com.google.common.jimfs.JimfsPath",
+        "com.google.common.jimfs.SymbolicLink"
+      ]
+    },
+    {
+      "package": "com.google.common.jimfs",
+      "class": "PathService",
+      "dependencies": [
+        "com.google.common.jimfs.Name",
+        "com.google.common.jimfs.PathMatchers",
+        "com.google.common.jimfs.Configuration",
+        "com.google.common.jimfs.PathNormalization",
+        "com.google.common.jimfs.JimfsPath",
+        "com.google.common.jimfs.PathType"
+      ]
+    },
+    {
+      "package": "com.google.common.jimfs",
+      "class": "AbstractWatchService",
+      "dependencies": [
+        "com.google.common.jimfs.AbstractWatchService.State",
+        "com.google.common.jimfs.AbstractWatchService.Key"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.common.jimfs",
+      "class": "JimfsFileSystems",
+      "dependencies": [
+        "com.google.common.jimfs.PathService",
+        "com.google.common.jimfs.AttributeService",
+        "com.google.common.jimfs.JimfsFileStore",
+        "com.google.common.jimfs.Name",
+        "com.google.common.jimfs.Jimfs",
+        "com.google.common.jimfs.JimfsFileSystemProvider",
+        "com.google.common.jimfs.HeapDisk",
+        "com.google.common.jimfs.Configuration",
+        "com.google.common.jimfs.FileFactory",
+        "com.google.common.jimfs.FileSystemState",
+        "com.google.common.jimfs.Directory",
+        "com.google.common.jimfs.FileSystemView",
+        "com.google.common.jimfs.JimfsPath",
+        "com.google.common.jimfs.WatchServiceConfiguration",
+        "com.google.common.jimfs.JimfsFileSystem"
+      ]
+    },
+    {
+      "package": "com.google.common.jimfs",
+      "class": "JimfsFileSystem",
+      "dependencies": [
+        "com.google.common.jimfs.PathService",
+        "com.google.common.jimfs.JimfsFileStore",
+        "com.google.common.jimfs.JimfsFileSystemProvider",
+        "com.google.common.jimfs.FileSystemView",
+        "com.google.common.jimfs.JimfsPath",
+        "com.google.common.jimfs.WatchServiceConfiguration"
+      ]
+    },
+    {
+      "package": "com.google.common.jimfs",
+      "class": "Configuration",
+      "dependencies": [
+        "com.google.common.jimfs.PathType",
+        "com.google.common.jimfs.Configuration.OsxHolder",
+        "com.google.common.jimfs.Configuration.Builder",
+        "com.google.common.jimfs.FileTimeSource",
+        "com.google.common.jimfs.Configuration.UnixHolder",
+        "com.google.common.jimfs.WatchServiceConfiguration",
+        "com.google.common.jimfs.SystemFileTimeSource",
+        "com.google.common.jimfs.Configuration.WindowsHolder"
+      ]
+    },
+    {
+      "package": "com.google.common.jimfs",
+      "class": "Configuration.Builder",
+      "dependencies": [
+        "com.google.common.jimfs.WatchServiceConfiguration",
+        "com.google.common.jimfs.FileTimeSource",
+        "com.google.common.jimfs.PathType",
+        "com.google.common.jimfs.SystemFileTimeSource"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

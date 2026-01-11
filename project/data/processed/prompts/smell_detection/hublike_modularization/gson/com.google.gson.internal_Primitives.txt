@@ -1,0 +1,66 @@
+##CONTEXT_SIZE=470
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson.internal",
+    "class": "Primitives",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.gson.internal.bind",
+      "class": "ReflectiveTypeAdapterFactory",
+      "dependencies": [
+        "com.google.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory",
+        "com.google.gson.internal.ReflectionAccessFilterHelper",
+        "com.google.gson.internal.Primitives",
+        "com.google.gson.Gson",
+        "com.google.gson.internal.ObjectConstructor",
+        "com.google.gson.FieldNamingStrategy",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.reflect.ReflectionHelper",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.internal.TroubleshootingGuide",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.internal.GsonTypes",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.internal.Excluder",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.BoundField",
+        "com.google.gson.JsonParseException",
+        "com.google.gson.internal.bind.ReflectiveTypeAdapterFactory.FieldsData"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

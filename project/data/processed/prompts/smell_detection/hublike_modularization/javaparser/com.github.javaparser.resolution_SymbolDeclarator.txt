@@ -1,0 +1,171 @@
+##CONTEXT_SIZE=1732
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.resolution",
+    "class": "SymbolDeclarator",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "JavaParserFactory",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.stmt.ForEachStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "StatementContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.nodeTypes.NodeWithStatements",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext",
+        "com.github.javaparser.resolution.model.Value",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "LambdaExprContext",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.resolution.logic.FunctionalInterfaceLogic",
+        "com.github.javaparser.ast.expr.AssignExpr",
+        "com.github.javaparser.resolution.logic.InferenceContext",
+        "com.github.javaparser.ast.expr.CastExpr",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.resolution.types.ResolvedLambdaConstraintType",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.ast.stmt.ReturnStmt",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext",
+        "com.github.javaparser.resolution.model.Value",
+        "com.github.javaparser.resolution.MethodUsage",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.logic.MethodResolutionLogic",
+        "com.github.javaparser.ast.expr.Expression"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "CatchClauseContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.stmt.CatchClause",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "AbstractMethodLikeDeclarationContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "AbstractJavaParserContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.MethodUsage",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserTypePatternDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "SwitchEntryContext",
+      "dependencies": [
+        "com.github.javaparser.ast.nodeTypes.SwitchNode",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext",
+        "com.github.javaparser.ast.stmt.SwitchEntry",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.resolution.TypeSolver"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

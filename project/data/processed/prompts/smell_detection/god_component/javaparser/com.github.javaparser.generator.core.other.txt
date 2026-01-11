@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.github.javaparser.generator.core.other", "metrics": {"num_classes": 3, "loc": 122, "Ce": 5, "Ca": 0}, "classes": [{"package": "com.github.javaparser.generator.core.other", "class": "BndGenerator", "file": "data/repositories/javaparser/javaparser-core-generators/src/main/java/com/github/javaparser/generator/core/other/BndGenerator.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 2, "loc": 30, "wmc": 4, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.SourceRoot"]}, {"package": "com.github.javaparser.generator.core.other", "class": "TokenKindGenerator", "file": "data/repositories/javaparser/javaparser-core-generators/src/main/java/com/github/javaparser/generator/core/other/TokenKindGenerator.java", "metrics": {"nof": 1, "nopf": 0, "nom": 4, "nopm": 2, "loc": 44, "wmc": 5, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.stmt.SwitchStmt", "com.github.javaparser.ast.body.EnumDeclaration", "com.github.javaparser.ast.CompilationUnit", "com.github.javaparser.ast.body.EnumConstantDeclaration", "com.github.javaparser.ast.expr.IntegerLiteralExpr", "com.github.javaparser.ast.stmt.SwitchEntry", "com.github.javaparser.utils.SourceRoot", "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration"]}, {"package": "com.github.javaparser.generator.core.other", "class": "GrammarLetterGenerator", "file": "data/repositories/javaparser/javaparser-core-generators/src/main/java/com/github/javaparser/generator/core/other/GrammarLetterGenerator.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 1, "loc": 48, "wmc": 9, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["com.github.javaparser.utils", "com.github.javaparser.ast", "com.github.javaparser.ast.body", "com.github.javaparser.ast.stmt", "com.github.javaparser.ast.expr"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

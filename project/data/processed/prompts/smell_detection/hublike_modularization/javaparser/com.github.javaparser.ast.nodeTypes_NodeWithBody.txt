@@ -1,0 +1,91 @@
+##CONTEXT_SIZE=793
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.ast.nodeTypes",
+    "class": "NodeWithBody",
+    "dependencies": [
+      "com.github.javaparser.ast.stmt.Statement",
+      "com.github.javaparser.ast.stmt.BlockStmt"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "Statement",
+      "dependencies": [
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.ast.stmt.IfStmt",
+        "com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.stmt.LabeledStmt",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.stmt.ContinueStmt",
+        "com.github.javaparser.ast.stmt.UnparsableStmt",
+        "com.github.javaparser.ast.stmt.YieldStmt",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+        "com.github.javaparser.ast.stmt.BreakStmt",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.ast.stmt.TryStmt",
+        "com.github.javaparser.ast.stmt.ReturnStmt",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.stmt.ThrowStmt",
+        "com.github.javaparser.ast.stmt.ForEachStmt",
+        "com.github.javaparser.ast.stmt.LocalClassDeclarationStmt",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.ast.stmt.WhileStmt",
+        "com.github.javaparser.ast.stmt.DoStmt",
+        "com.github.javaparser.ast.stmt.AssertStmt",
+        "com.github.javaparser.metamodel.StatementMetaModel",
+        "com.github.javaparser.ast.stmt.SynchronizedStmt",
+        "com.github.javaparser.ast.stmt.EmptyStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "BlockStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.BlockStmtMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

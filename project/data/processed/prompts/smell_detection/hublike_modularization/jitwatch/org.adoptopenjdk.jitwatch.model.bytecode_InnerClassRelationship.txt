@@ -1,0 +1,66 @@
+##CONTEXT_SIZE=609
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+    "class": "InnerClassRelationship",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.loader",
+      "class": "BytecodeLoader",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.InnerClassRelationship",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.process.javap.ReflectionJavap",
+        "org.adoptopenjdk.jitwatch.model.bytecode.IBytecodeParam",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamSwitch",
+        "org.adoptopenjdk.jitwatch.loader.BytecodeLoader.BytecodeSection",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.model.bytecode.SourceMapper",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamConstant",
+        "org.adoptopenjdk.jitwatch.process.javap.JavapProcess",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamNumeric",
+        "org.adoptopenjdk.jitwatch.model.MetaClass",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamString"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

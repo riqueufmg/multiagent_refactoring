@@ -1,0 +1,166 @@
+##CONTEXT_SIZE=1584
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.scaffold",
+    "class": "MethodGraph.Resolved",
+    "dependencies": [
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+      "net.bytebuddy.description.method.MethodDescription",
+      "net.bytebuddy.description.modifier.Visibility",
+      "net.bytebuddy.dynamic.scaffold.MethodGraph"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodDescription",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.description.method.MethodDescription.Executable",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.MethodDescription.InDefinedShape",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.method.MethodDescription.Token",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.method.MethodDescription.TypeToken",
+        "net.bytebuddy.description.method.ParameterList"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.modifier",
+      "class": "Visibility",
+      "dependencies": [
+        "net.bytebuddy.description.modifier.ModifierContributor"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "MethodGraph",
+      "dependencies": [
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJVMMethod",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonizer",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJavaMethod",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.NodeList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Node",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Empty",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Compiler",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Detached",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Directional",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Resolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonized",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Entry",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Sort",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Linked",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Merger",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Unresolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Key",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "MethodGraph",
+      "dependencies": [
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJVMMethod",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonizer",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.ForJavaMethod",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.NodeList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Node",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Empty",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Compiler",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Detached",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Directional",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Resolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Harmonized",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Entry",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Sort",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Linked",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Merger",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Unresolved",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph.Key",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

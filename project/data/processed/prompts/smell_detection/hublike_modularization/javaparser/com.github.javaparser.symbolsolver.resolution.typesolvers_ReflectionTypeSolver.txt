@@ -1,0 +1,91 @@
+##CONTEXT_SIZE=781
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.resolution.typesolvers",
+    "class": "ReflectionTypeSolver",
+    "dependencies": [
+      "com.github.javaparser.symbolsolver.reflectionmodel.ReflectionFactory",
+      "com.github.javaparser.symbolsolver.utils.ModuleLayerHelper"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.reflectionmodel",
+      "class": "ReflectionFactory",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.reflectionmodel.ReflectionTypeParameter",
+        "com.github.javaparser.resolution.types.ResolvedVoidType",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.types.ResolvedPrimitiveType",
+        "com.github.javaparser.symbolsolver.logic.AbstractTypeDeclaration",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.resolution.types.ResolvedWildcard"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.utils",
+      "class": "ModuleLayerHelper",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typesolvers",
+      "class": "TypeSolverBuilder",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typesolvers.AarTypeSolver",
+        "com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.resolution.typesolvers.ClassLoaderTypeSolver",
+        "com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver",
+        "com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference.constraintformulas",
+      "class": "TypeCompatibleWithType",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.TypeHelper",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.BoundSet",
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

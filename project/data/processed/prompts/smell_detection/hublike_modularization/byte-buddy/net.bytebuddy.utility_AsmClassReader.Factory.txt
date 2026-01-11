@@ -1,0 +1,119 @@
+##CONTEXT_SIZE=952
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.utility",
+    "class": "AsmClassReader.Factory",
+    "dependencies": [
+      "net.bytebuddy.utility.OpenedClassReader",
+      "net.bytebuddy.ClassFileVersion",
+      "net.bytebuddy.build.AccessControllerPlugin",
+      "net.bytebuddy.utility.AsmClassReader"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "OpenedClassReader",
+      "dependencies": [
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassReader"
+      ]
+    },
+    {
+      "package": "net.bytebuddy",
+      "class": "ClassFileVersion",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.ClassFileVersion.VersionLocator",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.ClassFileVersion.Resolver"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "AccessControllerPlugin",
+      "dependencies": [
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.AccessControllerPlugin.Initializer",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.modifier.FieldManifestation"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "AsmClassReader",
+      "dependencies": [
+        "net.bytebuddy.utility.AsmClassReader.Factory",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.AsmClassReader.ForClassFileApi",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.AsmClassReader.Default",
+        "net.bytebuddy.utility.AsmClassReader.JdkClassReader"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "AsmClassReader",
+      "dependencies": [
+        "net.bytebuddy.utility.AsmClassReader.Factory",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.AsmClassReader.ForClassFileApi",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.AsmClassReader.Default",
+        "net.bytebuddy.utility.AsmClassReader.JdkClassReader"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

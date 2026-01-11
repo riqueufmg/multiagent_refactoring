@@ -1,0 +1,93 @@
+##CONTEXT_SIZE=594
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io.function",
+    "class": "IOSpliterator",
+    "dependencies": [
+      "org.apache.commons.io.function.IOSpliteratorAdapter",
+      "org.apache.commons.io.function.IOConsumer",
+      "org.apache.commons.io.function.IOComparator"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOSpliteratorAdapter",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOConsumer",
+      "dependencies": [
+        "org.apache.commons.io.IOExceptionList",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.IOStreams"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOComparator",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBaseStream",
+      "dependencies": [
+        "org.apache.commons.io.function.IOSpliterator",
+        "org.apache.commons.io.function.IOIterator",
+        "org.apache.commons.io.function.Erase",
+        "org.apache.commons.io.function.IORunnable"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOIterable",
+      "dependencies": [
+        "org.apache.commons.io.function.IOSpliterator",
+        "org.apache.commons.io.function.IOIterator",
+        "org.apache.commons.io.function.IOConsumer"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "UncheckedIOSpliterator",
+      "dependencies": [
+        "org.apache.commons.io.function.IOSpliterator"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

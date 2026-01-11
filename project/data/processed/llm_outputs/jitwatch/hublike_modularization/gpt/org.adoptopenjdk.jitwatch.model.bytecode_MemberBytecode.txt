@@ -1,0 +1,5 @@
+{
+    "class": "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+    "detection": true,
+    "justification": "MemberBytecode has a high number of outgoing dependencies (10 distinct types: ExceptionTable, LineTableEntry, MemberSignatureParts, Opcode, LineTable, BytecodeAnnotations, BytecodeInstruction, IBytecodeParam, ExceptionTableEntry, ClassBC) and a large number of incoming dependents (19 different classes across many packages: jarscan.* operations, loader.BytecodeLoader, model.IMetaMember, model.AbstractMetaMember, model.bytecode.ClassBC, SourceMapper, BytecodeAnnotationBuilder, UI classes like TriView and ViewerBytecode, HotThrowFinder, etc.). Several relationships are bi-directional (e.g., LineTable and ClassBC both reference MemberBytecode and are referenced by it), increasing coupling. The incoming dependents come from diverse responsibilities (analysis/scans, loading/parsing, UI, model utilities), showing MemberBytecode acts as a central connector. These factors (many incoming + many outgoing links, cross-cutting use by unrelated modules, and mutual dependencies) match the Hub-like Modularization smell."
+}

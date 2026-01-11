@@ -1,0 +1,86 @@
+##CONTEXT_SIZE=636
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.android.result.supplement",
+    "class": "BookResultInfoRetriever",
+    "dependencies": [
+      "com.google.zxing.client.android.HttpHelper",
+      "com.google.zxing.client.android.history.HistoryManager",
+      "com.google.zxing.client.android.LocaleManager"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "HttpHelper",
+      "dependencies": [
+        "com.google.zxing.client.android.HttpHelper.ContentType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.history",
+      "class": "HistoryManager",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.history.HistoryItem",
+        "com.google.zxing.client.android.history.DBHelper",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.android.result.ResultHandler",
+        "com.google.zxing.client.android.PreferencesActivity"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "LocaleManager",
+      "dependencies": [
+        "com.google.zxing.client.android.PreferencesActivity"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.android.result.supplement",
+      "class": "SupplementalInfoRetriever",
+      "dependencies": [
+        "com.google.zxing.client.android.result.supplement.ProductResultInfoRetriever",
+        "com.google.zxing.client.android.result.supplement.BookResultInfoRetriever",
+        "com.google.zxing.client.android.result.supplement.TitleRetriever",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.ProductParsedResult",
+        "com.google.zxing.client.android.history.HistoryManager",
+        "com.google.zxing.client.android.result.supplement.URIResultInfoRetriever"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

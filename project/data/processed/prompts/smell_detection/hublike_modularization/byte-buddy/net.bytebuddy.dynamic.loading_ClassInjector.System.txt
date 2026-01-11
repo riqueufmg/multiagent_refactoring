@@ -1,0 +1,99 @@
+##CONTEXT_SIZE=844
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.loading",
+    "class": "ClassInjector.System",
+    "dependencies": [
+      "net.bytebuddy.utility.dispatcher.JavaDispatcher"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.utility.dispatcher",
+      "class": "JavaDispatcher",
+      "dependencies": [
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.Resolver",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.OfPrimitiveArray",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.ForDefaultValue",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.utility.Invoker",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.NoOp",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.CreationAction",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.Dispatcher",
+        "net.bytebuddy.utility.MethodComparator",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.GraalImageCode",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.DynamicClassLoader"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassInjector",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.ClassInjector.AccessResolver",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Windows32BitFunctionMapper",
+        "net.bytebuddy.dynamic.loading.ClassInjector.UsingUnsafe",
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Lookup",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Initializable",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Default",
+        "net.bytebuddy.dynamic.loading.ClassInjector.CreationAction",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ClassInjector.MethodHandles",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Dispatcher",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.dynamic.loading.ClassInjector.System",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Jvm",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Target",
+        "net.bytebuddy.dynamic.ClassFileLocator"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

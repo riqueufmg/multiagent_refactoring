@@ -1,0 +1,73 @@
+##CONTEXT_SIZE=502
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.common",
+    "class": "ECIEncoderSet",
+    "dependencies": [
+      "com.google.zxing.common.CharacterSetECI"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.common",
+      "class": "CharacterSetECI",
+      "dependencies": [
+        "com.google.zxing.FormatException"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.common",
+      "class": "MinimalECIInput",
+      "dependencies": [
+        "com.google.zxing.common.MinimalECIInput.InputEdge",
+        "com.google.zxing.common.ECIEncoderSet"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.encoder",
+      "class": "MinimalEncoder",
+      "dependencies": [
+        "com.google.zxing.common.ECIEncoderSet",
+        "com.google.zxing.qrcode.encoder.MinimalEncoder.ResultList",
+        "com.google.zxing.qrcode.encoder.Encoder",
+        "com.google.zxing.qrcode.encoder.MinimalEncoder.Edge",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.qrcode.decoder.Mode",
+        "com.google.zxing.qrcode.encoder.MinimalEncoder.VersionSize",
+        "com.google.zxing.qrcode.decoder.Version"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "another", "metrics": {"num_classes": 6, "loc": 11, "Ce": 0, "Ca": 0}, "classes": [{"package": "another", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/TypeResolutionWithSameNameTest/03_single_type_import_precedes_package_member/another/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "another", "class": "String", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/TypeResolutionWithSameNameTest/05_asterisk_import_precedes_java_lang/another/String.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "another", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/TypeResolutionWithSameNameTest/04_package_member_precedes_asterisk_import/another/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "another", "class": "MyEnum", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/TypeResolutionWithSameNameTest/02_ignore_static_non_type_import/another/MyEnum.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "another", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/TypeResolutionWithSameNameTest/02_ignore_static_non_type_import/another/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "another", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/ImplementedOrExtendedTypeResolution/pkg/another/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": []}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

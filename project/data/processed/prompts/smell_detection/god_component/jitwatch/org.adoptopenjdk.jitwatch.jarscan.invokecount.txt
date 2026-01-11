@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.jarscan.invokecount", "metrics": {"num_classes": 3, "loc": 83, "Ce": 2, "Ca": 1}, "classes": [{"package": "org.adoptopenjdk.jitwatch.jarscan.invokecount", "class": "InvokeMethodCountMap", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/jarscan/invokecount/InvokeMethodCountMap.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 20, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.jarscan.invokecount.MethodCountMap", "org.adoptopenjdk.jitwatch.model.bytecode.Opcode"]}, {"package": "org.adoptopenjdk.jitwatch.jarscan.invokecount", "class": "MethodCountMap", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/jarscan/invokecount/MethodCountMap.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 3, "loc": 36, "wmc": 6, "nc": 0, "dit": 0, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.bytecode.Opcode"]}, {"package": "org.adoptopenjdk.jitwatch.jarscan.invokecount", "class": "InvokeCountOperation", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/jarscan/invokecount/InvokeCountOperation.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 3, "loc": 27, "wmc": 10, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode", "org.adoptopenjdk.jitwatch.util.ParseUtil", "org.adoptopenjdk.jitwatch.jarscan.invokecount.InvokeMethodCountMap", "org.adoptopenjdk.jitwatch.model.bytecode.Opcode", "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction"]}], "dependencies": ["org.adoptopenjdk.jitwatch.model.bytecode", "org.adoptopenjdk.jitwatch.util"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

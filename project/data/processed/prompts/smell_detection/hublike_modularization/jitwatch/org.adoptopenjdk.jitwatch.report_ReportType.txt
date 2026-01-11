@@ -1,0 +1,155 @@
+##CONTEXT_SIZE=1575
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.report",
+    "class": "ReportType",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.report",
+      "class": "Report",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.report.escapeanalysis",
+      "class": "AbstractEscapeAnalysisWalker",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineAnnotation",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.report.ReportType"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.report.suggestion",
+      "class": "SuggestionWalker",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.CodeCacheEvent",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.compilation.CompilationUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.report.inlining",
+      "class": "InliningWalker",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineAnnotation",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.report.ReportType"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview.bytecode",
+      "class": "ViewerBytecode",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.util.JVMSUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "org.adoptopenjdk.jitwatch.ui.triview.TriViewNavigationStack",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.ui.triview.bytecode.BytecodeLabel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.report.eliminatedallocation",
+      "class": "EliminatedAllocationRowBean",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.Compilation"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.report.locks",
+      "class": "OptimisedLockRowBean",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.Compilation"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.report.inlining",
+      "class": "InliningRowBean",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.Compilation"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

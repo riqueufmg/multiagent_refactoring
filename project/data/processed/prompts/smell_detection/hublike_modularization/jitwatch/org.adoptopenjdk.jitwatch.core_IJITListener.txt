@@ -1,0 +1,124 @@
+##CONTEXT_SIZE=1145
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.core",
+    "class": "IJITListener",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.model.JITEvent"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "JITEvent",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.EventType",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.parser",
+      "class": "ParserFactory",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.parser.ParserType",
+        "org.adoptopenjdk.jitwatch.core.IJITListener",
+        "org.adoptopenjdk.jitwatch.parser.ILogParser"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.parser",
+      "class": "AbstractLogParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.parser.ILogParseErrorListener",
+        "org.adoptopenjdk.jitwatch.model.JITEvent",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.EventType",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.Task",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.model.ParsedClasspath",
+        "org.adoptopenjdk.jitwatch.core.IJITListener",
+        "org.adoptopenjdk.jitwatch.util.ClassUtil",
+        "org.adoptopenjdk.jitwatch.model.CodeCacheEvent",
+        "org.adoptopenjdk.jitwatch.model.JITDataModel",
+        "org.adoptopenjdk.jitwatch.model.MetaClass",
+        "org.adoptopenjdk.jitwatch.model.CompilerThread",
+        "org.adoptopenjdk.jitwatch.core.TagProcessor",
+        "org.adoptopenjdk.jitwatch.model.SplitLog"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.parser.j9",
+      "class": "J9LogParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.NumberedLine",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.parser.j9.J9Line",
+        "org.adoptopenjdk.jitwatch.parser.j9.J9Util",
+        "org.adoptopenjdk.jitwatch.core.IJITListener"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.parser.zing",
+      "class": "ZingLogParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.parser.zing.ZingLineType",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.NumberedLine",
+        "org.adoptopenjdk.jitwatch.core.IJITListener",
+        "org.adoptopenjdk.jitwatch.parser.zing.ZingLine",
+        "org.adoptopenjdk.jitwatch.model.CompilerThread"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.parser.hotspot",
+      "class": "HotSpotLogParser",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.NumberedLine",
+        "org.adoptopenjdk.jitwatch.util.VmVersionDetector",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.core.IJITListener",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyProcessor"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

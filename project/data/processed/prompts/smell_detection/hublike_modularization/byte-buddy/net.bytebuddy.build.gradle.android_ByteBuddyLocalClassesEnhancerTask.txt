@@ -1,0 +1,189 @@
+##CONTEXT_SIZE=1721
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.build.gradle.android",
+    "class": "ByteBuddyLocalClassesEnhancerTask",
+    "dependencies": [
+      "net.bytebuddy.build.gradle.android.ByteBuddyAndroidTaskExtension",
+      "net.bytebuddy.build.Plugin",
+      "net.bytebuddy.dynamic.ClassFileLocator",
+      "net.bytebuddy.ClassFileVersion",
+      "net.bytebuddy.build.AndroidDescriptor"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build.gradle.android",
+      "class": "ByteBuddyAndroidTaskExtension",
+      "dependencies": [
+        "net.bytebuddy.build.gradle.android.Discovery",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.gradle.android.Transformation",
+        "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "Plugin",
+      "dependencies": [
+        "net.bytebuddy.build.Plugin.Origin",
+        "net.bytebuddy.build.Plugin.WithThrowawayExecutorService",
+        "net.bytebuddy.build.Plugin.Sink",
+        "net.bytebuddy.build.Plugin.Resolution",
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.build.Plugin.Unresolved",
+        "net.bytebuddy.build.Plugin.Failing",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.build.Plugin.NoFolderMatcher",
+        "net.bytebuddy.build.Plugin.Empty",
+        "net.bytebuddy.utility.StreamDrainer",
+        "net.bytebuddy.build.Plugin.PoolStrategy",
+        "net.bytebuddy.build.Plugin.Dispatcher",
+        "net.bytebuddy.build.Plugin.Factory",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.build.Plugin.ForParallelTransformation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.Plugin.Element",
+        "net.bytebuddy.build.Plugin.Materializable",
+        "net.bytebuddy.build.Plugin.NoOp",
+        "net.bytebuddy.build.Plugin.TypeStrategy",
+        "net.bytebuddy.build.Plugin.ForSerialTransformation",
+        "net.bytebuddy.build.Plugin.ErrorHandler",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.build.Plugin.Instantiator",
+        "net.bytebuddy.build.Plugin.Source",
+        "net.bytebuddy.build.Plugin.Target",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.build.Plugin.Enforcing",
+        "net.bytebuddy.build.Plugin.ArgumentResolver",
+        "net.bytebuddy.build.Plugin.Default",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.Plugin.Listener",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic",
+      "class": "ClassFileLocator",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.dynamic.ClassFileLocator.BootLoaderProxyCreationAction",
+        "net.bytebuddy.dynamic.ClassFileLocator.CreationAction",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.StreamDrainer",
+        "net.bytebuddy.dynamic.ClassFileLocator.ClassLoadingDelegate",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.dynamic.ClassFileLocator.Dispatcher",
+        "net.bytebuddy.dynamic.ClassFileLocator.MultiReleaseAware",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator.ForClassLoader",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.dynamic.ClassFileLocator.NoOp",
+        "net.bytebuddy.dynamic.ClassFileLocator.Resolution",
+        "net.bytebuddy.dynamic.ClassFileLocator.Initializable",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy",
+      "class": "ClassFileVersion",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.ClassFileVersion.VersionLocator",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.ClassFileVersion.Resolver"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "AndroidDescriptor",
+      "dependencies": [
+        "net.bytebuddy.build.AndroidDescriptor.TypeScope",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.build.gradle.android",
+      "class": "ByteBuddyAndroidPlugin",
+      "dependencies": [
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.GetOutputFileFunction",
+        "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.RuntimeClassPathResolver",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.GetLocalClassesFunction",
+        "org.gradle.api.provider.Provider",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.TransformationDispatcher",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.ForLegacyAndroid",
+        "net.bytebuddy.build.gradle.android.LegacyByteBuddyLocalClassesEnhancerTask",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.GetOutputDirFunction",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.GetLocalClassesDirsFunction",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidService",
+        "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.GetProjectJarsFunction"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build.gradle.android",
+      "class": "ByteBuddyAndroidPlugin.TransformationDispatcher",
+      "dependencies": [
+        "net.bytebuddy.build.gradle.android.LegacyByteBuddyLocalClassesEnhancerTask",
+        "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build.gradle.android",
+      "class": "ByteBuddyAndroidPlugin.ForApk74CompatibleAndroid",
+      "dependencies": [
+        "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build.gradle.android",
+      "class": "ByteBuddyAndroidTaskExtension",
+      "dependencies": [
+        "net.bytebuddy.build.gradle.android.Discovery",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.gradle.android.Transformation",
+        "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -36,6 +36,7 @@ class DeepSeekEngine:
 
         response = self.client.chat.completions.create(
             model=self.model_name,  # ex: "deepseek-chat" ou "deepseek-reasoner"
+            temperature=0.1,
             messages=[
                 {"role": "user", "content": prompt_text}
             ],

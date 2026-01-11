@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.ui.filechooser", "metrics": {"num_classes": 2, "loc": 146, "Ce": 1, "Ca": 2}, "classes": [{"package": "org.adoptopenjdk.jitwatch.ui.filechooser", "class": "FileChooserListSrcZip", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/filechooser/FileChooserListSrcZip.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 23, "wmc": 4, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.FileUtil"]}, {"package": "org.adoptopenjdk.jitwatch.ui.filechooser", "class": "FileChooserList", "file": "data/repositories/jitwatch/ui/src/main/java/org/adoptopenjdk/jitwatch/ui/filechooser/FileChooserList.java", "metrics": {"nof": 5, "nopf": 0, "nom": 9, "nopm": 6, "loc": 123, "wmc": 21, "nc": 1, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.util.UserInterfaceUtil"]}], "dependencies": ["org.adoptopenjdk.jitwatch.util"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

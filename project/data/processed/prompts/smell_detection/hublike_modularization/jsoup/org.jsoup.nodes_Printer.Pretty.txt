@@ -1,0 +1,68 @@
+##CONTEXT_SIZE=416
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.nodes",
+    "class": "Printer.Pretty",
+    "dependencies": [
+      "org.jsoup.parser.Tag",
+      "org.jsoup.nodes.Entities"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.parser",
+      "class": "Tag",
+      "dependencies": [
+        "org.jsoup.parser.TokeniserState",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.parser.TagSet"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Entities",
+      "dependencies": [
+        "org.jsoup.nodes.Entities.CoreCharset",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.nodes.EntitiesData",
+        "org.jsoup.nodes.Entities.EscapeMode",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.Parser"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

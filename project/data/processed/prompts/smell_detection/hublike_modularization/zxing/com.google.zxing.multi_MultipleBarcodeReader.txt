@@ -1,0 +1,90 @@
+##CONTEXT_SIZE=650
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.multi",
+    "class": "MultipleBarcodeReader",
+    "dependencies": [
+      "com.google.zxing.BinaryBitmap"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing",
+      "class": "BinaryBitmap",
+      "dependencies": [
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.Binarizer",
+        "com.google.zxing.LuminanceSource"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.j2se",
+      "class": "DecodeWorker",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.LuminanceSource",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.multi.MultipleBarcodeReader",
+        "com.google.zxing.client.j2se.BufferedImageLuminanceSource",
+        "com.google.zxing.client.j2se.ImageReader",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.client.j2se.DecoderConfig",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.MultiFormatReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web",
+      "class": "DecodeServlet",
+      "dependencies": [
+        "com.google.zxing.Reader",
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.multi.MultipleBarcodeReader",
+        "com.google.zxing.client.j2se.ImageReader",
+        "com.google.zxing.web.DoSTracker",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ReaderException",
+        "com.google.zxing.LuminanceSource"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

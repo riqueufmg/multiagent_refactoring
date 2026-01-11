@@ -1,0 +1,78 @@
+##CONTEXT_SIZE=640
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.ui.filechooser",
+    "class": "FileChooserList",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.util",
+      "class": "UserInterfaceUtil",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.util.ObservableResourceFactory"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+      "class": "SandboxConfigStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener",
+        "org.adoptopenjdk.jitwatch.util.DisassemblyUtil",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.VMLanguageList",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.ui.filechooser.FileChooserList"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.main",
+      "class": "MainConfigStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.logger.ILogListener",
+        "org.adoptopenjdk.jitwatch.ui.Dialogs",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.filechooser.FileChooserListSrcZip",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener",
+        "org.adoptopenjdk.jitwatch.ui.stage.StageManager",
+        "org.adoptopenjdk.jitwatch.ui.filechooser.FileChooserList"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

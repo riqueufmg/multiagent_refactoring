@@ -1,0 +1,98 @@
+##CONTEXT_SIZE=695
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.ast.validator",
+    "class": "TypedValidator",
+    "dependencies": [
+      "com.github.javaparser.ParserConfiguration",
+      "com.github.javaparser.Processor",
+      "com.github.javaparser.ParseResult",
+      "com.github.javaparser.ast.validator.ProblemReporter"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser",
+      "class": "ParserConfiguration",
+      "dependencies": [
+        "com.github.javaparser.LineEndingProcessingProvider",
+        "com.github.javaparser.ast.validator.Validator",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ParserConfiguration.LanguageLevel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ParseResult",
+        "com.github.javaparser.Providers",
+        "com.github.javaparser.ast.validator.postprocessors.PostProcessors",
+        "com.github.javaparser.UnicodeEscapeProcessingProvider"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "Processor",
+      "dependencies": [
+        "com.github.javaparser.ParserConfiguration",
+        "com.github.javaparser.Provider",
+        "com.github.javaparser.ParseResult"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "ParseResult",
+      "dependencies": [
+        "com.github.javaparser.ast.comments.CommentsCollection",
+        "com.github.javaparser.Problem",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.validator",
+      "class": "ProblemReporter",
+      "dependencies": [
+        "com.github.javaparser.ast.nodeTypes.NodeWithTokenRange",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.validator.language_level_validations.UpgradeJavaMessage"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.validator",
+      "class": "SingleNodeTypeValidator",
+      "dependencies": [
+        "com.github.javaparser.ast.validator.TypedValidator",
+        "com.github.javaparser.ast.validator.ProblemReporter",
+        "com.github.javaparser.ast.Node"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

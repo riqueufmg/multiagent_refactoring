@@ -1,0 +1,2084 @@
+##CONTEXT_SIZE=20283
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.printer",
+    "class": "DefaultPrettyPrinterVisitor",
+    "dependencies": [
+      "com.github.javaparser.ast.stmt.IfStmt",
+      "com.github.javaparser.ast.type.ReferenceType",
+      "com.github.javaparser.printer.configuration.PrinterConfiguration",
+      "com.github.javaparser.ast.body.FieldDeclaration",
+      "com.github.javaparser.ast.Modifier",
+      "com.github.javaparser.ast.stmt.LabeledStmt",
+      "com.github.javaparser.ast.expr.FieldAccessExpr",
+      "com.github.javaparser.ast.expr.DoubleLiteralExpr",
+      "com.github.javaparser.ast.stmt.ContinueStmt",
+      "com.github.javaparser.ast.body.ReceiverParameter",
+      "com.github.javaparser.ast.body.AnnotationMemberDeclaration",
+      "com.github.javaparser.ast.modules.ModuleOpensDirective",
+      "com.github.javaparser.ast.body.RecordDeclaration",
+      "com.github.javaparser.ast.expr.BinaryExpr",
+      "com.github.javaparser.ast.expr.MethodCallExpr",
+      "com.github.javaparser.ast.stmt.ReturnStmt",
+      "com.github.javaparser.ast.type.TypeParameter",
+      "com.github.javaparser.ast.ArrayCreationLevel",
+      "com.github.javaparser.ast.expr.ArrayAccessExpr",
+      "com.github.javaparser.ast.expr.InstanceOfExpr",
+      "com.github.javaparser.ast.expr.UnaryExpr",
+      "com.github.javaparser.ast.expr.EnclosedExpr",
+      "com.github.javaparser.ast.stmt.SwitchEntry",
+      "com.github.javaparser.ast.expr.ObjectCreationExpr",
+      "com.github.javaparser.ast.type.IntersectionType",
+      "com.github.javaparser.ast.modules.ModuleDeclaration",
+      "com.github.javaparser.ast.stmt.LocalClassDeclarationStmt",
+      "com.github.javaparser.ast.stmt.DoStmt",
+      "com.github.javaparser.ast.body.ConstructorDeclaration",
+      "com.github.javaparser.ast.nodeTypes.SwitchNode",
+      "com.github.javaparser.ast.expr.NullLiteralExpr",
+      "com.github.javaparser.ast.type.UnionType",
+      "com.github.javaparser.ast.expr.AssignExpr",
+      "com.github.javaparser.ast.expr.RecordPatternExpr",
+      "com.github.javaparser.ast.modules.ModuleUsesDirective",
+      "com.github.javaparser.ast.expr.CastExpr",
+      "com.github.javaparser.ast.NodeList",
+      "com.github.javaparser.ast.comments.LineComment",
+      "com.github.javaparser.ast.expr.MarkerAnnotationExpr",
+      "com.github.javaparser.ast.body.Parameter",
+      "com.github.javaparser.ast.expr.SingleMemberAnnotationExpr",
+      "com.github.javaparser.ast.expr.SuperExpr",
+      "com.github.javaparser.ast.body.VariableDeclarator",
+      "com.github.javaparser.ast.expr.ConditionalExpr",
+      "com.github.javaparser.ast.stmt.ThrowStmt",
+      "com.github.javaparser.ast.comments.MarkdownComment",
+      "com.github.javaparser.ast.stmt.ForEachStmt",
+      "com.github.javaparser.ast.body.InitializerDeclaration",
+      "com.github.javaparser.ast.type.ClassOrInterfaceType",
+      "com.github.javaparser.ast.expr.TypePatternExpr",
+      "com.github.javaparser.ast.expr.Expression",
+      "com.github.javaparser.ast.type.WildcardType",
+      "com.github.javaparser.ast.visitor.Visitable",
+      "com.github.javaparser.ast.expr.MatchAllPatternExpr",
+      "com.github.javaparser.ast.stmt.AssertStmt",
+      "com.github.javaparser.ast.body.CompactConstructorDeclaration",
+      "com.github.javaparser.printer.SourcePrinter",
+      "com.github.javaparser.ast.PackageDeclaration",
+      "com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments",
+      "com.github.javaparser.ast.stmt.EmptyStmt",
+      "com.github.javaparser.ast.stmt.ExpressionStmt",
+      "com.github.javaparser.ast.expr.Name",
+      "com.github.javaparser.printer.configuration.ImportOrderingStrategy",
+      "com.github.javaparser.ast.body.EnumConstantDeclaration",
+      "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+      "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+      "com.github.javaparser.ast.expr.LongLiteralExpr",
+      "com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt",
+      "com.github.javaparser.ast.type.Type",
+      "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+      "com.github.javaparser.ast.expr.ThisExpr",
+      "com.github.javaparser.ast.expr.NormalAnnotationExpr",
+      "com.github.javaparser.ast.stmt.YieldStmt",
+      "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+      "com.github.javaparser.ast.modules.ModuleRequiresDirective",
+      "com.github.javaparser.ast.stmt.SwitchStmt",
+      "com.github.javaparser.ast.expr.SimpleName",
+      "com.github.javaparser.ast.stmt.BlockStmt",
+      "com.github.javaparser.ast.comments.TraditionalJavadocComment",
+      "com.github.javaparser.ast.expr.TypeExpr",
+      "com.github.javaparser.ast.expr.SwitchExpr",
+      "com.github.javaparser.ast.expr.ArrayCreationExpr",
+      "com.github.javaparser.ast.body.MethodDeclaration",
+      "com.github.javaparser.ast.modules.ModuleExportsDirective",
+      "com.github.javaparser.ast.type.UnknownType",
+      "com.github.javaparser.ast.body.EnumDeclaration",
+      "com.github.javaparser.ast.expr.StringLiteralExpr",
+      "com.github.javaparser.ast.type.VoidType",
+      "com.github.javaparser.ast.expr.TextBlockLiteralExpr",
+      "com.github.javaparser.printer.configuration.imports.DefaultImportOrderingStrategy",
+      "com.github.javaparser.ast.ImportDeclaration",
+      "com.github.javaparser.utils.Utils",
+      "com.github.javaparser.ast.stmt.SynchronizedStmt",
+      "com.github.javaparser.ast.type.PrimitiveType",
+      "com.github.javaparser.printer.configuration.ConfigurationOption",
+      "com.github.javaparser.ast.expr.LambdaExpr",
+      "com.github.javaparser.ast.stmt.Statement",
+      "com.github.javaparser.ast.type.ArrayType",
+      "com.github.javaparser.ast.expr.IntegerLiteralExpr",
+      "com.github.javaparser.ast.expr.BooleanLiteralExpr",
+      "com.github.javaparser.ast.comments.BlockComment",
+      "com.github.javaparser.ast.modules.ModuleProvidesDirective",
+      "com.github.javaparser.ast.expr.MemberValuePair",
+      "com.github.javaparser.ast.stmt.UnparsableStmt",
+      "com.github.javaparser.ast.stmt.TryStmt",
+      "com.github.javaparser.ast.stmt.BreakStmt",
+      "com.github.javaparser.ast.body.AnnotationDeclaration",
+      "com.github.javaparser.ast.expr.NameExpr",
+      "com.github.javaparser.ast.expr.CharLiteralExpr",
+      "com.github.javaparser.ast.Node",
+      "com.github.javaparser.ast.stmt.CatchClause",
+      "com.github.javaparser.ast.expr.ClassExpr",
+      "com.github.javaparser.ast.type.VarType",
+      "com.github.javaparser.ast.CompilationUnit",
+      "com.github.javaparser.ast.stmt.ForStmt",
+      "com.github.javaparser.ast.stmt.WhileStmt",
+      "com.github.javaparser.ast.expr.MethodReferenceExpr"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "IfStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.IfStmtMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "ReferenceType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ReferenceTypeMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.configuration",
+      "class": "PrinterConfiguration",
+      "dependencies": [
+        "com.github.javaparser.printer.configuration.ConfigurationOption"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "FieldDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.FieldDeclarationMetaModel",
+        "com.github.javaparser.ast.body.EnumDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "Modifier",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.Modifier.Keyword",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.ModifierMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.AccessSpecifier"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "LabeledStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.LabeledStmtMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "FieldAccessExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.resolution.declarations.ResolvedValueDeclaration",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.FieldAccessExprMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "DoubleLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.DoubleLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ContinueStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ContinueStmtMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "ReceiverParameter",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.ReceiverParameterMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "AnnotationMemberDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.declarations.ResolvedAnnotationMemberDeclaration",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.AnnotationMemberDeclarationMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.modules",
+      "class": "ModuleOpensDirective",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.ModuleOpensDirectiveMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "RecordDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.RecordDeclarationMetaModel",
+        "com.github.javaparser.ast.body.ReceiverParameter",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "BinaryExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.BinaryExprMetaModel",
+        "com.github.javaparser.ast.expr.BinaryExpr.Operator",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.AssignExpr"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "MethodCallExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.metamodel.MethodCallExprMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ReturnStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.ReturnStmtMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "TypeParameter",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.resolution.types.ResolvedTypeVariable",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.metamodel.TypeParameterMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "ArrayCreationLevel",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.ArrayCreationLevelMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ArrayAccessExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.ArrayAccessExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "InstanceOfExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.ReferenceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.InstanceOfExprMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.PatternExpr",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "UnaryExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.UnaryExpr.Operator",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.UnaryExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "EnclosedExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.EnclosedExprMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "SwitchEntry",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.SwitchEntryMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.stmt.SwitchEntry.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ObjectCreationExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.body.BodyDeclaration",
+        "com.github.javaparser.metamodel.ObjectCreationExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "IntersectionType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.IntersectionTypeMetaModel",
+        "com.github.javaparser.resolution.types.ResolvedIntersectionType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.modules",
+      "class": "ModuleDeclaration",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.metamodel.ModuleDeclarationMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.modules.ModuleDirective",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "LocalClassDeclarationStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.LocalClassDeclarationStmtMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "DoStmt",
+      "dependencies": [
+        "com.github.javaparser.metamodel.DoStmtMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "ConstructorDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.metamodel.ConstructorDeclarationMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration",
+        "com.github.javaparser.ast.body.ReceiverParameter",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.nodeTypes",
+      "class": "SwitchNode",
+      "dependencies": [
+        "com.github.javaparser.ast.stmt.SwitchEntry",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "NullLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.NullLiteralExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "UnionType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.UnionTypeMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.types.ResolvedUnionType",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "AssignExpr",
+      "dependencies": [
+        "com.github.javaparser.metamodel.AssignExprMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.AssignExpr.Operator",
+        "com.github.javaparser.ast.expr.BinaryExpr"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "RecordPatternExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.ReferenceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.RecordPatternExprMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.modules",
+      "class": "ModuleUsesDirective",
+      "dependencies": [
+        "com.github.javaparser.metamodel.ModuleUsesDirectiveMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "CastExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.CastExprMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "NodeList",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "LineComment",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.LineCommentMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "MarkerAnnotationExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.MarkerAnnotationExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "Parameter",
+      "dependencies": [
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.ParameterMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "SingleMemberAnnotationExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.SingleMemberAnnotationExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "SuperExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.SuperExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "VariableDeclarator",
+      "dependencies": [
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.nodeTypes.NodeWithVariables",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.resolution.declarations.ResolvedValueDeclaration",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.VariableDeclaratorMetaModel",
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ConditionalExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.ConditionalExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ThrowStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.ThrowStmtMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "MarkdownComment",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.MarkdownCommentMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ForEachStmt",
+      "dependencies": [
+        "com.github.javaparser.metamodel.ForEachStmtMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "InitializerDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.metamodel.InitializerDeclarationMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "ClassOrInterfaceType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ClassOrInterfaceTypeMetaModel",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.type.PrimitiveType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "TypePatternExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.TypePatternExprMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "Expression",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NullLiteralExpr",
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.ast.expr.LiteralStringValueExpr",
+        "com.github.javaparser.ast.expr.LongLiteralExpr",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.AssignExpr",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.ast.expr.BooleanLiteralExpr",
+        "com.github.javaparser.ast.expr.DoubleLiteralExpr",
+        "com.github.javaparser.ast.expr.IntegerLiteralExpr",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.expr.NormalAnnotationExpr",
+        "com.github.javaparser.ast.expr.CastExpr",
+        "com.github.javaparser.ast.expr.ThisExpr",
+        "com.github.javaparser.ast.expr.RecordPatternExpr",
+        "com.github.javaparser.ast.expr.MatchAllPatternExpr",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.expr.BinaryExpr",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.metamodel.ExpressionMetaModel",
+        "com.github.javaparser.ast.expr.LiteralExpr",
+        "com.github.javaparser.ast.expr.MarkerAnnotationExpr",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.expr.CharLiteralExpr",
+        "com.github.javaparser.ast.expr.SingleMemberAnnotationExpr",
+        "com.github.javaparser.ast.expr.InstanceOfExpr",
+        "com.github.javaparser.ast.expr.ArrayAccessExpr",
+        "com.github.javaparser.ast.expr.SuperExpr",
+        "com.github.javaparser.ast.expr.TypeExpr",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.expr.ArrayCreationExpr",
+        "com.github.javaparser.ast.expr.SwitchExpr",
+        "com.github.javaparser.ast.expr.ConditionalExpr",
+        "com.github.javaparser.ast.expr.EnclosedExpr",
+        "com.github.javaparser.ast.expr.ClassExpr",
+        "com.github.javaparser.ast.expr.PatternExpr",
+        "com.github.javaparser.ast.expr.ObjectCreationExpr",
+        "com.github.javaparser.ast.expr.StringLiteralExpr",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.expr.TextBlockLiteralExpr",
+        "com.github.javaparser.ast.expr.MethodReferenceExpr",
+        "com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "WildcardType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.ReferenceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.WildcardTypeMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.resolution.types.ResolvedWildcard"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.visitor",
+      "class": "Visitable",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.visitor.GenericVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "MatchAllPatternExpr",
+      "dependencies": [
+        "com.github.javaparser.metamodel.MatchAllPatternExprMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "AssertStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.AssertStmtMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "CompactConstructorDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.CompactConstructorDeclarationMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer",
+      "class": "SourcePrinter",
+      "dependencies": [
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.printer.configuration.PrettyPrinterConfiguration",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.printer.configuration.Indentation"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "PackageDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.PackageDeclarationMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.nodeTypes",
+      "class": "NodeWithTypeArguments",
+      "dependencies": [
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "EmptyStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.EmptyStmtMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ExpressionStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ExpressionStmtMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "Name",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.NameMetaModel",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.configuration",
+      "class": "ImportOrderingStrategy",
+      "dependencies": [
+        "com.github.javaparser.ast.NodeList"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "EnumConstantDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.declarations.ResolvedEnumConstantDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.EnumConstantDeclarationMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ArrayInitializerExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ArrayInitializerExprMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "VariableDeclarationExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.VariableDeclarationExprMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "LongLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.LongLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "LocalRecordDeclarationStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.body.RecordDeclaration",
+        "com.github.javaparser.metamodel.LocalRecordDeclarationStmtMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "Type",
+      "dependencies": [
+        "com.github.javaparser.ast.type.ReferenceType",
+        "com.github.javaparser.ast.type.UnionType",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.type.TypeParameter",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.TypeMetaModel",
+        "com.github.javaparser.ast.type.IntersectionType",
+        "com.github.javaparser.ast.type.UnknownType",
+        "com.github.javaparser.ast.type.VarType",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.type.VoidType",
+        "com.github.javaparser.ast.type.WildcardType",
+        "com.github.javaparser.ast.type.PrimitiveType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "ClassOrInterfaceDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.metamodel.ClassOrInterfaceDeclarationMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ThisExpr",
+      "dependencies": [
+        "com.github.javaparser.metamodel.ThisExprMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "NormalAnnotationExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.expr.MemberValuePair",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.NormalAnnotationExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "YieldStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.YieldStmtMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ExplicitConstructorInvocationStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.ExplicitConstructorInvocationStmtMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.modules",
+      "class": "ModuleRequiresDirective",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.ModuleRequiresDirectiveMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "SwitchStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.SwitchStmtMetaModel",
+        "com.github.javaparser.ast.stmt.SwitchEntry"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "SimpleName",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.SimpleNameMetaModel",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "BlockStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.BlockStmtMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "TraditionalJavadocComment",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.TraditionalJavadocCommentMetaModel",
+        "com.github.javaparser.javadoc.Javadoc"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "TypeExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.TypeExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "SwitchExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.SwitchExprMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.stmt.SwitchEntry"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ArrayCreationExpr",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.ArrayCreationExprMetaModel",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "MethodDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.metamodel.MethodDeclarationMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.body.ReceiverParameter",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.ast.AccessSpecifier"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.modules",
+      "class": "ModuleExportsDirective",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.ModuleExportsDirectiveMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "UnknownType",
+      "dependencies": [
+        "com.github.javaparser.metamodel.UnknownTypeMetaModel",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "EnumDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.body.EnumConstantDeclaration",
+        "com.github.javaparser.resolution.declarations.ResolvedEnumDeclaration",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.EnumDeclarationMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "StringLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.utils.StringEscapeUtils",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.StringLiteralExprMetaModel",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "VoidType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.VoidTypeMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.types.ResolvedVoidType",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "TextBlockLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.utils.StringEscapeUtils",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.TextBlockLiteralExprMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.configuration.imports",
+      "class": "DefaultImportOrderingStrategy",
+      "dependencies": [
+        "com.github.javaparser.ast.NodeList"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "ImportDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ImportDeclarationMetaModel",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "Utils",
+      "dependencies": [
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.Provider",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "SynchronizedStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.SynchronizedStmtMetaModel",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "PrimitiveType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.type.PrimitiveType.Primitive",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.resolution.types.ResolvedPrimitiveType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.PrimitiveTypeMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.configuration",
+      "class": "ConfigurationOption",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "LambdaExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.LambdaExprMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "Statement",
+      "dependencies": [
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.ast.stmt.IfStmt",
+        "com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.stmt.LabeledStmt",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.stmt.ContinueStmt",
+        "com.github.javaparser.ast.stmt.UnparsableStmt",
+        "com.github.javaparser.ast.stmt.YieldStmt",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+        "com.github.javaparser.ast.stmt.BreakStmt",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.ast.stmt.TryStmt",
+        "com.github.javaparser.ast.stmt.ReturnStmt",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.stmt.ThrowStmt",
+        "com.github.javaparser.ast.stmt.ForEachStmt",
+        "com.github.javaparser.ast.stmt.LocalClassDeclarationStmt",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.ast.stmt.WhileStmt",
+        "com.github.javaparser.ast.stmt.DoStmt",
+        "com.github.javaparser.ast.stmt.AssertStmt",
+        "com.github.javaparser.metamodel.StatementMetaModel",
+        "com.github.javaparser.ast.stmt.SynchronizedStmt",
+        "com.github.javaparser.ast.stmt.EmptyStmt"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "ArrayType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.type.ArrayType.Origin",
+        "com.github.javaparser.ast.type.ArrayType.ArrayBracketPair",
+        "com.github.javaparser.metamodel.ArrayTypeMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.resolution.types.ResolvedArrayType",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "IntegerLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.IntegerLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "BooleanLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.BooleanLiteralExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "BlockComment",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.BlockCommentMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.modules",
+      "class": "ModuleProvidesDirective",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.metamodel.ModuleProvidesDirectiveMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "MemberValuePair",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.MemberValuePairMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "UnparsableStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.UnparsableStmtMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "TryStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.TryStmtMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "BreakStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.BreakStmtMetaModel",
+        "com.github.javaparser.ast.expr.SimpleName"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.body",
+      "class": "AnnotationDeclaration",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.AnnotationDeclarationMetaModel",
+        "com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "NameExpr",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedValueDeclaration",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.metamodel.NameExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "CharLiteralExpr",
+      "dependencies": [
+        "com.github.javaparser.utils.StringEscapeUtils",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.CharLiteralExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "Node",
+      "dependencies": [
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.ast.Node.ObserverRegistrationMode",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.Node.TreeTraversal",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.visitor.EqualsVisitor",
+        "com.github.javaparser.metamodel.NodeMetaModel",
+        "com.github.javaparser.ast.visitor.HashCodeVisitor",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.ast.Node.Parsedness",
+        "com.github.javaparser.ast.DataKey",
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.ast.observer.PropagatingAstObserver",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.printer.ConfigurablePrinter"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "CatchClause",
+      "dependencies": [
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.metamodel.CatchClauseMetaModel",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ClassExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.ClassExprMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.type",
+      "class": "VarType",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.metamodel.VarTypeMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "CompilationUnit",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.ast.body.AnnotationDeclaration",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.CompilationUnit.Storage",
+        "com.github.javaparser.utils.ClassUtils",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ParseStart",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.metamodel.CompilationUnitMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "ForStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.ForStmtMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.stmt",
+      "class": "WhileStmt",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.WhileStmtMetaModel",
+        "com.github.javaparser.ast.stmt.Statement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "MethodReferenceExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.MethodReferenceExprMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.utils.Utils"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

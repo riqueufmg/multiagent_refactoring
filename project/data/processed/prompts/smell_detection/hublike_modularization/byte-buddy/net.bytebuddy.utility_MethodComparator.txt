@@ -1,0 +1,97 @@
+##CONTEXT_SIZE=743
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.utility",
+    "class": "MethodComparator",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.utility.dispatcher",
+      "class": "JavaDispatcher",
+      "dependencies": [
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.Resolver",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.OfPrimitiveArray",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.ForDefaultValue",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.utility.Invoker",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.NoOp",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.CreationAction",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.Dispatcher",
+        "net.bytebuddy.utility.MethodComparator",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.GraalImageCode",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher.DynamicClassLoader"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility.dispatcher",
+      "class": "JavaDispatcher.DynamicClassLoader",
+      "dependencies": [
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.MethodComparator"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodList",
+      "dependencies": [
+        "net.bytebuddy.utility.ConstructorComparator",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.MethodComparator",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodList.ForLoadedMethods",
+      "dependencies": [
+        "net.bytebuddy.utility.ConstructorComparator",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.MethodComparator"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

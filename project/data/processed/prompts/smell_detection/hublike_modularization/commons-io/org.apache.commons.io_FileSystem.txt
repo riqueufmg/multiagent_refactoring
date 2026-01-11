@@ -1,0 +1,66 @@
+##CONTEXT_SIZE=391
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io",
+    "class": "FileSystem",
+    "dependencies": [
+      "org.apache.commons.io.FileSystem.NameLengthStrategy",
+      "org.apache.commons.io.FilenameUtils"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "FileSystem.NameLengthStrategy",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "FilenameUtils",
+      "dependencies": [
+        "org.apache.commons.io.IOCase",
+        "org.apache.commons.io.FileSystem"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "FilenameUtils",
+      "dependencies": [
+        "org.apache.commons.io.IOCase",
+        "org.apache.commons.io.FileSystem"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

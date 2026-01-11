@@ -1,0 +1,189 @@
+##CONTEXT_SIZE=1446
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.agent",
+    "class": "ByteBuddyAgent",
+    "dependencies": [
+      "net.bytebuddy.agent.ByteBuddyAgent.ForCurrentVm",
+      "net.bytebuddy.agent.ByteBuddyAgent.Disabled",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForEmulatedAttachment",
+      "net.bytebuddy.agent.ByteBuddyAgent.AttachmentTypeEvaluator",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForByteBuddyAgent",
+      "net.bytebuddy.agent.ByteBuddyAgent.ProcessProvider",
+      "net.bytebuddy.agent.Attacher",
+      "net.bytebuddy.agent.VirtualMachine",
+      "net.bytebuddy.agent.ByteBuddyAgent.Simple",
+      "net.bytebuddy.agent.Installer",
+      "net.bytebuddy.agent.ByteBuddyAgent.AttachmentProvider",
+      "net.bytebuddy.agent.ByteBuddyAgent.Unavailable",
+      "net.bytebuddy.agent.ByteBuddyAgent.Accessor",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForUserDefinedToolsJar",
+      "net.bytebuddy.agent.ByteBuddyAgent.ExternalAttachment",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForJ9Vm",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForStandardToolsJarVm",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForModularizedVm",
+      "net.bytebuddy.agent.ByteBuddyAgent.InstallationAction",
+      "net.bytebuddy.agent.ByteBuddyAgent.AgentProvider",
+      "net.bytebuddy.agent.ByteBuddyAgent.ForLegacyVm"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForCurrentVm",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.Disabled",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForEmulatedAttachment",
+      "dependencies": [
+        "net.bytebuddy.agent.VirtualMachine"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.AttachmentTypeEvaluator",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForByteBuddyAgent",
+      "dependencies": [
+        "net.bytebuddy.agent.Installer"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ProcessProvider",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "Attacher",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "VirtualMachine",
+      "dependencies": [
+        "net.bytebuddy.agent.VirtualMachine.Connection",
+        "net.bytebuddy.agent.VirtualMachine.Factory",
+        "net.bytebuddy.agent.VirtualMachine.Dispatcher",
+        "net.bytebuddy.agent.VirtualMachine.PosixOwnerProvider",
+        "net.bytebuddy.agent.VirtualMachine.ForJnaWindowsNamedPipe",
+        "net.bytebuddy.agent.VirtualMachine.ForJnaPosixSocket",
+        "net.bytebuddy.agent.VirtualMachine.ForJnaSolarisDoor",
+        "net.bytebuddy.agent.VirtualMachine.WindowsAttachLibrary",
+        "net.bytebuddy.agent.VirtualMachine.WindowsLibrary",
+        "net.bytebuddy.agent.VirtualMachine.SolarisLibrary",
+        "net.bytebuddy.agent.VirtualMachine.MacLibrary",
+        "net.bytebuddy.agent.VirtualMachine.PosixLibrary"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.Simple",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "Installer",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.AttachmentProvider",
+      "dependencies": [
+        "net.bytebuddy.agent.VirtualMachine"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.Unavailable",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.Accessor",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForUserDefinedToolsJar",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ExternalAttachment",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForJ9Vm",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForStandardToolsJarVm",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForModularizedVm",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.InstallationAction",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.AgentProvider",
+      "dependencies": [
+        "net.bytebuddy.agent.Installer"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.agent",
+      "class": "ByteBuddyAgent.ForLegacyVm",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

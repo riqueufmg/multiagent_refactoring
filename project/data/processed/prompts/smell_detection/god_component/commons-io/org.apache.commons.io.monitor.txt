@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.apache.commons.io.monitor", "metrics": {"num_classes": 7, "loc": 947, "Ce": 5, "Ca": 0}, "classes": [{"package": "org.apache.commons.io.monitor", "class": "FileEntry", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/FileEntry.java", "metrics": {"nof": 10, "nopf": 0, "nom": 22, "nopm": 21, "loc": 212, "wmc": 22, "nc": 0, "dit": 0, "lcom": 0.0909090909090909, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.FileUtils", "org.apache.commons.io.monitor.SerializableFileTime", "org.apache.commons.io.file.attribute.FileTimes"]}, {"package": "org.apache.commons.io.monitor", "class": "FileAlterationObserver", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/FileAlterationObserver.java", "metrics": {"nof": 8, "nopf": 0, "nom": 29, "nopm": 16, "loc": 375, "wmc": 45, "nc": 0, "dit": 0, "lcom": 0.1724137931034483, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.monitor.FileAlterationObserver.Builder", "org.apache.commons.io.monitor.FileEntry", "org.apache.commons.io.IOCase", "org.apache.commons.io.comparator.NameFileComparator", "org.apache.commons.io.FileUtils", "org.apache.commons.io.monitor.FileAlterationListener", "org.apache.commons.io.filefilter.TrueFileFilter"]}, {"package": "org.apache.commons.io.monitor", "class": "FileAlterationObserver.Builder", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/FileAlterationObserver.java", "metrics": {"nof": 3, "nopf": 0, "nom": 0, "nopm": 0, "loc": 49, "wmc": 0, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.monitor.FileEntry", "org.apache.commons.io.IOCase"]}, {"package": "org.apache.commons.io.monitor", "class": "FileAlterationMonitor", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/FileAlterationMonitor.java", "metrics": {"nof": 6, "nopf": 0, "nom": 13, "nopm": 13, "loc": 150, "wmc": 23, "nc": 0, "dit": 0, "lcom": 0.1538461538461538, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.ThreadUtils", "org.apache.commons.io.monitor.FileAlterationObserver"]}, {"package": "org.apache.commons.io.monitor", "class": "FileAlterationListenerAdaptor", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/FileAlterationListenerAdaptor.java", "metrics": {"nof": 0, "nopf": 0, "nom": 9, "nopm": 9, "loc": 60, "wmc": 9, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.monitor.FileAlterationObserver"]}, {"package": "org.apache.commons.io.monitor", "class": "SerializableFileTime", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/SerializableFileTime.java", "metrics": {"nof": 3, "nopf": 0, "nom": 11, "nopm": 4, "loc": 54, "wmc": 13, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.file.attribute.FileTimes"]}, {"package": "org.apache.commons.io.monitor", "class": "FileAlterationListener", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/monitor/FileAlterationListener.java", "metrics": {"nof": 0, "nopf": 0, "nom": 8, "nopm": 0, "loc": 47, "wmc": 8, "nc": 2, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.monitor.FileAlterationObserver"]}], "dependencies": ["org.apache.commons.io.filefilter", "org.apache.commons.io.file.attribute", "org.apache.commons.io.file", "org.apache.commons.io.comparator", "org.apache.commons.io"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

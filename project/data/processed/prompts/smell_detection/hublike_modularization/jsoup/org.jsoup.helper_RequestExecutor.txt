@@ -1,0 +1,79 @@
+##CONTEXT_SIZE=486
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.helper",
+    "class": "RequestExecutor",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.helper",
+      "class": "RequestDispatch",
+      "dependencies": [
+        "org.jsoup.helper.RequestExecutor",
+        "org.jsoup.internal.SharedConstants"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.helper.HttpConnection.Response",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.Progress",
+        "org.jsoup.helper.HttpConnection.Request",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.helper.RequestExecutor",
+        "org.jsoup.Connection",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.helper.AuthenticationHandler",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection.Response",
+      "dependencies": [
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.helper.RequestExecutor",
+        "org.jsoup.Connection",
+        "org.jsoup.helper.AuthenticationHandler",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

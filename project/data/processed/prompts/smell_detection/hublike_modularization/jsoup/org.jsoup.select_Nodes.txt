@@ -1,0 +1,103 @@
+##CONTEXT_SIZE=644
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.select",
+    "class": "Nodes",
+    "dependencies": [
+      "org.jsoup.helper.Validate",
+      "org.jsoup.internal.StringUtil"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.helper",
+      "class": "Validate",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "StringUtil",
+      "dependencies": [
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.internal.StringUtil.StringJoiner"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Element",
+      "dependencies": [
+        "org.jsoup.nodes.Printer",
+        "org.jsoup.select.NodeVisitor",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.select.NodeFilter",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.nodes.DataNode",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.nodes.Attribute",
+        "org.jsoup.helper.Regex",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.parser.Tag",
+        "org.jsoup.nodes.CDataNode",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.parser.TokenQueue",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.select.Collector",
+        "org.jsoup.select.Nodes",
+        "org.jsoup.nodes.Element.NodeList",
+        "org.jsoup.select.Selector",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.NodeUtils",
+        "org.jsoup.nodes.TextNode"
+      ]
+    },
+    {
+      "package": "org.jsoup.select",
+      "class": "Collector",
+      "dependencies": [
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.select.Nodes"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

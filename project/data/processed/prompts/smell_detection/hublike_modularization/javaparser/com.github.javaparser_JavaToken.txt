@@ -1,0 +1,424 @@
+##CONTEXT_SIZE=4094
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser",
+    "class": "JavaToken",
+    "dependencies": [
+      "com.github.javaparser.TokenTypes",
+      "com.github.javaparser.JavaToken.Category",
+      "com.github.javaparser.TokenRange",
+      "com.github.javaparser.GeneratedJavaParserConstants",
+      "com.github.javaparser.utils.LineSeparator",
+      "com.github.javaparser.Range",
+      "com.github.javaparser.Token"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenTypes",
+      "dependencies": [
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "JavaToken.Category",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenRange",
+      "dependencies": [
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "GeneratedJavaParserConstants",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "LineSeparator",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "Range",
+      "dependencies": [
+        "com.github.javaparser.Position"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "Token",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenRange",
+      "dependencies": [
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenTypes",
+      "dependencies": [
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "GeneratedJavaParserBase",
+      "dependencies": [
+        "com.github.javaparser.Provider",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.stmt.Statement",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.type.ArrayType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.expr.CastExpr",
+        "com.github.javaparser.GeneratedJavaParserTokenManager",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.expr.ArrayCreationExpr",
+        "com.github.javaparser.ast.comments.CommentsCollection",
+        "com.github.javaparser.Token",
+        "com.github.javaparser.ParseException",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.utils.Pair"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenBase",
+      "dependencies": [
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "RangedList",
+      "dependencies": [
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "ModifierHolder",
+      "dependencies": [
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "GeneratedJavaParserTokenManagerBase",
+      "dependencies": [
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.Token",
+        "com.github.javaparser.ast.comments.MarkdownComment",
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "GeneratedJavaParser",
+      "dependencies": [
+        "com.github.javaparser.ast.stmt.IfStmt",
+        "com.github.javaparser.ast.type.ReferenceType",
+        "com.github.javaparser.ast.body.FieldDeclaration",
+        "com.github.javaparser.ast.stmt.LabeledStmt",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.expr.DoubleLiteralExpr",
+        "com.github.javaparser.GeneratedJavaParser.LookaheadSuccess",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.stmt.ContinueStmt",
+        "com.github.javaparser.ast.body.ReceiverParameter",
+        "com.github.javaparser.ast.body.AnnotationMemberDeclaration",
+        "com.github.javaparser.ast.modules.ModuleOpensDirective",
+        "com.github.javaparser.ast.body.RecordDeclaration",
+        "com.github.javaparser.ast.expr.BinaryExpr",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.ast.stmt.ReturnStmt",
+        "com.github.javaparser.ast.type.TypeParameter",
+        "com.github.javaparser.ast.expr.InstanceOfExpr",
+        "com.github.javaparser.ast.expr.ArrayAccessExpr",
+        "com.github.javaparser.ast.expr.UnaryExpr",
+        "com.github.javaparser.ast.expr.EnclosedExpr",
+        "com.github.javaparser.Token",
+        "com.github.javaparser.ast.stmt.SwitchEntry",
+        "com.github.javaparser.ast.expr.ObjectCreationExpr",
+        "com.github.javaparser.ast.type.IntersectionType",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ParseException",
+        "com.github.javaparser.ast.stmt.LocalClassDeclarationStmt",
+        "com.github.javaparser.ast.stmt.DoStmt",
+        "com.github.javaparser.ast.body.ConstructorDeclaration",
+        "com.github.javaparser.GeneratedJavaParser.JJCalls",
+        "com.github.javaparser.ast.type.UnionType",
+        "com.github.javaparser.ast.expr.AssignExpr",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.ast.expr.RecordPatternExpr",
+        "com.github.javaparser.ast.modules.ModuleUsesDirective",
+        "com.github.javaparser.ast.expr.CastExpr",
+        "com.github.javaparser.GeneratedJavaParserTokenManager",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.expr.MarkerAnnotationExpr",
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.expr.SingleMemberAnnotationExpr",
+        "com.github.javaparser.SimpleCharStream",
+        "com.github.javaparser.ast.expr.SuperExpr",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.expr.ConditionalExpr",
+        "com.github.javaparser.ast.stmt.ThrowStmt",
+        "com.github.javaparser.ast.expr.PatternExpr",
+        "com.github.javaparser.ast.body.InitializerDeclaration",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.ModifierHolder",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.type.WildcardType",
+        "com.github.javaparser.ast.expr.MatchAllPatternExpr",
+        "com.github.javaparser.ast.stmt.AssertStmt",
+        "com.github.javaparser.ast.body.CompactConstructorDeclaration",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ast.stmt.EmptyStmt",
+        "com.github.javaparser.ast.stmt.ExpressionStmt",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.ast.body.EnumConstantDeclaration",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.ast.expr.LongLiteralExpr",
+        "com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.ast.expr.ThisExpr",
+        "com.github.javaparser.ast.expr.NormalAnnotationExpr",
+        "com.github.javaparser.ast.stmt.YieldStmt",
+        "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+        "com.github.javaparser.ast.modules.ModuleRequiresDirective",
+        "com.github.javaparser.ast.stmt.SwitchStmt",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.expr.TypeExpr",
+        "com.github.javaparser.ast.expr.SwitchExpr",
+        "com.github.javaparser.ast.expr.ArrayCreationExpr",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.body.BodyDeclaration",
+        "com.github.javaparser.ast.modules.ModuleExportsDirective",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.expr.StringLiteralExpr",
+        "com.github.javaparser.ast.type.VoidType",
+        "com.github.javaparser.ast.expr.TextBlockLiteralExpr",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.ast.stmt.SynchronizedStmt",
+        "com.github.javaparser.ast.type.PrimitiveType",
+        "com.github.javaparser.Provider",
+        "com.github.javaparser.ast.expr.LambdaExpr",
+        "com.github.javaparser.ast.stmt.Statement",
+        "com.github.javaparser.ast.expr.IntegerLiteralExpr",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.expr.BooleanLiteralExpr",
+        "com.github.javaparser.ast.modules.ModuleProvidesDirective",
+        "com.github.javaparser.ast.expr.MemberValuePair",
+        "com.github.javaparser.ast.stmt.TryStmt",
+        "com.github.javaparser.ast.stmt.BreakStmt",
+        "com.github.javaparser.ast.body.AnnotationDeclaration",
+        "com.github.javaparser.RangedList",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.ast.expr.NameExpr",
+        "com.github.javaparser.ast.expr.CharLiteralExpr",
+        "com.github.javaparser.ast.stmt.CatchClause",
+        "com.github.javaparser.ast.expr.ClassExpr",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.modules.ModuleDirective",
+        "com.github.javaparser.ast.stmt.WhileStmt",
+        "com.github.javaparser.ast.expr.MethodReferenceExpr",
+        "com.github.javaparser.utils.Pair"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "GeneratedJavaParserTokenManager",
+      "dependencies": [
+        "com.github.javaparser.SimpleCharStream",
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.GeneratedJavaParserTokenManagerBase",
+        "com.github.javaparser.TokenMgrException",
+        "com.github.javaparser.ast.comments.CommentsCollection",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.Token",
+        "com.github.javaparser.ast.comments.MarkdownComment",
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "LexicalPreservingPrinter",
+      "dependencies": [
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.printer.lexicalpreservation.NodeText",
+        "com.github.javaparser.printer.lexicalpreservation.DefaultLexicalPreservingPrinter",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmMix",
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmToken",
+        "com.github.javaparser.printer.ConcreteSyntaxModel",
+        "com.github.javaparser.printer.lexicalpreservation.TokenTextElement",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmElement",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.ast.DataKey",
+        "com.github.javaparser.printer.lexicalpreservation.Difference",
+        "com.github.javaparser.printer.lexicalpreservation.TextElementIteratorsFactory",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "LexicalPreservingPrinter.Observer",
+      "dependencies": [
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "TokenTextElement",
+      "dependencies": [
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingVisitor",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "Difference",
+      "dependencies": [
+        "com.github.javaparser.printer.lexicalpreservation.Difference.EnforcingIndentationContext",
+        "com.github.javaparser.printer.lexicalpreservation.ChildTextElement",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.printer.lexicalpreservation.Difference.ArrayIterator",
+        "com.github.javaparser.printer.lexicalpreservation.NodeText",
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+        "com.github.javaparser.printer.lexicalpreservation.DifferenceElement",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.printer.lexicalpreservation.TextElement",
+        "com.github.javaparser.printer.lexicalpreservation.Removed",
+        "com.github.javaparser.printer.lexicalpreservation.Kept",
+        "com.github.javaparser.printer.lexicalpreservation.TokenTextElement",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmElement",
+        "com.github.javaparser.printer.lexicalpreservation.RemovedGroup",
+        "com.github.javaparser.printer.lexicalpreservation.Added",
+        "com.github.javaparser.printer.lexicalpreservation.ReshuffledDiffElementExtractor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "RemovedGroup",
+      "dependencies": [
+        "com.github.javaparser.printer.lexicalpreservation.Removed",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmToken",
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.serialization",
+      "class": "JavaParserJsonDeserializer",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.PropertyMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.serialization",
+      "class": "JavaParserJsonSerializer",
+      "dependencies": [
+        "com.github.javaparser.metamodel.BaseNodeMetaModel",
+        "com.github.javaparser.serialization.JavaParserJsonSerializer.JsonRange",
+        "com.github.javaparser.serialization.JavaParserJsonSerializer.JsonToken",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.serialization.JavaParserJsonSerializer.JsonTokenRange",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.serialization.JavaParserJsonSerializer.JsonNode",
+        "com.github.javaparser.JavaToken"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

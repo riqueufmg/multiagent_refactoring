@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.github.javaparser.symbolsolver.resolution", "metrics": {"num_classes": 1, "loc": 106, "Ce": 20, "Ca": 6}, "classes": [{"package": "com.github.javaparser.symbolsolver.resolution", "class": "SymbolSolver", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/resolution/SymbolSolver.java", "metrics": {"nof": 1, "nopf": 0, "nom": 14, "nopm": 14, "loc": 106, "wmc": 26, "nc": 0, "dit": 1, "lcom": 0.1428571428571428, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.symbolsolver.reflectionmodel.ReflectionInterfaceDeclaration", "com.github.javaparser.symbolsolver.reflectionmodel.ReflectionEnumDeclaration", "com.github.javaparser.resolution.model.SymbolReference", "com.github.javaparser.symbolsolver.reflectionmodel.ReflectionClassDeclaration", "com.github.javaparser.ast.Node", "com.github.javaparser.ast.type.Type", "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory", "com.github.javaparser.resolution.MethodUsage", "com.github.javaparser.resolution.types.ResolvedPrimitiveType", "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration", "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration", "com.github.javaparser.resolution.types.ResolvedType", "com.github.javaparser.resolution.Context", "com.github.javaparser.resolution.TypeSolver", "com.github.javaparser.symbolsolver.reflectionmodel.ReflectionAnnotationDeclaration"]}], "dependencies": ["com.github.javaparser.ast", "com.github.javaparser.resolution.model", "com.github.javaparser.ast.body", "com.github.javaparser.symbolsolver.javaparsermodel", "com.github.javaparser", "com.github.javaparser.ast.type", "com.github.javaparser.resolution", "com.github.javaparser.symbolsolver.javassistmodel", "com.github.javaparser.resolution.types", "com.github.javaparser.symbolsolver.core.resolution", "com.github.javaparser.ast.expr", "com.github.javaparser.utils", "com.github.javaparser.symbolsolver", "com.github.javaparser.resolution.declarations", "com.github.javaparser.resolution.model.typesystem", "com.github.javaparser.symbolsolver.resolution.typesolvers", "com.github.javaparser.symbolsolver.javaparsermodel.contexts", "com.github.javaparser.symbolsolver.reflectionmodel", "com.github.javaparser.ast.stmt", "com.github.javaparser.symbolsolver.javaparsermodel.declarations"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

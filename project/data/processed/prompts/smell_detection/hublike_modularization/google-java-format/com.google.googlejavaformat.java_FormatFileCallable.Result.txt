@@ -1,0 +1,54 @@
+##CONTEXT_SIZE=363
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.googlejavaformat.java",
+    "class": "FormatFileCallable.Result",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "FormatFileCallable",
+      "dependencies": [
+        "com.google.googlejavaformat.java.ImportOrderer",
+        "com.google.googlejavaformat.java.FormatterException",
+        "com.google.googlejavaformat.java.FormatFileCallable.Result",
+        "com.google.googlejavaformat.java.Formatter",
+        "com.google.googlejavaformat.java.RemoveUnusedImports",
+        "com.google.googlejavaformat.java.StringWrapper",
+        "com.google.googlejavaformat.java.JavaFormatterOptions"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

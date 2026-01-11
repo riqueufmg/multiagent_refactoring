@@ -1,0 +1,115 @@
+##CONTEXT_SIZE=971
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.ast",
+    "class": "CompilationUnit.Storage",
+    "dependencies": [
+      "com.github.javaparser.ast.CompilationUnit",
+      "com.github.javaparser.ParseStart"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "CompilationUnit",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.ast.body.AnnotationDeclaration",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.CompilationUnit.Storage",
+        "com.github.javaparser.utils.ClassUtils",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ParseStart",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.metamodel.CompilationUnitMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "ParseStart",
+      "dependencies": [
+        "com.github.javaparser.ParseException",
+        "com.github.javaparser.GeneratedJavaParser"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "CompilationUnit",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.ast.body.AnnotationDeclaration",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.CompilationUnit.Storage",
+        "com.github.javaparser.utils.ClassUtils",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.body.EnumDeclaration",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ParseStart",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.metamodel.CompilationUnitMetaModel"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,126 @@
+##CONTEXT_SIZE=943
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser",
+    "class": "GeneratedJavaParserTokenManagerBase",
+    "dependencies": [
+      "com.github.javaparser.TokenTypes",
+      "com.github.javaparser.TokenRange",
+      "com.github.javaparser.ast.comments.Comment",
+      "com.github.javaparser.Token",
+      "com.github.javaparser.ast.comments.MarkdownComment",
+      "com.github.javaparser.JavaToken"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenTypes",
+      "dependencies": [
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "TokenRange",
+      "dependencies": [
+        "com.github.javaparser.JavaToken"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "Comment",
+      "dependencies": [
+        "com.github.javaparser.ast.comments.TraditionalJavadocComment",
+        "com.github.javaparser.ast.comments.BlockComment",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.CommentMetaModel",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.LineComment",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.comments.MarkdownComment"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "Token",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "MarkdownComment",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.MarkdownCommentMetaModel",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.utils.LineSeparator"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "JavaToken",
+      "dependencies": [
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.JavaToken.Category",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.Token"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser",
+      "class": "GeneratedJavaParserTokenManager",
+      "dependencies": [
+        "com.github.javaparser.SimpleCharStream",
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.GeneratedJavaParserTokenManagerBase",
+        "com.github.javaparser.TokenMgrException",
+        "com.github.javaparser.ast.comments.CommentsCollection",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.Token",
+        "com.github.javaparser.ast.comments.MarkdownComment",
+        "com.github.javaparser.JavaToken"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

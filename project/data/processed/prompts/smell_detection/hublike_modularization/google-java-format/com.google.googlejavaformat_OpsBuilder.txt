@@ -1,0 +1,172 @@
+##CONTEXT_SIZE=1331
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.googlejavaformat",
+    "class": "OpsBuilder",
+    "dependencies": [
+      "com.google.googlejavaformat.OpenOp",
+      "com.google.googlejavaformat.FormatterDiagnostic",
+      "com.google.googlejavaformat.Doc",
+      "com.google.googlejavaformat.Input",
+      "com.google.googlejavaformat.OpsBuilder.BlankLineWanted",
+      "com.google.googlejavaformat.Indent",
+      "com.google.googlejavaformat.Op",
+      "com.google.googlejavaformat.CloseOp",
+      "com.google.googlejavaformat.Output"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "OpenOp",
+      "dependencies": [
+        "com.google.googlejavaformat.DocBuilder",
+        "com.google.googlejavaformat.Op",
+        "com.google.googlejavaformat.Indent"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "FormatterDiagnostic",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "Doc",
+      "dependencies": [
+        "com.google.googlejavaformat.Doc.FillMode",
+        "com.google.googlejavaformat.Input",
+        "com.google.googlejavaformat.CommentsHelper",
+        "com.google.googlejavaformat.Indent",
+        "com.google.googlejavaformat.Doc.Token",
+        "com.google.googlejavaformat.Doc.State",
+        "com.google.googlejavaformat.Doc.Tok",
+        "com.google.googlejavaformat.Doc.RealOrImaginary",
+        "com.google.googlejavaformat.Output",
+        "com.google.googlejavaformat.Doc.Space"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "Input",
+      "dependencies": [
+        "com.google.googlejavaformat.FormatterDiagnostic",
+        "com.google.googlejavaformat.Input.Token"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "OpsBuilder.BlankLineWanted",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "Indent",
+      "dependencies": [
+        "com.google.googlejavaformat.Indent.Const"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "Op",
+      "dependencies": [
+        "com.google.googlejavaformat.DocBuilder"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "CloseOp",
+      "dependencies": [
+        "com.google.googlejavaformat.DocBuilder",
+        "com.google.googlejavaformat.Op"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "Output",
+      "dependencies": [
+        "com.google.googlejavaformat.Input",
+        "com.google.googlejavaformat.CommentsHelper"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "Formatter",
+      "dependencies": [
+        "com.google.googlejavaformat.java.JavaInputAstVisitor",
+        "com.google.googlejavaformat.OpsBuilder",
+        "com.google.googlejavaformat.Doc",
+        "com.google.googlejavaformat.java.Trees",
+        "com.google.googlejavaformat.java.ModifierOrderer",
+        "com.google.googlejavaformat.Newlines",
+        "com.google.googlejavaformat.java.FormatterException",
+        "com.google.googlejavaformat.DocBuilder",
+        "com.google.googlejavaformat.java.ImportOrderer",
+        "com.google.googlejavaformat.java.RemoveUnusedImports",
+        "com.google.googlejavaformat.java.JavaOutput",
+        "com.google.googlejavaformat.java.StringWrapper",
+        "com.google.googlejavaformat.java.JavaFormatterOptions",
+        "com.google.googlejavaformat.java.JavaInput"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "JavaInputAstVisitor",
+      "dependencies": [
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.DeclarationModifiersAndTypeAnnotations",
+        "com.google.googlejavaformat.Indent",
+        "com.google.googlejavaformat.java.DimensionHelpers",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.Direction",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.AllowTrailingBlankLine",
+        "com.google.googlejavaformat.Doc",
+        "com.google.googlejavaformat.OpsBuilder",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.BracesOrNot",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.DeclarationKind",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.CollapseEmptyOrNot",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.Kind",
+        "com.google.googlejavaformat.Input",
+        "com.google.googlejavaformat.java.TypeNameClassifier",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.AnnotationOrModifier",
+        "com.google.googlejavaformat.CloseOp",
+        "com.google.googlejavaformat.OpenOp",
+        "com.google.googlejavaformat.java.Trees",
+        "com.google.googlejavaformat.Newlines",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.FirstDeclarationsOrNot",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.BreakOrNot",
+        "com.google.googlejavaformat.java.JavaInputAstVisitor.AllowLeadingBlankLine"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import os
 
-from agents.llm_inference.llm_engine import LLMInferenceEngine
 from agents.llm_inference.gpt_engine import GPTEngine
+from agents.llm_inference.deepseek_engine import DeepSeekEngine
 
 class InsufficientModularizationDetector:
 
@@ -99,19 +99,15 @@ class InsufficientModularizationDetector:
 
             output_file = output_base_dir / f"{prompt_file.stem}.txt"
 
-            # 1. Skip if already inferred
             if output_file.exists():
                 print(f"Output already exists: {output_file.name}")
                 continue
 
-            # 2. Load prompt
             with open(prompt_file, "r", encoding="utf-8") as f:
                 prompt_content = f.read()
 
-            # 3. Run inference
             response = llm_engine.generate(prompt_content)
 
-            # 4. Safe write (atomic)
             tmp_file = output_file.with_suffix(".tmp")
             with open(tmp_file, "w", encoding="utf-8") as out_f:
                 out_f.write(response)
@@ -119,3 +115,38 @@ class InsufficientModularizationDetector:
             tmp_file.replace(output_file)
 
             print(f"Saved output to {output_file.name}")
+    
+    def detect_deepseek(self, list_of_prompt_files):
+        llm_config = {
+            "model_name": "deepseek-chat",
+            "max_input_tokens": 100000,
+            "max_completion_tokens": 8192,
+        }
+
+        llm_engine = DeepSeekEngine(**llm_config)
+
+        output_dir = Path(
+            os.getenv("OUTPUT_PATH"),
+            "llm_outputs",
+            self.project_name,
+            "insufficient_modularization",
+            "deepseek"
+        )
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        for prompt_file in list_of_prompt_files:
+            output_file = output_dir / f"{prompt_file.stem}.txt"
+
+            if output_file.exists():
+                print(f"[SKIP] Output already exists: {output_file.name}")
+                continue
+
+            with open(prompt_file, "r", encoding="utf-8") as f:
+                prompt_content = f.read()
+
+            response = llm_engine.generate(prompt_content)
+
+            with open(output_file, "w", encoding="utf-8") as out_f:
+                out_f.write(response)
+
+            print(f"[OK] Saved DeepSeek output to {output_file.name}")

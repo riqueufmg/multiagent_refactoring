@@ -1,0 +1,326 @@
+##CONTEXT_SIZE=2158
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io.function",
+    "class": "Uncheck",
+    "dependencies": [
+      "org.apache.commons.io.function.IORunnable",
+      "org.apache.commons.io.function.IOTriFunction",
+      "org.apache.commons.io.function.IOSupplier",
+      "org.apache.commons.io.function.IOIntConsumer",
+      "org.apache.commons.io.function.IOLongSupplier",
+      "org.apache.commons.io.function.IOBiFunction",
+      "org.apache.commons.io.function.IOIntSupplier",
+      "org.apache.commons.io.function.IOTriConsumer",
+      "org.apache.commons.io.function.IOBiConsumer",
+      "org.apache.commons.io.function.IOComparator",
+      "org.apache.commons.io.function.IOFunction",
+      "org.apache.commons.io.function.IOBooleanSupplier",
+      "org.apache.commons.io.function.IOConsumer",
+      "org.apache.commons.io.function.IOPredicate",
+      "org.apache.commons.io.function.IOQuadFunction"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IORunnable",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOTriFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOFunction"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOIntConsumer",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOLongSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBiFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOFunction",
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOIntSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOTriConsumer",
+      "dependencies": [
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBiConsumer",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOComparator",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBooleanSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOConsumer",
+      "dependencies": [
+        "org.apache.commons.io.IOExceptionList",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.IOStreams"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOPredicate",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOQuadFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOFunction"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "FileUtils",
+      "dependencies": [
+        "org.apache.commons.io.FileExistsException",
+        "org.apache.commons.io.filefilter.IOFileFilter",
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.filefilter.TrueFileFilter",
+        "org.apache.commons.io.filefilter.FileEqualsFileFilter",
+        "org.apache.commons.io.filefilter.SuffixFileFilter",
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.filefilter.FileFileFilter",
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.AccumulatorPathVisitor",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.LineIterator"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBooleanSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOPredicate",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IORunnable",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOIntSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOLongSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "UncheckedIOIterator",
+      "dependencies": [
+        "org.apache.commons.io.function.IOIterator",
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOConsumer",
+      "dependencies": [
+        "org.apache.commons.io.IOExceptionList",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.IOStreams"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBiFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOFunction",
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOComparator",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOBiConsumer",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.input",
+      "class": "UncheckedFilterReader",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.input.UncheckedFilterReader.Builder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.input",
+      "class": "UncheckedBufferedReader",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.input.UncheckedBufferedReader.Builder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.input",
+      "class": "UncheckedFilterInputStream",
+      "dependencies": [
+        "org.apache.commons.io.input.UncheckedFilterInputStream.Builder",
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.output",
+      "class": "UncheckedFilterWriter",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.output.UncheckedFilterWriter.Builder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.output",
+      "class": "UncheckedFilterOutputStream",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.output.UncheckedFilterOutputStream.Builder"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

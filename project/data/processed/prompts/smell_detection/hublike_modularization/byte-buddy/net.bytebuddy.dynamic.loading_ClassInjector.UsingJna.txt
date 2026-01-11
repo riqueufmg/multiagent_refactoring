@@ -1,0 +1,102 @@
+##CONTEXT_SIZE=850
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.loading",
+    "class": "ClassInjector.UsingJna",
+    "dependencies": [
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+      "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+      "net.bytebuddy.build.AccessControllerPlugin"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassLoadingStrategy",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.WrappingDispatcher",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Configurable"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "AccessControllerPlugin",
+      "dependencies": [
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.AccessControllerPlugin.Initializer",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.modifier.FieldManifestation"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

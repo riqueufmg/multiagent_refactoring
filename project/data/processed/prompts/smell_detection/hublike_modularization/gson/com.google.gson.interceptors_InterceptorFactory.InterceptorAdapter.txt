@@ -1,0 +1,62 @@
+##CONTEXT_SIZE=394
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson.interceptors",
+    "class": "InterceptorFactory.InterceptorAdapter",
+    "dependencies": [
+      "com.google.gson.interceptors.JsonPostDeserializer",
+      "com.google.gson.TypeAdapter"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.gson.interceptors",
+      "class": "JsonPostDeserializer",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.gson",
+      "class": "TypeAdapter",
+      "dependencies": [
+        "com.google.gson.internal.bind.JsonTreeReader",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.JsonElement",
+        "com.google.gson.internal.bind.JsonTreeWriter"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

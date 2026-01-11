@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.zxing.pdf417.decoder.ec", "metrics": {"num_classes": 3, "loc": 396, "Ce": 3, "Ca": 1}, "classes": [{"package": "com.google.zxing.pdf417.decoder.ec", "class": "ModulusGF", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/ec/ModulusGF.java", "metrics": {"nof": 6, "nopf": 1, "nom": 11, "nopm": 0, "loc": 75, "wmc": 18, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.PDF417Common", "com.google.zxing.pdf417.decoder.ec.ModulusPoly"]}, {"package": "com.google.zxing.pdf417.decoder.ec", "class": "ErrorCorrection", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/ec/ErrorCorrection.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 2, "loc": 129, "wmc": 23, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.ec.ModulusGF", "com.google.zxing.ChecksumException", "com.google.zxing.pdf417.decoder.ec.ModulusPoly"]}, {"package": "com.google.zxing.pdf417.decoder.ec", "class": "ModulusPoly", "file": "data/repositories/zxing/core/src/main/java/com/google/zxing/pdf417/decoder/ec/ModulusPoly.java", "metrics": {"nof": 2, "nopf": 0, "nom": 13, "nopm": 1, "loc": 192, "wmc": 46, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.zxing.pdf417.decoder.ec.ModulusGF"]}], "dependencies": ["com.google.zxing.common.reedsolomon", "com.google.zxing.pdf417", "com.google.zxing"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

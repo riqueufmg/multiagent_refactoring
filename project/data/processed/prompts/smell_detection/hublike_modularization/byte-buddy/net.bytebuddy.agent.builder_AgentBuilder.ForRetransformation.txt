@@ -1,0 +1,156 @@
+##CONTEXT_SIZE=1688
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.agent.builder",
+    "class": "AgentBuilder.ForRetransformation",
+    "dependencies": [
+      "net.bytebuddy.agent.builder.AgentBuilder"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.agent.builder",
+      "class": "AgentBuilder",
+      "dependencies": [
+        "net.bytebuddy.agent.builder.AgentBuilder.InstallationListener",
+        "net.bytebuddy.agent.builder.AgentBuilder.PatchMode",
+        "net.bytebuddy.agent.builder.AgentBuilder.Default",
+        "net.bytebuddy.agent.builder.AgentBuilder.ForTotal",
+        "net.bytebuddy.agent.builder.AgentBuilder.InjectionStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.InitializationStrategy",
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.modifier.FieldManifestation",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionImmediateMatcher",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.agent.builder.AgentBuilder.Delegator",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionEnforcer",
+        "net.bytebuddy.build.SafeVarargsPlugin",
+        "net.bytebuddy.agent.builder.AgentBuilder.TransformerDecorator",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.agent.builder.AgentBuilder.SinglePass",
+        "net.bytebuddy.dynamic.VisibilityBridgeStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Factory",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.SelfInjection",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.agent.builder.AgentBuilder.NativeMethodStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.RedefinitionListenable",
+        "net.bytebuddy.agent.builder.AgentBuilder.StreamWriting",
+        "net.bytebuddy.agent.builder.AgentBuilder.Transformation",
+        "net.bytebuddy.agent.builder.AgentBuilder.Ignored",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.implementation.bytecode.Duplication",
+        "net.bytebuddy.agent.builder.AgentBuilder.BootstrapMarkerAction",
+        "net.bytebuddy.agent.builder.AgentBuilder.Inactive",
+        "net.bytebuddy.agent.builder.AgentBuilder.NoOp",
+        "net.bytebuddy.agent.builder.AgentBuilder.ForClassLoader",
+        "net.bytebuddy.agent.builder.AgentBuilder.Listener",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionScheduler",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.agent.builder.AgentBuilder.PoolStrategy",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.agent.builder.AgentBuilder.ForLegacyVm",
+        "net.bytebuddy.agent.builder.AgentBuilder.WarmupStrategy",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.agent.builder.AgentBuilder.BatchAllocator",
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.agent.builder.AgentBuilder.SuperTypeLoading",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.asm.Advice",
+        "net.bytebuddy.agent.builder.AgentBuilder.LambdaInstrumentationStrategy",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.RawMatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.CreationAction",
+        "net.bytebuddy.agent.builder.AgentBuilder.FallbackStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.DiscoveryStrategy",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.implementation.LoadedTypeInitializer",
+        "net.bytebuddy.agent.builder.AgentBuilder.Collector",
+        "net.bytebuddy.matcher.LatentMatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.TypeStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.RedefinitionStrategy",
+        "net.bytebuddy.NamingStrategy",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.description.modifier.TypeManifestation",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.agent.builder.AgentBuilder.Loader",
+        "net.bytebuddy.agent.builder.AgentBuilder.UsingReflection",
+        "net.bytebuddy.dynamic.NexusAccessor",
+        "net.bytebuddy.agent.builder.AgentBuilder.Cancelable",
+        "net.bytebuddy.agent.builder.AgentBuilder.Narrowable",
+        "net.bytebuddy.agent.builder.AgentBuilder.ConstructorImplementation",
+        "net.bytebuddy.agent.builder.AgentBuilder.FactoryImplementation",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.agent.builder.AgentBuilder.WithoutBatchStrategy",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.agent.builder.AgentBuilder.Trivial",
+        "net.bytebuddy.agent.builder.AgentBuilder.LambdaMetafactoryFactory",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionOnErrorMatcher",
+        "net.bytebuddy.agent.builder.ResettableClassFileTransformer",
+        "net.bytebuddy.agent.builder.AgentBuilder.LocationStrategy",
+        "net.bytebuddy.description.modifier.MethodManifestation",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.agent.builder.AgentBuilder.Entry",
+        "net.bytebuddy.agent.builder.AgentBuilder.Transformer",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.agent.builder.AgentBuilder.CircularityLock",
+        "net.bytebuddy.agent.builder.AgentBuilder.ExecutingTransformer",
+        "net.bytebuddy.agent.builder.AgentBuilder.DescriptionStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Disabled",
+        "net.bytebuddy.agent.builder.AgentBuilder.Dispatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.UsingDirectInvocation",
+        "net.bytebuddy.agent.builder.AgentBuilder.Handler",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.ClassFileBufferStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Unavailable",
+        "net.bytebuddy.agent.builder.AgentBuilder.Identified",
+        "net.bytebuddy.agent.builder.AgentBuilder.UsingMethodHandleLookup"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

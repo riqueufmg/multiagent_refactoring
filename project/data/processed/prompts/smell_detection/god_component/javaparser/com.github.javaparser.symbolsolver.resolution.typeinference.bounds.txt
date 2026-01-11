@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds", "metrics": {"num_classes": 5, "loc": 210, "Ce": 5, "Ca": 1}, "classes": [{"package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds", "class": "SubtypeOfBound", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/resolution/typeinference/bounds/SubtypeOfBound.java", "metrics": {"nof": 2, "nopf": 0, "nom": 11, "nopm": 11, "loc": 60, "wmc": 17, "nc": 0, "dit": 1, "lcom": 0.1818181818181818, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution", "com.github.javaparser.symbolsolver.resolution.typeinference.TypeHelper", "com.github.javaparser.resolution.types.ResolvedType"]}, {"package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds", "class": "CapturesBound", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/resolution/typeinference/bounds/CapturesBound.java", "metrics": {"nof": 2, "nopf": 0, "nom": 8, "nopm": 8, "loc": 39, "wmc": 11, "nc": 0, "dit": 1, "lcom": 0.375, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"]}, {"package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds", "class": "SameAsBound", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/resolution/typeinference/bounds/SameAsBound.java", "metrics": {"nof": 2, "nopf": 0, "nom": 10, "nopm": 10, "loc": 57, "wmc": 16, "nc": 0, "dit": 1, "lcom": 0.2, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution", "com.github.javaparser.symbolsolver.resolution.typeinference.TypeHelper", "com.github.javaparser.resolution.types.ResolvedType"]}, {"package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds", "class": "FalseBound", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/resolution/typeinference/bounds/FalseBound.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 4, "loc": 21, "wmc": 5, "nc": 0, "dit": 1, "lcom": 1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"]}, {"package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds", "class": "ThrowsBound", "file": "data/repositories/javaparser/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/resolution/typeinference/bounds/ThrowsBound.java", "metrics": {"nof": 1, "nopf": 0, "nom": 7, "nopm": 7, "loc": 33, "wmc": 9, "nc": 0, "dit": 1, "lcom": 0.2857142857142857, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariable", "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"]}], "dependencies": ["com.github.javaparser.resolution.declarations", "com.github.javaparser.resolution.model.typesystem", "com.github.javaparser.symbolsolver.resolution.typeinference", "com.github.javaparser.resolution", "com.github.javaparser.resolution.types"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

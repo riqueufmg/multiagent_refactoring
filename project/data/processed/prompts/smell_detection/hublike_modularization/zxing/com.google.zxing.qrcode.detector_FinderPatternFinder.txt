@@ -1,0 +1,119 @@
+##CONTEXT_SIZE=835
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.qrcode.detector",
+    "class": "FinderPatternFinder",
+    "dependencies": [
+      "com.google.zxing.ResultPointCallback",
+      "com.google.zxing.common.BitMatrix",
+      "com.google.zxing.NotFoundException",
+      "com.google.zxing.DecodeHintType",
+      "com.google.zxing.ResultPoint",
+      "com.google.zxing.qrcode.detector.FinderPattern",
+      "com.google.zxing.qrcode.detector.FinderPatternFinder.EstimatedModuleComparator",
+      "com.google.zxing.qrcode.detector.FinderPatternInfo"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing",
+      "class": "ResultPointCallback",
+      "dependencies": [
+        "com.google.zxing.ResultPoint"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common",
+      "class": "BitMatrix",
+      "dependencies": [
+        "com.google.zxing.common.BitArray"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "NotFoundException",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "DecodeHintType",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultPoint",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.detector",
+      "class": "FinderPattern",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.qrcode.detector",
+      "class": "FinderPatternFinder.EstimatedModuleComparator",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.qrcode.detector",
+      "class": "FinderPatternInfo",
+      "dependencies": [
+        "com.google.zxing.qrcode.detector.FinderPattern"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.qrcode.detector",
+      "class": "Detector",
+      "dependencies": [
+        "com.google.zxing.ResultPointCallback",
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.common.PerspectiveTransform",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.GridSampler",
+        "com.google.zxing.qrcode.detector.AlignmentPatternFinder",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.qrcode.detector.FinderPatternFinder",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.qrcode.detector.FinderPattern",
+        "com.google.zxing.qrcode.detector.AlignmentPattern",
+        "com.google.zxing.qrcode.decoder.Version",
+        "com.google.zxing.qrcode.detector.FinderPatternInfo"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

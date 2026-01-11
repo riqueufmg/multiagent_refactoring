@@ -1,0 +1,103 @@
+##CONTEXT_SIZE=741
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.gson.typeadapters",
+    "class": "PostConstructAdapterFactory",
+    "dependencies": [
+      "com.google.gson.reflect.TypeToken",
+      "com.google.gson.Gson",
+      "com.google.gson.TypeAdapter"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.gson.reflect",
+      "class": "TypeToken",
+      "dependencies": [
+        "com.google.gson.internal.TroubleshootingGuide",
+        "com.google.gson.internal.GsonTypes"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "Gson",
+      "dependencies": [
+        "com.google.gson.internal.bind.ArrayTypeAdapter",
+        "com.google.gson.TypeAdapterFactory",
+        "com.google.gson.internal.bind.NumberTypeAdapter",
+        "com.google.gson.internal.bind.TypeAdapters",
+        "com.google.gson.internal.GsonBuildConfig",
+        "com.google.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory",
+        "com.google.gson.JsonElement",
+        "com.google.gson.internal.bind.JsonTreeWriter",
+        "com.google.gson.JsonIOException",
+        "com.google.gson.FieldNamingPolicy",
+        "com.google.gson.internal.sql.SqlTypesSupport",
+        "com.google.gson.FieldNamingStrategy",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.ToNumberPolicy",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.GsonBuilder",
+        "com.google.gson.ToNumberStrategy",
+        "com.google.gson.Strictness",
+        "com.google.gson.internal.Excluder",
+        "com.google.gson.reflect.TypeToken",
+        "com.google.gson.JsonSyntaxException",
+        "com.google.gson.internal.bind.ObjectTypeAdapter",
+        "com.google.gson.TypeAdapter",
+        "com.google.gson.internal.bind.DefaultDateTypeAdapter",
+        "com.google.gson.LongSerializationPolicy",
+        "com.google.gson.Gson.FutureTypeAdapter",
+        "com.google.gson.internal.ConstructorConstructor",
+        "com.google.gson.FormattingStyle",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.JsonNull"
+      ]
+    },
+    {
+      "package": "com.google.gson",
+      "class": "TypeAdapter",
+      "dependencies": [
+        "com.google.gson.internal.bind.JsonTreeReader",
+        "com.google.gson.stream.JsonReader",
+        "com.google.gson.stream.JsonToken",
+        "com.google.gson.internal.Streams",
+        "com.google.gson.stream.JsonWriter",
+        "com.google.gson.JsonElement",
+        "com.google.gson.internal.bind.JsonTreeWriter"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

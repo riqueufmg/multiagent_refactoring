@@ -1,0 +1,346 @@
+##CONTEXT_SIZE=2546
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io.file",
+    "class": "PathUtils",
+    "dependencies": [
+      "org.apache.commons.io.FilenameUtils",
+      "org.apache.commons.io.Charsets",
+      "org.apache.commons.io.file.PathFilter",
+      "org.apache.commons.io.function.IOSupplier",
+      "org.apache.commons.io.IOUtils",
+      "org.apache.commons.io.FileUtils",
+      "org.apache.commons.io.RandomAccessFileMode",
+      "org.apache.commons.io.RandomAccessFiles",
+      "org.apache.commons.io.file.attribute.FileTimes",
+      "org.apache.commons.io.function.IOFunction",
+      "org.apache.commons.io.ThreadUtils",
+      "org.apache.commons.io.file.StandardDeleteOption",
+      "org.apache.commons.io.file.PathUtils.RelativeSortedPaths",
+      "org.apache.commons.io.file.AccumulatorPathVisitor",
+      "org.apache.commons.io.file.DeleteOption",
+      "org.apache.commons.io.file.Counters",
+      "org.apache.commons.io.file.CountingPathVisitor"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "FilenameUtils",
+      "dependencies": [
+        "org.apache.commons.io.IOCase",
+        "org.apache.commons.io.FileSystem"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "Charsets",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "PathFilter",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOSupplier",
+      "dependencies": [
+        "org.apache.commons.io.function.Uncheck"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "IOUtils",
+      "dependencies": [
+        "org.apache.commons.io.output.ByteArrayOutputStream",
+        "org.apache.commons.io.output.StringBuilderWriter",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream",
+        "org.apache.commons.io.function.IOTriFunction",
+        "org.apache.commons.io.output.NullOutputStream",
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.StandardLineSeparator",
+        "org.apache.commons.io.IOUtils.ScratchBytes",
+        "org.apache.commons.io.input.CharSequenceReader",
+        "org.apache.commons.io.input.BoundedInputStream",
+        "org.apache.commons.io.output.NullWriter",
+        "org.apache.commons.io.IOExceptionList",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.IOUtils.ScratchChars",
+        "org.apache.commons.io.LineIterator",
+        "org.apache.commons.io.input.QueueInputStream"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "FileUtils",
+      "dependencies": [
+        "org.apache.commons.io.FileExistsException",
+        "org.apache.commons.io.filefilter.IOFileFilter",
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.filefilter.TrueFileFilter",
+        "org.apache.commons.io.filefilter.FileEqualsFileFilter",
+        "org.apache.commons.io.filefilter.SuffixFileFilter",
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.filefilter.FileFileFilter",
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.AccumulatorPathVisitor",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.LineIterator"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "RandomAccessFileMode",
+      "dependencies": [
+        "org.apache.commons.io.function.IOFunction",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.IORandomAccessFile"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "RandomAccessFiles",
+      "dependencies": [
+        "org.apache.commons.io.IOUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file.attribute",
+      "class": "FileTimes",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.function",
+      "class": "IOFunction",
+      "dependencies": [
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.function.Constants"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "ThreadUtils",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "StandardDeleteOption",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "PathUtils.RelativeSortedPaths",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "AccumulatorPathVisitor",
+      "dependencies": [
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.file.AccumulatorPathVisitor.Builder",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.IOBiFunction"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "DeleteOption",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "Counters",
+      "dependencies": [
+        "org.apache.commons.io.file.Counters.NoopPathCounters",
+        "org.apache.commons.io.file.Counters.Counter",
+        "org.apache.commons.io.file.Counters.PathCounters",
+        "org.apache.commons.io.file.Counters.NoopCounter"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "CountingPathVisitor",
+      "dependencies": [
+        "org.apache.commons.io.filefilter.IOFileFilter",
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.CountingPathVisitor.AbstractBuilder",
+        "org.apache.commons.io.file.SimplePathVisitor",
+        "org.apache.commons.io.filefilter.TrueFileFilter",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.IOBiFunction"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "FileUtils",
+      "dependencies": [
+        "org.apache.commons.io.FileExistsException",
+        "org.apache.commons.io.filefilter.IOFileFilter",
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.filefilter.TrueFileFilter",
+        "org.apache.commons.io.filefilter.FileEqualsFileFilter",
+        "org.apache.commons.io.filefilter.SuffixFileFilter",
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.filefilter.FileFileFilter",
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.AccumulatorPathVisitor",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.LineIterator"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "DeletingPathVisitor",
+      "dependencies": [
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "CopyDirectoryVisitor",
+      "dependencies": [
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "CleaningPathVisitor",
+      "dependencies": [
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.file.CountingPathVisitor"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "DirectoryStreamFilter",
+      "dependencies": [
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "AccumulatorPathVisitor",
+      "dependencies": [
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.file.AccumulatorPathVisitor.Builder",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.IOBiFunction"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.output",
+      "class": "DeferredFileOutputStream",
+      "dependencies": [
+        "org.apache.commons.io.output.ByteArrayOutputStream",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.output.DeferredFileOutputStream.Builder",
+        "org.apache.commons.io.output.AbstractByteArrayOutputStream"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.build",
+      "class": "AbstractStreamBuilder",
+      "dependencies": [
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.filefilter",
+      "class": "SuffixFileFilter",
+      "dependencies": [
+        "org.apache.commons.io.IOCase",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.filefilter",
+      "class": "WildcardFileFilter",
+      "dependencies": [
+        "org.apache.commons.io.filefilter.WildcardFileFilter.Builder",
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.IOCase",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.filefilter",
+      "class": "PathVisitorFileFilter",
+      "dependencies": [
+        "org.apache.commons.io.file.NoopPathVisitor",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.file.PathVisitor"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.filefilter",
+      "class": "WildcardFilter",
+      "dependencies": [
+        "org.apache.commons.io.filefilter.AbstractFileFilter",
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.filefilter",
+      "class": "NameFileFilter",
+      "dependencies": [
+        "org.apache.commons.io.IOCase",
+        "org.apache.commons.io.file.PathUtils"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

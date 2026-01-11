@@ -1,0 +1,82 @@
+##CONTEXT_SIZE=672
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+    "class": "VMLanguageConfigStage",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+      "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+      "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.core",
+      "class": "JITWatchConfig",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.model.ParsedClasspath",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.CompressedOops",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.BackgroundCompilation",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.TieredCompilation",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.OnStackReplacement"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.util",
+      "class": "UserInterfaceUtil",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.util.ObservableResourceFactory"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.stage",
+      "class": "IStageClosedListener",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+      "class": "VMLanguageList",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.jvmlang.LanguageManager",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.VMLanguageConfigStage",
+        "org.adoptopenjdk.jitwatch.ui.stage.StageManager"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

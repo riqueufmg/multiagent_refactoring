@@ -1,0 +1,105 @@
+##CONTEXT_SIZE=717
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.result",
+    "class": "AddressBookParsedResult",
+    "dependencies": [
+      "com.google.zxing.client.result.ParsedResultType"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ParsedResultType",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "AddressBookResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.AddressBookParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.encode",
+      "class": "QRCodeEncoder",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.encode.ContactEncoder",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "VCardResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "AddressBookAUResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "AddressBookDoCoMoResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "BizcardResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

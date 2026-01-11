@@ -1,0 +1,130 @@
+##CONTEXT_SIZE=1322
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.printer.lexicalpreservation",
+    "class": "Added",
+    "dependencies": [
+      "com.github.javaparser.printer.lexicalpreservation.TextElement",
+      "com.github.javaparser.printer.lexicalpreservation.DifferenceElement",
+      "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+      "com.github.javaparser.printer.concretesyntaxmodel.CsmElement"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "TextElement",
+      "dependencies": [
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.printer.lexicalpreservation.TextElementMatcher",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "DifferenceElement",
+      "dependencies": [
+        "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmElement"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "LexicalDifferenceCalculator",
+      "dependencies": [
+        "com.github.javaparser.printer.lexicalpreservation.DifferenceElementCalculator",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmConditional",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmAttribute",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmList",
+        "com.github.javaparser.ast.Modifier",
+        "com.github.javaparser.printer.lexicalpreservation.NodeText",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmSingleReference",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmSequence",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmMix",
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CalculatedSyntaxModel",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.printer.lexicalpreservation.DifferenceElement",
+        "com.github.javaparser.printer.lexicalpreservation.changes.Change",
+        "com.github.javaparser.printer.ConcreteSyntaxModel",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmElement",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.printer.lexicalpreservation.Difference"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.printer.concretesyntaxmodel",
+      "class": "CsmElement",
+      "dependencies": [
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmConditional",
+        "com.github.javaparser.printer.SourcePrinter",
+        "com.github.javaparser.printer.lexicalpreservation.TextElement"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.printer.lexicalpreservation",
+      "class": "Difference",
+      "dependencies": [
+        "com.github.javaparser.printer.lexicalpreservation.Difference.EnforcingIndentationContext",
+        "com.github.javaparser.printer.lexicalpreservation.ChildTextElement",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.printer.lexicalpreservation.Difference.ArrayIterator",
+        "com.github.javaparser.printer.lexicalpreservation.NodeText",
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+        "com.github.javaparser.printer.lexicalpreservation.DifferenceElement",
+        "com.github.javaparser.JavaToken",
+        "com.github.javaparser.printer.lexicalpreservation.TextElement",
+        "com.github.javaparser.printer.lexicalpreservation.Removed",
+        "com.github.javaparser.printer.lexicalpreservation.Kept",
+        "com.github.javaparser.printer.lexicalpreservation.TokenTextElement",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.printer.concretesyntaxmodel.CsmElement",
+        "com.github.javaparser.printer.lexicalpreservation.RemovedGroup",
+        "com.github.javaparser.printer.lexicalpreservation.Added",
+        "com.github.javaparser.printer.lexicalpreservation.ReshuffledDiffElementExtractor"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

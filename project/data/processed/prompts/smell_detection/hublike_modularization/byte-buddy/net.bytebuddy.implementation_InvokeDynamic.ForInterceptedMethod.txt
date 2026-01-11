@@ -1,0 +1,84 @@
+##CONTEXT_SIZE=759
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.implementation",
+    "class": "InvokeDynamic.ForInterceptedMethod",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "InvokeDynamic",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.dynamic.scaffold.FieldLocator",
+        "net.bytebuddy.implementation.InvokeDynamic.ForInterceptedMethod",
+        "net.bytebuddy.implementation.InvokeDynamic.InvocationProvider",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.implementation.InvokeDynamic.ForField",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph",
+        "net.bytebuddy.implementation.InvokeDynamic.ForInterceptedMethodParameters",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.implementation.bytecode.constant.NullConstant",
+        "net.bytebuddy.implementation.InvokeDynamic.NameProvider",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.implementation.InvokeDynamic.ForInterceptedMethodInstanceAndParameters",
+        "net.bytebuddy.implementation.InvokeDynamic.Resolved",
+        "net.bytebuddy.implementation.InvokeDynamic.ForMethodParameter",
+        "net.bytebuddy.implementation.InvokeDynamic.Target",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.InvokeDynamic.ReturnTypeProvider",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.implementation.InvokeDynamic.TerminationHandler",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.implementation.InvokeDynamic.ArgumentProvider",
+        "net.bytebuddy.implementation.InvokeDynamic.WithImplicitArguments",
+        "net.bytebuddy.utility.ConstantValue",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.implementation.InvokeDynamic.WithImplicitTarget",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.implementation.InvokeDynamic.WithImplicitType"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

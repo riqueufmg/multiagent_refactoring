@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import os
 
-from agents.llm_inference.llm_engine import LLMInferenceEngine
 from agents.llm_inference.gpt_engine import GPTEngine
+from agents.llm_inference.deepseek_engine import DeepSeekEngine
 
 class UnstableDependencyDetector:
 
@@ -39,23 +39,19 @@ class UnstableDependencyDetector:
         with open(self.json_path, "r") as f:
             data = json.load(f)
 
-        # Mapeia pacotes para seus dados
         packages_index = {pkg["package"]: pkg for pkg in data.get("packages", [])}
 
-        # Constrói outgoing dependencies (pacotes que cada pacote depende)
         outgoing_map = {}
         for pkg_name, pkg in packages_index.items():
             outgoing = set(pkg.get("dependencies", []))
             outgoing_map[pkg_name] = list(outgoing)
 
-        # Constrói incoming dependencies (pacotes que dependem de cada pacote)
         incoming_map = {pkg_name: [] for pkg_name in packages_index}
         for src, targets in outgoing_map.items():
             for target in targets:
                 if target in incoming_map:
                     incoming_map[target].append(src)
 
-        # Gera lista final de pacotes para o prompt
         filtered_packages = []
         for pkg_name, pkg in packages_index.items():
             filtered_packages.append({
@@ -170,7 +166,7 @@ class UnstableDependencyDetector:
 
         llm_config = {
             "model_name": "gpt-5-mini",
-            "max_input_tokens": 30720,
+            "max_input_tokens": 100000,
             "max_completion_tokens": 30720
         }
 
@@ -183,33 +179,47 @@ class UnstableDependencyDetector:
 
             response = llm_engine.generate(prompt_content)
 
-            output_file = Path("data", "processed", "llm_outputs", self.project_name, "unstable_dependency", f"{prompt_file.stem}.txt")
-            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_dir = Path(
+                os.getenv("OUTPUT_PATH"),
+                "llm_outputs",
+                self.project_name,
+                "unstable_dependency",
+                "gpt"
+            )
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            output_file = output_dir / f"{prompt_file.stem}.txt"
+            
             with open(output_file, "w") as out_f:
                 out_f.write(response)
-        
-    def detect_hf(self, list_of_prompt_files):
+    
+    def detect_deepseek(self, list_of_prompt_files):
 
         llm_config = {
-            "model_name_or_path": "meta-llama/Llama-3.2-3B-Instruct",
-            "max_input_tokens": 2048,
-            "max_total_tokens": 4096,
-            "temperature": 0.2,
-            "top_k": 50,
-            "top_p": 0.9
+            "model_name": "deepseek-chat",
+            "max_input_tokens": 100000,
+            "max_completion_tokens": 8192
         }
 
-        llm_engine = LLMInferenceEngine(**llm_config)
+        llm_engine = DeepSeekEngine(**llm_config)
 
         for prompt_file in list_of_prompt_files:
 
             with open(prompt_file, "r") as f:
                 prompt_content = f.read()
 
-            llm_engine.load_model()
             response = llm_engine.generate(prompt_content)
 
-            output_file = Path("data", "processed", "llm_outputs", self.project_name, "unstable_dependency", f"{prompt_file.stem}.txt")
-            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_dir = Path(
+                os.getenv("OUTPUT_PATH"),
+                "llm_outputs",
+                self.project_name,
+                "unstable_dependency",
+                "deepseek"
+            )
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            output_file = output_dir / f"{prompt_file.stem}.txt"
+
             with open(output_file, "w") as out_f:
                 out_f.write(response)

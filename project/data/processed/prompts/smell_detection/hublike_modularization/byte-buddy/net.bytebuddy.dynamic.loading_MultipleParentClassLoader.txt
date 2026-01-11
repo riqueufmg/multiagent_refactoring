@@ -1,0 +1,137 @@
+##CONTEXT_SIZE=1250
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.loading",
+    "class": "MultipleParentClassLoader",
+    "dependencies": [
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+      "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "ClassLoadingStrategy",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.WrappingDispatcher",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Configurable"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.asm",
+      "class": "ClassVisitorFactory",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.member.MethodVariableAccess",
+        "net.bytebuddy.asm.ClassVisitorFactory.HandleTranslator",
+        "net.bytebuddy.asm.ClassVisitorFactory.LabelTranslator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.implementation.MethodCall",
+        "net.bytebuddy.description.modifier.FieldManifestation",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.asm.ClassVisitorFactory.FrameTranslator",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.implementation.FieldAccessor",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.ExceptionMethod",
+        "net.bytebuddy.asm.ClassVisitorFactory.AttributeTranslator",
+        "net.bytebuddy.implementation.bytecode.TypeCreation",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.asm.ClassVisitorFactory.ConstantDynamicTranslator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.asm.ClassVisitorFactory.TypePathTranslator",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.asm.ClassVisitorFactory.LabelArrayTranslator",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.asm.ClassVisitorFactory.ConstantTranslator",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.implementation.bytecode.Duplication",
+        "net.bytebuddy.dynamic.loading.MultipleParentClassLoader",
+        "net.bytebuddy.asm.ClassVisitorFactory.ConstantArrayTranslator"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.asm",
+      "class": "ClassVisitorFactory.CreateClassVisitorFactory",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.implementation.MethodCall",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.dynamic.loading.MultipleParentClassLoader"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

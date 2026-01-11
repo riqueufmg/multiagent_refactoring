@@ -1,0 +1,338 @@
+##CONTEXT_SIZE=2764
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing",
+    "class": "FormatException",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing",
+      "class": "Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.BinaryBitmap"
+      ]
+    },
+    {
+      "package": "com.google.zxing.maxicode.decoder",
+      "class": "DecodedBitStreamParser",
+      "dependencies": [
+        "com.google.zxing.FormatException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.maxicode.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.maxicode.decoder.BitMatrixParser",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.maxicode.decoder.DecodedBitStreamParser",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common",
+      "class": "ECIStringBuilder",
+      "dependencies": [
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.CharacterSetECI"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common",
+      "class": "CharacterSetECI",
+      "dependencies": [
+        "com.google.zxing.FormatException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code39Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code93Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "UPCAReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.oned.UPCEANReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "ITFReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code128Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "UPCEANReader",
+      "dependencies": [
+        "com.google.zxing.ResultPointCallback",
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.oned.EANManufacturerOrgSupport",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.oned.UPCEANExtensionSupport",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned.rss.expanded.decoders",
+      "class": "GeneralAppIdDecoder",
+      "dependencies": [
+        "com.google.zxing.FormatException",
+        "com.google.zxing.oned.rss.expanded.decoders.DecodedChar",
+        "com.google.zxing.oned.rss.expanded.decoders.DecodedInformation",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.oned.rss.expanded.decoders.BlockParsedResult",
+        "com.google.zxing.oned.rss.expanded.decoders.CurrentParsingState",
+        "com.google.zxing.oned.rss.expanded.decoders.DecodedNumeric",
+        "com.google.zxing.oned.rss.expanded.decoders.FieldParser"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned.rss.expanded.decoders",
+      "class": "DecodedNumeric",
+      "dependencies": [
+        "com.google.zxing.FormatException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "DecodedBitStreamParser",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.pdf417.decoder.DecodedBitStreamParser.Mode",
+        "com.google.zxing.common.ECIStringBuilder",
+        "com.google.zxing.pdf417.PDF417ResultMetadata"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417.decoder",
+      "class": "PDF417ScanningDecoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.pdf417.decoder.DetectionResultColumn",
+        "com.google.zxing.pdf417.decoder.BarcodeValue",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.pdf417.PDF417Common",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.pdf417.decoder.DecodedBitStreamParser",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.pdf417.decoder.DetectionResultRowIndicatorColumn",
+        "com.google.zxing.pdf417.decoder.BarcodeMetadata",
+        "com.google.zxing.pdf417.decoder.ec.ErrorCorrection",
+        "com.google.zxing.pdf417.decoder.BoundingBox",
+        "com.google.zxing.pdf417.decoder.PDF417CodewordDecoder",
+        "com.google.zxing.pdf417.decoder.DetectionResult",
+        "com.google.zxing.pdf417.decoder.Codeword"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "DecodedBitStreamParser",
+      "dependencies": [
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.CharacterSetECI",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.qrcode.decoder.Mode",
+        "com.google.zxing.common.StringUtils",
+        "com.google.zxing.qrcode.decoder.Version",
+        "com.google.zxing.common.BitSource"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.qrcode.decoder.DataBlock",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.qrcode.decoder.BitMatrixParser",
+        "com.google.zxing.qrcode.decoder.Version",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder",
+        "com.google.zxing.qrcode.decoder.DecodedBitStreamParser"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "Version",
+      "dependencies": [
+        "com.google.zxing.qrcode.decoder.Version.ECBlocks",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.decoder.FormatInformation",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "BitMatrixParser",
+      "dependencies": [
+        "com.google.zxing.qrcode.decoder.DataMask",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.decoder.FormatInformation",
+        "com.google.zxing.qrcode.decoder.Version"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix.decoder",
+      "class": "DecodedBitStreamParser",
+      "dependencies": [
+        "com.google.zxing.datamatrix.decoder.DecodedBitStreamParser.Mode",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitSource",
+        "com.google.zxing.common.ECIStringBuilder"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix.decoder",
+      "class": "Version",
+      "dependencies": [
+        "com.google.zxing.datamatrix.decoder.Version.ECBlocks",
+        "com.google.zxing.FormatException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix.decoder",
+      "class": "BitMatrixParser",
+      "dependencies": [
+        "com.google.zxing.datamatrix.decoder.Version",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec",
+      "class": "AztecReader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.ResultPointCallback",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.aztec.AztecDetectorResult",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.aztec.detector.Detector",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.common.CharacterSetECI",
+        "com.google.zxing.aztec.AztecDetectorResult",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.aztec.decoder.Decoder.Table",
+        "com.google.zxing.aztec.decoder.Decoder.CorrectedBitsResult",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,105 @@
+##CONTEXT_SIZE=796
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io.output",
+    "class": "UnsynchronizedByteArrayOutputStream",
+    "dependencies": [
+      "org.apache.commons.io.IOUtils",
+      "org.apache.commons.io.input.UnsynchronizedByteArrayInputStream",
+      "org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream.Builder"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "IOUtils",
+      "dependencies": [
+        "org.apache.commons.io.output.ByteArrayOutputStream",
+        "org.apache.commons.io.output.StringBuilderWriter",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream",
+        "org.apache.commons.io.function.IOTriFunction",
+        "org.apache.commons.io.output.NullOutputStream",
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.StandardLineSeparator",
+        "org.apache.commons.io.IOUtils.ScratchBytes",
+        "org.apache.commons.io.input.CharSequenceReader",
+        "org.apache.commons.io.input.BoundedInputStream",
+        "org.apache.commons.io.output.NullWriter",
+        "org.apache.commons.io.IOExceptionList",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.IOUtils.ScratchChars",
+        "org.apache.commons.io.LineIterator",
+        "org.apache.commons.io.input.QueueInputStream"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.input",
+      "class": "UnsynchronizedByteArrayInputStream",
+      "dependencies": [
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.input.UnsynchronizedByteArrayInputStream.Builder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.output",
+      "class": "UnsynchronizedByteArrayOutputStream.Builder",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "IOUtils",
+      "dependencies": [
+        "org.apache.commons.io.output.ByteArrayOutputStream",
+        "org.apache.commons.io.output.StringBuilderWriter",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream",
+        "org.apache.commons.io.function.IOTriFunction",
+        "org.apache.commons.io.output.NullOutputStream",
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.StandardLineSeparator",
+        "org.apache.commons.io.IOUtils.ScratchBytes",
+        "org.apache.commons.io.input.CharSequenceReader",
+        "org.apache.commons.io.input.BoundedInputStream",
+        "org.apache.commons.io.output.NullWriter",
+        "org.apache.commons.io.IOExceptionList",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.IOUtils.ScratchChars",
+        "org.apache.commons.io.LineIterator",
+        "org.apache.commons.io.input.QueueInputStream"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,109 @@
+##CONTEXT_SIZE=922
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.build",
+    "class": "Plugin.Resolution",
+    "dependencies": [
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.build",
+      "class": "Plugin",
+      "dependencies": [
+        "net.bytebuddy.build.Plugin.Origin",
+        "net.bytebuddy.build.Plugin.WithThrowawayExecutorService",
+        "net.bytebuddy.build.Plugin.Sink",
+        "net.bytebuddy.build.Plugin.Resolution",
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.build.Plugin.Unresolved",
+        "net.bytebuddy.build.Plugin.Failing",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.build.Plugin.NoFolderMatcher",
+        "net.bytebuddy.build.Plugin.Empty",
+        "net.bytebuddy.utility.StreamDrainer",
+        "net.bytebuddy.build.Plugin.PoolStrategy",
+        "net.bytebuddy.build.Plugin.Dispatcher",
+        "net.bytebuddy.build.Plugin.Factory",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.build.Plugin.ForParallelTransformation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.Plugin.Element",
+        "net.bytebuddy.build.Plugin.Materializable",
+        "net.bytebuddy.build.Plugin.NoOp",
+        "net.bytebuddy.build.Plugin.TypeStrategy",
+        "net.bytebuddy.build.Plugin.ForSerialTransformation",
+        "net.bytebuddy.build.Plugin.ErrorHandler",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.build.Plugin.Instantiator",
+        "net.bytebuddy.build.Plugin.Source",
+        "net.bytebuddy.build.Plugin.Target",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.build.Plugin.Enforcing",
+        "net.bytebuddy.build.Plugin.ArgumentResolver",
+        "net.bytebuddy.build.Plugin.Default",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.Plugin.Listener",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.apache.commons.io.input.buffer", "metrics": {"num_classes": 3, "loc": 343, "Ce": 1, "Ca": 0}, "classes": [{"package": "org.apache.commons.io.input.buffer", "class": "CircularBufferInputStream", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/input/buffer/CircularBufferInputStream.java", "metrics": {"nof": 3, "nopf": 0, "nom": 7, "nopm": 5, "loc": 98, "wmc": 17, "nc": 1, "dit": 0, "lcom": 0.2857142857142857, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.IOUtils", "org.apache.commons.io.input.buffer.CircularByteBuffer"]}, {"package": "org.apache.commons.io.input.buffer", "class": "CircularByteBuffer", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/input/buffer/CircularByteBuffer.java", "metrics": {"nof": 4, "nopf": 0, "nom": 13, "nopm": 13, "loc": 196, "wmc": 34, "nc": 0, "dit": 0, "lcom": 0.1538461538461538, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.IOUtils"]}, {"package": "org.apache.commons.io.input.buffer", "class": "PeekableInputStream", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/input/buffer/PeekableInputStream.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 4, "loc": 49, "wmc": 6, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["org.apache.commons.io"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

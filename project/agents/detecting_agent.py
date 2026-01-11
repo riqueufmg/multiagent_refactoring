@@ -6,6 +6,7 @@ from .smells_detection.designite_runner import DesigniteRunner
 from .smells_detection.metrics_parser import MetricsParser
 
 from .smells_detection.god_component import GodComponentDetector
+from .smells_detection.hublike_modularization import HublikeModularizationDetector
 from .smells_detection.insufficient_modularization import InsufficientModularizationDetector
 from .smells_detection.unstable_dependency import UnstableDependencyDetector
 
@@ -67,6 +68,14 @@ class DetectingAgent:
                 
                 print(f"Prompts for God Component from {self.project_path} generated.")
                 return list_of_prompt_files
+            elif smell_name == "Hublike Modularization":
+                list_of_prompt_files = HublikeModularizationDetector(self.project_name).generate_prompts({
+                    "smell_name": smell_name,
+                    "smell_definition": smell_definition
+                })
+
+                print(f"Prompts for Hub-like Modularization from {self.project_path} generated.")
+                return list_of_prompt_files
             elif smell_name == "Insufficient Modularization":
                 list_of_prompt_files = InsufficientModularizationDetector(self.project_name).generate_prompts({
                     "smell_name": smell_name,
@@ -94,22 +103,24 @@ class DetectingAgent:
         try:
             if smell_name == "God Component":
                 detector = GodComponentDetector(self.project_name)
-
-                if engine == "gpt":
-                    detector.detect_gpt(list_of_prompt_files)
-                elif engine == "deepseek":
-                    detector.detect_deepseek(list_of_prompt_files)
-                else:
-                    raise ValueError(f"Unknown engine: {engine}")
-
+            elif smell_name == "Hublike Modularization":
+                detector = HublikeModularizationDetector(self.project_name)
             elif smell_name == "Insufficient Modularization":
-                InsufficientModularizationDetector(self.project_name).detect_gpt(list_of_prompt_files)
-                print(f"Insufficient Modularization detection for {self.project_path} completed.")
+                detector = InsufficientModularizationDetector(self.project_name)
             elif smell_name == "Unstable Dependency":
-                UnstableDependencyDetector(self.project_name).detect_gpt(list_of_prompt_files)
-                print(f"Unstable Dependency detection for {self.project_path} completed.")
+                detector = UnstableDependencyDetector(self.project_name)
             else:
-                print(f"Smell detection for {smell_name} is not implemented yet.")
+                raise ValueError(f"Smell detection for {smell_name} is not implemented yet.")
+            
+            if engine == "gpt":
+                detector.detect_gpt(list_of_prompt_files)
+                print(f"The {smell_name} detection for {self.project_path} completed for engine {engine}.")
+            elif engine == "deepseek":
+                detector.detect_deepseek(list_of_prompt_files)
+                print(f"The {smell_name} detection for {self.project_path} completed for engine {engine}.")
+            else:
+                raise ValueError(f"Unknown engine: {engine}")
+
         except Exception as e:
             print(f"Error detecting smell {smell_name}: {e} for {self.project_path}")
             raise

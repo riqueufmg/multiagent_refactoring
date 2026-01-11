@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "foo", "metrics": {"num_classes": 15, "loc": 71, "Ce": 0, "Ca": 0}, "classes": [{"package": "foo", "class": "Main", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue4846/foo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 2, "loc": 7, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.Foo"]}, {"package": "foo", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue2951/foo/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 4, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.A.FindMeIfYouCan"]}, {"package": "foo", "class": "B", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue4358/foo/B.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 4, "wmc": 1, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue4358/foo/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 5, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.A.FindMeIfYouCan"]}, {"package": "foo", "class": "IB", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue2953/foo/IB.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 0, "loc": 6, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue2953/foo/A.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 1, "loc": 8, "wmc": 2, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.A.FindMeIfYouCan"]}, {"package": "foo", "class": "Foo", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/EmptyVarargsCallTest/Foo.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 0, "loc": 8, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "C", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue276/foo/C.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 2, "loc": 9, "wmc": 2, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.A"]}, {"package": "foo", "class": "B", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue276/foo/B.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue276/foo/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 4, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.A.FindMeIfYouCan"]}, {"package": "foo", "class": "A.FindMeIfYouCan", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue276/foo/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "A", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue1456/foo/A.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["foo.A.FindMeIfYouCan"]}, {"package": "foo", "class": "JavaTest", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue128/foo/Issue128.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 5, "wmc": 1, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "OtherClass", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue1769/foo/OtherClass.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 4, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "foo", "class": "OtherClass.InnerClass", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue1769/foo/OtherClass.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": []}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

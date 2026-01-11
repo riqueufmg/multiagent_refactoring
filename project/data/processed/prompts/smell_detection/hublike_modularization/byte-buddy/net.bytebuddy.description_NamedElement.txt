@@ -1,0 +1,204 @@
+##CONTEXT_SIZE=1700
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.description",
+    "class": "NamedElement",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic",
+      "class": "ClassFileLocator",
+      "dependencies": [
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.dynamic.ClassFileLocator.BootLoaderProxyCreationAction",
+        "net.bytebuddy.dynamic.ClassFileLocator.CreationAction",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.StreamDrainer",
+        "net.bytebuddy.dynamic.ClassFileLocator.ClassLoadingDelegate",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.dynamic.ClassFileLocator.Dispatcher",
+        "net.bytebuddy.dynamic.ClassFileLocator.MultiReleaseAware",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator.ForClassLoader",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.dynamic.ClassFileLocator.NoOp",
+        "net.bytebuddy.dynamic.ClassFileLocator.Resolution",
+        "net.bytebuddy.dynamic.ClassFileLocator.Initializable",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic",
+      "class": "ClassFileLocator.PackageDiscriminating",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.NamedElement"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.matcher",
+      "class": "ElementMatchers",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.matcher.MethodSortMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.matcher.CachingMatcher",
+        "net.bytebuddy.matcher.ModifierMatcher",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.matcher.StringMatcher",
+        "net.bytebuddy.matcher.BooleanMatcher",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.matcher.NullMatcher",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.matcher",
+      "class": "DescriptorMatcher",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.matcher",
+      "class": "IsNamedMatcher",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "JavaModule",
+      "dependencies": [
+        "net.bytebuddy.utility.JavaModule.Resolver",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.utility.JavaModule.Module",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "RecordComponentDescription",
+      "dependencies": [
+        "net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape",
+        "net.bytebuddy.description.type.RecordComponentDescription.Token",
+        "net.bytebuddy.description.type.RecordComponentDescription.RecordComponent",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.type",
+      "class": "PackageDescription",
+      "dependencies": [
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ByteCodeElement",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description",
+      "class": "ByteCodeElement.Member",
+      "dependencies": [
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.DeclaredByType"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.method",
+      "class": "ParameterDescription",
+      "dependencies": [
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.ParameterDescription.InGenericShape",
+        "net.bytebuddy.description.method.ParameterDescription.InDefinedShape",
+        "net.bytebuddy.description.method.ParameterDescription.ParameterAnnotationSource",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.ParameterDescription.Parameter",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.description.method.ParameterDescription.Token",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.ParameterList"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

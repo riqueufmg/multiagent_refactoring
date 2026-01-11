@@ -1,0 +1,397 @@
+##CONTEXT_SIZE=4329
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+    "class": "MemberBytecode",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTable",
+      "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry",
+      "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+      "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+      "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+      "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+      "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+      "org.adoptopenjdk.jitwatch.model.bytecode.IBytecodeParam",
+      "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry",
+      "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "ExceptionTable",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "LineTableEntry",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "MemberSignatureParts",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.util.StringUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "Opcode",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "LineTable",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "BytecodeAnnotations",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineAnnotation",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "BytecodeInstruction",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.IBytecodeParam",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamSwitch",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "IBytecodeParam",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "ExceptionTableEntry",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "ClassBC",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ConstantPool"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.methodsizehisto",
+      "class": "MethodSizeHistoOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.sequencecount",
+      "class": "SequenceCountOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.jarscan.sequencecount.InstructionSequence",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan",
+      "class": "IJarScanOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.sequencesearch",
+      "class": "SequenceSearchOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.jarscan.sequencesearch.FoundSequence",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.freqinlinesize",
+      "class": "FreqInlineSizeOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.invokecount",
+      "class": "InvokeCountOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.jarscan.invokecount.InvokeMethodCountMap",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.allocationcount",
+      "class": "AllocationCountOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.jarscan.allocationcount.InstructionAllocCountMap",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.methodlength",
+      "class": "MethodLengthOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.jarscan.instructioncount",
+      "class": "InstructionCountOperation",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.loader",
+      "class": "BytecodeLoader",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.InnerClassRelationship",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.process.javap.ReflectionJavap",
+        "org.adoptopenjdk.jitwatch.model.bytecode.IBytecodeParam",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamSwitch",
+        "org.adoptopenjdk.jitwatch.loader.BytecodeLoader.BytecodeSection",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.model.bytecode.SourceMapper",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamConstant",
+        "org.adoptopenjdk.jitwatch.process.javap.JavapProcess",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamNumeric",
+        "org.adoptopenjdk.jitwatch.model.MetaClass",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCParamString"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "IMetaMember",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "AbstractMetaMember",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "ClassBC",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ConstantPool"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "SourceMapper",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "BytecodeAnnotationBuilder",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.model.PackageManager",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTable",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.model.bytecode.UncommonTrap",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineAnnotation",
+        "org.adoptopenjdk.jitwatch.model.AnnotationException",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.util.TooltipUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "org.adoptopenjdk.jitwatch.model.BCIOpcodeMap",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.MetaClass",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.compilation.CompilationUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.bytecode",
+      "class": "LineTable",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.hotthrow",
+      "class": "HotThrowFinder",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTableEntry",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ExceptionTable",
+        "org.adoptopenjdk.jitwatch.model.Tag",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.IParseDictionary",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.hotthrow.HotThrowResult",
+        "org.adoptopenjdk.jitwatch.model.LogParseException",
+        "org.adoptopenjdk.jitwatch.compilation.CompilationUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview",
+      "class": "TriView",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.CompilationInfo",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.ui.triview.source.ViewerSource",
+        "org.adoptopenjdk.jitwatch.ui.triview.TriViewNavigationStack",
+        "org.adoptopenjdk.jitwatch.model.Task",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.ui.triview.bytecode.ViewerBytecode",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.ui.triview.ClassSearch",
+        "org.adoptopenjdk.jitwatch.ui.main.IMemberSelectedListener",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.bytecode.ClassBC",
+        "org.adoptopenjdk.jitwatch.model.bytecode.SourceMapper",
+        "org.adoptopenjdk.jitwatch.ui.compilationchooser.CompilationChooser",
+        "org.adoptopenjdk.jitwatch.ui.Dialogs",
+        "org.adoptopenjdk.jitwatch.ui.triview.assembly.ViewerAssembly",
+        "org.adoptopenjdk.jitwatch.ui.triview.bytecode.BytecodeLabel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.model.MetaClass",
+        "org.adoptopenjdk.jitwatch.ui.triview.TriViewPane",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTableEntry",
+        "org.adoptopenjdk.jitwatch.loader.ResourceLoader",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview.bytecode",
+      "class": "ViewerBytecode",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.util.JVMSUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "org.adoptopenjdk.jitwatch.ui.triview.TriViewNavigationStack",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.ui.triview.bytecode.BytecodeLabel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

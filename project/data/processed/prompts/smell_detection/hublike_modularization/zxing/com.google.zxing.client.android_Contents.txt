@@ -1,0 +1,89 @@
+##CONTEXT_SIZE=643
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.android",
+    "class": "Contents",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ResultHandler",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.android.PreferencesActivity",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.client.android.LocaleManager"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.encode",
+      "class": "EncodeActivity",
+      "dependencies": [
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.client.android.encode.QRCodeEncoder",
+        "com.google.zxing.client.android.Contents"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.encode",
+      "class": "QRCodeEncoder",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.encode.ContactEncoder",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.share",
+      "class": "ShareActivity",
+      "dependencies": [
+        "com.google.zxing.client.android.clipboard.ClipboardInterface",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.android.Contents"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

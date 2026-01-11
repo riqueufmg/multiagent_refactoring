@@ -1,0 +1,90 @@
+##CONTEXT_SIZE=738
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.implementation",
+    "class": "HashCodeMethod.NoOp",
+    "dependencies": [
+      "net.bytebuddy.implementation.bytecode.StackManipulation",
+      "net.bytebuddy.implementation.bytecode.StackSize"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.implementation.bytecode",
+      "class": "StackManipulation",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation.Size",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.implementation.bytecode.StackManipulation.Dispatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.implementation.bytecode",
+      "class": "StackSize",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.description.type.TypeDefinition"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.implementation",
+      "class": "HashCodeMethod",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.Multiplication",
+        "net.bytebuddy.implementation.HashCodeMethod.ForStaticTypeHash",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.HashCodeMethod.NullValueGuard",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.implementation.HashCodeMethod.ValueTransformer",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.HashCodeMethod.NoOp",
+        "net.bytebuddy.implementation.HashCodeMethod.ForSuperMethodCall",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.bytecode.Addition",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.implementation.HashCodeMethod.ForDynamicTypeHash",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.implementation.HashCodeMethod.OffsetProvider",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

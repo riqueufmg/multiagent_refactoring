@@ -1,0 +1,750 @@
+##CONTEXT_SIZE=5807
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing",
+    "class": "Result",
+    "dependencies": [
+      "com.google.zxing.ResultPoint",
+      "com.google.zxing.ResultMetadataType",
+      "com.google.zxing.BarcodeFormat"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing",
+      "class": "ResultPoint",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultMetadataType",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "BarcodeFormat",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.j2se",
+      "class": "DecodeWorker",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.LuminanceSource",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.multi.MultipleBarcodeReader",
+        "com.google.zxing.client.j2se.BufferedImageLuminanceSource",
+        "com.google.zxing.client.j2se.ImageReader",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.client.j2se.DecoderConfig",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.MultiFormatReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.j2se",
+      "class": "GUIRunner",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.j2se.ImageReader",
+        "com.google.zxing.client.j2se.BufferedImageLuminanceSource",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.LuminanceSource"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "ScanFromWebPageManager",
+      "dependencies": [
+        "com.google.zxing.client.android.result.ResultHandler",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "CaptureActivity",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever",
+        "com.google.zxing.client.android.ViewfinderView",
+        "com.google.zxing.client.android.CaptureActivityHandler",
+        "com.google.zxing.client.android.InactivityTimer",
+        "com.google.zxing.client.android.result.ResultHandler",
+        "com.google.zxing.client.android.history.HistoryManager",
+        "com.google.zxing.client.android.DecodeHintManager",
+        "com.google.zxing.client.android.result.ResultHandlerFactory",
+        "com.google.zxing.client.android.camera.CameraManager",
+        "com.google.zxing.client.android.PreferencesActivity",
+        "com.google.zxing.client.android.ScanFromWebPageManager",
+        "com.google.zxing.client.android.history.HistoryItem",
+        "com.google.zxing.client.android.AmbientLightManager",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.android.BeepManager",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.client.android.clipboard.ClipboardInterface",
+        "com.google.zxing.client.android.IntentSource",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.client.android.DecodeFormatManager"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android",
+      "class": "DecodeHandler",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.PlanarYUVLuminanceSource",
+        "com.google.zxing.client.android.CaptureActivity",
+        "com.google.zxing.client.android.DecodeThread",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.MultiFormatReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.history",
+      "class": "HistoryItem",
+      "dependencies": [
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.history",
+      "class": "HistoryManager",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.history.HistoryItem",
+        "com.google.zxing.client.android.history.DBHelper",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.android.result.ResultHandler",
+        "com.google.zxing.client.android.PreferencesActivity"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.history",
+      "class": "HistoryItemAdapter",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.history.HistoryItem"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ProductResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ResultHandlerFactory",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.result.ResultHandler",
+        "com.google.zxing.client.android.CaptureActivity",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.result.ResultParser"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "TextResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ISBNResultHandler",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.ISBNParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.result",
+      "class": "ResultHandler",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.android.PreferencesActivity",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.client.android.LocaleManager"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.encode",
+      "class": "QRCodeEncoder",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.encode.ContactEncoder",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web",
+      "class": "DecodeServlet",
+      "dependencies": [
+        "com.google.zxing.Reader",
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.multi.MultipleBarcodeReader",
+        "com.google.zxing.client.j2se.ImageReader",
+        "com.google.zxing.web.DoSTracker",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ReaderException",
+        "com.google.zxing.LuminanceSource"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.BinaryBitmap"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "MultiFormatReader",
+      "dependencies": [
+        "com.google.zxing.Reader",
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.BinaryBitmap"
+      ]
+    },
+    {
+      "package": "com.google.zxing.maxicode",
+      "class": "MaxiCodeReader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.maxicode.decoder.Decoder",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "MultiFormatUPCEANReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.oned.UPCEANReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code39Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "UPCEANExtension2Support",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.oned.UPCEANReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code93Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "CodaBarReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "UPCAReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.oned.UPCEANReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "ITFReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "OneDReader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "UPCEANExtension5Support",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.oned.UPCEANReader"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code128Reader",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "UPCEANReader",
+      "dependencies": [
+        "com.google.zxing.ResultPointCallback",
+        "com.google.zxing.Result",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.oned.EANManufacturerOrgSupport",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.oned.UPCEANExtensionSupport",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned.rss",
+      "class": "RSS14Reader",
+      "dependencies": [
+        "com.google.zxing.ResultPointCallback",
+        "com.google.zxing.Result",
+        "com.google.zxing.oned.rss.DataCharacter",
+        "com.google.zxing.oned.rss.FinderPattern",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.oned.rss.RSSUtils",
+        "com.google.zxing.oned.rss.Pair",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned.rss.expanded",
+      "class": "RSSExpandedReader",
+      "dependencies": [
+        "com.google.zxing.oned.rss.DataCharacter",
+        "com.google.zxing.Result",
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.oned.rss.FinderPattern",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.oned.rss.expanded.ExpandedPair",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.oned.rss.expanded.BitArrayBuilder",
+        "com.google.zxing.oned.rss.RSSUtils",
+        "com.google.zxing.oned.rss.expanded.ExpandedRow",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417",
+      "class": "PDF417Reader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.pdf417.detector.PDF417DetectorResult",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.pdf417.PDF417Common",
+        "com.google.zxing.pdf417.decoder.PDF417ScanningDecoder",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.pdf417.detector.Detector",
+        "com.google.zxing.pdf417.PDF417ResultMetadata"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "URIResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.URIParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "SMSTOMMSTOResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.SMSParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "EmailAddressResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.EmailDoCoMoResultParser",
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.EmailAddressParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ISBNResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.ISBNParsedResult",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "URLTOResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.URIParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "VEventResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.VCardResultParser",
+        "com.google.zxing.client.result.CalendarParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "VINResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.VINParsedResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ProductResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.ProductParsedResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.oned.UPCEReader",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "SMSMMSResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.SMSParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "TelResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.TelParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ExpandedProductResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.ExpandedProductParsedResult",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "VCardResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "SMTPResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.EmailAddressParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "ResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "WifiResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.WifiParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "BookmarkDoCoMoResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.URIResultParser",
+        "com.google.zxing.client.result.URIParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "AddressBookAUResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "AddressBookDoCoMoResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "GeoResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.GeoParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "BizcardResultParser",
+      "dependencies": [
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.Result"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.result",
+      "class": "EmailDoCoMoResultParser",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.result.EmailAddressParsedResult"
+      ]
+    },
+    {
+      "package": "com.google.zxing.multi",
+      "class": "ByQuadrantReader",
+      "dependencies": [
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.Reader",
+        "com.google.zxing.Result",
+        "com.google.zxing.BinaryBitmap"
+      ]
+    },
+    {
+      "package": "com.google.zxing.multi",
+      "class": "GenericMultipleBarcodeReader",
+      "dependencies": [
+        "com.google.zxing.Reader",
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.BinaryBitmap"
+      ]
+    },
+    {
+      "package": "com.google.zxing.multi.qrcode",
+      "class": "QRCodeMultiReader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.common.DetectorResult",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode",
+      "class": "QRCodeReader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.common.DetectorResult",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.qrcode.decoder.Decoder"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix",
+      "class": "DataMatrixReader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.Result",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.common.DetectorResult",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.datamatrix.decoder.Decoder"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec",
+      "class": "AztecReader",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.ResultPointCallback",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.Result",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.aztec.AztecDetectorResult",
+        "com.google.zxing.DecodeHintType",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.aztec.detector.Detector",
+        "com.google.zxing.BinaryBitmap",
+        "com.google.zxing.ResultMetadataType"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

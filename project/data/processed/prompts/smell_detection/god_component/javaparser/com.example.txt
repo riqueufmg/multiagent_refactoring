@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.example", "metrics": {"num_classes": 6, "loc": 34, "Ce": 1, "Ca": 0}, "classes": [{"package": "com.example", "class": "ConstructorParameterTest", "file": "data/repositories/javaparser/javaparser-core-generators/target/test-classes/com/github/javaparser/generator/core/quality/NotNullGeneratorTest/expected/ConstructorParameterTest.java", "metrics": {"nof": 3, "nopf": 0, "nom": 1, "nopm": 1, "loc": 11, "wmc": 1, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.quality.Preconditions"]}, {"package": "com.example", "class": "ConstructorParameterTest", "file": "data/repositories/javaparser/javaparser-core-generators/target/test-classes/com/github/javaparser/generator/core/quality/NotNullGeneratorTest/original/ConstructorParameterTest.java", "metrics": {"nof": 3, "nopf": 0, "nom": 1, "nopm": 1, "loc": 10, "wmc": 1, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.quality.Preconditions"]}, {"package": "com.example", "class": "Beta", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue3099/com/example/Beta.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 5, "wmc": 0, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.example.Alpha", "com.example.Beta.CustomInterface"]}, {"package": "com.example", "class": "Beta.CustomInterface", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue3099/com/example/Beta.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.example", "class": "Alpha", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue3099/com/example/Alpha.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 4, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.example", "class": "Alpha.CustomInterface", "file": "data/repositories/javaparser/javaparser-symbol-solver-testing/target/test-classes/issue3099/com/example/Alpha.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 2, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["com.github.javaparser.quality"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

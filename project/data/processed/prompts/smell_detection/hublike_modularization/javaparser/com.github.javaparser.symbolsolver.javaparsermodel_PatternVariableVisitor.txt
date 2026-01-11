@@ -1,0 +1,266 @@
+##CONTEXT_SIZE=2599
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+    "class": "PatternVariableVisitor",
+    "dependencies": [
+      "com.github.javaparser.ast.expr.InstanceOfExpr",
+      "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+      "com.github.javaparser.ast.expr.ComponentPatternExpr",
+      "com.github.javaparser.ast.expr.UnaryExpr",
+      "com.github.javaparser.ast.Node",
+      "com.github.javaparser.ast.expr.EnclosedExpr",
+      "com.github.javaparser.ast.expr.BinaryExpr"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "InstanceOfExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.type.ReferenceType",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.metamodel.InstanceOfExprMetaModel",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.PatternExpr",
+        "com.github.javaparser.ast.type.Type"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+      "class": "PatternVariableResult",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "ComponentPatternExpr",
+      "dependencies": [
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.ComponentPatternExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "UnaryExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.expr.UnaryExpr.Operator",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.metamodel.UnaryExprMetaModel"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "Node",
+      "dependencies": [
+        "com.github.javaparser.printer.configuration.PrinterConfiguration",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.ast.Node.ObserverRegistrationMode",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.resolution.SymbolResolver",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.Node.TreeTraversal",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Position",
+        "com.github.javaparser.printer.Printer",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.ast.visitor.EqualsVisitor",
+        "com.github.javaparser.metamodel.NodeMetaModel",
+        "com.github.javaparser.ast.visitor.HashCodeVisitor",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.ast.Node.Parsedness",
+        "com.github.javaparser.ast.DataKey",
+        "com.github.javaparser.ast.observer.AstObserver",
+        "com.github.javaparser.ast.observer.PropagatingAstObserver",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.printer.ConfigurablePrinter"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "EnclosedExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.EnclosedExprMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.observer.ObservableProperty"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.expr",
+      "class": "BinaryExpr",
+      "dependencies": [
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.metamodel.BinaryExprMetaModel",
+        "com.github.javaparser.ast.expr.BinaryExpr.Operator",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.ast.expr.AssignExpr"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "ConditionalExprContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.expr.ConditionalExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "WhileStatementContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.stmt.WhileStmt",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "BinaryExprContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.ast.expr.BinaryExpr"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "IfStatementContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.stmt.IfStmt",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.AbstractJavaParserContext",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "ForStatementContext",
+      "dependencies": [
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.StatementContext",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.ast.stmt.ForStmt",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "AbstractJavaParserContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserSymbolDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.expr.FieldAccessExpr",
+        "com.github.javaparser.ast.expr.ComponentPatternExpr",
+        "com.github.javaparser.resolution.SymbolDeclarator",
+        "com.github.javaparser.ast.expr.MethodCallExpr",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+        "com.github.javaparser.resolution.Navigator",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.MethodUsage",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.TypePatternExpr",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration",
+        "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserTypePatternDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+      "class": "DoStatementContext",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableResult",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.stmt.DoStmt",
+        "com.github.javaparser.symbolsolver.javaparsermodel.PatternVariableVisitor",
+        "com.github.javaparser.symbolsolver.javaparsermodel.NormalCompletionVisitor"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

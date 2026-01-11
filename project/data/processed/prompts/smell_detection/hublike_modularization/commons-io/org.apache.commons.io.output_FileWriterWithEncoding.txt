@@ -1,0 +1,77 @@
+##CONTEXT_SIZE=540
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io.output",
+    "class": "FileWriterWithEncoding",
+    "dependencies": [
+      "org.apache.commons.io.Charsets",
+      "org.apache.commons.io.FileUtils",
+      "org.apache.commons.io.output.FileWriterWithEncoding.Builder"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "Charsets",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io",
+      "class": "FileUtils",
+      "dependencies": [
+        "org.apache.commons.io.FileExistsException",
+        "org.apache.commons.io.filefilter.IOFileFilter",
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.file.PathUtils",
+        "org.apache.commons.io.filefilter.TrueFileFilter",
+        "org.apache.commons.io.filefilter.FileEqualsFileFilter",
+        "org.apache.commons.io.filefilter.SuffixFileFilter",
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.filefilter.FileFileFilter",
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.AccumulatorPathVisitor",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.LineIterator"
+      ]
+    },
+    {
+      "package": "org.apache.commons.io.output",
+      "class": "FileWriterWithEncoding.Builder",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

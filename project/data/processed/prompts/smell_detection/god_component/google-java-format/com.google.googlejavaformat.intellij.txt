@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.googlejavaformat.intellij", "metrics": {"num_classes": 10, "loc": 381, "Ce": 1, "Ca": 0}, "classes": [{"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatConfigurable", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatConfigurable.java", "metrics": {"nof": 4, "nopf": 0, "nom": 14, "nopm": 11, "loc": 73, "wmc": 14, "nc": 0, "dit": 0, "lcom": 0.4285714285714285, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.intellij.GoogleJavaFormatSettings", "com.google.googlejavaformat.intellij.UiFormatterStyle"]}, {"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatImportOptimizer", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatImportOptimizer.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 2, "loc": 43, "wmc": 7, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.intellij.GoogleJavaFormatSettings", "com.google.googlejavaformat.java.RemoveUnusedImports", "com.google.googlejavaformat.java.ImportOrderer", "com.google.googlejavaformat.intellij.JreConfigurationChecker", "com.google.googlejavaformat.java.JavaFormatterOptions", "com.google.googlejavaformat.intellij.Notifications"]}, {"package": "com.google.googlejavaformat.intellij", "class": "UiFormatterStyle", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/UiFormatterStyle.java", "metrics": {"nof": 2, "nopf": 0, "nom": 4, "nopm": 2, "loc": 19, "wmc": 4, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.JavaFormatterOptions"]}, {"package": "com.google.googlejavaformat.intellij", "class": "Notifications", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/Notifications.java", "metrics": {"nof": 2, "nopf": 0, "nom": 2, "nopm": 0, "loc": 10, "wmc": 2, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.intellij", "class": "JreConfigurationChecker", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/JreConfigurationChecker.java", "metrics": {"nof": 3, "nopf": 0, "nom": 7, "nopm": 2, "loc": 50, "wmc": 10, "nc": 0, "dit": 0, "lcom": 0.7142857142857143, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatSettings", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatSettings.java", "metrics": {"nof": 4, "nopf": 1, "nom": 10, "nopm": 2, "loc": 60, "wmc": 11, "nc": 0, "dit": 0, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.intellij.GoogleJavaFormatSettings.State", "com.google.googlejavaformat.java.JavaFormatterOptions", "com.google.googlejavaformat.intellij.JreConfigurationChecker", "com.google.googlejavaformat.intellij.GoogleJavaFormatSettings.EnabledState"]}, {"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatSettings.EnabledState", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatSettings.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 1, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatSettings.State", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatSettings.java", "metrics": {"nof": 2, "nopf": 1, "nom": 0, "nopm": 0, "loc": 22, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.JavaFormatterOptions"]}, {"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatFormattingService", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatFormattingService.java", "metrics": {"nof": 3, "nopf": 1, "nom": 7, "nopm": 3, "loc": 70, "wmc": 9, "nc": 2, "dit": 0, "lcom": 0.8571428571428571, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.intellij.GoogleJavaFormatSettings", "com.google.googlejavaformat.java.Builder", "com.google.googlejavaformat.java.Formatter", "com.google.googlejavaformat.intellij.JreConfigurationChecker", "com.google.googlejavaformat.java.JavaFormatterOptions", "com.google.googlejavaformat.intellij.Notifications"]}, {"package": "com.google.googlejavaformat.intellij", "class": "GoogleJavaFormatFormattingService.GoogleJavaFormatFormattingTask", "file": "data/repositories/google-java-format/idea_plugin/src/main/java/com/google/googlejavaformat/intellij/GoogleJavaFormatFormattingService.java", "metrics": {"nof": 2, "nopf": 0, "nom": 0, "nopm": 0, "loc": 33, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.Formatter", "com.google.googlejavaformat.intellij.Notifications"]}], "dependencies": ["com.google.googlejavaformat.java"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

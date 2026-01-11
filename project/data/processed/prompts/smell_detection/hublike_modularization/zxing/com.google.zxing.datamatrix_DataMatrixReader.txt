@@ -1,0 +1,135 @@
+##CONTEXT_SIZE=915
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.datamatrix",
+    "class": "DataMatrixReader",
+    "dependencies": [
+      "com.google.zxing.common.DecoderResult",
+      "com.google.zxing.Result",
+      "com.google.zxing.common.BitMatrix",
+      "com.google.zxing.NotFoundException",
+      "com.google.zxing.BarcodeFormat",
+      "com.google.zxing.DecodeHintType",
+      "com.google.zxing.ResultPoint",
+      "com.google.zxing.common.DetectorResult",
+      "com.google.zxing.BinaryBitmap",
+      "com.google.zxing.ResultMetadataType",
+      "com.google.zxing.datamatrix.decoder.Decoder"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.common",
+      "class": "DecoderResult",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "Result",
+      "dependencies": [
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common",
+      "class": "BitMatrix",
+      "dependencies": [
+        "com.google.zxing.common.BitArray"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "NotFoundException",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "BarcodeFormat",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "DecodeHintType",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultPoint",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils"
+      ]
+    },
+    {
+      "package": "com.google.zxing.common",
+      "class": "DetectorResult",
+      "dependencies": [
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.common.BitMatrix"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "BinaryBitmap",
+      "dependencies": [
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.Binarizer",
+        "com.google.zxing.LuminanceSource"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultMetadataType",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.datamatrix.decoder",
+      "class": "Decoder",
+      "dependencies": [
+        "com.google.zxing.common.DecoderResult",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.datamatrix.decoder.BitMatrixParser",
+        "com.google.zxing.ChecksumException",
+        "com.google.zxing.datamatrix.decoder.Version",
+        "com.google.zxing.datamatrix.decoder.DecodedBitStreamParser",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder",
+        "com.google.zxing.datamatrix.decoder.DataBlock"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

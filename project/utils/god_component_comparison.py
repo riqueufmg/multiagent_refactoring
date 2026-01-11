@@ -3,14 +3,15 @@ import csv
 from pathlib import Path
 
 class GodComponentComparison:
-    def __init__(self, project_name, base_path="data/processed/"):
+    def __init__(self, project_name, engine, base_path="data/processed/"):
         self.project_name = project_name
         self.base_path = Path(base_path)
+        self.engine = engine
 
-    def consolidate_llm_outputs(self, project_name: str):
-        project_path = self.base_path / "llm_outputs" / project_name / "god_component"
+    def consolidate_llm_outputs(self, project_name):
+        project_path = self.base_path / "llm_outputs" / project_name / "god_component" / self.engine
 
-        output_dir = self.base_path / "consolidated_detection" / project_name / "god_component"
+        output_dir = self.base_path / "consolidated_detection" / project_name / "god_component" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "godcomponent_llm.json"
 
@@ -39,7 +40,7 @@ class GodComponentComparison:
     
     def consolidate_designite_outputs(self, project_name: str):
         csv_file = self.base_path / "metrics" / project_name / "ArchitectureSmells.csv"
-        output_dir = self.base_path / "consolidated_detection" / project_name / "god_component"
+        output_dir = self.base_path / "consolidated_detection" / project_name / "god_component" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "godcomponent_designite.json"
 
@@ -138,7 +139,7 @@ class GodComponentComparison:
             }
         }
 
-        output_dir = self.base_path / "consolidated_detection" / self.project_name / "god_component"
+        output_dir = self.base_path / "consolidated_detection" / self.project_name / "god_component" / self.engine
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / "godcomponent_metrics.json"
 

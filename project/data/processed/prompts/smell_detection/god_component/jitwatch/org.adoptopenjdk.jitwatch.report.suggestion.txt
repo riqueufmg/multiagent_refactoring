@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.report.suggestion", "metrics": {"num_classes": 1, "loc": 310, "Ce": 4, "Ca": 2}, "classes": [{"package": "org.adoptopenjdk.jitwatch.report.suggestion", "class": "SuggestionWalker", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/report/suggestion/SuggestionWalker.java", "metrics": {"nof": 32, "nopf": 0, "nom": 10, "nopm": 3, "loc": 310, "wmc": 45, "nc": 0, "dit": 3, "lcom": 0.2, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.report.Report", "org.adoptopenjdk.jitwatch.report.ReportType", "org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.compilation.CompilationUtil", "org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.model.CodeCacheEvent", "org.adoptopenjdk.jitwatch.model.IParseDictionary", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.util.ParseUtil", "org.adoptopenjdk.jitwatch.model.LogParseException"]}], "dependencies": ["org.adoptopenjdk.jitwatch.compilation", "org.adoptopenjdk.jitwatch.report", "org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.model"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

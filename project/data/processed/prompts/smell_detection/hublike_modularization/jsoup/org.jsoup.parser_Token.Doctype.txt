@@ -1,0 +1,70 @@
+##CONTEXT_SIZE=429
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.parser",
+    "class": "Token.Doctype",
+    "dependencies": [
+      "org.jsoup.parser.TokenData"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.parser",
+      "class": "TokenData",
+      "dependencies": [
+        "org.jsoup.internal.StringUtil"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.parser",
+      "class": "Token",
+      "dependencies": [
+        "org.jsoup.parser.TokenData",
+        "org.jsoup.parser.Token.TokenType",
+        "org.jsoup.parser.TokeniserState",
+        "org.jsoup.parser.Token.Character",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.parser.Token.EndTag",
+        "org.jsoup.parser.Token.XmlDecl",
+        "org.jsoup.parser.TreeBuilder",
+        "org.jsoup.parser.Token.StartTag",
+        "org.jsoup.parser.Token.Comment",
+        "org.jsoup.parser.Tokeniser",
+        "org.jsoup.parser.Token.Doctype"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

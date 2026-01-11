@@ -1,0 +1,72 @@
+##CONTEXT_SIZE=505
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.io.filefilter",
+    "class": "NameFileFilter",
+    "dependencies": [
+      "org.apache.commons.io.IOCase",
+      "org.apache.commons.io.file.PathUtils"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.io",
+      "class": "IOCase",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.io.file",
+      "class": "PathUtils",
+      "dependencies": [
+        "org.apache.commons.io.FilenameUtils",
+        "org.apache.commons.io.Charsets",
+        "org.apache.commons.io.file.PathFilter",
+        "org.apache.commons.io.function.IOSupplier",
+        "org.apache.commons.io.IOUtils",
+        "org.apache.commons.io.FileUtils",
+        "org.apache.commons.io.RandomAccessFileMode",
+        "org.apache.commons.io.RandomAccessFiles",
+        "org.apache.commons.io.file.attribute.FileTimes",
+        "org.apache.commons.io.function.IOFunction",
+        "org.apache.commons.io.ThreadUtils",
+        "org.apache.commons.io.file.StandardDeleteOption",
+        "org.apache.commons.io.file.PathUtils.RelativeSortedPaths",
+        "org.apache.commons.io.file.AccumulatorPathVisitor",
+        "org.apache.commons.io.file.DeleteOption",
+        "org.apache.commons.io.file.Counters",
+        "org.apache.commons.io.file.CountingPathVisitor"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

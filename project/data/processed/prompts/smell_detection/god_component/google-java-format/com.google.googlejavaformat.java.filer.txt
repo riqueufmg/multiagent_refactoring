@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.google.googlejavaformat.java.filer", "metrics": {"num_classes": 2, "loc": 102, "Ce": 1, "Ca": 0}, "classes": [{"package": "com.google.googlejavaformat.java.filer", "class": "FormattingFiler", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/filer/FormattingFiler.java", "metrics": {"nof": 3, "nopf": 0, "nom": 7, "nopm": 7, "loc": 49, "wmc": 8, "nc": 0, "dit": 0, "lcom": 0.2857142857142857, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.Formatter"]}, {"package": "com.google.googlejavaformat.java.filer", "class": "FormattingJavaFileObject", "file": "data/repositories/google-java-format/core/src/main/java/com/google/googlejavaformat/java/filer/FormattingJavaFileObject.java", "metrics": {"nof": 3, "nopf": 0, "nom": 7, "nopm": 6, "loc": 53, "wmc": 9, "nc": 0, "dit": 0, "lcom": 0.7142857142857143, "fanin": 0, "fanout": 0}, "dependencies": ["com.google.googlejavaformat.java.Formatter"]}], "dependencies": ["com.google.googlejavaformat.java"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

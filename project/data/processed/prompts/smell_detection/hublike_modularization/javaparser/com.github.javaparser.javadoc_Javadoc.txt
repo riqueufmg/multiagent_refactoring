@@ -1,0 +1,197 @@
+##CONTEXT_SIZE=1725
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.javadoc",
+    "class": "Javadoc",
+    "dependencies": [
+      "com.github.javaparser.javadoc.description.JavadocDescription",
+      "com.github.javaparser.ast.comments.JavadocComment",
+      "com.github.javaparser.utils.LineSeparator",
+      "com.github.javaparser.javadoc.JavadocBlockTag"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.javadoc.description",
+      "class": "JavadocDescription",
+      "dependencies": [
+        "com.github.javaparser.utils.Pair",
+        "com.github.javaparser.javadoc.description.JavadocDescriptionElement",
+        "com.github.javaparser.javadoc.description.JavadocInlineTag"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "JavadocComment",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavadocCommentMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.javadoc.Javadoc"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "LineSeparator",
+      "dependencies": []
+    },
+    {
+      "package": "com.github.javaparser.javadoc",
+      "class": "JavadocBlockTag",
+      "dependencies": [
+        "com.github.javaparser.javadoc.description.JavadocDescription",
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.javadoc.JavadocBlockTag.Type"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.nodeTypes",
+      "class": "NodeWithJavadoc",
+      "dependencies": [
+        "com.github.javaparser.ast.comments.Comment",
+        "com.github.javaparser.javadoc.Javadoc",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "JavadocComment",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavadocCommentMetaModel",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.javadoc.Javadoc"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.comments",
+      "class": "TraditionalJavadocComment",
+      "dependencies": [
+        "com.github.javaparser.StaticJavaParser",
+        "com.github.javaparser.ast.visitor.GenericVisitor",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.ast.visitor.VoidVisitor",
+        "com.github.javaparser.metamodel.JavaParserMetaModel",
+        "com.github.javaparser.metamodel.TraditionalJavadocCommentMetaModel",
+        "com.github.javaparser.javadoc.Javadoc"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "StaticJavaParser",
+      "dependencies": [
+        "com.github.javaparser.ParserConfiguration",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.quality.Preconditions",
+        "com.github.javaparser.ast.stmt.Statement",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.JavaParser",
+        "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.type.TypeParameter",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.ast.body.BodyDeclaration",
+        "com.github.javaparser.javadoc.Javadoc",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.modules.ModuleDirective",
+        "com.github.javaparser.JavadocParser",
+        "com.github.javaparser.JavaParserAdapter",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ParseResult"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "JavadocParser",
+      "dependencies": [
+        "com.github.javaparser.javadoc.description.JavadocDescription",
+        "com.github.javaparser.javadoc.JavadocBlockTag",
+        "com.github.javaparser.ast.comments.JavadocComment",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.javadoc.Javadoc",
+        "com.github.javaparser.utils.Utils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "JavaParserAdapter",
+      "dependencies": [
+        "com.github.javaparser.ParserConfiguration",
+        "com.github.javaparser.ast.expr.Name",
+        "com.github.javaparser.ast.expr.ArrayInitializerExpr",
+        "com.github.javaparser.ast.expr.VariableDeclarationExpr",
+        "com.github.javaparser.ast.ImportDeclaration",
+        "com.github.javaparser.ast.stmt.Statement",
+        "com.github.javaparser.ast.type.Type",
+        "com.github.javaparser.ast.body.TypeDeclaration",
+        "com.github.javaparser.JavaParser",
+        "com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt",
+        "com.github.javaparser.ast.expr.SimpleName",
+        "com.github.javaparser.ast.body.Parameter",
+        "com.github.javaparser.ast.type.TypeParameter",
+        "com.github.javaparser.ast.stmt.BlockStmt",
+        "com.github.javaparser.ast.body.MethodDeclaration",
+        "com.github.javaparser.javadoc.Javadoc",
+        "com.github.javaparser.ast.body.BodyDeclaration",
+        "com.github.javaparser.ast.modules.ModuleDeclaration",
+        "com.github.javaparser.ast.type.ClassOrInterfaceType",
+        "com.github.javaparser.ast.CompilationUnit",
+        "com.github.javaparser.ast.expr.AnnotationExpr",
+        "com.github.javaparser.ast.modules.ModuleDirective",
+        "com.github.javaparser.JavadocParser",
+        "com.github.javaparser.ast.PackageDeclaration",
+        "com.github.javaparser.ParseResult"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

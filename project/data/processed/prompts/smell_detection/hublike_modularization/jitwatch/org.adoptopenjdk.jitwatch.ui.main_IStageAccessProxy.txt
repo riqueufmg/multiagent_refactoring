@@ -1,0 +1,232 @@
+##CONTEXT_SIZE=2629
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.ui.main",
+    "class": "IStageAccessProxy",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+      "org.adoptopenjdk.jitwatch.model.IMetaMember"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.core",
+      "class": "JITWatchConfig",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.model.ParsedClasspath",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.CompressedOops",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.BackgroundCompilation",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.TieredCompilation",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig.OnStackReplacement"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model",
+      "class": "IMetaMember",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.MemberSignatureParts",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.sandbox",
+      "class": "SandboxStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.jvmlang.LanguageManager",
+        "org.adoptopenjdk.jitwatch.ui.Dialogs",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.util.NetUtil",
+        "org.adoptopenjdk.jitwatch.ui.stage.IStageClosedListener",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.SandboxConfigStage",
+        "org.adoptopenjdk.jitwatch.parser.ILogParser",
+        "org.adoptopenjdk.jitwatch.ui.stage.StageManager",
+        "org.adoptopenjdk.jitwatch.util.DisassemblyUtil",
+        "org.adoptopenjdk.jitwatch.ui.sandbox.EditorPane",
+        "org.adoptopenjdk.jitwatch.sandbox.Sandbox",
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "org.adoptopenjdk.jitwatch.process.IExternalProcess"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview",
+      "class": "Viewer",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.ui.triview.NoOpLineListener"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview.assembly",
+      "class": "ViewerAssembly",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.MnemonicEntry",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMRegisterType",
+        "org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMExtend",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMShifter",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyReference",
+        "org.adoptopenjdk.jitwatch.ui.triview.assembly.AssemblyLabel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyUtil",
+        "org.adoptopenjdk.jitwatch.model.assembly.x86.X86RegisterType"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview.bytecode",
+      "class": "ViewerBytecode",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BCAnnotationType",
+        "org.adoptopenjdk.jitwatch.model.bytecode.MemberBytecode",
+        "org.adoptopenjdk.jitwatch.util.JVMSUtil",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationList",
+        "org.adoptopenjdk.jitwatch.ui.triview.TriViewNavigationStack",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotationBuilder",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeAnnotations",
+        "org.adoptopenjdk.jitwatch.util.ParseUtil",
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.ui.triview.bytecode.BytecodeLabel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.Opcode",
+        "org.adoptopenjdk.jitwatch.model.bytecode.LineTable",
+        "org.adoptopenjdk.jitwatch.report.ReportType",
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview.source",
+      "class": "ViewerSource",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.InstructionLabel",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.main",
+      "class": "ClassMemberList",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.intrinsic.IntrinsicFinder",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.ui.main.IMemberSelectedListener",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.model.MetaClass"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.report",
+      "class": "ReportStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.report.inlining.InliningRowBuilder",
+        "org.adoptopenjdk.jitwatch.ui.report.suggestion.SuggestionRowBuilder",
+        "org.adoptopenjdk.jitwatch.ui.report.ReportStageType",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.ui.report.locks.OptimisedLockRowBuilder",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConstants",
+        "org.adoptopenjdk.jitwatch.ui.report.eliminatedallocation.EliminatedAllocationRowBuilder",
+        "org.adoptopenjdk.jitwatch.ui.report.cell.MemberTableCell",
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "org.adoptopenjdk.jitwatch.ui.report.ReportPackageFilter",
+        "org.adoptopenjdk.jitwatch.ui.report.cell.LinkedBCICell"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.report.cell",
+      "class": "LinkedBCICell",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.report.cell",
+      "class": "MemberTableCell",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.report.Report",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.model.Compilation",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.compilechain",
+      "class": "CompileChainStage",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.compilationchooser.CompilationChooser",
+        "org.adoptopenjdk.jitwatch.util.UserInterfaceUtil",
+        "org.adoptopenjdk.jitwatch.ui.compilechain.CompileChainStage.PlotNode",
+        "org.adoptopenjdk.jitwatch.chain.CompileNode",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.IMetaMember",
+        "org.adoptopenjdk.jitwatch.chain.CompileChainWalker",
+        "org.adoptopenjdk.jitwatch.ui.main.IMemberSelectedListener",
+        "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel",
+        "org.adoptopenjdk.jitwatch.ui.resize.RateLimitedResizeListener",
+        "org.adoptopenjdk.jitwatch.ui.main.JITWatchUI",
+        "org.adoptopenjdk.jitwatch.model.Compilation"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

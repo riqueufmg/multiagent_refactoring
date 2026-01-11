@@ -1,0 +1,85 @@
+##CONTEXT_SIZE=750
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.model.assembly",
+    "class": "AssemblyReference",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.model.assembly.AssemblyReference.AssemblyReferenceHandler",
+      "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+      "org.adoptopenjdk.jitwatch.model.assembly.arm.MnemonicEntry"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "AssemblyReference.AssemblyReferenceHandler",
+      "dependencies": []
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly",
+      "class": "Architecture",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.util.StringUtil"
+      ]
+    },
+    {
+      "package": "org.adoptopenjdk.jitwatch.model.assembly.arm",
+      "class": "MnemonicEntry",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.ui.triview.assembly",
+      "class": "ViewerAssembly",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.ui.triview.ILineListener",
+        "org.adoptopenjdk.jitwatch.model.assembly.Architecture",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.MnemonicEntry",
+        "org.adoptopenjdk.jitwatch.ui.main.IStageAccessProxy",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMRegisterType",
+        "org.adoptopenjdk.jitwatch.model.assembly.IAssemblyParser",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyMethod",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyInstruction",
+        "org.adoptopenjdk.jitwatch.util.StringUtil",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMExtend",
+        "org.adoptopenjdk.jitwatch.model.assembly.arm.ARMShifter",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyReference",
+        "org.adoptopenjdk.jitwatch.ui.triview.assembly.AssemblyLabel",
+        "org.adoptopenjdk.jitwatch.model.bytecode.BytecodeInstruction",
+        "org.adoptopenjdk.jitwatch.model.assembly.AssemblyUtil",
+        "org.adoptopenjdk.jitwatch.model.assembly.x86.X86RegisterType"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

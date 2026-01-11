@@ -1,0 +1,117 @@
+##CONTEXT_SIZE=1185
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.scaffold",
+    "class": "TypeWriter.Disabled",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "TypeWriter",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.FrameWriter",
+        "net.bytebuddy.implementation.attribute.AnnotationAppender",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.dynamic.scaffold.MethodRegistry",
+        "net.bytebuddy.utility.AsmClassReader",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForAnnotation",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.RecordComponentPool",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.MethodPool",
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.FieldPool",
+        "net.bytebuddy.dynamic.scaffold.subclass.SubclassImplementationTarget",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.NoOp",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.InitializationHandler",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForDefinedMethod",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassWriter",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForInlining",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForRecord",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.WithoutDrain",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForModuleType",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Disabled",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.implementation.LoadedTypeInitializer",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Constraint",
+        "net.bytebuddy.implementation.attribute.RecordComponentAttributeAppender",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.implementation.attribute.AnnotationRetention",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ClassDumpAction",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.utility.visitor.ContextClassVisitor",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Dispatcher",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.WithDrain",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.implementation.attribute.TypeAttributeAppender",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Record",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForPackageType",
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForClass",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ContextRegistry",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForInterface",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Expanding",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Sort",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.dynamic.scaffold.inline.RebaseImplementationTarget",
+        "net.bytebuddy.implementation.attribute.FieldAttributeAppender",
+        "net.bytebuddy.description.method.ParameterList"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

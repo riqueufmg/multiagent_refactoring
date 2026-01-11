@@ -1,0 +1,182 @@
+##CONTEXT_SIZE=1428
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3",
+    "class": "CharUtils",
+    "dependencies": [
+      "org.apache.commons.lang3.StringUtils"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "StringUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.function.Suppliers",
+        "org.apache.commons.lang3.CharSequenceUtils",
+        "org.apache.commons.lang3.Charsets",
+        "org.apache.commons.lang3.stream.LangCollectors",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.Strings"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "RuntimeEnvironment",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "StringEscapeUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.Strings",
+        "org.apache.commons.lang3.text.translate.CharSequenceTranslator",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "StringEscapeUtils.CsvEscaper",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.Strings"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "StringEscapeUtils.CsvUnescaper",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.Strings"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ArrayUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.mutable.MutableInt",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.function.FailableFunction",
+        "org.apache.commons.lang3.BooleanUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "StringUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.function.Suppliers",
+        "org.apache.commons.lang3.CharSequenceUtils",
+        "org.apache.commons.lang3.Charsets",
+        "org.apache.commons.lang3.stream.LangCollectors",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.Strings"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.math",
+      "class": "NumberUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.text",
+      "class": "StrBuilder",
+      "dependencies": [
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.text.StrMatcher",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.Strings",
+        "org.apache.commons.lang3.text.StrTokenizer"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.text.translate",
+      "class": "OctalUnescaper",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.text.translate",
+      "class": "NumericEntityUnescaper",
+      "dependencies": [
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.text.translate.NumericEntityUnescaper.OPTION"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.time",
+      "class": "FastDatePrinter",
+      "dependencies": [
+        "org.apache.commons.lang3.time.FastDatePrinter.WeekYear",
+        "org.apache.commons.lang3.time.FastDatePrinter.NumberRule",
+        "org.apache.commons.lang3.time.FastDatePrinter.TwelveHourField",
+        "org.apache.commons.lang3.time.FastDatePrinter.TwentyFourHourField",
+        "org.apache.commons.lang3.time.FastDatePrinter.Iso8601_Rule",
+        "org.apache.commons.lang3.time.FastDatePrinter.TwoDigitMonthField",
+        "org.apache.commons.lang3.time.FastDatePrinter.TimeZoneNumberRule",
+        "org.apache.commons.lang3.time.FastDatePrinter.DayInWeekField",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.time.CalendarUtils",
+        "org.apache.commons.lang3.time.FastDatePrinter.CharacterLiteral",
+        "org.apache.commons.lang3.time.FastDatePrinter.TextField",
+        "org.apache.commons.lang3.time.FastDatePrinter.TimeZoneNameRule",
+        "org.apache.commons.lang3.time.FastDatePrinter.TimeZoneDisplayKey",
+        "org.apache.commons.lang3.time.FastDatePrinter.Rule",
+        "org.apache.commons.lang3.time.FastDatePrinter.UnpaddedMonthField",
+        "org.apache.commons.lang3.time.FastDatePrinter.TwoDigitYearField",
+        "org.apache.commons.lang3.time.FastDatePrinter.StringLiteral",
+        "org.apache.commons.lang3.exception.ExceptionUtils"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

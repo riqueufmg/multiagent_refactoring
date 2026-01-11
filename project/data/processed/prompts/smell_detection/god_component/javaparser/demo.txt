@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "demo", "metrics": {"num_classes": 6, "loc": 111, "Ce": 1, "Ca": 0}, "classes": [{"package": "demo", "class": "Main", "file": "data/repositories/javaparser/javaparser-core-testing/target/test-classes/com/github/javaparser/utils/projectroot/issue2615/with_module_info/demo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 31, "wmc": 4, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.ParserCollectionStrategy", "com.github.javaparser.utils.ProjectRoot", "demo.Main.Callback", "com.github.javaparser.utils.SourceRoot"]}, {"package": "demo", "class": "Main.Callback", "file": "data/repositories/javaparser/javaparser-core-testing/target/test-classes/com/github/javaparser/utils/projectroot/issue2615/with_module_info/demo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 6, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.SourceRoot"]}, {"package": "demo", "class": "Main", "file": "data/repositories/javaparser/javaparser-core-testing/target/test-classes/com/github/javaparser/utils/projectroot/issue2615/without_module_info/demo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 31, "wmc": 4, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.ParserCollectionStrategy", "com.github.javaparser.utils.ProjectRoot", "demo.Main.Callback", "com.github.javaparser.utils.SourceRoot"]}, {"package": "demo", "class": "Main.Callback", "file": "data/repositories/javaparser/javaparser-core-testing/target/test-classes/com/github/javaparser/utils/projectroot/issue2615/without_module_info/demo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 6, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.SourceRoot"]}, {"package": "demo", "class": "Main", "file": "data/repositories/javaparser/javaparser-core-testing/target/test-classes/com/github/javaparser/utils/projectroot/issue2615/with_module_info_in_root/demo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 1, "loc": 31, "wmc": 4, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.ParserCollectionStrategy", "com.github.javaparser.utils.ProjectRoot", "demo.Main.Callback", "com.github.javaparser.utils.SourceRoot"]}, {"package": "demo", "class": "Main.Callback", "file": "data/repositories/javaparser/javaparser-core-testing/target/test-classes/com/github/javaparser/utils/projectroot/issue2615/with_module_info_in_root/demo/Main.java", "metrics": {"nof": 0, "nopf": 0, "nom": 0, "nopm": 0, "loc": 6, "wmc": 0, "nc": 0, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.utils.SourceRoot"]}], "dependencies": ["com.github.javaparser.utils"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.adoptopenjdk.jitwatch.toplist", "metrics": {"num_classes": 12, "loc": 277, "Ce": 6, "Ca": 1}, "classes": [{"package": "org.adoptopenjdk.jitwatch.toplist", "class": "MemberScore", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/MemberScore.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 3, "loc": 14, "wmc": 3, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "ITopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/ITopListVisitable.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 3, "wmc": 1, "nc": 1, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "StringTopListScore", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/StringTopListScore.java", "metrics": {"nof": 2, "nopf": 0, "nom": 3, "nopm": 3, "loc": 14, "wmc": 3, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "NativeMethodSizeTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/NativeMethodSizeTopListVisitable.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 2, "loc": 27, "wmc": 4, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "CompileTimeTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/CompileTimeTopListVisitable.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 2, "loc": 12, "wmc": 4, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "InliningFailReasonTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/InliningFailReasonTopListVisitable.java", "metrics": {"nof": 1, "nopf": 0, "nom": 5, "nopm": 4, "loc": 77, "wmc": 14, "nc": 0, "dit": 3, "lcom": 0.4, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.compilation.CompilationUtil", "org.adoptopenjdk.jitwatch.util.StringUtil", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.model.IParseDictionary", "org.adoptopenjdk.jitwatch.model.LogParseException"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "StaleTaskToplistVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/StaleTaskToplistVisitable.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 3, "loc": 28, "wmc": 8, "nc": 0, "dit": 3, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.Task", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.compilation.CompilationUtil"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "AbstractTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/AbstractTopListVisitable.java", "metrics": {"nof": 4, "nopf": 0, "nom": 6, "nopm": 6, "loc": 33, "wmc": 8, "nc": 7, "dit": 2, "lcom": 0.5, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.treevisitor.TreeVisitor", "org.adoptopenjdk.jitwatch.model.Tag", "org.adoptopenjdk.jitwatch.toplist.ITopListScore", "org.adoptopenjdk.jitwatch.model.IParseDictionary", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.model.LogParseException"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "MostUsedIntrinsicsTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/MostUsedIntrinsicsTopListVisitable.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 3, "loc": 26, "wmc": 7, "nc": 0, "dit": 3, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel", "org.adoptopenjdk.jitwatch.intrinsic.IntrinsicFinder"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "CompiledAttributeTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/CompiledAttributeTopListVisitable.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 2, "loc": 13, "wmc": 3, "nc": 0, "dit": 3, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel"]}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "ITopListScore", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/ITopListScore.java", "metrics": {"nof": 0, "nopf": 0, "nom": 2, "nopm": 0, "loc": 4, "wmc": 2, "nc": 2, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.adoptopenjdk.jitwatch.toplist", "class": "HotThrowTopListVisitable", "file": "data/repositories/jitwatch/core/src/main/java/org/adoptopenjdk/jitwatch/toplist/HotThrowTopListVisitable.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 3, "loc": 26, "wmc": 7, "nc": 0, "dit": 3, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.adoptopenjdk.jitwatch.model.IMetaMember", "org.adoptopenjdk.jitwatch.hotthrow.HotThrowFinder", "org.adoptopenjdk.jitwatch.model.IReadOnlyJITDataModel"]}], "dependencies": ["org.adoptopenjdk.jitwatch.model", "org.adoptopenjdk.jitwatch.util", "org.adoptopenjdk.jitwatch.treevisitor", "org.adoptopenjdk.jitwatch.intrinsic", "org.adoptopenjdk.jitwatch.compilation", "org.adoptopenjdk.jitwatch.hotthrow"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

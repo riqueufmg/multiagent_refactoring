@@ -1,0 +1,84 @@
+##CONTEXT_SIZE=600
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.printer.lexicalpreservation",
+    "class": "LexicalPreservingPrinter.Observer",
+    "dependencies": [
+      "com.github.javaparser.ast.observer.AstObserver",
+      "com.github.javaparser.JavaToken",
+      "com.github.javaparser.ast.observer.ObservableProperty",
+      "com.github.javaparser.utils.LineSeparator"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.ast.observer",
+      "class": "AstObserver",
+      "dependencies": [
+        "com.github.javaparser.ast.observer.AstObserver.ListChangeType",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.observer.ObservableProperty",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser",
+      "class": "JavaToken",
+      "dependencies": [
+        "com.github.javaparser.TokenTypes",
+        "com.github.javaparser.JavaToken.Category",
+        "com.github.javaparser.TokenRange",
+        "com.github.javaparser.GeneratedJavaParserConstants",
+        "com.github.javaparser.utils.LineSeparator",
+        "com.github.javaparser.Range",
+        "com.github.javaparser.Token"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast.observer",
+      "class": "ObservableProperty",
+      "dependencies": [
+        "com.github.javaparser.ast.observer.ObservableProperty.Type",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.utils.Utils",
+        "com.github.javaparser.ast.Node"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.utils",
+      "class": "LineSeparator",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

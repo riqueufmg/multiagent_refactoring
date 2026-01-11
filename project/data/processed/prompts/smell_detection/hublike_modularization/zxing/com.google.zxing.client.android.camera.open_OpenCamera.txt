@@ -1,0 +1,79 @@
+##CONTEXT_SIZE=554
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.client.android.camera.open",
+    "class": "OpenCamera",
+    "dependencies": [
+      "com.google.zxing.client.android.camera.open.CameraFacing"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.client.android.camera.open",
+      "class": "CameraFacing",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.android.camera",
+      "class": "CameraConfigurationManager",
+      "dependencies": [
+        "com.google.zxing.client.android.camera.FrontLightMode",
+        "com.google.zxing.client.android.camera.CameraConfigurationUtils",
+        "com.google.zxing.client.android.camera.open.OpenCamera",
+        "com.google.zxing.client.android.camera.open.CameraFacing",
+        "com.google.zxing.client.android.PreferencesActivity"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.camera",
+      "class": "CameraManager",
+      "dependencies": [
+        "com.google.zxing.client.android.camera.CameraConfigurationManager",
+        "com.google.zxing.client.android.camera.AutoFocusManager",
+        "com.google.zxing.client.android.camera.open.OpenCamera",
+        "com.google.zxing.client.android.camera.PreviewCallback",
+        "com.google.zxing.client.android.camera.open.OpenCameraInterface"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.camera.open",
+      "class": "OpenCameraInterface",
+      "dependencies": [
+        "com.google.zxing.client.android.camera.open.CameraFacing",
+        "com.google.zxing.client.android.camera.open.OpenCamera"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

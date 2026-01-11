@@ -1,0 +1,169 @@
+##CONTEXT_SIZE=1643
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.dynamic.scaffold",
+    "class": "ClassWriterStrategy.Delegating",
+    "dependencies": [
+      "net.bytebuddy.dynamic.scaffold.ClassWriterStrategy",
+      "net.bytebuddy.pool.TypePool",
+      "net.bytebuddy.utility.AsmClassWriter",
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "ClassWriterStrategy",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.utility.AsmClassWriter"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.pool",
+      "class": "TypePool",
+      "dependencies": [
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.pool.TypePool.ModuleToken",
+        "net.bytebuddy.pool.TypePool.LazyAnnotationValue",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.pool.TypePool.RawAnnotatedType",
+        "net.bytebuddy.pool.TypePool.ForRecordComponent",
+        "net.bytebuddy.description.enumeration.EnumerationDescription",
+        "net.bytebuddy.pool.TypePool.ForType",
+        "net.bytebuddy.pool.TypePool.GenericTypeRegistrant",
+        "net.bytebuddy.utility.AsmClassReader",
+        "net.bytebuddy.pool.TypePool.AbstractBase",
+        "net.bytebuddy.pool.TypePool.LazyTypeDescription",
+        "net.bytebuddy.pool.TypePool.MethodToken",
+        "net.bytebuddy.pool.TypePool.SelfContained",
+        "net.bytebuddy.pool.TypePool.ReaderMode",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.pool.TypePool.ParameterBag",
+        "net.bytebuddy.pool.TypePool.ForTypeVariable",
+        "net.bytebuddy.pool.TypePool.ForUnboundWildcard",
+        "net.bytebuddy.pool.TypePool.TokenizedGenericType",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.pool.TypePool.Delegate",
+        "net.bytebuddy.pool.TypePool.TypeContainment",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.pool.TypePool.WithIndex",
+        "net.bytebuddy.pool.TypePool.Resolution",
+        "net.bytebuddy.pool.TypePool.GenericTypeExtractor",
+        "net.bytebuddy.pool.TypePool.LazinessMode",
+        "net.bytebuddy.pool.TypePool.ComponentTypeLocator",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.pool.TypePool.IncompleteToken",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.pool.TypePool.ComponentTypeReference",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.pool.TypePool.AnnotationToken",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.pool.TypePool.ForMethod",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.pool.TypePool.Raw",
+        "net.bytebuddy.pool.TypePool.ForByteCodeElement",
+        "net.bytebuddy.pool.TypePool.Illegal",
+        "net.bytebuddy.pool.TypePool.Empty",
+        "net.bytebuddy.pool.TypePool.AnnotationRegistrant",
+        "net.bytebuddy.pool.TypePool.ForParameterizedType",
+        "net.bytebuddy.pool.TypePool.ForSignature",
+        "net.bytebuddy.pool.TypePool.NoOp",
+        "net.bytebuddy.pool.TypePool.Malformed",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.pool.TypePool.ForField",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.pool.TypePool.CacheProvider",
+        "net.bytebuddy.pool.TypePool.GenericTypeToken",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.pool.TypePool.LazyTokenList",
+        "net.bytebuddy.description.method.ParameterList",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "AsmClassWriter",
+      "dependencies": [
+        "net.bytebuddy.utility.AsmClassWriter.ForClassFileApi",
+        "net.bytebuddy.utility.AsmClassWriter.JdkClassWriter",
+        "net.bytebuddy.utility.AsmClassWriter.Default",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassReader",
+        "net.bytebuddy.utility.AsmClassWriter.SuperClassResolvingJdkClassWriter",
+        "net.bytebuddy.utility.AsmClassWriter.EmptyAsmClassReader",
+        "net.bytebuddy.utility.AsmClassWriter.Factory",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.EqualsMethod"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "org.apache.commons.io.serialization", "metrics": {"num_classes": 7, "loc": 579, "Ce": 1, "Ca": 0}, "classes": [{"package": "org.apache.commons.io.serialization", "class": "ClassNameMatcher", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/ClassNameMatcher.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 0, "loc": 11, "wmc": 1, "nc": 3, "dit": 0, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.apache.commons.io.serialization", "class": "WildcardClassNameMatcher", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/WildcardClassNameMatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 1, "loc": 16, "wmc": 2, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.FilenameUtils"]}, {"package": "org.apache.commons.io.serialization", "class": "ValidatingObjectInputStream", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/ValidatingObjectInputStream.java", "metrics": {"nof": 2, "nopf": 0, "nom": 17, "nopm": 11, "loc": 278, "wmc": 19, "nc": 1, "dit": 0, "lcom": 0.2352941176470588, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.serialization.ValidatingObjectInputStream.Builder", "org.apache.commons.io.serialization.ObjectStreamClassPredicate", "org.apache.commons.io.serialization.ClassNameMatcher"]}, {"package": "org.apache.commons.io.serialization", "class": "ValidatingObjectInputStream.Builder", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/ValidatingObjectInputStream.java", "metrics": {"nof": 1, "nopf": 0, "nom": 0, "nopm": 0, "loc": 123, "wmc": 0, "nc": 0, "dit": 4, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.serialization.ObjectStreamClassPredicate"]}, {"package": "org.apache.commons.io.serialization", "class": "ObjectStreamClassPredicate", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/ObjectStreamClassPredicate.java", "metrics": {"nof": 2, "nopf": 0, "nom": 11, "nopm": 11, "loc": 111, "wmc": 15, "nc": 0, "dit": 0, "lcom": 0.2727272727272727, "fanin": 0, "fanout": 0}, "dependencies": ["org.apache.commons.io.serialization.ClassNameMatcher"]}, {"package": "org.apache.commons.io.serialization", "class": "RegexpClassNameMatcher", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/RegexpClassNameMatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 1, "loc": 24, "wmc": 3, "nc": 0, "dit": 1, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": []}, {"package": "org.apache.commons.io.serialization", "class": "FullClassNameMatcher", "file": "data/repositories/commons-io/src/main/java/org/apache/commons/io/serialization/FullClassNameMatcher.java", "metrics": {"nof": 1, "nopf": 0, "nom": 2, "nopm": 1, "loc": 16, "wmc": 2, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": []}], "dependencies": ["org.apache.commons.io"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

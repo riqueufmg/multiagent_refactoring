@@ -1,0 +1,98 @@
+##CONTEXT_SIZE=656
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3.reflect",
+    "class": "MemberUtils",
+    "dependencies": [
+      "org.apache.commons.lang3.ClassUtils",
+      "org.apache.commons.lang3.reflect.AccessibleObjects",
+      "org.apache.commons.lang3.reflect.MemberUtils.Executable"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ClassUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ClassUtils.Interfaces",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "AccessibleObjects",
+      "dependencies": []
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "MemberUtils.Executable",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "MethodUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.reflect.MemberUtils",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.stream.LangCollectors",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.reflect.TypeUtils",
+        "org.apache.commons.lang3.reflect.AccessibleObjects"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "ConstructorUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.reflect.MemberUtils",
+        "org.apache.commons.lang3.reflect.MethodUtils",
+        "org.apache.commons.lang3.ClassUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "FieldUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.reflect.MemberUtils",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.JavaVersion",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.SystemUtils"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

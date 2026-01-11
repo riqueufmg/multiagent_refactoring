@@ -1,0 +1,140 @@
+##CONTEXT_SIZE=1059
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.googlejavaformat.java",
+    "class": "ImportOrderer",
+    "dependencies": [
+      "com.google.googlejavaformat.Newlines",
+      "com.google.googlejavaformat.java.FormatterException",
+      "com.google.googlejavaformat.java.ImportOrderer.StringAndIndex",
+      "com.google.googlejavaformat.java.ImportOrderer.ImportsAndIndex",
+      "com.google.googlejavaformat.java.ImportOrderer.ImportType",
+      "com.google.googlejavaformat.java.ImportOrderer.Import",
+      "com.google.googlejavaformat.java.JavaInput"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.googlejavaformat",
+      "class": "Newlines",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "FormatterException",
+      "dependencies": [
+        "com.google.googlejavaformat.FormatterDiagnostic"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "ImportOrderer.StringAndIndex",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "ImportOrderer.ImportsAndIndex",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "ImportOrderer.ImportType",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "ImportOrderer.Import",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "JavaInput",
+      "dependencies": [
+        "com.google.googlejavaformat.java.JavaInput.Token",
+        "com.google.googlejavaformat.java.JavacTokens",
+        "com.google.googlejavaformat.Input",
+        "com.google.googlejavaformat.Newlines",
+        "com.google.googlejavaformat.java.FormatterException",
+        "com.google.googlejavaformat.java.JavaInput.Tok",
+        "com.google.googlejavaformat.java.JavaOutput"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "Formatter",
+      "dependencies": [
+        "com.google.googlejavaformat.java.JavaInputAstVisitor",
+        "com.google.googlejavaformat.OpsBuilder",
+        "com.google.googlejavaformat.Doc",
+        "com.google.googlejavaformat.java.Trees",
+        "com.google.googlejavaformat.java.ModifierOrderer",
+        "com.google.googlejavaformat.Newlines",
+        "com.google.googlejavaformat.java.FormatterException",
+        "com.google.googlejavaformat.DocBuilder",
+        "com.google.googlejavaformat.java.ImportOrderer",
+        "com.google.googlejavaformat.java.RemoveUnusedImports",
+        "com.google.googlejavaformat.java.JavaOutput",
+        "com.google.googlejavaformat.java.StringWrapper",
+        "com.google.googlejavaformat.java.JavaFormatterOptions",
+        "com.google.googlejavaformat.java.JavaInput"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.java",
+      "class": "FormatFileCallable",
+      "dependencies": [
+        "com.google.googlejavaformat.java.ImportOrderer",
+        "com.google.googlejavaformat.java.FormatterException",
+        "com.google.googlejavaformat.java.FormatFileCallable.Result",
+        "com.google.googlejavaformat.java.Formatter",
+        "com.google.googlejavaformat.java.RemoveUnusedImports",
+        "com.google.googlejavaformat.java.StringWrapper",
+        "com.google.googlejavaformat.java.JavaFormatterOptions"
+      ]
+    },
+    {
+      "package": "com.google.googlejavaformat.intellij",
+      "class": "GoogleJavaFormatImportOptimizer",
+      "dependencies": [
+        "com.google.googlejavaformat.java.ImportOrderer",
+        "com.google.googlejavaformat.intellij.Notifications",
+        "com.google.googlejavaformat.java.RemoveUnusedImports",
+        "com.google.googlejavaformat.intellij.JreConfigurationChecker",
+        "com.google.googlejavaformat.intellij.GoogleJavaFormatSettings",
+        "com.google.googlejavaformat.java.JavaFormatterOptions"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,245 @@
+##CONTEXT_SIZE=2356
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.javassistmodel",
+    "class": "JavassistFactory",
+    "dependencies": [
+      "com.github.javaparser.resolution.TypeSolver",
+      "com.github.javaparser.resolution.types.ResolvedVoidType",
+      "com.github.javaparser.resolution.types.ResolvedType",
+      "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+      "com.github.javaparser.resolution.types.ResolvedPrimitiveType",
+      "com.github.javaparser.ast.AccessSpecifier"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.resolution",
+      "class": "TypeSolver",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.UnsolvedSymbolException"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.types",
+      "class": "ResolvedVoidType",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.types",
+      "class": "ResolvedType",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.resolution.types.ResolvedTypeVariable",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.resolution.types.ResolvedPrimitiveType",
+        "com.github.javaparser.resolution.types.ResolvedWildcard",
+        "com.github.javaparser.resolution.types.ResolvedUnionType",
+        "com.github.javaparser.resolution.types.ResolvedLambdaConstraintType",
+        "com.github.javaparser.resolution.types.ResolvedArrayType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.declarations",
+      "class": "ResolvedReferenceTypeDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.types",
+      "class": "ResolvedPrimitiveType",
+      "dependencies": [
+        "com.github.javaparser.utils.TypeUtils",
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.ast",
+      "class": "AccessSpecifier",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typesolvers",
+      "class": "JarTypeSolver",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.symbolsolver.utils.JavassistModuleHelper",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.UnsolvedSymbolException",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistEnumDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistTypeDeclarationAdapter",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistClassDeclaration",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistUtils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistMethodDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistMethodLikeDeclarationAdapter",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.resolution.MethodUsage"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistInterfaceDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedInterfaceDeclaration",
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistTypeDeclarationAdapter",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistClassDeclaration",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistUtils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistConstructorDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistMethodLikeDeclarationAdapter",
+        "com.github.javaparser.ast.AccessSpecifier"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistRecordDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistTypeDeclarationAdapter",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistUtils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistFieldDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration",
+        "com.github.javaparser.ast.AccessSpecifier"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistClassDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.resolution.model.SymbolReference",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistInterfaceDeclaration",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistTypeDeclarationAdapter",
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.ast.AccessSpecifier",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistUtils"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistParameterDeclaration",
+      "dependencies": [
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.javassistmodel",
+      "class": "JavassistTypeDeclarationAdapter",
+      "dependencies": [
+        "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+        "com.github.javaparser.resolution.TypeSolver",
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistFactory",
+        "com.github.javaparser.symbolsolver.javassistmodel.JavassistUtils"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

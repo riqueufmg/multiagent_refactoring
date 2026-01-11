@@ -1,0 +1,177 @@
+##CONTEXT_SIZE=1152
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.safety",
+    "class": "Safelist",
+    "dependencies": [
+      "org.jsoup.safety.Safelist.AttributeValue",
+      "org.jsoup.safety.Safelist.AttributeKey",
+      "org.jsoup.safety.Safelist.Protocol",
+      "org.jsoup.safety.Safelist.TagName",
+      "org.jsoup.nodes.Attributes",
+      "org.jsoup.nodes.Element",
+      "org.jsoup.internal.Normalizer",
+      "org.jsoup.nodes.Attribute",
+      "org.jsoup.helper.Validate"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.safety",
+      "class": "Safelist.AttributeValue",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.safety",
+      "class": "Safelist.AttributeKey",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.safety",
+      "class": "Safelist.Protocol",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.safety",
+      "class": "Safelist.TagName",
+      "dependencies": []
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Attributes",
+      "dependencies": [
+        "org.jsoup.nodes.Range",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.nodes.Attribute",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Element",
+      "dependencies": [
+        "org.jsoup.nodes.Printer",
+        "org.jsoup.select.NodeVisitor",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.select.NodeFilter",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.nodes.DataNode",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.nodes.Attribute",
+        "org.jsoup.helper.Regex",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.nodes.Comment",
+        "org.jsoup.parser.Tag",
+        "org.jsoup.nodes.CDataNode",
+        "org.jsoup.select.Evaluator",
+        "org.jsoup.parser.TokenQueue",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.select.Collector",
+        "org.jsoup.select.Nodes",
+        "org.jsoup.nodes.Element.NodeList",
+        "org.jsoup.select.Selector",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.select.Elements",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.nodes.NodeUtils",
+        "org.jsoup.nodes.TextNode"
+      ]
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "Normalizer",
+      "dependencies": [
+        "org.jsoup.nodes.Attribute",
+        "org.jsoup.nodes.Document"
+      ]
+    },
+    {
+      "package": "org.jsoup.nodes",
+      "class": "Attribute",
+      "dependencies": [
+        "org.jsoup.nodes.Entities",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.internal.Normalizer",
+        "org.jsoup.internal.QuietAppendable",
+        "org.jsoup.helper.Validate"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "Validate",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup",
+      "class": "Jsoup",
+      "dependencies": [
+        "org.jsoup.helper.HttpConnection",
+        "org.jsoup.safety.Cleaner",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.safety.Safelist",
+        "org.jsoup.Connection",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.safety",
+      "class": "Cleaner",
+      "dependencies": [
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.safety.Safelist",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.safety.Cleaner.ElementMeta",
+        "org.jsoup.safety.Cleaner.CleaningVisitor",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.Parser"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

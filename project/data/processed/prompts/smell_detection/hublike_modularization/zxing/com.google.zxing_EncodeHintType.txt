@@ -1,0 +1,172 @@
+##CONTEXT_SIZE=1389
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing",
+    "class": "EncodeHintType",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.client.j2se",
+      "class": "CommandLineEncoder",
+      "dependencies": [
+        "com.google.zxing.client.j2se.MatrixToImageWriter",
+        "com.google.zxing.client.j2se.EncoderConfig",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.client.android.encode",
+      "class": "QRCodeEncoder",
+      "dependencies": [
+        "com.google.zxing.Result",
+        "com.google.zxing.client.android.Intents",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.client.result.AddressBookParsedResult",
+        "com.google.zxing.client.result.ParsedResult",
+        "com.google.zxing.client.android.encode.ContactEncoder",
+        "com.google.zxing.client.android.Contents",
+        "com.google.zxing.client.result.ResultParser",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web",
+      "class": "ChartServlet",
+      "dependencies": [
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.client.j2se.MatrixToImageWriter",
+        "com.google.zxing.EncodeHintType",
+        "com.google.zxing.web.ChartServletRequestParameters"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "Code128Writer",
+      "dependencies": [
+        "com.google.zxing.oned.Code128Writer.Latch",
+        "com.google.zxing.oned.Code128Writer.CType",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.oned.Code128Writer.Charset",
+        "com.google.zxing.oned.Code128Reader",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.oned",
+      "class": "OneDimensionalCodeWriter",
+      "dependencies": [
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.EncodeHintType",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing.pdf417",
+      "class": "PDF417Writer",
+      "dependencies": [
+        "com.google.zxing.pdf417.encoder.Compaction",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.pdf417.encoder.Dimensions",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.pdf417.encoder.PDF417",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode",
+      "class": "QRCodeWriter",
+      "dependencies": [
+        "com.google.zxing.qrcode.encoder.ByteMatrix",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.encoder.Encoder",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.qrcode.encoder.QRCode",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.encoder",
+      "class": "Encoder",
+      "dependencies": [
+        "com.google.zxing.qrcode.encoder.ByteMatrix",
+        "com.google.zxing.common.CharacterSetECI",
+        "com.google.zxing.qrcode.encoder.QRCode",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.qrcode.decoder.Mode",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.common.StringUtils",
+        "com.google.zxing.qrcode.encoder.MaskUtil",
+        "com.google.zxing.qrcode.encoder.MatrixUtil",
+        "com.google.zxing.qrcode.encoder.MinimalEncoder",
+        "com.google.zxing.qrcode.decoder.Version",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.datamatrix",
+      "class": "DataMatrixWriter",
+      "dependencies": [
+        "com.google.zxing.qrcode.encoder.ByteMatrix",
+        "com.google.zxing.datamatrix.encoder.MinimalEncoder",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.Dimension",
+        "com.google.zxing.datamatrix.encoder.SymbolInfo",
+        "com.google.zxing.datamatrix.encoder.ErrorCorrection",
+        "com.google.zxing.datamatrix.encoder.DefaultPlacement",
+        "com.google.zxing.datamatrix.encoder.SymbolShapeHint",
+        "com.google.zxing.datamatrix.encoder.HighLevelEncoder",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec",
+      "class": "AztecWriter",
+      "dependencies": [
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.aztec.encoder.AztecCode",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.aztec.encoder.Encoder",
+        "com.google.zxing.EncodeHintType"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,86 @@
+##CONTEXT_SIZE=719
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "net.bytebuddy.build.maven",
+    "class": "Discovery",
+    "dependencies": [
+      "net.bytebuddy.build.maven.ByteBuddyMojo"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build.maven",
+      "class": "ByteBuddyMojo",
+      "dependencies": [
+        "net.bytebuddy.build.maven.Transformation",
+        "net.bytebuddy.build.maven.Discovery",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.Coordinate",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.StalenessFilter",
+        "net.bytebuddy.build.maven.ClassLoaderResolver",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.TransformationLogger",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.ForDiscoveredPlugin",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.maven.Initialization",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.Transformer",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "net.bytebuddy.build.maven",
+      "class": "ByteBuddyMojo",
+      "dependencies": [
+        "net.bytebuddy.build.maven.Transformation",
+        "net.bytebuddy.build.maven.Discovery",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.Coordinate",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.StalenessFilter",
+        "net.bytebuddy.build.maven.ClassLoaderResolver",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.TransformationLogger",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.ForDiscoveredPlugin",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.build.maven.Initialization",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.build.maven.ByteBuddyMojo.Transformer",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.matcher.ElementMatcher"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

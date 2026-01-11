@@ -1,0 +1,37 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: God Component
+
+Definition:
+God Component arise when a component is **excessively** large either in terms of Lines Of Code or the number of classes.
+
+# Constraints
+
+- Give the answer exactly in the structure defined in the **#Successful Output** section, without any comments or explanations.
+- The **justification** field must summarize the key elements that support the detection result.
+- Only perform the analysis if you deem the information in the **#Input** section sufficient. Otherwise, follow the guidelines in the **#Unsuccessful Output** section.
+- All fields in the **#Successful Output** are mandatory.
+- Do not rely on fixed metric thresholds; use contextual judgment based on the provided data.
+
+# Input
+
+The following metrics and dependencies are available at package and class levels:
+
+```json
+{"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "metrics": {"num_classes": 7, "loc": 359, "Ce": 9, "Ca": 0}, "classes": [{"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "ModifierValidator", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/ModifierValidator.java", "metrics": {"nof": 6, "nopf": 0, "nom": 18, "nopm": 12, "loc": 168, "wmc": 44, "nc": 0, "dit": 3, "lcom": 0.6666666666666666, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.expr.LambdaExpr", "com.github.javaparser.utils.SeparatedItemStringBuilder", "com.github.javaparser.ast.body.FieldDeclaration", "com.github.javaparser.ast.body.EnumDeclaration", "com.github.javaparser.ast.stmt.CatchClause", "com.github.javaparser.ast.Modifier", "com.github.javaparser.ast.body.TypeDeclaration", "com.github.javaparser.ast.body.AnnotationMemberDeclaration", "com.github.javaparser.ast.body.ConstructorDeclaration", "com.github.javaparser.ast.expr.VariableDeclarationExpr", "com.github.javaparser.ast.body.ClassOrInterfaceDeclaration", "com.github.javaparser.ast.validator.ProblemReporter", "com.github.javaparser.ast.body.AnnotationDeclaration", "com.github.javaparser.ast.body.MethodDeclaration", "com.github.javaparser.ast.modules.ModuleRequiresDirective"]}, {"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "CommonValidators", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/CommonValidators.java", "metrics": {"nof": 0, "nopf": 0, "nom": 1, "nopm": 1, "loc": 41, "wmc": 9, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.expr.Expression", "com.github.javaparser.metamodel.NodeMetaModel", "com.github.javaparser.ast.NodeList"]}, {"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "RecordDeclarationValidator", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/RecordDeclarationValidator.java", "metrics": {"nof": 0, "nopf": 0, "nom": 4, "nopm": 1, "loc": 32, "wmc": 7, "nc": 0, "dit": 1, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.body.RecordDeclaration", "com.github.javaparser.ast.validator.ProblemReporter", "com.github.javaparser.ast.Modifier"]}, {"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "VarValidator", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/VarValidator.java", "metrics": {"nof": 1, "nopf": 0, "nom": 3, "nopm": 2, "loc": 73, "wmc": 17, "nc": 0, "dit": 1, "lcom": 0.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.type.VarType", "com.github.javaparser.ast.validator.ProblemReporter", "com.github.javaparser.ast.expr.VariableDeclarationExpr"]}, {"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "NoUnderscoresInIntegerLiteralsValidator", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/NoUnderscoresInIntegerLiteralsValidator.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 2, "loc": 15, "wmc": 4, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.expr.IntegerLiteralExpr", "com.github.javaparser.ast.validator.ProblemReporter", "com.github.javaparser.ast.expr.LongLiteralExpr", "com.github.javaparser.ast.expr.LiteralStringValueExpr"]}, {"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "NoBinaryIntegerLiteralsValidator", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/NoBinaryIntegerLiteralsValidator.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 2, "loc": 15, "wmc": 4, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.expr.IntegerLiteralExpr", "com.github.javaparser.ast.validator.ProblemReporter", "com.github.javaparser.ast.expr.LongLiteralExpr", "com.github.javaparser.ast.expr.LiteralStringValueExpr"]}, {"package": "com.github.javaparser.ast.validator.language_level_validations.chunks", "class": "UnderscoreKeywordValidator", "file": "data/repositories/javaparser/javaparser-core/src/main/java/com/github/javaparser/ast/validator/language_level_validations/chunks/UnderscoreKeywordValidator.java", "metrics": {"nof": 0, "nopf": 0, "nom": 3, "nopm": 2, "loc": 15, "wmc": 4, "nc": 0, "dit": 3, "lcom": -1.0, "fanin": 0, "fanout": 0}, "dependencies": ["com.github.javaparser.ast.expr.Name", "com.github.javaparser.ast.validator.ProblemReporter", "com.github.javaparser.ast.Node", "com.github.javaparser.ast.expr.SimpleName"]}], "dependencies": ["com.github.javaparser.utils", "com.github.javaparser.ast.modules", "com.github.javaparser.ast", "com.github.javaparser.ast.body", "com.github.javaparser.ast.validator", "com.github.javaparser.ast.type", "com.github.javaparser.metamodel", "com.github.javaparser.ast.stmt", "com.github.javaparser.ast.expr"]}
+```
+
+# Successful Output
+
+Provide the output in this structure:
+
+```json
+{
+    "smell": "God Component",
+    "package": [package name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

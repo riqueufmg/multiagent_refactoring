@@ -1,0 +1,133 @@
+##CONTEXT_SIZE=938
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.web.generator.client",
+    "class": "GeneratorException",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "WifiGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "GeoLocationGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "GeneratorSource",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.GeneratorException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "EmailGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException",
+        "com.google.zxing.web.generator.client.Validators"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "ContactInfoGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException",
+        "com.google.zxing.web.generator.client.Validators"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "SmsAddressGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException",
+        "com.google.zxing.web.generator.client.Validators"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "CalendarEventGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException",
+        "com.google.zxing.web.generator.client.TimeZoneList"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "Validators",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.GeneratorException"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "PhoneNumberGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException",
+        "com.google.zxing.web.generator.client.Validators"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "UrlGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException",
+        "com.google.zxing.web.generator.client.Validators"
+      ]
+    },
+    {
+      "package": "com.google.zxing.web.generator.client",
+      "class": "TextGenerator",
+      "dependencies": [
+        "com.google.zxing.web.generator.client.StylesDefs",
+        "com.google.zxing.web.generator.client.GeneratorException"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

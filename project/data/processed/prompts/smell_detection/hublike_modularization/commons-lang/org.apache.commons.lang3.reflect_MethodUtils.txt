@@ -1,0 +1,114 @@
+##CONTEXT_SIZE=787
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3.reflect",
+    "class": "MethodUtils",
+    "dependencies": [
+      "org.apache.commons.lang3.reflect.MemberUtils",
+      "org.apache.commons.lang3.ArrayUtils",
+      "org.apache.commons.lang3.stream.LangCollectors",
+      "org.apache.commons.lang3.ClassUtils",
+      "org.apache.commons.lang3.reflect.TypeUtils",
+      "org.apache.commons.lang3.reflect.AccessibleObjects"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "MemberUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.reflect.AccessibleObjects",
+        "org.apache.commons.lang3.reflect.MemberUtils.Executable"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ArrayUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.mutable.MutableInt",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.function.FailableFunction",
+        "org.apache.commons.lang3.BooleanUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.stream",
+      "class": "LangCollectors",
+      "dependencies": [
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ClassUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ClassUtils.Interfaces",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "TypeUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.Validate",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.reflect.TypeUtils.WildcardTypeBuilder",
+        "org.apache.commons.lang3.reflect.Typed",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.AppendableJoiner"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "AccessibleObjects",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3.reflect",
+      "class": "ConstructorUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.reflect.MemberUtils",
+        "org.apache.commons.lang3.reflect.MethodUtils",
+        "org.apache.commons.lang3.ClassUtils"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

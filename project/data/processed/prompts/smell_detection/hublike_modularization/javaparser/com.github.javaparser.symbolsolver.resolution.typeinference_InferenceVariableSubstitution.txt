@@ -1,0 +1,117 @@
+##CONTEXT_SIZE=978
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.github.javaparser.symbolsolver.resolution.typeinference",
+    "class": "InferenceVariableSubstitution",
+    "dependencies": [
+      "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariable",
+      "com.github.javaparser.resolution.types.ResolvedType"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference",
+      "class": "InferenceVariable",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedType",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.resolution.types",
+      "class": "ResolvedType",
+      "dependencies": [
+        "com.github.javaparser.resolution.types.ResolvedReferenceType",
+        "com.github.javaparser.resolution.types.ResolvedTypeVariable",
+        "com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration",
+        "com.github.javaparser.resolution.Context",
+        "com.github.javaparser.resolution.types.ResolvedPrimitiveType",
+        "com.github.javaparser.resolution.types.ResolvedWildcard",
+        "com.github.javaparser.resolution.types.ResolvedUnionType",
+        "com.github.javaparser.resolution.types.ResolvedLambdaConstraintType",
+        "com.github.javaparser.resolution.types.ResolvedArrayType"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference",
+      "class": "Bound",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariable",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.bounds.FalseBound",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds",
+      "class": "SubtypeOfBound",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.TypeHelper",
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds",
+      "class": "CapturesBound",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds",
+      "class": "SameAsBound",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.TypeHelper",
+        "com.github.javaparser.resolution.types.ResolvedType"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds",
+      "class": "FalseBound",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"
+      ]
+    },
+    {
+      "package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds",
+      "class": "ThrowsBound",
+      "dependencies": [
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariable",
+        "com.github.javaparser.symbolsolver.resolution.typeinference.InferenceVariableSubstitution"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

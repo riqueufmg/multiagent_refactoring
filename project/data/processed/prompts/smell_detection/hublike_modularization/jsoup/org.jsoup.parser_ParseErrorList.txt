@@ -1,0 +1,111 @@
+##CONTEXT_SIZE=722
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.parser",
+    "class": "ParseErrorList",
+    "dependencies": []
+  },
+  "outgoing_dependencies": [],
+  "incoming_dependencies": [
+    {
+      "package": "org.jsoup.safety",
+      "class": "Cleaner",
+      "dependencies": [
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.safety.Safelist",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.safety.Cleaner.ElementMeta",
+        "org.jsoup.safety.Cleaner.CleaningVisitor",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "Tokeniser",
+      "dependencies": [
+        "org.jsoup.parser.TokenData",
+        "org.jsoup.parser.Token",
+        "org.jsoup.parser.Tag",
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Entities",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.parser.TreeBuilder",
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.TokeniserState"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "Parser",
+      "dependencies": [
+        "org.jsoup.parser.TagSet",
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.parser.TreeBuilder",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.parser.HtmlTreeBuilder",
+        "org.jsoup.parser.Tokeniser",
+        "org.jsoup.parser.XmlTreeBuilder",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings"
+      ]
+    },
+    {
+      "package": "org.jsoup.parser",
+      "class": "TreeBuilder",
+      "dependencies": [
+        "org.jsoup.parser.Tag",
+        "org.jsoup.parser.Token",
+        "org.jsoup.parser.TagSet",
+        "org.jsoup.select.NodeVisitor",
+        "org.jsoup.parser.ParseErrorList",
+        "org.jsoup.nodes.Range",
+        "org.jsoup.parser.Tokeniser",
+        "org.jsoup.nodes.Attributes",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.internal.SharedConstants",
+        "org.jsoup.nodes.Element",
+        "org.jsoup.nodes.Node",
+        "org.jsoup.parser.CharacterReader",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.ParseSettings",
+        "org.jsoup.parser.Parser"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,141 @@
+##CONTEXT_SIZE=958
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.aztec",
+    "class": "AztecReader",
+    "dependencies": [
+      "com.google.zxing.common.DecoderResult",
+      "com.google.zxing.ResultPointCallback",
+      "com.google.zxing.FormatException",
+      "com.google.zxing.Result",
+      "com.google.zxing.NotFoundException",
+      "com.google.zxing.BarcodeFormat",
+      "com.google.zxing.aztec.AztecDetectorResult",
+      "com.google.zxing.DecodeHintType",
+      "com.google.zxing.ResultPoint",
+      "com.google.zxing.aztec.detector.Detector",
+      "com.google.zxing.BinaryBitmap",
+      "com.google.zxing.ResultMetadataType"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.common",
+      "class": "DecoderResult",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultPointCallback",
+      "dependencies": [
+        "com.google.zxing.ResultPoint"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "FormatException",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "Result",
+      "dependencies": [
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.ResultMetadataType",
+        "com.google.zxing.BarcodeFormat"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "NotFoundException",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "BarcodeFormat",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.aztec",
+      "class": "AztecDetectorResult",
+      "dependencies": [
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.common.BitMatrix"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "DecodeHintType",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultPoint",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils"
+      ]
+    },
+    {
+      "package": "com.google.zxing.aztec.detector",
+      "class": "Detector",
+      "dependencies": [
+        "com.google.zxing.common.detector.MathUtils",
+        "com.google.zxing.aztec.detector.Detector.CorrectedParameter",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.GridSampler",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.ResultPoint",
+        "com.google.zxing.aztec.detector.Detector.Point",
+        "com.google.zxing.common.reedsolomon.ReedSolomonDecoder"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "BinaryBitmap",
+      "dependencies": [
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.NotFoundException",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.Binarizer",
+        "com.google.zxing.LuminanceSource"
+      ]
+    },
+    {
+      "package": "com.google.zxing",
+      "class": "ResultMetadataType",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

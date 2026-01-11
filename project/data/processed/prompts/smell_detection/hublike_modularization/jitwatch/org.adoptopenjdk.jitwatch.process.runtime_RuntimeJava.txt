@@ -1,0 +1,71 @@
+##CONTEXT_SIZE=587
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.adoptopenjdk.jitwatch.process.runtime",
+    "class": "RuntimeJava",
+    "dependencies": [
+      "org.adoptopenjdk.jitwatch.logger.ILogListener"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.logger",
+      "class": "ILogListener",
+      "dependencies": []
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.adoptopenjdk.jitwatch.jvmlang",
+      "class": "LanguageManager",
+      "dependencies": [
+        "org.adoptopenjdk.jitwatch.process.runtime.IRuntime",
+        "org.adoptopenjdk.jitwatch.logger.ILogListener",
+        "org.adoptopenjdk.jitwatch.process.compiler.CompilerKotlin",
+        "org.adoptopenjdk.jitwatch.process.runtime.RuntimeKotlin",
+        "org.adoptopenjdk.jitwatch.process.compiler.ICompiler",
+        "org.adoptopenjdk.jitwatch.process.compiler.CompilerJava",
+        "org.adoptopenjdk.jitwatch.process.runtime.RuntimeJRuby",
+        "org.adoptopenjdk.jitwatch.process.runtime.RuntimeScala",
+        "org.adoptopenjdk.jitwatch.process.runtime.RuntimeJava",
+        "org.adoptopenjdk.jitwatch.process.compiler.CompilerJavaScript",
+        "org.adoptopenjdk.jitwatch.process.compiler.CompilerScala",
+        "org.adoptopenjdk.jitwatch.process.runtime.RuntimeGroovy",
+        "org.adoptopenjdk.jitwatch.process.runtime.RuntimeJavaScript",
+        "org.adoptopenjdk.jitwatch.core.JITWatchConfig",
+        "org.adoptopenjdk.jitwatch.process.compiler.CompilerJRuby",
+        "org.adoptopenjdk.jitwatch.process.compiler.CompilerGroovy"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

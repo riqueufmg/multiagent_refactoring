@@ -1,0 +1,119 @@
+##CONTEXT_SIZE=890
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "com.google.zxing.qrcode.encoder",
+    "class": "QRCode",
+    "dependencies": [
+      "com.google.zxing.qrcode.encoder.ByteMatrix",
+      "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+      "com.google.zxing.qrcode.decoder.Version",
+      "com.google.zxing.qrcode.decoder.Mode"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "com.google.zxing.qrcode.encoder",
+      "class": "ByteMatrix",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "ErrorCorrectionLevel",
+      "dependencies": []
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "Version",
+      "dependencies": [
+        "com.google.zxing.qrcode.decoder.Version.ECBlocks",
+        "com.google.zxing.FormatException",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.decoder.FormatInformation",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.decoder",
+      "class": "Mode",
+      "dependencies": [
+        "com.google.zxing.qrcode.decoder.Version"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "com.google.zxing.qrcode",
+      "class": "QRCodeWriter",
+      "dependencies": [
+        "com.google.zxing.qrcode.encoder.ByteMatrix",
+        "com.google.zxing.common.BitMatrix",
+        "com.google.zxing.qrcode.encoder.Encoder",
+        "com.google.zxing.BarcodeFormat",
+        "com.google.zxing.qrcode.encoder.QRCode",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.encoder",
+      "class": "Encoder",
+      "dependencies": [
+        "com.google.zxing.qrcode.encoder.ByteMatrix",
+        "com.google.zxing.common.CharacterSetECI",
+        "com.google.zxing.qrcode.encoder.QRCode",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.qrcode.decoder.Mode",
+        "com.google.zxing.common.reedsolomon.GenericGF",
+        "com.google.zxing.common.StringUtils",
+        "com.google.zxing.qrcode.encoder.MaskUtil",
+        "com.google.zxing.qrcode.encoder.MatrixUtil",
+        "com.google.zxing.qrcode.encoder.MinimalEncoder",
+        "com.google.zxing.qrcode.decoder.Version",
+        "com.google.zxing.EncodeHintType"
+      ]
+    },
+    {
+      "package": "com.google.zxing.qrcode.encoder",
+      "class": "MatrixUtil",
+      "dependencies": [
+        "com.google.zxing.qrcode.encoder.ByteMatrix",
+        "com.google.zxing.qrcode.encoder.QRCode",
+        "com.google.zxing.qrcode.decoder.ErrorCorrectionLevel",
+        "com.google.zxing.common.BitArray",
+        "com.google.zxing.qrcode.encoder.MaskUtil",
+        "com.google.zxing.qrcode.decoder.Version"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

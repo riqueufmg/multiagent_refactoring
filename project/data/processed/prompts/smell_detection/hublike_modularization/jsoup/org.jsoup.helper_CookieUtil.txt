@@ -1,0 +1,98 @@
+##CONTEXT_SIZE=607
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.jsoup.helper",
+    "class": "CookieUtil",
+    "dependencies": [
+      "org.jsoup.parser.CharacterReader",
+      "org.jsoup.helper.HttpConnection",
+      "org.jsoup.Connection",
+      "org.jsoup.internal.StringUtil"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.jsoup.parser",
+      "class": "CharacterReader",
+      "dependencies": [
+        "org.jsoup.parser.CharacterReader.CharPredicate",
+        "org.jsoup.internal.StringUtil",
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.parser.TokeniserState"
+      ]
+    },
+    {
+      "package": "org.jsoup.helper",
+      "class": "HttpConnection",
+      "dependencies": [
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.helper.HttpConnection.Response",
+        "org.jsoup.helper.DataUtil",
+        "org.jsoup.Progress",
+        "org.jsoup.helper.HttpConnection.Request",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.helper.RequestExecutor",
+        "org.jsoup.Connection",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.helper.AuthenticationHandler",
+        "org.jsoup.parser.Parser",
+        "org.jsoup.internal.ControllableInputStream"
+      ]
+    },
+    {
+      "package": "org.jsoup",
+      "class": "Connection",
+      "dependencies": [
+        "org.jsoup.Connection.Method",
+        "org.jsoup.helper.RequestAuthenticator",
+        "org.jsoup.Connection.Response",
+        "org.jsoup.nodes.Document",
+        "org.jsoup.Progress",
+        "org.jsoup.Connection.Request",
+        "org.jsoup.Connection.KeyVal",
+        "org.jsoup.parser.Parser"
+      ]
+    },
+    {
+      "package": "org.jsoup.internal",
+      "class": "StringUtil",
+      "dependencies": [
+        "org.jsoup.internal.SoftPool",
+        "org.jsoup.helper.Validate",
+        "org.jsoup.internal.StringUtil.StringJoiner"
+      ]
+    }
+  ],
+  "incoming_dependencies": []
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```

@@ -1,0 +1,174 @@
+##CONTEXT_SIZE=1238
+
+# Task
+
+You are a software engineering expert in software refactoring. Your task is to detect the smell: Hub-like Modularization.
+
+Definition:
+Hub-like Modularization  arises when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.
+
+# Constraints
+- I give as input software metrics and dependencies.
+- The analysis must consider the class in isolation. Do not assume the existence of other classes, packages, or system-level context beyond the provided data.
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+
+# Input
+
+```json
+{
+  "analyzed_package": {
+    "package": "org.apache.commons.lang3.builder",
+    "class": "ToStringStyle",
+    "dependencies": [
+      "org.apache.commons.lang3.ObjectUtils",
+      "org.apache.commons.lang3.Strings",
+      "org.apache.commons.lang3.ClassUtils",
+      "org.apache.commons.lang3.StringUtils"
+    ]
+  },
+  "outgoing_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ObjectUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.function.Suppliers",
+        "org.apache.commons.lang3.time.DurationUtils",
+        "org.apache.commons.lang3.text.StrBuilder",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.ObjectUtils.Null"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "Strings",
+      "dependencies": [
+        "org.apache.commons.lang3.function.ToBooleanBiFunction",
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.CharSequenceUtils",
+        "org.apache.commons.lang3.Strings.Builder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ClassUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ClassUtils.Interfaces",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "StringUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.function.Suppliers",
+        "org.apache.commons.lang3.CharSequenceUtils",
+        "org.apache.commons.lang3.Charsets",
+        "org.apache.commons.lang3.stream.LangCollectors",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.LocaleUtils",
+        "org.apache.commons.lang3.Strings"
+      ]
+    }
+  ],
+  "incoming_dependencies": [
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "ArrayUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.mutable.MutableInt",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.CharUtils",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.function.FailableFunction",
+        "org.apache.commons.lang3.BooleanUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3",
+      "class": "AnnotationUtils",
+      "dependencies": [
+        "org.apache.commons.lang3.builder.ToStringBuilder",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.StringUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.builder",
+      "class": "ReflectionDiffBuilder",
+      "dependencies": [
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.builder.ReflectionDiffBuilder.Builder",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.builder.DiffResult",
+        "org.apache.commons.lang3.reflect.FieldUtils",
+        "org.apache.commons.lang3.ClassUtils",
+        "org.apache.commons.lang3.builder.DiffBuilder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.builder",
+      "class": "DiffBuilder",
+      "dependencies": [
+        "org.apache.commons.lang3.builder.Builder",
+        "org.apache.commons.lang3.builder.DiffBuilder.SerializableSupplier",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.ObjectUtils",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.builder.DiffResult"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.builder",
+      "class": "DiffBuilder.Builder",
+      "dependencies": [
+        "org.apache.commons.lang3.builder.ToStringStyle"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.builder",
+      "class": "ReflectionToStringBuilder",
+      "dependencies": [
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.ArrayUtils",
+        "org.apache.commons.lang3.ClassUtils"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.builder",
+      "class": "ToStringBuilder",
+      "dependencies": [
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.builder.ReflectionToStringBuilder"
+      ]
+    },
+    {
+      "package": "org.apache.commons.lang3.builder",
+      "class": "DiffResult",
+      "dependencies": [
+        "org.apache.commons.lang3.StringUtils",
+        "org.apache.commons.lang3.builder.ToStringStyle",
+        "org.apache.commons.lang3.builder.ToStringBuilder"
+      ]
+    }
+  ]
+}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+    "class": [package name].[class name],
+    "detection": [true/false],
+    "justification": [Reasons for the detection result, citing the elements that justify the decision]
+}
+```
