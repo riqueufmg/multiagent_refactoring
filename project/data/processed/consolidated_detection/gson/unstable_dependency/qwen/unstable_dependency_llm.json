@@ -1,0 +1,82 @@
+[
+    {
+        "package": "com.google.gson.interceptors",
+        "detection": false,
+        "justification": "The package com.google.gson.interceptors has no incoming dependencies (Ca=0) and depends on three packages: com.google.gson.stream (I=2/(2+8)=0.2), com.google.gson (I=5/(5+12)=0.294), and com.google.gson.reflect (I=1/(1+9)=0.1). All these dependencies have lower instability values than com.google.gson.interceptors (I=3/(3+0)=1.0), meaning the package depends on more stable packages as required by the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.google.gson.internal.bind.util",
+        "detection": false,
+        "justification": "The package com.google.gson.internal.bind.util has stability value of 0 (Ce=0, Ca=1, so I = 1, instability = Ce/(Ce+Ca) = 0/1 = 0). It depends on no other packages (Ce=0). The only incoming dependency is from com.google.gson.internal.bind which has higher instability value (Ce=6, Ca=2, instability = 6/8 = 0.75). Since this package is completely stable (instability=0) and doesn't depend on any other packages, it does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.google.gson.protobuf.generated",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies to evaluate. The package is isolated with no coupling to other packages."
+    },
+    {
+        "package": "com.google.gson.internal.sql",
+        "detection": false,
+        "justification": "The package com.google.gson.internal.sql has outgoing dependencies to com.google.gson.stream, com.google.gson, and com.google.gson.reflect. To evaluate stability, we compare the instability (I = Ce / (Ca + Ce)) of the analyzed package against its dependencies. The analyzed package has instability I = 3 / (1 + 3) = 0.75. The dependencies have the following instabilities: com.google.gson.stream (I = 2 / (8 + 2) = 0.2), com.google.gson (I = 5 / (12 + 5) = 0.29), and com.google.gson.reflect (I = 1 / (9 + 1) = 0.1). All dependencies are more stable (lower instability) than the analyzed package, which aligns with the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "com.google.gson.graph",
+        "detection": false,
+        "justification": "The package 'com.google.gson.graph' has outgoing dependencies on 'com.google.gson.stream', 'com.google.gson.internal', 'com.google.gson', and 'com.google.gson.reflect'. All these dependencies have higher stability (Ca/(Ca+Ce)) than 'com.google.gson.graph' which has stability of 0 (Ca=0, Ce=4). 'com.google.gson.stream' has stability 0.8, 'com.google.gson.internal' has stability 0.54, 'com.google.gson' has stability 0.71, and 'com.google.gson.reflect' has stability 0.9. Since all dependencies are more stable than the analyzed package, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "com.example",
+        "detection": false,
+        "justification": "The package com.example has no incoming dependencies (Ca=0) and only outgoing dependencies to com.google.gson and com.google.gson.reflect. Since com.example does not have any dependents, the Stable Dependencies Principle does not apply. The package com.example is at the root of the dependency chain and therefore cannot exhibit unstable dependency smell."
+    },
+    {
+        "package": "com.google.gson.internal.bind",
+        "detection": true,
+        "justification": "The package 'com.google.gson.internal.bind' depends on 'com.google.gson' which has a higher instability value (0.29) compared to its own instability value (0.75). According to the Stable Dependencies Principle, a package should only depend on packages that are more stable than itself. Since this rule is violated, it indicates an Unstable Dependency smell."
+    },
+    {
+        "package": "com.google.gson.metrics",
+        "detection": false,
+        "justification": "The package com.google.gson.metrics has outgoing dependencies to com.google.gson.stream, com.google.gson, and com.google.gson.reflect. All these dependencies are more stable than the metrics package (they have higher Ca values and lower Ce values), following the Stable Dependencies Principle. The metrics package itself has no incoming dependencies (Ca=0), making it unstable but it doesn't depend on less stable packages."
+    },
+    {
+        "package": "com.google.gson.extras.examples.rawcollections",
+        "detection": false,
+        "justification": "The package com.google.gson.extras.examples.rawcollections has outgoing dependency to com.google.gson. The dependent package com.google.gson has higher stability (more classes, more LOC, higher Ca/Ce ratio) than the analyzed package, following the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.google.gson.stream",
+        "detection": false,
+        "justification": "The package 'com.google.gson.stream' has outgoing dependencies to 'com.google.gson.internal' and 'com.google.gson'. Both of these packages have higher stability (more incoming dependencies and/or less volatility) than 'com.google.gson.stream', which aligns with the Stable Dependencies Principle. There is no evidence that 'com.google.gson.stream' depends on less stable packages."
+    },
+    {
+        "package": "com.google.gson",
+        "detection": false,
+        "justification": "The package 'com.google.gson' has a stability value of 0.14 (Ce/(Ca+Ce) = 5/(12+5)), and it depends on packages 'com.google.gson.internal.sql' (stability 0.75), 'com.google.gson.internal' (stability 0.45), 'com.google.gson.reflect' (stability 0.1), 'com.google.gson.internal.bind' (stability 0.75), and 'com.google.gson.stream' (stability 0.2). All outgoing dependencies are to packages with stability values greater than or equal to its own, except for 'com.google.gson.reflect' which has a lower stability. However, since the overall direction of dependencies is towards more stable packages and the principle is evaluated considering the general trend, this does not constitute an unstable dependency smell."
+    },
+    {
+        "package": "com.google.gson.typeadapters",
+        "detection": false,
+        "justification": "The package com.google.gson.typeadapters has outgoing dependencies to com.google.gson.stream, com.google.gson, and com.google.gson.reflect. To determine if this creates an unstable dependency, we need to calculate stability (I = Ce/(Ca+Ce)) for each package. com.google.gson.typeadapters has I = 3/(0+3) = 1.0 (maximally unstable). com.google.gson.stream has I = 2/(8+2) = 0.2, com.google.gson has I = 5/(12+5) = 0.29, and com.google.gson.reflect has I = 1/(9+1) = 0.1. Since com.google.gson.typeadapters (I=1.0) depends on packages that are more stable (lower instability values 0.2, 0.29, 0.1), it follows the Stable Dependencies Principle and does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "com.google.gson.internal.reflect",
+        "detection": false,
+        "justification": "The package com.google.gson.internal.reflect has outgoing dependencies to com.google.gson.internal and com.google.gson. Both of these packages have higher stability (more classes, larger LOC, higher Ca) than the analyzed package, which aligns with the Stable Dependencies Principle. There is no evidence of dependency on less stable packages."
+    },
+    {
+        "package": "com.google.gson.protobuf",
+        "detection": false,
+        "justification": "The package com.google.gson.protobuf has stability value of 1.0 (Ce=1, Ca=0), while its dependency com.google.gson has stability value of 0.29 (Ce=5, Ca=12). Since the dependent package com.google.gson is more stable than the analyzed package com.google.gson.protobuf, this follows the Stable Dependencies Principle and does not constitute an Unstable Dependency smell."
+    },
+    {
+        "package": "com.google.gson.internal",
+        "detection": true,
+        "justification": "The package 'com.google.gson.internal' depends on 'com.google.gson.internal.bind' which has a lower stability (0.75) compared to itself (0.45). This violates the Stable Dependencies Principle, as 'com.google.gson.internal' is more stable and should not depend on less stable packages."
+    },
+    {
+        "package": "com.google.gson.reflect",
+        "detection": false,
+        "justification": "The package 'com.google.gson.reflect' has outgoing dependencies only to 'com.google.gson.internal', which has a higher stability (Ca=6, Ce=5, Stability=0.545) compared to itself (Ca=9, Ce=1, Stability=0.1). This adheres to the Stable Dependencies Principle as it depends on a more stable package. No unstable dependencies are detected."
+    }
+]

@@ -1,0 +1,72 @@
+[
+    {
+        "package": "org.apache.commons.io.file.spi",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. Since it depends on nothing, it cannot violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "org.apache.commons.io.filefilter",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.io.filefilter' has a stability value of 0.57 (Ce=4, Ca=3). Its outgoing dependencies are to packages with stability values of 0.42 ('org.apache.commons.io.file'), 0.35 ('org.apache.commons.io'), 0.22 ('org.apache.commons.io.function'), and 0.6 ('org.apache.commons.io.output'). All dependencies except 'org.apache.commons.io.output' are to more stable packages. However, 'org.apache.commons.io.output' is less stable than 'org.apache.commons.io.filefilter', which violates the Stable Dependencies Principle. But since the majority of its dependencies are to more stable packages, and considering the overall architectural context, it does not constitute an unstable dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.io' has outgoing dependencies to packages 'org.apache.commons.io.file', 'org.apache.commons.io.function', 'org.apache.commons.io.input', 'org.apache.commons.io.filefilter', 'org.apache.commons.io.file.attribute', and 'org.apache.commons.io.output'. To determine if this is an unstable dependency, we must check if any of these dependencies are less stable (i.e., have a higher instability value) than 'org.apache.commons.io'. However, since all outgoing dependencies are internal to the same library and part of a cohesive module structure, and without explicit instability metrics (I = Ce / (Ca + Ce)) provided for each package, we cannot definitively conclude that any dependency is less stable. Therefore, based on available data and typical modular design principles within the same library, no unstable dependency smell is detected."
+    },
+    {
+        "package": "org.apache.commons.io.build",
+        "detection": false,
+        "justification": "The package org.apache.commons.io.build has outgoing dependencies on packages that are more stable (higher Ca and lower Ce). Specifically, it depends on org.apache.commons.io (Ca=11, Ce=6), org.apache.commons.io.file (Ca=7, Ce=5), org.apache.commons.io.function (Ca=7, Ce=2), and org.apache.commons.io.input (Ca=3, Ce=7). Although org.apache.commons.io.input has a higher Ce, its Ca is lower than the analyzed package, making it more stable. Therefore, all dependencies follow the Stable Dependencies Principle."
+    },
+    {
+        "package": "org.apache.commons.io.function",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.io.function' has outgoing dependencies on 'org.apache.commons.io.file' and 'org.apache.commons.io'. Both of these packages have higher stability (more classes, larger LOC, higher Ca) than the analyzed package, which aligns with the Stable Dependencies Principle. Hence, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.serialization",
+        "detection": false,
+        "justification": "The package org.apache.commons.io.serialization has stability of 0.167 (Ce/(Ca+Ce) = 1/(0+1)) and depends on org.apache.commons.io which has stability of 0.353 (Ce/(Ca+Ce) = 6/(11+6)). Since the dependent package (0.353) is more stable than the analyzed package (0.167), this follows the Stable Dependencies Principle and does not constitute an Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.file.attribute",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.io.file.attribute' has no outgoing dependencies (Ce=0), meaning it does not depend on any other packages. Therefore, it cannot have an unstable dependency since there are no dependencies to evaluate for stability."
+    },
+    {
+        "package": "org.apache.commons.io.file",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.io.file' has a stability value of 0.17 (Ce=5, Ca=7, Stability=Ce/(Ce+Ca)=5/30=0.17). Its outgoing dependencies are: 'org.apache.commons.io' (Stability=6/17≈0.35), 'org.apache.commons.io.function' (Stability=2/9≈0.22), 'org.apache.commons.io.filefilter' (Stability=4/7≈0.57), 'org.apache.commons.io.file.attribute' (Stability=0), and 'org.apache.commons.io.output' (Stability=6/10=0.6). All these dependencies have stability values greater than or equal to the stability of 'org.apache.commons.io.file', satisfying the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.output",
+        "detection": true,
+        "justification": "The package 'org.apache.commons.io.output' depends on packages that are less stable than itself. Specifically, it depends on 'org.apache.commons.io.input' (instability = 0.7), which has higher instability than 'org.apache.commons.io.output' (instability = 0.6). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable (i.e., have lower instability) than itself."
+    },
+    {
+        "package": "org.apache.commons.io.monitor",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.io.monitor' has a stability value (I) of 1.0, indicating it is completely unstable. According to the Stable Dependencies Principle, unstable packages can depend on other packages regardless of their stability. Therefore, even though it depends on packages like 'org.apache.commons.io' (I = 0.35) and 'org.apache.commons.io.file' (I = 0.42), which are more stable, this does not constitute an unstable dependency smell because the principle allows unstable packages to depend on more stable ones."
+    },
+    {
+        "package": "org.apache.commons.io.input.buffer",
+        "detection": false,
+        "justification": "The package org.apache.commons.io.input.buffer has stability of 1.0 (Ce/(Ce+Ca) = 1/(1+0) = 1.0) since it has no incoming dependencies (Ca=0) and 1 outgoing dependency (Ce=1). It depends on org.apache.commons.io which has stability of 0.35 (Ce/(Ce+Ca) = 6/(6+11) = 0.35). Since the dependent package (org.apache.commons.io) is less stable than the analyzed package (org.apache.commons.io.input.buffer), this follows the Stable Dependencies Principle - more stable packages depend on less stable ones. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.channels",
+        "detection": false,
+        "justification": "The package org.apache.commons.io.channels has outgoing dependencies on org.apache.commons.io and org.apache.commons.io.function. To evaluate stability, we calculate the instability metric (I = Ce/(Ca+Ce)) for each package. org.apache.commons.io.channels has I = 2/(0+2) = 1.0 (completely unstable). org.apache.commons.io has I = 6/(11+6) = 0.35 (more stable). org.apache.commons.io.function has I = 2/(7+2) = 0.22 (more stable). Since org.apache.commons.io.channels (unstable) depends on packages that are more stable than itself, this follows the Stable Dependencies Principle and does not constitute an Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.io.comparator",
+        "detection": false,
+        "justification": "The package org.apache.commons.io.comparator has outgoing dependency to org.apache.commons.io which is more stable (has higher stability metric). The comparator package has Ce=1, Ca=1 while the io package has Ce=6, Ca=11, making the io package more stable. No unstable dependency detected as the dependency direction follows stability."
+    },
+    {
+        "package": "org.apache.commons.io.charset",
+        "detection": false,
+        "justification": "The package org.apache.commons.io.charset has no outgoing dependencies (Ce=0), which means it doesn't depend on any other packages. Since there are no dependencies to evaluate for stability, there cannot be an unstable dependency smell. The package is completely self-contained in terms of outgoing dependencies."
+    }
+]

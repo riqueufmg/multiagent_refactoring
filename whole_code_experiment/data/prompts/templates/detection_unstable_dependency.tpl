@@ -1,0 +1,34 @@
+# Task
+
+You are a software engineering expert in software refactoring.
+
+Your task is to detect the smell: Unstable Dependency.
+
+Definition:
+Unstable Dependency arises when a component depends on other less stable components. Stable Dependencies Principle states that the dependencies between packages should be in the direction of the stability of packages. Hence, a package should only depend on packages that are more stable than itself. An unstable dependency architecture smell occurs when this principle is not followed.
+
+# Constraints
+- When assessing each package, consider outgoing dependencies and incoming dependencies
+- Give the answer exactly in the structure defined in the **#Successful Output** section.
+- Do not include comments, explanations, or text outside the defined output format.
+- All fields in the **#Output** are mandatory.
+
+# Input
+
+The following package code, including incoming and outgoing dependencies, are available for each package:
+
+```java
+{INPUT_DATA}
+```
+
+# Output
+
+Provide the output in this structure:
+
+```json
+{
+"package": "[package_name]",
+"detection": true/false,
+"justification": "[Reasons for the detection result, citing the elements that justify the decision]"
+}
+```

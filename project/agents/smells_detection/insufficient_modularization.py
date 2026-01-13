@@ -4,6 +4,7 @@ import os
 
 from agents.llm_inference.gpt_engine import GPTEngine
 from agents.llm_inference.deepseek_engine import DeepSeekEngine
+from agents.llm_inference.openrouter_engine import OpenRouterEngine
 
 class InsufficientModularizationDetector:
 
@@ -150,3 +151,38 @@ class InsufficientModularizationDetector:
                 out_f.write(response)
 
             print(f"[OK] Saved DeepSeek output to {output_file.name}")
+    
+    def detect_qwen(self, list_of_prompt_files):
+        llm_config = {
+            "model": "qwen/qwen3-coder",
+            "max_input_tokens": 100_000,
+            "max_output_tokens": 8192,
+            "temperature": 0.1
+        }
+
+        llm_engine = OpenRouterEngine(**llm_config)
+
+        output_dir = Path(
+                os.getenv("OUTPUT_PATH"),
+                "llm_outputs",
+                self.project_name,
+                "insufficient_modularization",
+                "qwen"
+            )
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        for prompt_file in list_of_prompt_files:
+
+            output_file = output_dir / f"{prompt_file.stem}.txt"
+
+            if output_file.exists():
+                print(f"Output already exists: {output_file.name}")
+                continue
+
+            with open(prompt_file, "r") as f:
+                prompt_content = f.read()
+
+            response = llm_engine.generate(prompt_content)
+
+            with open(output_file, "w") as out_f:
+                out_f.write(response)

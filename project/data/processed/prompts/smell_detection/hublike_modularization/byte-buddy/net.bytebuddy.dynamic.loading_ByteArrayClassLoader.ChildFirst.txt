@@ -21,27 +21,13 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "package": "net.bytebuddy.dynamic.loading",
     "class": "ByteArrayClassLoader.ChildFirst",
     "dependencies": [
-      "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
       "net.bytebuddy.dynamic.loading.ClassFilePostProcessor",
-      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
-      "net.bytebuddy.dynamic.loading.ClassLoaderDecorator"
+      "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+      "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+      "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy"
     ]
   },
   "outgoing_dependencies": [
-    {
-      "package": "net.bytebuddy.dynamic.loading",
-      "class": "ClassLoadingStrategy",
-      "dependencies": [
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Configurable",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.WrappingDispatcher",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default",
-        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
-        "net.bytebuddy.dynamic.loading.ClassInjector",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy"
-      ]
-    },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ClassFilePostProcessor",
@@ -51,22 +37,36 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
-      "class": "PackageDefinitionStrategy",
+      "class": "ClassLoaderDecorator",
       "dependencies": [
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Trivial",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.NonSealing",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.SealBaseLocator",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Undefined",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Definition"
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
-      "class": "ClassLoaderDecorator",
+      "class": "ClassLoadingStrategy",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.WrappingDispatcher",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Configurable",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.loading",
+      "class": "PackageDefinitionStrategy",
+      "dependencies": [
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.SealBaseLocator",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Undefined",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Definition",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.NonSealing",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy.Trivial"
       ]
     }
   ],

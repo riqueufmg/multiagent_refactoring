@@ -21,67 +21,48 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "package": "net.bytebuddy.dynamic.scaffold",
     "class": "TypeWriter.CodePreservingMethodVisitor",
     "dependencies": [
-      "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver",
       "net.bytebuddy.implementation.Implementation",
-      "net.bytebuddy.utility.OpenedClassReader"
+      "net.bytebuddy.utility.OpenedClassReader",
+      "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver"
     ]
   },
   "outgoing_dependencies": [
-    {
-      "package": "net.bytebuddy.dynamic.scaffold.inline",
-      "class": "MethodRebaseResolver",
-      "dependencies": [
-        "net.bytebuddy.implementation.MethodAccessorFactory",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.description.method.ParameterDescription",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.annotation.AnnotationValue",
-        "net.bytebuddy.implementation.auxiliary.TrivialType",
-        "net.bytebuddy.description.method.ParameterList",
-        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
-        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
-        "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver.Resolution"
-      ]
-    },
     {
       "package": "net.bytebuddy.implementation",
       "class": "Implementation",
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
-        "net.bytebuddy.dynamic.scaffold.MethodGraph",
-        "net.bytebuddy.implementation.Implementation.Composable",
         "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.implementation.Implementation.SpecialMethodInvocation",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
-        "net.bytebuddy.implementation.Implementation.DefaultMethodInvocation",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.implementation.Implementation.Context",
-        "net.bytebuddy.implementation.Implementation.Compound",
-        "net.bytebuddy.implementation.Implementation.Dispatcher",
-        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
-        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
         "net.bytebuddy.implementation.Implementation.Target",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.Implementation.ExtractableView",
+        "net.bytebuddy.implementation.Implementation.FrameGeneration",
+        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.implementation.Implementation.Context",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.description.method.ParameterList",
+        "net.bytebuddy.implementation.Implementation.DefaultMethodInvocation",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.description.modifier.Visibility",
         "net.bytebuddy.implementation.Implementation.Illegal",
         "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
         "net.bytebuddy.description.method.ParameterDescription",
-        "net.bytebuddy.description.method.ParameterList",
-        "net.bytebuddy.implementation.Implementation.FrameGeneration",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter",
-        "net.bytebuddy.implementation.bytecode.StackManipulation",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.annotation.AnnotationValue",
-        "net.bytebuddy.utility.JavaConstant",
-        "net.bytebuddy.implementation.Implementation.ExtractableView"
+        "net.bytebuddy.implementation.Implementation.SpecialMethodInvocation",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.implementation.Implementation.Composable",
+        "net.bytebuddy.implementation.Implementation.Compound",
+        "net.bytebuddy.implementation.Implementation.Dispatcher"
       ]
     },
     {
@@ -89,8 +70,27 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "OpenedClassReader",
       "dependencies": [
         "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.AsmClassReader",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassReader"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold.inline",
+      "class": "MethodRebaseResolver",
+      "dependencies": [
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.method.ParameterList",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.implementation.MethodAccessorFactory",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.auxiliary.TrivialType",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver.Resolution",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     }
   ],

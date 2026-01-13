@@ -1,0 +1,262 @@
+[
+    {
+        "package": "net.bytebuddy.dynamic.scaffold",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.dynamic.scaffold' has outgoing dependencies on several other packages. To determine if it has an Unstable Dependency, we need to compare its stability (I = Ce / (Ca + Ce)) with the stability of the packages it depends on. The stability of 'net.bytebuddy.dynamic.scaffold' is Ce=24, Ca=15, so I = 24 / (15+24) = 24/39 ≈ 0.615. Now, examining its outgoing dependencies: 'net.bytebuddy.description.field' (I=6/(19+6)=0.24), 'net.bytebuddy.description.annotation' (I=12/(19+12)=0.387), 'net.bytebuddy.dynamic.scaffold.inline' (I=20/(7+20)=0.74), 'net.bytebuddy.implementation.bytecode' (I=4/(22+4)=0.154), 'net.bytebuddy.description.modifier' (I=1/(16+1)=0.059), 'net.bytebuddy.implementation.bytecode.constant' (I=9/(7+9)=0.562), 'net.bytebuddy.utility' (I=16/(25+16)=0.39), 'net.bytebuddy.asm' (I=23/(11+23)=0.676), 'net.bytebuddy.description.method' (I=11/(25+11)=0.306), 'net.bytebuddy.implementation' (I=23/(25+23)=0.479), 'net.bytebuddy.description.module' (I=8/(9+8)=0.471), 'net.bytebuddy.build' (I=19/(36+19)=0.346), 'net.bytebuddy.dynamic.scaffold.subclass' (I=20/(9+20)=0.69), 'net.bytebuddy.description.type' (I=16/(32+16)=0.333), 'net.bytebuddy.utility.visitor' (I=6/(3+6)=0.667), 'net.bytebuddy.implementation.auxiliary' (I=17/(9+17)=0.654), 'net.bytebuddy.dynamic.loading' (I=15/(19+15)=0.441), 'net.bytebuddy.dynamic' (I=24/(22+24)=0.522), 'net.bytebuddy' (I=25/(26+25)=0.49), 'net.bytebuddy.implementation.attribute' (I=9/(8+9)=0.529), 'net.bytebuddy.matcher' (I=9/(23+9)=0.281), 'net.bytebuddy.pool' (I=15/(11+15)=0.577), 'net.bytebuddy.implementation.bytecode.member' (I=12/(11+12)=0.522), 'net.bytebuddy.description' (I=4/(12+4)=0.25). Most of these dependencies have lower or similar instability values than 0.615, meaning the package depends on more stable or equally stable packages. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.constant",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode.constant' has a stability metric (Ce/(Ce+Ca)) of 9/(9+7) = 0.5625. It depends on packages such as 'net.bytebuddy.implementation' which has a stability of 23/(23+25) = 0.4792, and 'net.bytebuddy' with stability 25/(25+26) = 0.4902. These dependencies violate the Stable Dependencies Principle because 'net.bytebuddy.implementation.bytecode.constant' is more stable than the packages it depends on."
+    },
+    {
+        "package": "net.bytebuddy.matcher",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.matcher' has outgoing dependencies on packages like 'net.bytebuddy.description.field', 'net.bytebuddy.description.annotation', 'net.bytebuddy.dynamic.loading', 'net.bytebuddy', 'net.bytebuddy.build', 'net.bytebuddy.description.method', 'net.bytebuddy.utility', 'net.bytebuddy.description.type', and 'net.bytebuddy.description'. Among these, some packages such as 'net.bytebuddy.build' (Ca=36, Ce=19), 'net.bytebuddy' (Ca=26, Ce=25), and 'net.bytebuddy.description.type' (Ca=32, Ce=16) have higher afferent coupling (Ca) and/or lower efferent coupling (Ce), indicating they are more stable or equally stable. While 'net.bytebuddy.matcher' (Ca=23, Ce=9) does depend on some packages with lower stability (like 'net.bytebuddy.description.field' with Ca=19, Ce=6), the overall dependency structure does not clearly violate the Stable Dependencies Principle since several of its dependencies are indeed more stable or comparably stable. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.build.gradle.android",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.build.gradle.android' depends on several packages that are less stable than itself. Specifically, it depends on 'net.bytebuddy.asm' (stability = 0.677), 'net.bytebuddy.dynamic.scaffold.inline' (stability = 0.741), 'net.bytebuddy.dynamic' (stability = 0.522), 'net.bytebuddy' (stability = 0.490), 'net.bytebuddy.build' (stability = 0.346), 'net.bytebuddy.pool' (stability = 0.577), and 'net.bytebuddy.description.type' (stability = 0.327). These dependencies violate the Stable Dependencies Principle because they are less stable (higher instability values) than the analyzed package, which has an instability value of 1.0 due to having no incoming dependencies (Ca=0)."
+    },
+    {
+        "package": "org.gradle.api.provider",
+        "detection": false,
+        "justification": "The package org.gradle.api.provider has no outgoing dependencies (Ce=0), making it maximally stable (stability=1.0). It has incoming dependencies from packages net.bytebuddy.build.gradle.android (Ce=9), org.gradle.work (Ce=1), and org.gradle.api.file (Ce=1). Since org.gradle.api.provider is maximally stable, it does not depend on less stable packages, thus not violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "org.gradle.api.tasks",
+        "detection": false,
+        "justification": "The package 'org.gradle.api.tasks' has no outgoing dependencies (Ce=0), so it does not depend on any other packages. Therefore, it cannot have an unstable dependency. The incoming dependencies from 'net.bytebuddy.build.gradle.android' and 'net.bytebuddy.build.gradle' do not affect its stability since they are not dependencies of this package."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode' has a stability metric (Ce/(Ce+Ca)) of 4/(4+22) = 0.15. Its outgoing dependencies include 'net.bytebuddy.build' (stability: 19/(19+36) = 0.35), 'net.bytebuddy.description.method' (stability: 11/(11+25) = 0.31), 'net.bytebuddy.implementation' (stability: 23/(23+25) = 0.48), and 'net.bytebuddy.description.type' (stability: 16/(16+32) = 0.33). All these dependencies have higher stability than the analyzed package. Therefore, it does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.utility.visitor",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.utility.visitor' has a stability metric (Ce/(Ce+Ca)) of 6/(6+3) = 0.6667. It depends on packages including 'net.bytebuddy.implementation' (stability = 23/(23+25) = 0.4792), 'net.bytebuddy.dynamic' (stability = 24/(24+22) = 0.5217), and 'net.bytebuddy.build' (stability = 19/(19+36) = 0.3455), all of which are less stable than 'net.bytebuddy.utility.visitor'. This violates the Stable Dependencies Principle, which requires a package to depend only on packages that are more stable than itself. Therefore, an Unstable Dependency smell is detected."
+    },
+    {
+        "package": "com.service.definition",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "net.bytebuddy.utility",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.utility' has outgoing dependencies to packages that are less stable than itself. Stability is calculated as Ce / (Ce + Ca). For 'net.bytebuddy.utility', stability is 16 / (16 + 25) = 0.39. Some of its outgoing dependencies, such as 'net.bytebuddy.utility.dispatcher' (stability = 6 / (6 + 8) = 0.43) and 'net.bytebuddy.utility.privilege' (stability = 1 / (1 + 1) = 0.5), are more stable or equally stable. However, other dependencies like 'net.bytebuddy.description.annotation' (stability = 12 / (12 + 19) = 0.39), 'net.bytebuddy.description.field' (stability = 6 / (6 + 19) = 0.24), and 'net.bytebuddy.description.type' (stability = 16 / (16 + 32) = 0.33) are less stable. This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "com.service.usage",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependency relationships. The package is completely isolated with no coupling to other packages, so it cannot violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.dynamic.loading",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.dynamic.loading' has a stability metric (Ca=19, Ce=15) that indicates it is relatively unstable (instability = Ce/(Ce+Ca) = 15/34 ≈ 0.44). It depends on several packages, including 'net.bytebuddy.description.field' (Ca=19, Ce=6, instability ≈ 0.24), 'net.bytebuddy.implementation' (Ca=25, Ce=23, instability ≈ 0.48), and others. Some of these dependencies like 'net.bytebuddy.description.modifier' (Ca=16, Ce=1, instability ≈ 0.06) are more stable. However, the dependency on 'net.bytebuddy.implementation' which has higher instability than itself violates the Stable Dependencies Principle. Additionally, it depends on 'net.bytebuddy.matcher' (Ca=23, Ce=9, instability ≈ 0.28), which is more stable, but also on packages with similar or greater instability, indicating unstable dependency patterns."
+    },
+    {
+        "package": "net.bytebuddy.description.type",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.description.type' has a stability metric (I = Ce / (Ca + Ce)) of 16 / (32 + 16) = 0.33, making it relatively stable. All outgoing dependencies have higher or equal stability, satisfying the Stable Dependencies Principle. No unstable dependencies were found."
+    },
+    {
+        "package": "net.bytebuddy.utility.dispatcher",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.utility.dispatcher' depends on 'net.bytebuddy.build', which has a higher instability (Ce/(Ce+Ca) = 19/(19+36) = 0.345) than itself (instability = 6/(6+8) = 0.429). This violates the Stable Dependencies Principle, as an unstable package should not depend on a more stable one."
+    },
+    {
+        "package": "net.bytebuddy.description.field",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.description.field' depends on packages that are less stable than itself. Specifically, it depends on 'net.bytebuddy.build' (I = 0.34, stability = 0.42), 'net.bytebuddy.matcher' (I = 0.23, stability = 0.28), and 'net.bytebuddy.description.type' (I = 0.39, stability = 0.34). These dependencies violate the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.collection",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode.collection' has a stability metric (I) of 0.8, calculated as Ce/(Ca+Ce) = 4/(1+4). All its outgoing dependencies are to packages with higher stability or equal stability, thus adhering to the Stable Dependencies Principle. None of the dependencies violate the principle as all target packages have stability values greater than or equal to the source package."
+    },
+    {
+        "package": "net.bytebuddy.implementation",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.implementation' has a stability metric (I) of 0.48, calculated as Ce/(Ca+Ce) = 23/(25+23). Several of its outgoing dependencies have lower stability (higher I values), such as 'net.bytebuddy.implementation.bind' (I = 0.73), 'net.bytebuddy.implementation.attribute' (I = 0.53), and 'net.bytebuddy.implementation.bytecode.assign' (I = 0.30). However, it also depends on more stable packages like 'net.bytebuddy.description.modifier' (I = 0.06). The presence of dependencies on less stable packages violates the Stable Dependencies Principle, indicating an Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.description.modifier",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.description.modifier' has a stability metric (I) of 0.94, calculated as Ce/(Ca+Ce) = 1/(16+1) = 1/17 ≈ 0.06, indicating it is highly stable. It depends on 'net.bytebuddy.build', which has a stability metric (I) of 0.53, calculated as 19/(36+19) = 19/55 ≈ 0.35. Since the analyzed package is more stable than the package it depends on, it does not violate the Stable Dependencies Principle, and therefore, the Unstable Dependency smell is not detected."
+    },
+    {
+        "package": "net.bytebuddy.build.gradle",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.build.gradle' depends on several packages that are less stable than itself. Specifically, it depends on 'net.bytebuddy.dynamic.scaffold.inline' (I = 0.29), 'net.bytebuddy.dynamic' (I = 0.52), 'net.bytebuddy.build' (I = 0.35), 'net.bytebuddy' (I = 0.49), and 'net.bytebuddy.utility' (I = 0.39), all of which have lower stability (higher instability) compared to 'net.bytebuddy.build.gradle' (I = 1.0). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.member",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode.member' has outgoing dependencies to several other packages. To determine if it has an Unstable Dependency smell, we need to check if it depends on packages that are less stable than itself. Stability is typically measured as the ratio of incoming dependencies (Ca) to the sum of incoming and outgoing dependencies (Ca + Ce). The stability of 'net.bytebuddy.implementation.bytecode.member' is Ca/(Ca+Ce) = 11/(11+12) ≈ 0.478. We then compare this to the stability of its outgoing dependencies. For example, 'net.bytebuddy.description.field' has stability 19/(19+6) = 0.76, which is more stable, so this dependency is acceptable. Repeating this for all outgoing dependencies shows that all dependencies are to packages that are as stable or more stable than 'net.bytebuddy.implementation.bytecode.member'. Therefore, it does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.android",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.android' has a stability metric (Ce/(Ce+Ca)) of 1.0, as it has 7 efferent couplings (Ce) and 0 afferent couplings (Ca). All of its outgoing dependencies are to packages that are less stable than itself, violating the Stable Dependencies Principle. For example, 'net.bytebuddy.implementation' has stability 0.48 (23/(23+25)), 'net.bytebuddy.dynamic.loading' has stability 0.44 (15/(15+19)), and similarly other dependencies have lower stability. Therefore, 'net.bytebuddy.android' depends on less stable packages, constituting an Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bind",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.implementation.bind' depends on 'net.bytebuddy.implementation' which has a higher instability (Ce=23, Ca=25) compared to itself (Ce=8, Ca=3), violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.agent.builder",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.agent.builder' has a stability metric (Ce/(Ce+Ca)) of 23/(23+1) = 0.958, indicating it is highly unstable. It depends on packages such as 'net.bytebuddy.dynamic.scaffold.inline' (stability = 20/(20+7) = 0.741), 'net.bytebuddy.asm' (stability = 23/(23+11) = 0.676), and 'net.bytebuddy.implementation' (stability = 23/(23+25) = 0.479), which are less stable or equally unstable. This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "org.gradle.work",
+        "detection": false,
+        "justification": "The package org.gradle.work has stability of 0.25 (Ce/(Ca+Ce) = 1/(1+3) = 1/4 = 0.25). It depends on org.gradle.api.provider which has stability of 0 (Ce/(Ca+Ce) = 0/(0+3) = 0). Since org.gradle.work (stability 0.25) depends on org.gradle.api.provider (stability 0), and 0.25 > 0, this follows the Stable Dependencies Principle - the more stable package (org.gradle.api.provider with stability 0) is depended upon by the less stable package (org.gradle.work with stability 0.25)."
+    },
+    {
+        "package": "net.bytebuddy.dynamic.scaffold.inline",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.dynamic.scaffold.inline' has outgoing dependencies on packages that are less stable than itself. For example, it depends on 'net.bytebuddy.build' (Ce=19, Ca=36), which has a higher afferent coupling (Ca) and lower efferent coupling (Ce) compared to the analyzed package, indicating that 'net.bytebuddy.build' is more stable. However, the analyzed package also depends on 'net.bytebuddy.asm' (Ce=23, Ca=11), which has lower afferent coupling and higher efferent coupling, making it less stable. Since the analyzed package depends on less stable packages like 'net.bytebuddy.asm', it violates the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.implementation.attribute",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.attribute' has a stability metric (Ce/(Ce+Ca)) of 9/(9+8) = 0.529. All of its outgoing dependencies have stability metrics greater than or equal to its own, meaning it does not depend on less stable packages. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.gradle.api.file",
+        "detection": false,
+        "justification": "The package org.gradle.api.file has a stability value of 0.5 (Ce=1, Ca=1) and depends on org.gradle.api.provider which has a stability value of 0 (Ce=0, Ca=3), meaning it depends on a more stable package. The dependency direction follows the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.service.usage2",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with no coupling to other packages, making it inherently stable."
+    },
+    {
+        "package": "net.bytebuddy.build",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.build' has outgoing dependencies to 19 other packages. To determine if it has an Unstable Dependency, we need to check the stability of its dependencies. Stability is calculated as Ce / (Ce + Ca), where Ce is efferent couplings and Ca is afferent couplings. For example, 'net.bytebuddy.description.modifier' has Ce=1 and Ca=16, giving it a stability of 1/17≈0.059. Most of its dependencies have low Ce and high Ca, indicating they are stable. The package 'net.bytebuddy.build' itself has Ce=19 and Ca=36, giving it a stability of 19/55≈0.345. Since it depends on packages that are more stable than itself (e.g., 'net.bytebuddy.description.modifier' with stability ~0.059), it does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.benchmark.runner",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "net.bytebuddy.agent",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.agent' depends on 'net.bytebuddy.dynamic', which is less stable. The stability of 'net.bytebuddy.agent' is 0.86 (Ce=1, Ca=4, Stability = Ce/(Ce+Ca)), while the stability of 'net.bytebuddy.dynamic' is 0.52 (Ce=24, Ca=22, Stability = Ce/(Ce+Ca)). According to the Stable Dependencies Principle, a package should only depend on packages that are more stable than itself. Since 'net.bytebuddy.agent' (stability 0.86) depends on 'net.bytebuddy.dynamic' (stability 0.52), which is less stable, this constitutes an Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.dynamic.scaffold.subclass",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.dynamic.scaffold.subclass' has a stability metric (I = Ce / (Ca + Ce)) of 0.69. It depends on packages such as 'net.bytebuddy.asm' (I = 0.68) and 'net.bytebuddy.build' (I = 0.35), which are less stable or equally stable. According to the Stable Dependencies Principle, this package should only depend on more stable packages, thus constituting an Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy' has a stability metric (Ce/(Ce+Ca)) of 25/(25+26) = 0.49. It depends on packages such as 'net.bytebuddy.description.annotation' (stability 12/(12+19) = 0.39), 'net.bytebuddy.description.field' (stability 6/(6+19) = 0.24), and others. All dependencies have stability values higher than or equal to its own, satisfying the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.pool",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.pool' has a stability metric (Ce=15, Ca=11) indicating it is less stable than some of the packages it depends on. It depends on 'net.bytebuddy.description.annotation' (Ce=12, Ca=19), 'net.bytebuddy.dynamic' (Ce=24, Ca=22), and 'net.bytebuddy.build' (Ce=19, Ca=36), which are more stable or equally stable, but also depends on 'net.bytebuddy.matcher' (Ce=9, Ca=23) and 'net.bytebuddy.description' (Ce=4, Ca=12), which are more stable (lower Ce). This violates the Stable Dependencies Principle as 'net.bytebuddy.pool' is unstable and depends on more stable packages, creating an unstable dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.asm",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.asm' has a stability metric (Ce=23, Ca=11) indicating it is relatively stable. Its outgoing dependencies are to packages that are generally more stable or have comparable stability, and there are no clear violations of the Stable Dependencies Principle where it depends on less stable packages. Therefore, no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "net.bytebuddy.description.method",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.description.method' has outgoing dependencies to packages that are less stable than itself. Specifically, it depends on 'net.bytebuddy.implementation.bytecode' (stability = 0.15), 'net.bytebuddy.build' (stability = 0.43), and 'net.bytebuddy.utility.dispatcher' (stability = 0.43), among others. Meanwhile, the stability of 'net.bytebuddy.description.method' is 0.31, which is higher than some of its dependencies, violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.assign.reference",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode.assign.reference' has a stability metric (I) of 0.833, calculated as Ce/(Ca+Ce) = 5/(1+5). Among its outgoing dependencies, 'net.bytebuddy.implementation' has I = 0.48, 'net.bytebuddy.implementation.bytecode' has I = 0.15, 'net.bytebuddy.build' has I = 0.35, 'net.bytebuddy.description.type' has I = 0.33, and 'net.bytebuddy.implementation.bytecode.assign' has I = 0.29. All these dependencies are more stable (lower I values) than the analyzed package, which complies with the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.benchmark.specimen",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0), making it impossible to violate the Stable Dependencies Principle. While it has one incoming dependency from 'net.bytebuddy.benchmark' (Ca=1), the absence of outgoing dependencies means there are no unstable dependencies to evaluate."
+    },
+    {
+        "package": "net.bytebuddy.benchmark.jmh_generated",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce = 0) and no incoming dependencies (Ca = 0), therefore there are no unstable dependencies to evaluate. Since there are no dependencies at all, the Stable Dependencies Principle is trivially satisfied."
+    },
+    {
+        "package": "net.bytebuddy.dynamic",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.dynamic' has outgoing dependencies to several other packages. To determine if it has an Unstable Dependency, we need to check if it depends on packages that are less stable than itself. Stability is calculated as Ce / (Ce + Ca), where Ce is efferent couplings and Ca is afferent couplings. For 'net.bytebuddy.dynamic', Ce = 24 and Ca = 22, so its stability is 24 / (24 + 22) = 24/46 ≈ 0.52. We then compare this value with the stability of each outgoing dependency. All outgoing dependencies have stability values greater than or equal to 0.52, meaning 'net.bytebuddy.dynamic' does not depend on less stable packages. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.assign",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode.assign' has a stability metric (I = Ce / (Ca + Ce)) of 0.294, indicating it is relatively unstable. It depends on packages like 'net.bytebuddy.implementation' (I = 0.479), 'net.bytebuddy.implementation.bytecode' (I = 0.154), 'net.bytebuddy.build' (I = 0.346), and 'net.bytebuddy.description.type' (I = 0.333). While some of these dependencies are more stable, others such as 'net.bytebuddy.implementation' have lower stability, violating the Stable Dependencies Principle which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "net.bytebuddy.description.enumeration",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.description.enumeration' has outgoing dependencies on 'net.bytebuddy.build', 'net.bytebuddy.description.method', and 'net.bytebuddy.description.type'. To determine if it has an unstable dependency, we must compare its stability (I) with the stability of its dependencies. The instability (I) is calculated as Ce / (Ca + Ce). For this package, I = 3 / (7 + 3) = 0.3. The outgoing dependencies have the following instabilities: 'net.bytebuddy.build' (I = 19 / (36 + 19) = 0.35), 'net.bytebuddy.description.method' (I = 11 / (25 + 11) = 0.31), and 'net.bytebuddy.description.type' (I = 16 / (32 + 16) = 0.33). Since all outgoing dependencies have higher instability values than the package itself, it does not violate the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.description.module",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.description.module' has a stability metric (Ce/(Ce+Ca)) of 8/(8+9) = 0.47. It depends on packages like 'net.bytebuddy.dynamic' (stability = 24/(24+22) = 0.52), 'net.bytebuddy' (stability = 25/(25+26) = 0.49), and 'net.bytebuddy.utility' (stability = 16/(16+25) = 0.39). While some dependencies are less stable, others are more stable. However, the dependency on 'net.bytebuddy.dynamic' violates the Stable Dependencies Principle because it is less stable (0.52) than the analyzed package (0.47)."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bytecode.assign.primitive",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.bytecode.assign.primitive' has no incoming dependencies (Ca=0), meaning it is unstable (I=1). All its outgoing dependencies are to packages with lower instability values (higher stability), satisfying the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.build.maven",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.build.maven' has a stability metric (I) of 1.0, calculated as Ce/(Ca+Ce) = 7/(0+7), indicating it is completely unstable. It depends on packages like 'net.bytebuddy.implementation' (I=0.48), 'net.bytebuddy.dynamic' (I=0.52), and 'net.bytebuddy.build' (I=0.35), which are more stable than itself. This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself. Therefore, an Unstable Dependency smell is detected."
+    },
+    {
+        "package": "(default package)",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with no coupling to other packages, so it cannot violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "net.bytebuddy.benchmark",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.benchmark' depends on multiple packages including 'net.bytebuddy.implementation', 'net.bytebuddy.dynamic.loading', 'net.bytebuddy.matcher', 'net.bytebuddy.pool', 'net.bytebuddy.description.type', 'net.bytebuddy.dynamic.scaffold', and 'net.bytebuddy.benchmark.specimen'. Among these, several dependencies such as 'net.bytebuddy.implementation' (Ce=23, Ca=25), 'net.bytebuddy.pool' (Ce=15, Ca=11), and 'net.bytebuddy.dynamic.scaffold' (Ce=24, Ca=15) have higher efferent coupling (Ce) and lower afferent coupling (Ca) compared to the analyzed package (Ce=7, Ca=0), indicating they are less stable. According to the Stable Dependencies Principle, a package should depend only on more stable packages; hence, this constitutes an Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.description",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.description' has a stability value (I) of 0.25, calculated as Ce/(Ca+Ce) = 4/(12+4). Among its outgoing dependencies, 'net.bytebuddy.description.method' has I=0.31, 'net.bytebuddy.description.type' has I=0.33, 'net.bytebuddy.description.modifier' has I=0.06, and 'net.bytebuddy.matcher' has I=0.28. While some dependencies like 'net.bytebuddy.description.method' and 'net.bytebuddy.description.type' are less stable (higher I values) than the analyzed package, the overall dependency structure does not consistently violate the Stable Dependencies Principle. Additionally, many of its incoming dependencies are more stable (lower I values), which supports appropriate dependency direction. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.implementation.auxiliary",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.implementation.auxiliary' depends on several packages that are less stable (higher Ce/Ca ratio or equal stability) such as 'net.bytebuddy.implementation' (Ce=23, Ca=25), 'net.bytebuddy.dynamic.loading' (Ce=15, Ca=19), 'net.bytebuddy.dynamic' (Ce=24, Ca=22), and 'net.bytebuddy' (Ce=25, Ca=26). These dependencies violate the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "net.bytebuddy.description.annotation",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.description.annotation' has outgoing dependencies to several other packages. To determine if it has an Unstable Dependency, we must check if it depends on packages that are less stable (i.e., have higher instability index (I = Ce / (Ca + Ce)) than itself). However, the outgoing dependencies include packages like 'net.bytebuddy.description.field' (I = 6/25 = 0.24), 'net.bytebuddy.matcher' (I = 9/32 ≈ 0.28), and others which may be less stable. But since the incoming dependencies show that many packages depend on this package, indicating it is relatively stable (Ca = 19), and its own instability index is I = 12/(19+12) ≈ 0.39, it does not clearly violate the Stable Dependencies Principle. Therefore, no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "net.bytebuddy.implementation.bind.annotation",
+        "detection": false,
+        "justification": "The package 'net.bytebuddy.implementation.bind.annotation' has a stability value (I) of 0.8696, calculated as Ce/(Ca+Ce) = 20/(3+20). Most of its outgoing dependencies have lower stability values, meaning it depends on more stable packages. For example, 'net.bytebuddy.description.modifier' has I=0.0588, 'net.bytebuddy.implementation.bytecode.collection' has I=0.8, and 'net.bytebuddy.implementation.bytecode.assign' has I=0.2941. Since this package depends on packages that are as stable or more stable than itself, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "net.bytebuddy.utility.privilege",
+        "detection": true,
+        "justification": "The package 'net.bytebuddy.utility.privilege' has an instability value of 0.5 (Ce=1, Ca=1), while its outgoing dependency 'net.bytebuddy.build' has an instability value of 0.35 (Ce=19, Ca=36). According to the Stable Dependencies Principle, a package should only depend on packages that are more stable (less unstable) than itself. Since 'net.bytebuddy.utility.privilege' depends on a more stable package, this constitutes an Unstable Dependency smell."
+    }
+]

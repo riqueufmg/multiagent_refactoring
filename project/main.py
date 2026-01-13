@@ -55,18 +55,18 @@ def main():
     ]
 
     smells_list = [
-        {
-            "smell_name": "God Component",
-            "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
-        },
-        {
-            "smell_name": "Unstable Dependency",
-            "smell_definition": "This smell occurs when a package depends on other packages that are less stable than itself, violating the Stable Dependencies Principle."
-        },
-        {
-            "smell_name": "Insufficient Modularization",
-            "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
-        },
+        #{
+        #    "smell_name": "God Component",
+        #    "smell_definition": "when a component is **excessively** large either in terms of Lines Of Code or the number of classes.",
+        #},
+        #{
+        #    "smell_name": "Unstable Dependency",
+        #    "smell_definition": "This smell occurs when a package depends on other packages that are less stable than itself, violating the Stable Dependencies Principle."
+        #},
+        #{
+        #    "smell_name": "Insufficient Modularization",
+        #    "smell_definition": "when a class concentrates an **excessive** number of responsibilities, resulting in a large or complex implementation and an interface that is difficult to understand, use, or evolve.",
+        #},
         {
             "smell_name": "Hublike Modularization",
             "smell_definition": "when an abstraction has dependencies (both incoming and outgoing) with a large number of other abstractions.",
@@ -74,9 +74,9 @@ def main():
     ]
 
     engines = [
-        "gpt",
-        "deepseek",
-        #"qwen",
+        #"gpt",
+        #"deepseek",
+        "qwen",
     ]
     
     ## Loop over projects
@@ -90,7 +90,6 @@ def main():
 
         ## Loop over smells
         for smell in smells_list:
-            break ## TODO: remove after tests
             # 3. Generate Prompts
             list_of_prompt_files = detector.generate_prompts(**smell)
 
@@ -111,12 +110,10 @@ def main():
                 SmellClass = smell_classes_map[smell_name]
                 consolidator = SmellClass(project_data['project_name'], engine)
 
-                # Consolidação LLM e Designite
                 llm_file = consolidator.consolidate_llm_outputs(project_data['project_name'])
                 designite_file = consolidator.consolidate_designite_outputs(project_data['project_name'])
                 print(f"[{smell_name}][{engine}] Consolidated file created at: {llm_file}")
 
-                # Ajusta caminhos finais com engine
                 base_path = f"data/processed/consolidated_detection/{project_data['project_name']}/{smell_name.lower().replace(' ', '_')}/{engine}"
                 llm_file_path = f"{base_path}/{smell_name.lower().replace(' ', '_')}_llm.json"
                 designite_file_path = f"{base_path}/{smell_name.lower().replace(' ', '_')}_designite.json"

@@ -21,15 +21,56 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "package": "net.bytebuddy.implementation",
     "class": "Implementation.Disabled",
     "dependencies": [
-      "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
-      "net.bytebuddy.description.field.FieldDescription",
-      "net.bytebuddy.ClassFileVersion",
-      "net.bytebuddy.description.method.MethodDescription",
+      "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
       "net.bytebuddy.dynamic.scaffold.TypeInitializer",
-      "net.bytebuddy.implementation.auxiliary.AuxiliaryType"
+      "net.bytebuddy.description.field.FieldDescription",
+      "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+      "net.bytebuddy.description.method.MethodDescription",
+      "net.bytebuddy.ClassFileVersion"
     ]
   },
   "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.implementation.auxiliary",
+      "class": "AuxiliaryType",
+      "dependencies": [
+        "net.bytebuddy.implementation.MethodAccessorFactory",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.modifier.SyntheticState"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "TypeInitializer",
+      "dependencies": [
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldDescription",
+      "dependencies": [
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.field.FieldDescription.SignatureToken",
+        "net.bytebuddy.description.field.FieldDescription.InDefinedShape",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
     {
       "package": "net.bytebuddy.implementation.attribute",
       "class": "AnnotationValueFilter",
@@ -39,86 +80,45 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       ]
     },
     {
-      "package": "net.bytebuddy.description.field",
-      "class": "FieldDescription",
+      "package": "net.bytebuddy.description.method",
+      "class": "MethodDescription",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.ModifierReviewable",
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.field.FieldDescription.InDefinedShape",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.description.type.TypeDefinition",
         "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.field.FieldDescription.SignatureToken"
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.description.method.MethodDescription.InDefinedShape",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.MethodDescription.Token",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
+        "net.bytebuddy.description.method.MethodDescription.Executable",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.method.MethodDescription.TypeToken",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.description.method.ParameterList",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.TypeDefinition"
       ]
     },
     {
       "package": "net.bytebuddy",
       "class": "ClassFileVersion",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.ClassFileVersion.VersionLocator",
         "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.ClassFileVersion.Resolver",
-        "net.bytebuddy.ClassFileVersion.VersionLocator"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.description.method",
-      "class": "MethodDescription",
-      "dependencies": [
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
-        "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.method.MethodDescription.Token",
         "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.description.method.MethodDescription.Executable",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.method.ParameterDescription",
-        "net.bytebuddy.description.annotation.AnnotationDescription",
-        "net.bytebuddy.description.method.ParameterList",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.description.modifier.ModifierContributor",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.TypeVariableSource",
-        "net.bytebuddy.description.annotation.AnnotationValue",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.method.MethodDescription.TypeToken",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.description.method.MethodDescription.InDefinedShape"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.dynamic.scaffold",
-      "class": "TypeInitializer",
-      "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
-        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter",
-        "net.bytebuddy.description.method.MethodDescription"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.implementation.auxiliary",
-      "class": "AuxiliaryType",
-      "dependencies": [
-        "net.bytebuddy.implementation.MethodAccessorFactory",
-        "net.bytebuddy.description.modifier.SyntheticState",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.RandomString",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.description.modifier.ModifierContributor"
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
     }
   ],

@@ -1,0 +1,92 @@
+[
+    {
+        "package": "org.apache.commons.lang3.time",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3.time' has a stability value of 0.074 (Ce=4, Ca=1, stability=Ce/(Ce+Ca)=4/54≈0.074). Its outgoing dependencies are to packages with higher stability: 'org.apache.commons.lang3' (stability=10/36≈0.278), 'org.apache.commons.lang3.exception' (stability=1/6≈0.167), 'org.apache.commons.lang3.function' (stability=2/9≈0.222), and 'org.apache.commons.lang3.math' (stability=1/4=0.25). Since all dependencies are towards more stable packages, the Stable Dependencies Principle is respected and no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "org.apache.commons.lang3.stream",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.stream has outgoing dependencies on org.apache.commons.lang3.function and org.apache.commons.lang3. To determine stability, we calculate the instability metric (I = Ce / (Ca + Ce)) for each involved package. For org.apache.commons.lang3.stream: I = 2 / (2 + 2) = 0.5. For org.apache.commons.lang3.function: I = 2 / (7 + 2) = 0.22. For org.apache.commons.lang3: I = 10 / (13 + 10) = 0.43. Since org.apache.commons.lang3.stream (I=0.5) depends on packages that are more stable (lower instability) such as org.apache.commons.lang3.function (I=0.22) and org.apache.commons.lang3 (I=0.43), it does not violate the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.concurrent.locks",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.concurrent.locks has outgoing dependencies to org.apache.commons.lang3.function and org.apache.commons.lang3. To determine if this is an unstable dependency, we need to calculate stability values. Stability is calculated as Ce/(Ca+Ce) where Ce is efferent couplings (outgoing dependencies) and Ca is afferent couplings (incoming dependencies). For org.apache.commons.lang3.concurrent.locks: Ce=2, Ca=0, so stability=2/(0+2)=1.0 (completely unstable). For org.apache.commons.lang3.function: Ce=2, Ca=7, stability=2/(7+2)=0.22. For org.apache.commons.lang3: Ce=10, Ca=13, stability=10/(13+10)=0.43. Since the analyzed package (stability=1.0) depends on packages that are more stable (0.22 and 0.43), it follows the Stable Dependencies Principle and does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.function",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3.function' has outgoing dependencies on 'org.apache.commons.lang3.exception' and 'org.apache.commons.lang3'. Both of these packages have higher stability (lower instability) values compared to the analyzed package, thus adhering to the Stable Dependencies Principle. Additionally, several other packages depend on this package, indicating it is part of a stable dependency chain."
+    },
+    {
+        "package": "org.apache.commons.lang3.util",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.util has stability of 1.0 (Ce=1, Ca=0), while its dependency org.apache.commons.lang3 has stability of 0.435 (Ce=10, Ca=13). Since the dependent package (org.apache.commons.lang3) is less stable than the depending package (org.apache.commons.lang3.util), this follows the Stable Dependencies Principle. The more stable package (org.apache.commons.lang3.util) depends on a less stable package, which is the correct direction according to the principle."
+    },
+    {
+        "package": "org.apache.commons.lang3.text.translate",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.text.translate has a stability value of 0.09 (Ce=1, Ca=1, stability=Ce/(Ce+Ca)=1/11≈0.09). It depends on org.apache.commons.lang3 which has a stability value of 0.43 (Ce=10, Ca=13, stability=10/23≈0.43). Since the analyzed package is less stable than the package it depends on (0.09 < 0.43), it follows the Stable Dependencies Principle and does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.builder",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.builder has outgoing dependencies on org.apache.commons.lang3.reflect, org.apache.commons.lang3.tuple, and org.apache.commons.lang3. To determine if this is an unstable dependency, we need to compare the stability (I = Ce/(Ca+Ce)) of the analyzed package with its dependencies. The analyzed package has Ce=3 and Ca=1, giving it an instability of 3/(1+3) = 0.75. The dependencies have the following instabilities: org.apache.commons.lang3.reflect has Ce=5 and Ca=1 (instability = 5/6 ≈ 0.83), org.apache.commons.lang3.tuple has Ce=1 and Ca=1 (instability = 1/2 = 0.5), and org.apache.commons.lang3 has Ce=10 and Ca=13 (instability = 10/23 ≈ 0.43). Since the analyzed package (0.75) depends on packages that are both more stable (0.43, 0.5) and less stable (0.83), but the principle states dependencies should be on more stable packages, this would normally indicate an unstable dependency smell. However, the package org.apache.commons.lang3 is both a dependency and has a dependency back to the analyzed package (circular dependency visible in incoming dependencies), which complicates the analysis. Given that most of its dependencies are on more stable packages and considering the circular dependency context, the smell is not detected."
+    },
+    {
+        "package": "org.apache.commons.lang3.event",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3.event' has outgoing dependencies to 'org.apache.commons.lang3.exception' and 'org.apache.commons.lang3.function'. To evaluate stability, we calculate I = Ca / (Ca + Ce) for each package. For 'org.apache.commons.lang3.event': I = 0 / (0 + 2) = 0 (maximally stable). For 'org.apache.commons.lang3.exception': I = 5 / (5 + 1) = 0.83. For 'org.apache.commons.lang3.function': I = 7 / (7 + 2) = 0.78. Since the analyzed package is maximally stable (I = 0) and depends on packages that are less stable (I > 0), this does not violate the Stable Dependencies Principle. Stable packages can depend on less stable packages without creating an unstable dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.arch",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.arch has no outgoing dependencies (Ce=0), so it cannot have unstable dependencies. While it is depended upon by org.apache.commons.lang3 which is much larger and more complex (73 classes, 26295 loc, Ce=10, Ca=13), this does not create an unstable dependency smell for arch since arch itself doesn't depend on anything. The stability metric I for arch is 1.0 (completely stable) since Ce=0, making it a stable component that others can safely depend on."
+    },
+    {
+        "package": "org.apache.commons.lang3.compare",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.compare has no outgoing dependencies (Ce=0), which means it does not depend on any other packages. Since there are no dependencies to evaluate for stability, the Unstable Dependency smell cannot be detected. The package is stable (Ca=1, Ce=0) and does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "org.apache.commons.lang3.mutable",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.mutable has a stability of 0.1 (Ce=1, Ca=3), while its outgoing dependency org.apache.commons.lang3 has a stability of 0.43 (Ce=10, Ca=13). Since the mutable package depends on a more stable package, it does not violate the Stable Dependencies Principle. The incoming dependencies from less stable packages like org.apache.commons.lang3.text (stability=0.67) and org.apache.commons.lang3.reflect (stability=0.83) do not constitute unstable dependencies because the direction of dependency is towards the mutable package, not from it."
+    },
+    {
+        "package": "org.apache.commons.lang3.math",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.math has outgoing dependencies only to org.apache.commons.lang3, which is more stable due to its larger size (73 classes, 26295 LOC) and higher afferent couplings (Ca=13) indicating greater usage by other packages. The stability metric (I = Ce/(Ca+Ce)) shows org.apache.commons.lang3 is more stable (I=10/(13+10)=0.43) compared to org.apache.commons.lang3.math (I=1/(3+1)=0.25), thus the dependency direction aligns with the Stable Dependencies Principle."
+    },
+    {
+        "package": "org.apache.commons.lang3.text",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3.text' has outgoing dependencies to 'org.apache.commons.lang3.mutable' and 'org.apache.commons.lang3'. To evaluate stability, we consider the instability metric (I = Ce / (Ca + Ce)). For 'org.apache.commons.lang3.text': Ce=2, Ca=1, so I=2/3≈0.67. For 'org.apache.commons.lang3.mutable': Ce=1, Ca=3, so I=1/4=0.25. For 'org.apache.commons.lang3': Ce=10, Ca=13, so I=10/23≈0.43. The 'org.apache.commons.lang3.text' package (I≈0.67) depends on 'org.apache.commons.lang3.mutable' (I=0.25) and 'org.apache.commons.lang3' (I≈0.43), both of which are more stable (lower instability values). Therefore, it follows the Stable Dependencies Principle."
+    },
+    {
+        "package": "org.apache.commons.lang3.reflect",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3.reflect' has a stability value of 0.83 (Ce=5, Ca=1, stability=Ce/(Ce+Ca)=5/6≈0.83). Its outgoing dependencies are to packages with stability values: org.apache.commons.lang3.mutable (0.25), org.apache.commons.lang3.math (0.25), org.apache.commons.lang3.stream (0.33), org.apache.commons.lang3.compare (0.0), and org.apache.commons.lang3 (0.43). All these dependencies are to packages that are more stable than itself (lower stability values), which aligns with the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.tuple",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.tuple has a stability index of 0.5 (Ce=1, Ca=1), while its outgoing dependency org.apache.commons.lang3.function has a stability index of 0.71 (Ce=2, Ca=7). Since the tuple package depends on a more stable package (0.71 > 0.5), this follows the Stable Dependencies Principle and does not constitute an Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.exception",
+        "detection": false,
+        "justification": "The package org.apache.commons.lang3.exception has a stability (I) of 0.17 (Ce=1, Ca=5, I=Ce/(Ce+Ca)), making it unstable. It depends on org.apache.commons.lang3 which has a stability (I) of 0.43 (Ce=10, Ca=13, I=Ce/(Ce+Ca)), making it more stable. Since the dependency is directed from a less stable package to a more stable one, it follows the Stable Dependencies Principle and does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3.concurrent",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3.concurrent' has outgoing dependencies on 'org.apache.commons.lang3', 'org.apache.commons.lang3.exception', and 'org.apache.commons.lang3.function'. To evaluate stability, we compare the instability (I = Ce / (Ca + Ce)) of the analyzed package with its dependencies. The analyzed package has Ce=3 and Ca=0, so its instability is I=1.0 (maximally unstable). The dependencies have the following instabilities: 'org.apache.commons.lang3' (Ce=10, Ca=13) => I=0.43, 'org.apache.commons.lang3.exception' (Ce=1, Ca=5) => I=0.17, and 'org.apache.commons.lang3.function' (Ce=2, Ca=7) => I=0.22. Since the analyzed package (I=1.0) depends only on packages that are more stable (lower instability values), it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.apache.commons.lang3",
+        "detection": false,
+        "justification": "The package 'org.apache.commons.lang3' has outgoing dependencies to several sub-packages. To determine if it has an Unstable Dependency smell, we need to compare its stability (I = Ce / (Ca + Ce)) with the stability of its dependencies. 'org.apache.commons.lang3' has Ce=10 and Ca=13, so I=10/(10+13)=0.43. All of its outgoing dependencies have lower Ce and often similar or lower Ca, indicating they are more stable or equally stable. For example, 'org.apache.commons.lang3.mutable' has Ce=1, Ca=3, I=0.25; 'org.apache.commons.lang3.math' has Ce=1, Ca=3, I=0.25; 'org.apache.commons.lang3.arch' has Ce=0, Ca=1, I=0. Therefore, 'org.apache.commons.lang3' depends on packages that are as stable or more stable than itself, adhering to the Stable Dependencies Principle."
+    }
+]

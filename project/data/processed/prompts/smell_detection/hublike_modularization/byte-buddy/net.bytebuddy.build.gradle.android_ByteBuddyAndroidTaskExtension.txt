@@ -21,13 +21,34 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "package": "net.bytebuddy.build.gradle.android",
     "class": "ByteBuddyAndroidTaskExtension",
     "dependencies": [
-      "net.bytebuddy.build.gradle.android.Transformation",
+      "net.bytebuddy.build.gradle.android.Discovery",
       "net.bytebuddy.build.EntryPoint",
-      "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask",
-      "net.bytebuddy.build.gradle.android.Discovery"
+      "net.bytebuddy.build.gradle.android.Transformation",
+      "net.bytebuddy.build.gradle.android.ByteBuddyLocalClassesEnhancerTask"
     ]
   },
   "outgoing_dependencies": [
+    {
+      "package": "net.bytebuddy.build.gradle.android",
+      "class": "Discovery",
+      "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "EntryPoint",
+      "dependencies": [
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.dynamic.scaffold.MethodGraph",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator"
+      ]
+    },
     {
       "package": "net.bytebuddy.build.gradle.android",
       "class": "Transformation",
@@ -36,36 +57,15 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       ]
     },
     {
-      "package": "net.bytebuddy.build",
-      "class": "EntryPoint",
-      "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.dynamic.scaffold.MethodGraph",
-        "net.bytebuddy.dynamic.scaffold.TypeValidation",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.ByteBuddy",
-        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer"
-      ]
-    },
-    {
       "package": "net.bytebuddy.build.gradle.android",
       "class": "ByteBuddyLocalClassesEnhancerTask",
       "dependencies": [
-        "net.bytebuddy.build.AndroidDescriptor",
+        "net.bytebuddy.build.Plugin",
         "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.dynamic.ClassFileLocator",
         "net.bytebuddy.build.gradle.android.ByteBuddyAndroidTaskExtension",
-        "net.bytebuddy.build.Plugin"
+        "net.bytebuddy.build.AndroidDescriptor",
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
-    },
-    {
-      "package": "net.bytebuddy.build.gradle.android",
-      "class": "Discovery",
-      "dependencies": []
     }
   ],
   "incoming_dependencies": [
@@ -73,11 +73,11 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.build.gradle.android",
       "class": "ByteBuddyLocalClassesEnhancerTask",
       "dependencies": [
-        "net.bytebuddy.build.AndroidDescriptor",
+        "net.bytebuddy.build.Plugin",
         "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.dynamic.ClassFileLocator",
         "net.bytebuddy.build.gradle.android.ByteBuddyAndroidTaskExtension",
-        "net.bytebuddy.build.Plugin"
+        "net.bytebuddy.build.AndroidDescriptor",
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
     },
     {

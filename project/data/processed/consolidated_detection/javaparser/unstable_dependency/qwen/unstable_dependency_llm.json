@@ -1,0 +1,517 @@
+[
+    {
+        "package": "a",
+        "detection": false,
+        "justification": "Package 'a' has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies to evaluate. The package is completely independent with no coupling to other packages."
+    },
+    {
+        "package": "com.github.javaparser.printer.concretesyntaxmodel",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.printer.concretesyntaxmodel' depends on packages such as 'com.github.javaparser.printer' (Ce=16, Ca=10) and 'com.github.javaparser' (Ce=16, Ca=38), which have higher efferent coupling (Ce) and lower afferent coupling (Ca) compared to the analyzed package (Ce=7, Ca=3). This indicates that the dependencies are less stable than the dependent package, violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "demo",
+        "detection": false,
+        "justification": "The package 'demo' has outgoing dependency to 'com.github.javaparser.utils'. The stability of 'demo' is 1.0 (Ce=1, Ca=0, I=0/1=0, S=1-0=1). The stability of 'com.github.javaparser.utils' is 0.965 (Ce=10, Ca=35, I=35/45=0.778, S=1-0.778=0.222, but considering only Ce and Ca, Ce/(Ce+Ca)=10/45=0.222, so S=1-0.222=0.778 is incorrect. Actually, S=Ca/(Ca+Ce)=35/45=0.778 for instability, so stability S=1-0.778=0.222. The demo package (S=1.0) depends on a more stable package (S=0.222), which follows the Stable Dependencies Principle."
+    },
+    {
+        "package": "package_b",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependency relationships to evaluate. The package is completely independent with no coupling to other packages."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution.typeinference.bounds",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.resolution.typeinference.bounds' depends on 'com.github.javaparser.symbolsolver.resolution.typeinference', which has a higher efferent coupling (Ce=17) and lower afferent coupling (Ca=5) compared to the analyzed package (Ce=5, Ca=1). This indicates that the dependency is less stable than the dependent package, violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser' has a stability value (I) of 0.2963, calculated as Ce/(Ca+Ce) = 16/(38+16). All outgoing dependencies have stability values greater than or equal to 0.2963, which means this package does not depend on packages that are less stable than itself. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.ast.validator.postprocessors",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.validator.postprocessors' has an instability value of 0.67 (Ce/(Ce+Ca) = 2/(2+1)), while its outgoing dependency 'com.github.javaparser' has an instability value of 0.29 (Ce/(Ce+Ca) = 16/(16+38)). According to the Stable Dependencies Principle, a package should only depend on packages that are more stable (less unstable) than itself. Since 0.67 > 0.29, this constitutes an unstable dependency."
+    },
+    {
+        "package": "com.github.javaparser.resolution.cache",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.resolution.cache' has no outgoing dependencies (Ce=0), meaning it does not depend on any other packages. Therefore, it cannot have an unstable dependency."
+    },
+    {
+        "package": "com.github.javaparser.storage",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.cache",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.symbolsolver.cache' has a stability of 0.2 (Ce/(Ce+Ca) = 1/(1+4) = 0.2) and depends on 'com.github.javaparser.resolution.cache' which has a stability of 0 (Ce/(Ce+Ca) = 0/(0+2) = 0). Since the dependent package is more stable (0 < 0.2), this adheres to the Stable Dependencies Principle and does not represent an unstable dependency."
+    },
+    {
+        "package": "com.packageName",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0), so it does not depend on any other packages. Since there are no dependencies to evaluate for stability, the Unstable Dependency smell does not apply. The package is independent and does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.resolution.model.typesystem",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.resolution.model.typesystem' depends on packages that are less stable than itself. Specifically, it depends on 'com.github.javaparser.resolution.logic' (stability = 0.36) and 'com.github.javaparser.resolution' (stability = 0.27), both of which have lower stability (higher instability) compared to the analyzed package (stability = 0.43). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "japa.parser.comments",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with no coupling to other packages."
+    },
+    {
+        "package": "com.github.javaparser.printer",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.printer' has a stability metric (Ca/(Ca+Ce)) of 10/(10+16) = 0.385. It depends on packages like 'com.github.javaparser.utils' (Ca=35, Ce=10, stability=0.778), 'com.github.javaparser.ast' (Ca=44, Ce=14, stability=0.759), and 'com.github.javaparser.ast.expr' (Ca=31, Ce=14, stability=0.689), which are more stable than itself. However, it also depends on less stable packages such as 'com.github.javaparser.printer.concretesyntaxmodel' (Ca=3, Ce=7, stability=0.300) and 'com.github.javaparser.printer.configuration' (Ca=5, Ce=2, stability=0.714). The dependency on 'com.github.javaparser.printer.concretesyntaxmodel', which is less stable, violates the Stable Dependencies Principle."
+    },
+    {
+        "package": "box",
+        "detection": false,
+        "justification": "Package 'box' has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore it does not violate the Stable Dependencies Principle as it depends on no other packages"
+    },
+    {
+        "package": "com.github.javaparser.utils",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.utils' has a stability metric (Ca/(Ca+Ce)) of 35/(35+10) = 0.778, indicating it is unstable. It depends on packages such as 'com.github.javaparser.ast.comments' (stability=0.524), 'com.github.javaparser.ast.visitor' (stability=0.500), 'com.github.javaparser.ast.body' (stability=0.708), 'com.github.javaparser.printer' (stability=0.385), 'com.github.javaparser.ast' (stability=0.758), 'com.github.javaparser' (stability=0.704), 'com.github.javaparser.ast.expr' (stability=0.689), 'com.github.javaparser.ast.stmt' (stability=0.750), 'com.github.javaparser.ast.type' (stability=0.575), and 'com.github.javaparser.ast.nodeTypes' (stability=0.444). Most of these dependencies have lower or comparable stability, which aligns with the Stable Dependencies Principle that unstable packages should depend on more stable ones. Therefore, no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "com.github.javaparser.ast.modules",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.modules' has a stability metric (Ce/(Ce+Ca)) of 6/(6+7) = 0.46. It depends on packages like 'com.github.javaparser.ast.visitor' (stability = 11/(11+11) = 0.5), 'com.github.javaparser.ast' (stability = 14/(14+44) = 0.24), and 'com.github.javaparser' (stability = 16/(16+38) = 0.296). While some dependencies are to less stable packages, it also depends on 'com.github.javaparser.metamodel' (stability = 5/(5+13) = 0.278) and others with similar or slightly higher stability. However, the overall pattern shows dependencies on packages with comparable or only marginally higher stability, violating the Stable Dependencies Principle which requires dependencies to be on significantly more stable packages."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.logic",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.symbolsolver.logic' has a stability metric (I = Ce / (Ca + Ce)) of 0.5, indicating it is neutrally stable. Its outgoing dependencies are to packages with higher or equal stability, adhering to the Stable Dependencies Principle. Incoming dependencies come from less stable packages, which is acceptable. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.generator.core.utils",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.generator.core.utils' has an instability value of 0.67 (Ce=2, Ca=1), while its outgoing dependency 'com.github.javaparser.ast.type' has an instability value of 0.42 (Ce=17, Ca=23) and 'com.github.javaparser' has an instability value of 0.29 (Ce=16, Ca=38). According to the Stable Dependencies Principle, this package should depend on packages that are more stable (lower instability values) than itself, but it depends on packages with lower instability (more stable), which incorrectly satisfies the principle. However, since this package is relatively unstable and depends on more stable packages, there is no unstable dependency smell based on the direction of stability. Correction: The package depends on more stable packages, hence it does NOT violate the Stable Dependencies Principle. Therefore, the detection should be false."
+    },
+    {
+        "package": "main",
+        "detection": false,
+        "justification": "Package 'main' has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore it does not depend on any other packages and cannot violate the Stable Dependencies Principle"
+    },
+    {
+        "package": "com.github.javaparser.generator.metamodel",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.generator.metamodel' has no incoming dependencies (Ca=0), meaning it is unstable (I=1). All its outgoing dependencies are to packages that have higher stability (lower instability) values. For example, 'com.github.javaparser.printer.configuration' has Ca=5 and Ce=2, making it more stable. Similarly, other dependencies like 'com.github.javaparser.ast' and 'com.github.javaparser' also exhibit higher stability. Therefore, the package follows the Stable Dependencies Principle by depending on more stable packages."
+    },
+    {
+        "package": "com.github.javaparser.serialization",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.serialization' has a stability metric (Ce/(Ce+Ca)) of 1.0, indicating it is completely unstable. It depends on multiple packages including 'com.github.javaparser.ast.comments', 'com.github.javaparser.metamodel', 'com.github.javaparser.utils', 'com.github.javaparser.resolution.types', 'com.github.javaparser.resolution.declarations', 'com.github.javaparser.ast.body', 'com.github.javaparser.ast', 'com.github.javaparser', 'com.github.javaparser.ast.expr', 'com.github.javaparser.resolution', 'com.github.javaparser.javadoc', and 'com.github.javaparser.ast.type'. Some of these dependencies like 'com.github.javaparser.javadoc' (stability = 0.5) are more stable than the analyzed package, violating the Stable Dependencies Principle which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "com.github.javaparser.ast.validator.language_level_validations",
+        "detection": false,
+        "justification": "The package has a stability metric (I) of 0.25, making it unstable. Its outgoing dependencies are to packages com.github.javaparser.ast (I=0.84), com.github.javaparser (I=0.74), and com.github.javaparser.ast.validator (I=0.67), all of which are more stable than itself. This follows the Stable Dependencies Principle, hence no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "com.github.javaparser.ast.validator.language_level_validations.chunks",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.ast.validator.language_level_validations.chunks' has 9 outgoing dependencies but no incoming dependencies (Ca=0). Since there are no incoming dependencies, it does not depend on any less stable components. All its dependencies are external and more stable, so it does not exhibit an unstable dependency."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarations",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.javaparsermodel.declarations' has outgoing dependencies on packages that are less stable than itself. Stability is calculated as Ce/(Ca+Ce). For this package, stability is 20/(7+20) = 0.74. It depends on 'com.github.javaparser.resolution' (stability = 9/(24+9) = 0.27), 'com.github.javaparser.symbolsolver.core.resolution' (stability = 3/(7+3) = 0.3), and others with lower stability values. According to the Stable Dependencies Principle, a package should only depend on packages more stable than itself, which is violated here."
+    },
+    {
+        "package": "foo.bar.differentpackage",
+        "detection": false,
+        "justification": "The package 'foo.bar.differentpackage' has stability of 0.5 (Ce=1, Ca=0, so Ce/(Ce+Ca) = 1/1 = 1, but since Ce=1 and Ca=0, stability = Ce/(Ce+Ca) = 1/(1+0) = 1, however the formula is Ce/(Ce+Ca) when Ce+Ca > 0, so it's 1/1 = 1.0 for outgoing and 0/1 = 0 for incoming perspective, but for stability we use Ce/(Ce+Ca) = 1/(1+0) = 1.0. The dependent package 'foo.bar' has stability of 0 (Ce=0, Ca=1, so 0/(0+1) = 0). Since the dependent package 'foo.bar' (stability=0) is less stable than 'foo.bar.differentpackage' (stability=1.0), this would normally indicate an unstable dependency. However, the package 'foo.bar.differentpackage' has only 1 outgoing dependency and 0 incoming dependencies, making it maximally unstable (instability=1.0) and it depends on a maximally stable package (instability=0), which follows the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.printer.lexicalpreservation",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.printer.lexicalpreservation' depends on several packages that are less stable (higher Ce/(Ce+Ca) ratio) than itself. For example, it depends on 'com.github.javaparser.printer.lexicalpreservation.changes' which has a stability of 0.857 (Ce=6, Ca=1), and 'com.github.javaparser.printer.concretesyntaxmodel' with stability of 0.7 (Ce=7, Ca=3), both of which are less stable than the analyzed package's stability of approximately 0.842 (Ce=16, Ca=3). This violates the Stable Dependencies Principle."
+    },
+    {
+        "package": "another",
+        "detection": false,
+        "justification": "Package 'another' has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore it does not violate the Stable Dependencies Principle as it depends on no other packages"
+    },
+    {
+        "package": "com.github.javaparser.generator.core.node",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.generator.core.node' depends on several other packages, some of which are less stable than itself. Stability is calculated as I = Ce / (Ca + Ce), where Ce is efferent couplings and Ca is afferent couplings. For 'com.github.javaparser.generator.core.node', I = 7 / (0 + 7) = 1.0, indicating it is completely unstable. However, it depends on packages like 'com.github.javaparser.utils' (I = 10/45 ≈ 0.22), 'com.github.javaparser.ast' (I = 14/58 ≈ 0.24), and 'com.github.javaparser' (I = 16/54 ≈ 0.30), which are more stable than itself. But it also depends on 'com.github.javaparser.metamodel' (I = 5/18 ≈ 0.28) and others with similar or lower stability. Since the package depends on components that are not strictly more stable than itself, it violates the Stable Dependencies Principle, thus constituting an Unstable Dependency smell."
+    },
+    {
+        "package": "issue1945.main",
+        "detection": false,
+        "justification": "The package 'issue1945.main' has an outgoing dependency on 'issue1945.interfaces'. To evaluate stability, we compare the instability values: issue1945.main has Ce=1, Ca=0, so instability = Ce/(Ce+Ca) = 1/1 = 1.0. The dependency 'issue1945.interfaces' has Ce=0, Ca=2, so instability = 0/(0+2) = 0.0. Since the dependent package (issue1945.main with instability 1.0) is more unstable than the dependency (issue1945.interfaces with instability 0.0), this follows the Stable Dependencies Principle. The more unstable package depends on the more stable package, so there is no Unstable Dependency smell."
+    },
+    {
+        "package": "javaparser",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.ast.type",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.type' has a stability metric (Ca/(Ca+Ce)) of 23/(23+17) = 0.575, indicating it is relatively unstable. It depends on packages like 'com.github.javaparser.resolution.types' (stability = 23/(23+6) = 0.793), 'com.github.javaparser.resolution.declarations' (stability = 25/(25+3) = 0.893), and 'com.github.javaparser.resolution' (stability = 24/(24+9) = 0.727), which are more stable than itself. However, it also depends on less stable packages such as 'com.github.javaparser.utils' (stability = 35/(35+10) = 0.778) and 'com.github.javaparser.ast.visitor' (stability = 11/(11+11) = 0.5), violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.foo.base",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution.typesolvers",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.resolution.typesolvers' has outgoing dependencies on packages that are less stable (higher Ce/(Ce+Ca) ratio) than itself. For example, it depends on 'com.github.javaparser.symbolsolver.javaparsermodel' which has a stability of 0.76 (Ce=24, Ca=10), while the analyzed package has a stability of 0.52 (Ce=14, Ca=13). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.javaparsermodel",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.javaparsermodel' has a stability metric (Ce/(Ce+Ca)) of 24/(24+10) = 0.706. It depends on packages such as 'com.github.javaparser.symbolsolver.resolution' (Ce=20, Ca=6, stability=0.769), 'com.github.javaparser.symbolsolver' (Ce=21, Ca=9, stability=0.700), and 'com.github.javaparser.symbolsolver.reflectionmodel' (Ce=17, Ca=7, stability=0.708). These dependencies have stability values greater than or equal to the analyzed package, violating the Stable Dependencies Principle which states that a package should only depend on packages that are more stable than itself. Hence, it exhibits the Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.javasymbolsolver.javassist_symbols.included_jar",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies to evaluate. The package is isolated with no coupling to other packages."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.reflectionmodel",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.reflectionmodel' has a stability metric (Ce/(Ce+Ca)) of 17/(17+7) = 0.708, indicating it is relatively unstable. It depends on several packages that are more stable or equally stable, such as 'com.github.javaparser.symbolsolver.logic' (stability 0.5), 'com.github.javaparser.utils' (stability 0.222), 'com.github.javaparser.resolution.declarations' (stability 0.107), and others with lower instability values. According to the Stable Dependencies Principle, an unstable package should not depend on other less stable packages. However, some of its dependencies like 'com.github.javaparser.symbolsolver.resolution' have high instability (20/(20+6) = 0.769), which violates the principle."
+    },
+    {
+        "package": "com.github.javaparser.resolution.model",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.resolution.model' has outgoing dependencies on 'com.github.javaparser.resolution.types' and 'com.github.javaparser.resolution.declarations'. To determine if this is an unstable dependency, we must evaluate the stability of these dependencies in comparison to the analyzed package. Stability is calculated as Ce / (Ca + Ce), where Ce is efferent couplings and Ca is afferent couplings. For 'com.github.javaparser.resolution.model', stability = 2 / (14 + 2) = 0.125. For 'com.github.javaparser.resolution.types', stability = 6 / (23 + 6) = 0.207. For 'com.github.javaparser.resolution.declarations', stability = 3 / (25 + 3) = 0.107. The analyzed package depends on 'com.github.javaparser.resolution.types', which is more stable (0.207 > 0.125), and 'com.github.javaparser.resolution.declarations', which is less stable (0.107 < 0.125). However, since one of the dependencies is more stable and the other is less stable, and considering that the overall architectural direction does not clearly violate the Stable Dependencies Principle in a significant way, this is not classified as an Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.ast.nodeTypes.modifiers",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies since it depends on nothing"
+    },
+    {
+        "package": "package_c",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with stability metric of 1.0 (no outgoing dependencies) and no violations of the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.ast.validator",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.validator' has a stability metric (I) of 0.667, calculated as Ce/(Ca+Ce) = 6/(3+6). It depends on packages such as 'com.github.javaparser.ast.expr' (I = 0.31), 'com.github.javaparser.ast.type' (I = 0.42), and 'com.github.javaparser' (I = 0.29), which are more stable than itself. However, it also depends on 'com.github.javaparser.ast.validator.language_level_validations' (I = 0.75), which is less stable than itself, violating the Stable Dependencies Principle. Additionally, the package 'com.github.javaparser' depends back on 'com.github.javaparser.ast.validator', creating a cyclic dependency that contributes to instability."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver' has a stability metric (Ce/(Ce+Ca)) of 21/(21+9) = 0.7, indicating it is unstable. It depends on packages such as 'com.github.javaparser.symbolsolver.javaparsermodel.declarations' (stability = 20/(20+7) ≈ 0.74), 'com.github.javaparser.symbolsolver.javaparsermodel' (stability = 24/(24+10) ≈ 0.71), and 'com.github.javaparser.symbolsolver.reflectionmodel' (stability = 17/(17+7) ≈ 0.71), which are also unstable or have similar stability. This violates the Stable Dependencies Principle, which states that a package should depend only on packages that are more stable than itself."
+    },
+    {
+        "package": "com.github.javaparser.javadoc",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.javadoc' has a stability metric (I = Ce / (Ca + Ce)) of 0.5, indicating it is neutrally stable. However, it depends on packages like 'com.github.javaparser.utils' (I = 0.22), 'com.github.javaparser.ast' (I = 0.24), and 'com.github.javaparser' (I = 0.29), which are more stable (lower instability values). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself. Additionally, it depends on 'com.github.javaparser.javadoc.description' (I = 0.2), which is also more stable. Therefore, this constitutes an Unstable Dependency smell."
+    },
+    {
+        "package": "com.example",
+        "detection": false,
+        "justification": "The package 'com.example' has outgoing dependency on 'com.github.javaparser.quality'. To determine if this is an unstable dependency, we need to calculate stability metrics. Stability is calculated as Ce/(Ca+Ce) where Ce is efferent couplings (outgoing dependencies) and Ca is afferent couplings (incoming dependencies). For 'com.example': Ce=1, Ca=0, so stability = 1/(0+1) = 1.0 (completely stable). For 'com.github.javaparser.quality': Ce=0, Ca=3, so stability = 0/(3+0) = 0.0 (completely unstable). Since 'com.example' (stability=1.0) depends on 'com.github.javaparser.quality' (stability=0.0), it violates the Stable Dependencies Principle - a stable package should not depend on an unstable package. However, the analyzed package 'com.example' itself is completely stable (Ce=1, Ca=0), so it does not exhibit unstable dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.generator.core",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.generator.core' depends on 'com.github.javaparser.utils' and 'com.github.javaparser'. Both of these dependencies have higher stability (lower instability) values than the analyzed package, thus adhering to the Stable Dependencies Principle. The analyzed package has an instability value of 1.0 (Ce=2, Ca=0), while both dependencies have lower instability values (com.github.javaparser.utils: Ce=10, Ca=35; com.github.javaparser: Ce=16, Ca=38)."
+    },
+    {
+        "package": "com.github.javaparser.ast",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.ast' has a stability value of 0.38, calculated as Ce/(Ca+Ce) = 14/(44+14). Among its outgoing dependencies, packages like 'com.github.javaparser.metamodel' (stability 0.28), 'com.github.javaparser.ast.modules' (stability 0.46), and 'com.github.javaparser.ast.visitor' (stability 0.52) have higher or comparable stability. Although some dependencies such as 'com.github.javaparser.utils' (stability 0.22) and 'com.github.javaparser.printer' (stability 0.62) are less stable, the overall architecture does not exhibit a clear violation of the Stable Dependencies Principle, as several key dependencies are more stable. Therefore, no Unstable Dependency smell is detected."
+    },
+    {
+        "package": "com.github.javaparser.resolution",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.resolution' has outgoing dependencies to packages that are less stable (higher instability index) than itself. For example, it depends on 'com.github.javaparser.ast.body' (I=0.29), 'com.github.javaparser.ast' (I=0.24), 'com.github.javaparser.ast.stmt' (I=0.25), and 'com.github.javaparser.ast.expr' (I=0.31), all of which have lower instability indices compared to 'com.github.javaparser.resolution' (I=0.27). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable (higher instability index) than itself."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.javassistmodel",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.javassistmodel' has outgoing dependencies to packages that are less stable than itself. Stability is calculated as Ce/(Ce+Ca). For this package, stability is 17/(17+3) = 0.85. It depends on 'com.github.javaparser.symbolsolver.javaparsermodel' (stability = 24/(24+10) = 0.705), 'com.github.javaparser.symbolsolver.resolution' (stability = 20/(20+6) = 0.769), and 'com.github.javaparser.symbolsolver' (stability = 21/(21+9) = 0.7), all of which have lower stability values, indicating they are less stable. This violates the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.resolution.logic",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.resolution.logic' has a stability metric (Ce/(Ce+Ca)) of 5/(5+9) = 0.36. It depends on 'com.github.javaparser.resolution.model.typesystem' which has a stability of 5/(5+14) = 0.26, and also on 'com.github.javaparser.resolution.model' with stability 2/(2+14) = 0.13. Both these dependencies are less stable than the analyzed package, violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution.typeinference",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.resolution.typeinference' has outgoing dependencies to packages that are less stable than itself. Stability is calculated as Ce/(Ca+Ce). For this package, stability is 17/(5+17) = 0.77. It depends on 'com.github.javaparser.symbolsolver.javaparsermodel' which has stability 24/(10+24) = 0.71, and 'com.github.javaparser.symbolsolver.resolution.typesolvers' with stability 14/(13+14) = 0.52. Both dependencies have lower stability, violating the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.ast.body",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.body' has a stability metric (Ce=12, Ca=29) indicating it is relatively unstable (instability = Ce/(Ce+Ca) = 12/41 ≈ 0.29). It depends on several other packages, some of which are more stable (e.g., 'com.github.javaparser.metamodel' with Ce=5, Ca=13 → instability ≈ 0.28), but also on less stable ones such as 'com.github.javaparser.utils' (Ce=10, Ca=35 → instability ≈ 0.22) and 'com.github.javaparser.ast.expr' (Ce=14, Ca=31 → instability ≈ 0.31). However, it also depends on packages like 'com.github.javaparser.resolution.declarations' (Ce=3, Ca=25 → instability ≈ 0.11), which is more stable. While not all dependencies violate the Stable Dependencies Principle, the presence of dependencies on less stable packages like 'com.github.javaparser.utils' and 'com.github.javaparser.ast.expr' contributes to the smell of Unstable Dependency."
+    },
+    {
+        "package": "com.github.javaparser.testpackage",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with no dependencies to violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "japa.bdd.samples",
+        "detection": false,
+        "justification": "The package japa.bdd.samples has outgoing dependency on com.github.javaparser.ast. The stability of japa.bdd.samples is 1.0 (Ce=1, Ca=0), while com.github.javaparser.ast has stability of 0.24 (Ce=14, Ca=44). Since japa.bdd.samples (stability=1.0) depends on com.github.javaparser.ast (stability=0.24), it follows the Stable Dependencies Principle as it depends on a less stable package, which is acceptable. However, this is actually a violation of the principle which states packages should depend on more stable packages. But given that japa.bdd.samples has stability of 1.0 (most unstable), it cannot depend on packages with higher stability since all packages have some level of instability. The justification needs to be corrected: japa.bdd.samples (instability=1.0) depends on com.github.javaparser.ast (instability=0.76), following the principle that unstable packages should depend on more stable ones, but since japa.bdd.samples is maximally unstable (I=1.0), this represents a potential smell. Actually, re-evaluating: japa.bdd.samples has Ce=1, Ca=0, so I=1.0. com.github.javaparser.ast has Ce=14, Ca=44, so I=14/(14+44)=14/58≈0.24. Since japa.bdd.samples (I=1.0) depends on com.github.javaparser.ast (I=0.24), this means an unstable package depends on a more stable package, which is correct according to the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.ast.comments",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.comments' has a stability metric (Ce/(Ce+Ca)) of 11/(11+12) = 0.478. It depends on packages such as 'com.github.javaparser.metamodel' (stability = 5/(5+13) = 0.278), 'com.github.javaparser.utils' (stability = 10/(10+35) = 0.222), and others with lower stability values. According to the Stable Dependencies Principle, a package should only depend on packages that are more stable than itself. Since this package depends on less stable packages, it exhibits the Unstable Dependency smell."
+    },
+    {
+        "package": "extends_duplicate",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies to violate the Stable Dependencies Principle"
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution.naming",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.symbolsolver.resolution.naming' has 11 outgoing dependencies and 0 incoming dependencies (Ca=0). To determine if there's an Unstable Dependency, we must evaluate the stability of this package and compare it with the stability of its dependencies. Stability is calculated as Ce / (Ca + Ce). For this package, stability = 11 / (0 + 11) = 1.0, indicating it is maximally unstable. However, since it has no incoming dependencies (Ca=0), it does not depend on any other package in a way that would violate the Stable Dependencies Principle. Therefore, it doesn't exhibit the Unstable Dependency smell because it doesn't depend on packages that are less stable than itself; rather, its own instability is at maximum due to having only outgoing dependencies."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.javaparsermodel.declarators",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.javaparsermodel.declarators' depends on 'com.github.javaparser.resolution' which has a higher instability (Ce=9, Ca=24) compared to itself (Ce=4, Ca=0), violating the Stable Dependencies Principle. Additionally, it depends on 'com.github.javaparser.symbolsolver.javaparsermodel.declarations' which also has a higher instability (Ce=20, Ca=7) than the analyzed package. Both outgoing dependencies are less stable than the analyzed package, confirming the presence of Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.resolution.types.parametrization",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.resolution.types.parametrization' has outgoing dependencies on 'com.github.javaparser.resolution.types' and 'com.github.javaparser.resolution.declarations'. To determine if this is an unstable dependency, we must assess the stability of these dependencies relative to the analyzed package. Stability is calculated as Ce / (Ca + Ce). For the analyzed package, Ca = 5 and Ce = 2, so its stability is 2 / (5 + 2) = 0.29. The dependency 'com.github.javaparser.resolution.types' has Ca = 23 and Ce = 6, giving it a stability of 6 / (23 + 6) = 0.21. The dependency 'com.github.javaparser.resolution.declarations' has Ca = 25 and Ce = 3, giving it a stability of 3 / (25 + 3) = 0.11. Both dependencies have lower stability values than the analyzed package (0.29), meaning the analyzed package depends on more stable packages. Therefore, the Stable Dependencies Principle is respected, and there is no Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.ast.observer",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.ast.observer' has outgoing dependencies on 'com.github.javaparser.utils', 'com.github.javaparser.ast', and 'com.github.javaparser.ast.body'. To determine if there is an unstable dependency, we calculate the stability (I = Ce / (Ca + Ce)) for each dependency: 'com.github.javaparser.utils' has I = 10/(35+10) = 0.22, 'com.github.javaparser.ast' has I = 14/(44+14) = 0.24, and 'com.github.javaparser.ast.body' has I = 12/(29+12) = 0.29. The analyzed package has I = 3/(12+3) = 0.2. Since the analyzed package is less stable than all its dependencies, it does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.ast.visitor",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.ast.visitor' has a stability value (I) of 0.5, calculated as Ce/(Ca+Ce) = 11/(11+11). All outgoing dependencies have stability values greater than or equal to 0.5, which means this package does not depend on packages that are less stable than itself. Therefore, it does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution.promotion",
+        "detection": false,
+        "justification": "The package has an instability value of 0.75 (Ce=3, Ca=1, instability=Ce/(Ce+Ca)=3/4), and it depends on packages with instability values of 0.26 (com.github.javaparser.resolution.types), 0.33 (com.github.javaparser.resolution.promotion), and 0.77 (com.github.javaparser.symbolsolver.resolution.typeinference). All dependencies have instability values greater than or equal to the package's instability, which means there are no unstable dependencies according to the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.declarations.common",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.symbolsolver.declarations.common' has no incoming dependencies (Ca=0), meaning it is unstable (I=1). All its outgoing dependencies are to packages with lower instability (higher stability), satisfying the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.ast.nodeTypes",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.nodeTypes' has outgoing dependencies to packages that are less stable than itself. For example, it depends on 'com.github.javaparser.utils' (Ce=10, Ca=35), 'com.github.javaparser.ast.body' (Ce=12, Ca=29), and 'com.github.javaparser.ast.expr' (Ce=14, Ca=31), which have higher instability (Ce/(Ce+Ca)) compared to 'com.github.javaparser.ast.nodeTypes' (Ce=10, Ca=8). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "com.github.javaparser.quality",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.quality' has no outgoing dependencies (Ce=0), meaning it does not depend on any other packages. Therefore, it cannot have an unstable dependency."
+    },
+    {
+        "package": "groovy.transform.builder",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.resolution.declarations",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.resolution.declarations' has a stability value (I) of 0.89 (Ce=3, Ca=25; I = Ce / (Ce + Ca) = 3 / (3 + 25) ≈ 0.11, Stability = 1 - I ≈ 0.89). Its outgoing dependencies are: 'com.github.javaparser.resolution.types' (I ≈ 0.21, Stability ≈ 0.79), 'com.github.javaparser.ast' (I ≈ 0.24, Stability ≈ 0.76), and 'com.github.javaparser.ast.expr' (I ≈ 0.31, Stability ≈ 0.69). All these dependencies have lower stability values than the analyzed package, which means the dependencies are in the correct direction according to the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "d.e.f",
+        "detection": false,
+        "justification": "Package d.e.f has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore it does not depend on any other packages and cannot exhibit unstable dependency. The package is completely isolated with no coupling to other packages."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.javaparsermodel.contexts",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.javaparsermodel.contexts' depends on several other packages, some of which are less stable (higher Ce/Ca ratio) than itself. For example, it depends on 'com.github.javaparser.symbolsolver.javaparsermodel.declarations' (Ce=20, Ca=7), 'com.github.javaparser.symbolsolver.resolution.typeinference' (Ce=17, Ca=5), and 'com.github.javaparser.symbolsolver.javaparsermodel' (Ce=24, Ca=10). These dependencies have higher efferent coupling (Ce) and lower afferent coupling (Ca) compared to the analyzed package (Ce=21, Ca=5), indicating they are less stable. According to the Stable Dependencies Principle, this package should not depend on less stable packages, hence an Unstable Dependency smell is detected."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution.typeinference.constraintformulas",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.resolution.typeinference.constraintformulas' has a stability metric (Ce/(Ce+Ca)) of 11/(11+1) = 0.916. It depends on packages such as 'com.github.javaparser.symbolsolver.javaparsermodel' (stability = 24/(24+10) = 0.706), 'com.github.javaparser.utils' (stability = 10/(10+35) = 0.222), and 'com.github.javaparser.resolution.types' (stability = 6/(6+23) = 0.207), which are less stable than itself. This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "issue1945.interfaces",
+        "detection": false,
+        "justification": "The package 'issue1945.interfaces' has no outgoing dependencies (Ce=0), so it cannot have an unstable dependency. While it has incoming dependencies from 'issue1945.implementations' and 'issue1945.main', these do not create unstable dependencies for this package since they are incoming rather than outgoing dependencies."
+    },
+    {
+        "package": "com.github.javaparser.printer.configuration.imports",
+        "detection": false,
+        "justification": "The package com.github.javaparser.printer.configuration.imports has a stability value of 0.25 (Ce/(Ce+Ca) = 1/(1+3) = 0.25). It depends on com.github.javaparser.ast which has a stability value of 0.76 (Ce/(Ce+Ca) = 14/(14+4) = 0.76). Since the analyzed package (0.25) is less stable than the package it depends on (0.76), it follows the Stable Dependencies Principle and does not exhibit the Unstable Dependency smell."
+    },
+    {
+        "package": "org.tensorflow.op",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. Since there are no dependencies at all, the Stable Dependencies Principle cannot be violated."
+    },
+    {
+        "package": "com.github.javaparser.javadoc.description",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.javadoc.description' has a stability metric (I) of 0.8 (Ce=1, Ca=4), making it unstable. It depends on 'com.github.javaparser.utils', which has a stability metric (I) of 0.22 (Ce=10, Ca=35), making it stable. Since the dependency is from an unstable package to a more stable package, this adheres to the Stable Dependencies Principle and does not constitute an Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.ast.stmt",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.stmt' has outgoing dependencies to packages that are less stable (higher Ce/Ca ratio) than itself. For example, it depends on 'com.github.javaparser.metamodel' (Ce=5, Ca=13), 'com.github.javaparser.resolution.declarations' (Ce=3, Ca=25), and 'com.github.javaparser.ast.type' (Ce=17, Ca=23), which have lower stability compared to 'com.github.javaparser.ast.stmt' (Ce=9, Ca=27). This violates the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.generator.core.quality",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.generator.core.quality' has no incoming dependencies (Ca=0), meaning it is unstable (I=1). All its outgoing dependencies are to packages with lower instability (higher stability), thus adhering to the Stable Dependencies Principle."
+    },
+    {
+        "package": "issue1945.implementations",
+        "detection": false,
+        "justification": "The package 'issue1945.implementations' has a dependency on 'issue1945.interfaces'. The stability of 'issue1945.implementations' is 0.25 (Ce=1, Ca=0, so Ce/(Ce+Ca) = 1/1 = 1, but since Ce+Ca=1, stability = Ce/(Ce+Ca) = 1/1 = 1.0, however with Ce=1 and Ca=0, it's actually unstable). Let me recalculate: Stability = Ce/(Ce+Ca). For 'issue1945.implementations': Ce=1, Ca=0, so Stability = 1/(1+0) = 1.0 (completely unstable). For 'issue1945.interfaces': Ce=0, Ca=2, so Stability = 0/(0+2) = 0.0 (completely stable). Since the dependent package 'issue1945.implementations' (stability=1.0) depends on a more stable package 'issue1945.interfaces' (stability=0.0), this follows the Stable Dependencies Principle and is NOT an unstable dependency."
+    },
+    {
+        "package": "aPackage",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely independent with no coupling to other packages."
+    },
+    {
+        "package": "issue241",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), so there are no unstable dependencies to evaluate. Since it depends on nothing, it cannot violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.reflectionmodel.comparators",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.symbolsolver.reflectionmodel.comparators' has no outgoing dependencies (Ce=0), meaning it does not depend on any other packages. Therefore, it cannot have an unstable dependency."
+    },
+    {
+        "package": "implements_duplicate",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.javasymbolsolver.javassist_symbols.excluded_jar",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), so there are no unstable dependencies to evaluate. The package is isolated with no dependencies in either direction."
+    },
+    {
+        "package": "bar",
+        "detection": false,
+        "justification": "Package 'bar' has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "package_a",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with no dependencies to other packages, making it stable by default."
+    },
+    {
+        "package": "com.github.javaparser.range",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), making it an isolated package with no dependency relationships to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.resolution.types",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.resolution.types' has outgoing dependencies to packages that are more stable (lower instability index) or equally stable. It depends on 'com.github.javaparser.resolution.types.parametrization' (I = 2/7 ≈ 0.29), 'com.github.javaparser.utils' (I = 10/45 ≈ 0.22), 'com.github.javaparser.resolution.declarations' (I = 3/28 ≈ 0.11), 'com.github.javaparser.ast' (I = 14/58 ≈ 0.24), 'com.github.javaparser.resolution.model.typesystem' (I = 5/19 ≈ 0.26), and 'com.github.javaparser.resolution' (I = 9/33 ≈ 0.27). The instability index (I = Ce / (Ca + Ce)) of this package is 6/29 ≈ 0.21. All its outgoing dependencies are to packages with instability index greater than or equal to its own, which aligns with the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "foo.bar",
+        "detection": false,
+        "justification": "Package foo.bar has stability of 1.0 (Ce=0, Ca=1, stability = Ce/(Ce+Ca) = 0/1 = 0). It depends on no packages (Ce=0) and is depended upon by foo.bar.differentpackage which has stability of 1.0 (Ce=1, Ca=0, stability = 1/1 = 1.0). Since foo.bar.differentpackage has higher stability (1.0) than foo.bar (0), the dependency direction follows the Stable Dependencies Principle. No unstable dependency smell detected."
+    },
+    {
+        "package": "com.github.javaparser.metamodel",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.metamodel' depends on packages such as 'com.github.javaparser.utils', 'com.github.javaparser.ast', 'com.github.javaparser.ast.stmt', 'com.github.javaparser.ast.expr', and 'com.github.javaparser.ast.type'. These dependencies have higher instability (Ce/(Ce+Ca)) compared to the metamodel package, violating the Stable Dependencies Principle. For example, 'com.github.javaparser.utils' has an instability of 10/(10+35) = 0.22, while 'com.github.javaparser.metamodel' has an instability of 5/(5+13) = 0.28. Similar comparisons with other dependencies show that the metamodel package is depending on packages that are more unstable than itself."
+    },
+    {
+        "package": "com.github.javaparser.printer.lexicalpreservation.changes",
+        "detection": true,
+        "justification": "The package com.github.javaparser.printer.lexicalpreservation.changes has outgoing dependencies to packages that are less stable than itself. Specifically, it depends on com.github.javaparser.printer.concretesyntaxmodel (stability=0.7) and com.github.javaparser (stability=0.296), both of which have lower stability values than the analyzed package (stability=0.857). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "com.github.javaparser.generator.core.other",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.generator.core.other' has no incoming dependencies (Ca=0), meaning it is unstable (I=1). All its outgoing dependencies are to packages that have higher stability (lower I values) or equal instability, thus adhering to the Stable Dependencies Principle. Therefore, there is no Unstable Dependency smell."
+    },
+    {
+        "package": "com.github.javaparser.resolution.promotion",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.resolution.promotion' has outgoing dependency to 'com.github.javaparser.resolution.types' which has higher stability (Ca=23, Ce=6) compared to the source package (Ca=2, Ce=1). The incoming dependencies are from packages like 'com.github.javaparser.symbolsolver.javaparsermodel' and 'com.github.javaparser.symbolsolver.resolution.promotion' which have higher instability values (Ce/(Ca+Ce)) than the current package, indicating that the dependencies follow the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.generator.core.visitor",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.generator.core.visitor' has outgoing dependencies on packages that are more stable (higher Ca and lower Ce). Specifically, it depends on 'com.github.javaparser.metamodel' (Ca=13, Ce=5), 'com.github.javaparser.utils' (Ca=35, Ce=10), 'com.github.javaparser.ast.body' (Ca=29, Ce=12), 'com.github.javaparser.ast' (Ca=44, Ce=14), 'com.github.javaparser.ast.stmt' (Ca=27, Ce=9), and 'com.github.javaparser' (Ca=38, Ce=16). All these dependencies have higher afferent coupling (Ca) and/or lower efferent coupling (Ce) indicating higher stability compared to the analyzed package. Therefore, it does not violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.resolution",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.resolution' has a stability metric (Ca=6, Ce=20) that indicates it is relatively unstable (high efferent coupling). It depends on several other packages including 'com.github.javaparser.symbolsolver.javaparsermodel', 'com.github.javaparser.symbolsolver.reflectionmodel', and 'com.github.javaparser.symbolsolver.resolution.typesolvers', which are also relatively unstable (high Ce values). This violates the Stable Dependencies Principle, which states that a package should only depend on packages that are more stable than itself."
+    },
+    {
+        "package": "(default package)",
+        "detection": true,
+        "justification": "The package (default package) has instability value of 1.0 (Ce=2, Ca=0, so I/(I+D) = 2/(2+0) = 1.0), making it highly unstable. It depends on com.packageName (instability = 0/(0+1) = 0.0) and com.github.javaparser.quality (instability = 0/(0+3) = 0.0), both of which are completely stable (instability = 0.0). This violates the Stable Dependencies Principle as an unstable package should not depend on more stable packages - the dependency direction should go from stable to unstable, not the reverse."
+    },
+    {
+        "package": "com.github.javaparser.generator",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.generator' has no incoming dependencies (Ca=0), meaning it is unstable (I=1). All its outgoing dependencies are to packages that have higher stability (lower instability) values, thus adhering to the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.foo",
+        "detection": true,
+        "justification": "The package 'com.foo' has a stability metric (I = Ce / (Ca + Ce)) of 1.0, indicating it is completely unstable. It depends on packages such as 'com.github.javaparser.symbolsolver.javaparsermodel' (I ≈ 0.706), 'com.github.javaparser.ast.body' (I ≈ 0.293), 'com.github.javaparser.ast' (I ≈ 0.241), 'com.github.javaparser.symbolsolver.resolution.typesolvers' (I ≈ 0.519), and 'com.github.javaparser' (I ≈ 0.296). All these dependencies have lower instability values than 'com.foo', violating the Stable Dependencies Principle which requires a package to depend only on packages that are more stable (higher instability) than itself."
+    },
+    {
+        "package": "com.github.javaparser.printer.configuration",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.printer.configuration' has a stability metric (I) of 0.286, calculated as Ce/(Ca+Ce) = 2/(5+2). Its outgoing dependencies include 'com.github.javaparser.utils' (I=0.222) and 'com.github.javaparser.ast' (I=0.241), both of which are more stable (lower I values) than the analyzed package itself. However, it also has incoming dependencies from packages like 'com.github.javaparser.ast' (I=0.241) and 'com.github.javaparser.printer' (I=0.615), indicating that it is depended upon by both less stable and more stable packages. The Unstable Dependency smell is detected because while it correctly depends on more stable packages, its own instability makes it vulnerable to changes in its dependencies, and it creates a dependency chain where less stable packages (like itself) end up depending on more stable ones, which violates the Stable Dependencies Principle when considering the overall architecture."
+    },
+    {
+        "package": "a.b.c",
+        "detection": false,
+        "justification": "Package a.b.c has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore it does not depend on any other packages and cannot violate the Stable Dependencies Principle"
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.utils",
+        "detection": false,
+        "justification": "The package 'com.github.javaparser.symbolsolver.utils' has outgoing dependencies to 'com.github.javaparser.utils', 'com.github.javaparser', and 'com.github.javaparser.symbolsolver.resolution.typesolvers'. To determine if there is an unstable dependency, we need to compare the stability (I = Ce / (Ca + Ce)) of the analyzed package with its dependencies. The analyzed package has Ce=3 and Ca=1, so its instability I=3/(1+3)=0.75. The dependencies have the following instabilities: 'com.github.javaparser.utils' has Ce=10, Ca=35, I=10/(10+35)=0.22; 'com.github.javaparser' has Ce=16, Ca=38, I=16/(16+38)=0.296; 'com.github.javaparser.symbolsolver.resolution.typesolvers' has Ce=14, Ca=13, I=14/(14+13)=0.518. Since the analyzed package (I=0.75) depends only on packages that are more stable (lower I values), it does not violate the Stable Dependencies Principle. Note that one of its dependencies is itself ('com.github.javaparser.symbolsolver.utils'), which does not constitute an unstable dependency."
+    },
+    {
+        "package": "com.github.javaparser.symbolsolver.core.resolution",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.symbolsolver.core.resolution' has a stability metric (I) of 0.3, calculated as Ce/(Ca+Ce) = 3/(7+3). It depends on packages including 'com.github.javaparser.symbolsolver.javaparsermodel.declarations' which has a stability metric (I) of 0.71, calculated as 20/(7+20). Since the analyzed package is less stable than the package it depends on, it violates the Stable Dependencies Principle, indicating an Unstable Dependency smell."
+    },
+    {
+        "package": "foo",
+        "detection": false,
+        "justification": "Package 'foo' has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore it does not depend on any other packages and cannot exhibit unstable dependency smell"
+    },
+    {
+        "package": "com.github.javaparser.wiki_samples",
+        "detection": false,
+        "justification": "Package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. The package is completely isolated with no dependencies to evaluate for stability violations."
+    },
+    {
+        "package": "com.github.javaparser.javasymbolsolver.javassist_symbols.main_jar",
+        "detection": false,
+        "justification": "The package has no outgoing dependencies (Ce=0) and no incoming dependencies (Ca=0), therefore there are no unstable dependencies. Since it depends on nothing, it cannot violate the Stable Dependencies Principle."
+    },
+    {
+        "package": "com.github.javaparser.ast.expr",
+        "detection": true,
+        "justification": "The package 'com.github.javaparser.ast.expr' has a stability metric (I = Ce / (Ca + Ce)) of 0.31, indicating it is relatively unstable. It depends on packages like 'com.github.javaparser.resolution' (I = 0.27), 'com.github.javaparser.resolution.declarations' (I = 0.11), and 'com.github.javaparser.resolution.types' (I = 0.21), which are more stable than itself. However, it also depends on less stable packages such as 'com.github.javaparser.utils' (I = 0.22) and 'com.github.javaparser.printer' (I = 0.62), violating the Stable Dependencies Principle."
+    }
+]

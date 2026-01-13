@@ -22,11 +22,11 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "class": "MemberAttributeExtension.ForField",
     "dependencies": [
       "net.bytebuddy.description.annotation.AnnotationList",
+      "net.bytebuddy.description.field.FieldDescription",
+      "net.bytebuddy.asm.AsmVisitorWrapper",
       "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
       "net.bytebuddy.implementation.attribute.FieldAttributeAppender",
-      "net.bytebuddy.description.field.FieldDescription",
-      "net.bytebuddy.utility.OpenedClassReader",
-      "net.bytebuddy.asm.AsmVisitorWrapper"
+      "net.bytebuddy.utility.OpenedClassReader"
     ]
   },
   "outgoing_dependencies": [
@@ -34,11 +34,42 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.annotation",
       "class": "AnnotationList",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.matcher.FilterableList",
         "net.bytebuddy.description.type.TypeList",
         "net.bytebuddy.description.annotation.AnnotationDescription",
-        "net.bytebuddy.matcher.FilterableList",
-        "net.bytebuddy.matcher.ElementMatcher"
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.description.field",
+      "class": "FieldDescription",
+      "dependencies": [
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.field.FieldDescription.SignatureToken",
+        "net.bytebuddy.description.field.FieldDescription.InDefinedShape",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.asm",
+      "class": "AsmVisitorWrapper",
+      "dependencies": [
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
@@ -54,24 +85,9 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "FieldAttributeAppender",
       "dependencies": [
         "net.bytebuddy.implementation.attribute.AnnotationAppender",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
-        "net.bytebuddy.description.field.FieldDescription"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.description.field",
-      "class": "FieldDescription",
-      "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.field.FieldDescription.InDefinedShape",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.field.FieldDescription.SignatureToken"
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
@@ -79,24 +95,8 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "OpenedClassReader",
       "dependencies": [
         "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.AsmClassReader",
-        "net.bytebuddy.build.AccessControllerPlugin"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.asm",
-      "class": "AsmVisitorWrapper",
-      "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.description.method.MethodList",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.matcher.ElementMatcher"
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassReader"
       ]
     }
   ],

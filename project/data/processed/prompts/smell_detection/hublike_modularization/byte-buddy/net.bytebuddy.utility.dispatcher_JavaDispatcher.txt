@@ -22,21 +22,21 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "class": "JavaDispatcher",
     "dependencies": [
       "net.bytebuddy.utility.dispatcher.JavaDispatcher.Dispatcher",
-      "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-      "net.bytebuddy.ClassFileVersion",
-      "net.bytebuddy.utility.MethodComparator",
+      "net.bytebuddy.asm.AsmVisitorWrapper",
       "net.bytebuddy.dynamic.scaffold.TypeWriter",
-      "net.bytebuddy.utility.GraalImageCode",
+      "net.bytebuddy.utility.Invoker",
+      "net.bytebuddy.build.AccessControllerPlugin",
+      "net.bytebuddy.utility.MethodComparator",
+      "net.bytebuddy.utility.dispatcher.JavaDispatcher.DynamicClassLoader",
+      "net.bytebuddy.utility.dispatcher.JavaDispatcher.Resolver",
+      "net.bytebuddy.utility.dispatcher.JavaDispatcher.OfPrimitiveArray",
       "net.bytebuddy.description.method.MethodDescription",
       "net.bytebuddy.utility.dispatcher.JavaDispatcher.ForDefaultValue",
-      "net.bytebuddy.utility.dispatcher.JavaDispatcher.DynamicClassLoader",
-      "net.bytebuddy.utility.Invoker",
-      "net.bytebuddy.utility.dispatcher.JavaDispatcher.CreationAction",
-      "net.bytebuddy.build.AccessControllerPlugin",
+      "net.bytebuddy.ClassFileVersion",
       "net.bytebuddy.utility.dispatcher.JavaDispatcher.NoOp",
-      "net.bytebuddy.utility.dispatcher.JavaDispatcher.Resolver",
-      "net.bytebuddy.asm.AsmVisitorWrapper",
-      "net.bytebuddy.utility.dispatcher.JavaDispatcher.OfPrimitiveArray"
+      "net.bytebuddy.utility.dispatcher.JavaDispatcher.CreationAction",
+      "net.bytebuddy.utility.GraalImageCode",
+      "net.bytebuddy.build.HashCodeAndEqualsPlugin"
     ]
   },
   "outgoing_dependencies": [
@@ -44,42 +44,126 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.utility.dispatcher",
       "class": "JavaDispatcher.Dispatcher",
       "dependencies": [
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodDescription"
       ]
+    },
+    {
+      "package": "net.bytebuddy.asm",
+      "class": "AsmVisitorWrapper",
+      "dependencies": [
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.description.type.TypeDescription"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.dynamic.scaffold",
+      "class": "TypeWriter",
+      "dependencies": [
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.dynamic.scaffold.subclass.SubclassImplementationTarget",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForModuleType",
+        "net.bytebuddy.utility.visitor.ContextClassVisitor",
+        "net.bytebuddy.dynamic.scaffold.inline.RebaseImplementationTarget",
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Sort",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.implementation.attribute.FieldAttributeAppender",
+        "net.bytebuddy.implementation.attribute.AnnotationAppender",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForInlining",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Dispatcher",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.WithDrain",
+        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.MethodPool",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForRecord",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.implementation.attribute.RecordComponentAttributeAppender",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.RecordComponentPool",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.WithoutDrain",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ClassDumpAction",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.FieldPool",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Expanding",
+        "net.bytebuddy.utility.AsmClassWriter",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForInterface",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.implementation.attribute.AnnotationRetention",
+        "net.bytebuddy.implementation.LoadedTypeInitializer",
+        "net.bytebuddy.utility.AsmClassReader",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForAnnotation",
+        "net.bytebuddy.description.method.ParameterList",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Constraint",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForPackageType",
+        "net.bytebuddy.dynamic.scaffold.MethodRegistry",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForDefinedMethod",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Disabled",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.FrameWriter",
+        "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.attribute.TypeAttributeAppender",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForClass",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.NoOp",
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.InitializationHandler",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.Record",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter.ContextRegistry"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "Invoker",
+      "dependencies": []
     },
     {
       "package": "net.bytebuddy.build",
-      "class": "HashCodeAndEqualsPlugin",
+      "class": "AccessControllerPlugin",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
-        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.matcher.ElementMatchers",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
-        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.build.AccessControllerPlugin.Initializer",
+        "net.bytebuddy.utility.JavaType",
         "net.bytebuddy.build.Plugin",
-        "net.bytebuddy.implementation.EqualsMethod",
-        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.description.modifier.FieldManifestation",
         "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper"
-      ]
-    },
-    {
-      "package": "net.bytebuddy",
-      "class": "ClassFileVersion",
-      "dependencies": [
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.description.modifier.Ownership",
         "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.Implementation",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.ClassFileVersion.Resolver",
-        "net.bytebuddy.ClassFileVersion.VersionLocator"
+        "net.bytebuddy.description.modifier.Visibility"
       ]
     },
     {
@@ -88,118 +172,57 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "dependencies": []
     },
     {
-      "package": "net.bytebuddy.dynamic.scaffold",
-      "class": "TypeWriter",
+      "package": "net.bytebuddy.utility.dispatcher",
+      "class": "JavaDispatcher.DynamicClassLoader",
       "dependencies": [
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.Dispatcher",
-        "net.bytebuddy.implementation.attribute.RecordComponentAttributeAppender",
-        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
-        "net.bytebuddy.implementation.attribute.FieldAttributeAppender",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ContextRegistry",
-        "net.bytebuddy.dynamic.scaffold.MethodRegistry",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.MethodPool",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.Sort",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.Disabled",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForModuleType",
-        "net.bytebuddy.utility.visitor.ContextClassVisitor",
-        "net.bytebuddy.utility.AsmClassWriter",
-        "net.bytebuddy.dynamic.scaffold.inline.RebaseImplementationTarget",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.NoOp",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.RecordComponentPool",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForPackageType",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
-        "net.bytebuddy.implementation.attribute.TypeAttributeAppender",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForInterface",
-        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForInlining",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.WithoutDrain",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.FrameWriter",
-        "net.bytebuddy.description.type.RecordComponentDescription",
-        "net.bytebuddy.dynamic.scaffold.TypeInitializer",
-        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.description.type.PackageDescription",
         "net.bytebuddy.asm.AsmVisitorWrapper",
-        "net.bytebuddy.implementation.LoadedTypeInitializer",
-        "net.bytebuddy.dynamic.scaffold.inline.MethodRebaseResolver",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForClass",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForAnnotation",
-        "net.bytebuddy.dynamic.scaffold.subclass.SubclassImplementationTarget",
-        "net.bytebuddy.dynamic.TypeResolutionStrategy",
-        "net.bytebuddy.description.method.ParameterDescription",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.description.module.ModuleDescription",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ClassDumpAction",
-        "net.bytebuddy.description.method.ParameterList",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.implementation.attribute.AnnotationRetention",
-        "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.description.modifier.ModifierContributor",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.Constraint",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.FieldPool",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.Record",
-        "net.bytebuddy.description.method.MethodList",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.InitializationHandler",
-        "net.bytebuddy.utility.AsmClassReader",
-        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.dynamic.scaffold.TypeWriter",
+        "net.bytebuddy.utility.MethodComparator",
         "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.annotation.AnnotationValue",
-        "net.bytebuddy.dynamic.scaffold.TypeValidation",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForRecord",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.Expanding",
-        "net.bytebuddy.description.type.RecordComponentList",
-        "net.bytebuddy.implementation.attribute.AnnotationAppender",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.ForDefinedMethod",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter.WithDrain"
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
-      "package": "net.bytebuddy.utility",
-      "class": "GraalImageCode",
+      "package": "net.bytebuddy.utility.dispatcher",
+      "class": "JavaDispatcher.Resolver",
       "dependencies": [
-        "net.bytebuddy.utility.GraalImageCode.ImageCodeContextAction",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.privilege.GetSystemPropertyAction"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
+    },
+    {
+      "package": "net.bytebuddy.utility.dispatcher",
+      "class": "JavaDispatcher.OfPrimitiveArray",
+      "dependencies": []
     },
     {
       "package": "net.bytebuddy.description.method",
       "class": "MethodDescription",
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
         "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.method.MethodDescription.Token",
-        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.description.method.MethodDescription.InDefinedShape",
         "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.MethodDescription.Token",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
         "net.bytebuddy.description.method.MethodDescription.Executable",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.method.MethodDescription.TypeToken",
         "net.bytebuddy.description.annotation.AnnotationDescription",
         "net.bytebuddy.description.method.ParameterList",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.description.modifier.ModifierContributor",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.TypeVariableSource",
         "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
+        "net.bytebuddy.description.TypeVariableSource",
         "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.method.MethodDescription.TypeToken",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.description.method.MethodDescription.InDefinedShape"
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.TypeDefinition"
       ]
     },
     {
@@ -210,46 +233,15 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       ]
     },
     {
-      "package": "net.bytebuddy.utility.dispatcher",
-      "class": "JavaDispatcher.DynamicClassLoader",
+      "package": "net.bytebuddy",
+      "class": "ClassFileVersion",
       "dependencies": [
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.dynamic.scaffold.TypeWriter",
-        "net.bytebuddy.utility.MethodComparator",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.asm.AsmVisitorWrapper"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.utility",
-      "class": "Invoker",
-      "dependencies": []
-    },
-    {
-      "package": "net.bytebuddy.utility.dispatcher",
-      "class": "JavaDispatcher.CreationAction",
-      "dependencies": []
-    },
-    {
-      "package": "net.bytebuddy.build",
-      "class": "AccessControllerPlugin",
-      "dependencies": [
+        "net.bytebuddy.ClassFileVersion.VersionLocator",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.ClassFileVersion.Resolver",
         "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.matcher.ElementMatchers",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.modifier.Ownership",
-        "net.bytebuddy.description.modifier.FieldManifestation",
-        "net.bytebuddy.asm.AsmVisitorWrapper",
-        "net.bytebuddy.build.AccessControllerPlugin.Initializer",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.build.Plugin",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
     },
     {
@@ -259,31 +251,39 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     },
     {
       "package": "net.bytebuddy.utility.dispatcher",
-      "class": "JavaDispatcher.Resolver",
-      "dependencies": [
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.asm",
-      "class": "AsmVisitorWrapper",
-      "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.description.method.MethodList",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.matcher.ElementMatcher"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.utility.dispatcher",
-      "class": "JavaDispatcher.OfPrimitiveArray",
+      "class": "JavaDispatcher.CreationAction",
       "dependencies": []
+    },
+    {
+      "package": "net.bytebuddy.utility",
+      "class": "GraalImageCode",
+      "dependencies": [
+        "net.bytebuddy.utility.privilege.GetSystemPropertyAction",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.GraalImageCode.ImageCodeContextAction"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "HashCodeAndEqualsPlugin",
+      "dependencies": [
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.Sort",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.ValueMatcher",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.InvokeSuper",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.EqualsMethod",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin.AnnotationOrderComparator",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.description.annotation.AnnotationDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator"
+      ]
     }
   ],
   "incoming_dependencies": [
@@ -292,40 +292,40 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "ByteArrayClassLoader",
       "dependencies": [
         "net.bytebuddy.dynamic.loading.ClassFilePostProcessor",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.PersistenceHandler",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.ForLegacyVm",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.EmptyEnumeration",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.PackageLookupStrategy",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.Dispatcher",
-        "net.bytebuddy.utility.GraalImageCode",
         "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.Initializable",
+        "net.bytebuddy.utility.GraalImageCode",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.CreationAction",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.EmptyEnumeration",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.PersistenceHandler",
+        "net.bytebuddy.ClassFileVersion",
         "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.ForLegacyVm",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.Initializable",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.Dispatcher",
+        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.SynchronizationStrategy",
         "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
-        "net.bytebuddy.dynamic.loading.ByteArrayClassLoader.SynchronizationStrategy"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ByteArrayClassLoader.PersistenceHandler",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ByteArrayClassLoader.UrlDefinitionAction",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -339,18 +339,18 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ClassReloadingStrategy",
       "dependencies": [
-        "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.Strategy",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.JavaModule",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.ClassResettingTransformer",
-        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.BootstrapInjection",
         "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.Dispatcher",
         "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.Disabled",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.ClassResettingTransformer",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.Strategy",
         "net.bytebuddy.dynamic.loading.ClassInjector",
-        "net.bytebuddy.dynamic.loading.ClassReloadingStrategy.BootstrapInjection"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
     },
     {
@@ -364,61 +364,61 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ClassInjector",
       "dependencies": [
-        "net.bytebuddy.description.type.PackageDescription",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.RandomString",
-        "net.bytebuddy.dynamic.loading.ClassInjector.Windows32BitFunctionMapper",
-        "net.bytebuddy.dynamic.loading.ClassInjector.Target",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.dynamic.loading.ClassInjector.System",
         "net.bytebuddy.dynamic.loading.ClassInjector.Default",
-        "net.bytebuddy.dynamic.loading.ClassInjector.Lookup",
-        "net.bytebuddy.dynamic.loading.ClassInjector.Dispatcher",
         "net.bytebuddy.dynamic.loading.ClassInjector.AccessResolver",
-        "net.bytebuddy.dynamic.loading.ClassInjector.Initializable",
-        "net.bytebuddy.dynamic.loading.ClassInjector.MethodHandles",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Windows32BitFunctionMapper",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
         "net.bytebuddy.dynamic.loading.ClassInjector.Jvm",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
-        "net.bytebuddy.dynamic.loading.ClassInjector.UsingUnsafe",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.dynamic.loading.ClassInjector.CreationAction",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.PackageDescription",
         "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.dynamic.loading.ClassInjector.System",
         "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy"
+        "net.bytebuddy.utility.RandomString",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Initializable",
+        "net.bytebuddy.dynamic.loading.ClassInjector.UsingUnsafe",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Target",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ClassInjector.CreationAction",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.dynamic.loading.ClassInjector.MethodHandles",
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Dispatcher",
+        "net.bytebuddy.dynamic.loading.ClassInjector.Lookup"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ClassInjector.UsingReflection",
       "dependencies": [
-        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.description.modifier.Visibility",
         "net.bytebuddy.dynamic.scaffold.TypeValidation",
-        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.DynamicType",
         "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
-        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy"
+        "net.bytebuddy.dynamic.loading.PackageDefinitionStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.modifier.Visibility"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ClassInjector.Dispatcher",
       "dependencies": [
-        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.description.modifier.Visibility",
         "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
         "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.modifier.Visibility"
       ]
     },
     {
@@ -432,11 +432,11 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ClassInjector.UsingLookup",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
@@ -458,11 +458,11 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "ClassInjector.UsingUnsafe",
       "dependencies": [
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.PackageDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
-        "net.bytebuddy.dynamic.loading.ClassInjector"
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
@@ -470,39 +470,39 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "ClassInjector.UsingInstrumentation",
       "dependencies": [
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.ClassFileVersion",
         "net.bytebuddy.utility.RandomString",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ModuleLayerFromSingleClassLoaderDecorator",
       "dependencies": [
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleLayerController",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleLayer",
-        "net.bytebuddy.description.type.PackageDescription",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.SimpleModuleReference",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Path",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Optional",
-        "net.bytebuddy.description.module.ModuleDescription",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Configuration",
-        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator",
         "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.SimpleModuleFinder",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Configuration",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Optional",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleLayerController",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.modifier.FieldManifestation",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Path",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleLayer",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.CreationAction",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleFinder",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.SimpleModuleReference",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.Stream",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleFinder",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.modifier.FieldManifestation",
         "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.ModuleDescriptor",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.implementation.bytecode.assign.Assigner",
-        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
-        "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator.CreationAction",
-        "net.bytebuddy.dynamic.loading.ClassLoaderDecorator"
+        "net.bytebuddy.implementation.bytecode.assign.Assigner"
       ]
     },
     {
@@ -552,20 +552,20 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "ModuleLayerFromSingleClassLoaderDecorator.SimpleModuleReference",
       "dependencies": [
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
         "net.bytebuddy.description.modifier.FieldManifestation",
         "net.bytebuddy.dynamic.DynamicType",
         "net.bytebuddy.implementation.bytecode.assign.Assigner",
-        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy"
+        "net.bytebuddy.description.modifier.Visibility"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic.loading",
       "class": "ModuleLayerFromSingleClassLoaderDecorator.SimpleModuleFinder",
       "dependencies": [
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
         "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.implementation.bytecode.assign.Assigner"
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -586,45 +586,45 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.dynamic",
       "class": "ClassFileLocator",
       "dependencies": [
-        "net.bytebuddy.utility.JavaModule",
-        "net.bytebuddy.dynamic.ClassFileLocator.Dispatcher",
         "net.bytebuddy.dynamic.ClassFileLocator.CreationAction",
-        "net.bytebuddy.dynamic.ClassFileLocator.BootLoaderProxyCreationAction",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.description.NamedElement",
         "net.bytebuddy.utility.StreamDrainer",
-        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.dynamic.ClassFileLocator.MultiReleaseAware",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.dynamic.ClassFileLocator.Dispatcher",
         "net.bytebuddy.dynamic.ClassFileLocator.NoOp",
         "net.bytebuddy.dynamic.ClassFileLocator.Initializable",
-        "net.bytebuddy.dynamic.ClassFileLocator.MultiReleaseAware",
         "net.bytebuddy.dynamic.ClassFileLocator.ClassLoadingDelegate",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.dynamic.ClassFileLocator.ForClassLoader",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.dynamic.ClassFileLocator.Resolution",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator.BootLoaderProxyCreationAction",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.dynamic.ClassFileLocator.ForClassLoader"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic",
       "class": "ClassFileLocator.ForInstrumentation",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDescription",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.dynamic",
       "class": "ClassFileLocator.Dispatcher",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -632,205 +632,205 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "AgentBuilder",
       "dependencies": [
         "net.bytebuddy.agent.builder.AgentBuilder.ForTotal",
-        "net.bytebuddy.agent.builder.AgentBuilder.Identified",
-        "net.bytebuddy.agent.builder.AgentBuilder.LocationStrategy",
-        "net.bytebuddy.matcher.LatentMatcher",
-        "net.bytebuddy.dynamic.VisibilityBridgeStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.WithoutBatchStrategy",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.agent.builder.AgentBuilder.InstallationListener",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.agent.builder.AgentBuilder.LambdaMetafactoryFactory",
-        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
-        "net.bytebuddy.asm.Advice",
-        "net.bytebuddy.agent.builder.AgentBuilder.RawMatcher",
-        "net.bytebuddy.agent.builder.AgentBuilder.Collector",
-        "net.bytebuddy.agent.builder.AgentBuilder.Inactive",
-        "net.bytebuddy.description.modifier.TypeManifestation",
         "net.bytebuddy.agent.builder.AgentBuilder.LambdaInstrumentationStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.Delegator",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.agent.builder.AgentBuilder.UsingDirectInvocation",
-        "net.bytebuddy.utility.JavaConstant",
-        "net.bytebuddy.agent.builder.AgentBuilder.FactoryImplementation",
-        "net.bytebuddy.agent.builder.AgentBuilder.StreamWriting",
-        "net.bytebuddy.agent.builder.AgentBuilder.Disabled",
-        "net.bytebuddy.agent.builder.AgentBuilder.PatchMode",
-        "net.bytebuddy.agent.builder.AgentBuilder.UsingReflection",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.agent.builder.AgentBuilder.BatchAllocator",
-        "net.bytebuddy.agent.builder.AgentBuilder.Transformation",
-        "net.bytebuddy.agent.builder.AgentBuilder.Listener",
-        "net.bytebuddy.agent.builder.AgentBuilder.CreationAction",
-        "net.bytebuddy.matcher.ElementMatcher",
-        "net.bytebuddy.build.EntryPoint",
-        "net.bytebuddy.agent.builder.AgentBuilder.ConstructorImplementation",
-        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.BootstrapMarkerAction",
-        "net.bytebuddy.agent.builder.AgentBuilder.ClassFileBufferStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.SelfInjection",
-        "net.bytebuddy.agent.builder.AgentBuilder.FallbackStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.RedefinitionStrategy",
-        "net.bytebuddy.dynamic.scaffold.TypeValidation",
-        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionImmediateMatcher",
-        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
-        "net.bytebuddy.build.Plugin",
-        "net.bytebuddy.agent.builder.AgentBuilder.UsingMethodHandleLookup",
-        "net.bytebuddy.agent.builder.AgentBuilder.PoolStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.Handler",
-        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionEnforcer",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.agent.builder.AgentBuilder.Ignored",
-        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
-        "net.bytebuddy.dynamic.loading.ClassInjector",
-        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
-        "net.bytebuddy.dynamic.NexusAccessor",
-        "net.bytebuddy.agent.builder.AgentBuilder.CircularityLock",
-        "net.bytebuddy.agent.builder.AgentBuilder.ForLegacyVm",
-        "net.bytebuddy.agent.builder.ResettableClassFileTransformer",
-        "net.bytebuddy.asm.AsmVisitorWrapper",
-        "net.bytebuddy.agent.builder.AgentBuilder.SuperTypeLoading",
-        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
-        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionScheduler",
-        "net.bytebuddy.build.SafeVarargsPlugin",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.agent.builder.AgentBuilder.Default",
-        "net.bytebuddy.agent.builder.AgentBuilder.Narrowable",
-        "net.bytebuddy.implementation.bytecode.StackManipulation",
-        "net.bytebuddy.agent.builder.AgentBuilder.Trivial",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.modifier.MethodManifestation",
-        "net.bytebuddy.implementation.bytecode.Duplication",
-        "net.bytebuddy.agent.builder.AgentBuilder.Entry",
-        "net.bytebuddy.agent.builder.AgentBuilder.RedefinitionListenable",
-        "net.bytebuddy.agent.builder.AgentBuilder.ExecutingTransformer",
-        "net.bytebuddy.implementation.bytecode.assign.Assigner",
-        "net.bytebuddy.agent.builder.AgentBuilder.Transformer",
-        "net.bytebuddy.agent.builder.AgentBuilder.InjectionStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionOnErrorMatcher",
-        "net.bytebuddy.agent.builder.AgentBuilder.Cancelable",
-        "net.bytebuddy.utility.JavaModule",
-        "net.bytebuddy.description.modifier.Ownership",
-        "net.bytebuddy.NamingStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.DescriptionStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.NativeMethodStrategy",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.agent.builder.AgentBuilder.SinglePass",
-        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
-        "net.bytebuddy.implementation.LoadedTypeInitializer",
-        "net.bytebuddy.agent.builder.AgentBuilder.Unavailable",
-        "net.bytebuddy.dynamic.TypeResolutionStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.NoOp",
-        "net.bytebuddy.agent.builder.AgentBuilder.Loader",
-        "net.bytebuddy.agent.builder.AgentBuilder.TransformerDecorator",
-        "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.agent.builder.AgentBuilder.WarmupStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.TypeStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.Factory",
-        "net.bytebuddy.agent.builder.AgentBuilder.DiscoveryStrategy",
         "net.bytebuddy.description.modifier.FieldManifestation",
-        "net.bytebuddy.agent.builder.AgentBuilder.Dispatcher",
-        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.implementation.LoadedTypeInitializer",
+        "net.bytebuddy.agent.builder.AgentBuilder.UsingDirectInvocation",
+        "net.bytebuddy.agent.builder.AgentBuilder.Default",
+        "net.bytebuddy.agent.builder.AgentBuilder.Unavailable",
         "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.agent.builder.AgentBuilder.Identified",
+        "net.bytebuddy.description.modifier.Visibility",
+        "net.bytebuddy.NamingStrategy",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.TransformerDecorator",
+        "net.bytebuddy.agent.builder.AgentBuilder.RedefinitionStrategy",
         "net.bytebuddy.agent.builder.AgentBuilder.ForClassLoader",
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.WarmupStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.UsingMethodHandleLookup",
+        "net.bytebuddy.implementation.bytecode.Duplication",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
+        "net.bytebuddy.agent.builder.AgentBuilder.Narrowable",
+        "net.bytebuddy.agent.builder.AgentBuilder.ConstructorImplementation",
+        "net.bytebuddy.asm.Advice",
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.agent.builder.AgentBuilder.Dispatcher",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.agent.builder.AgentBuilder.LocationStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.InstallationListener",
+        "net.bytebuddy.dynamic.VisibilityBridgeStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Handler",
+        "net.bytebuddy.agent.builder.AgentBuilder.Trivial",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.agent.builder.ResettableClassFileTransformer",
+        "net.bytebuddy.description.modifier.TypeManifestation",
+        "net.bytebuddy.agent.builder.AgentBuilder.Listener",
+        "net.bytebuddy.agent.builder.AgentBuilder.Inactive",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Loader",
+        "net.bytebuddy.agent.builder.AgentBuilder.TypeStrategy",
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.agent.builder.AgentBuilder.Delegator",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.agent.builder.AgentBuilder.Ignored",
+        "net.bytebuddy.agent.builder.AgentBuilder.SuperTypeLoading",
+        "net.bytebuddy.agent.builder.AgentBuilder.ExecutingTransformer",
+        "net.bytebuddy.agent.builder.AgentBuilder.Factory",
+        "net.bytebuddy.implementation.bytecode.assign.Assigner",
+        "net.bytebuddy.agent.builder.AgentBuilder.WithoutBatchStrategy",
+        "net.bytebuddy.description.modifier.MethodManifestation",
+        "net.bytebuddy.agent.builder.AgentBuilder.CreationAction",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionScheduler",
+        "net.bytebuddy.agent.builder.AgentBuilder.SelfInjection",
+        "net.bytebuddy.agent.builder.AgentBuilder.Transformer",
+        "net.bytebuddy.dynamic.NexusAccessor",
+        "net.bytebuddy.agent.builder.AgentBuilder.ForLegacyVm",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.agent.builder.AgentBuilder.CircularityLock",
+        "net.bytebuddy.agent.builder.AgentBuilder.FallbackStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.DiscoveryStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.ClassFileBufferStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.PatchMode",
+        "net.bytebuddy.agent.builder.AgentBuilder.SinglePass",
+        "net.bytebuddy.agent.builder.AgentBuilder.UsingReflection",
+        "net.bytebuddy.agent.builder.AgentBuilder.InitializationStrategy",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.Cancelable",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionOnErrorMatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.Transformation",
         "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
-        "net.bytebuddy.agent.builder.AgentBuilder.InitializationStrategy"
+        "net.bytebuddy.agent.builder.AgentBuilder.InjectionStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Disabled",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.agent.builder.AgentBuilder.NoOp",
+        "net.bytebuddy.implementation.bytecode.ByteCodeAppender",
+        "net.bytebuddy.agent.builder.AgentBuilder.PoolStrategy",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.agent.builder.AgentBuilder.NativeMethodStrategy",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy",
+        "net.bytebuddy.agent.builder.AgentBuilder.Entry",
+        "net.bytebuddy.agent.builder.AgentBuilder.Collector",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionEnforcer",
+        "net.bytebuddy.agent.builder.AgentBuilder.DescriptionStrategy",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.agent.builder.AgentBuilder.FactoryImplementation",
+        "net.bytebuddy.agent.builder.AgentBuilder.BootstrapMarkerAction",
+        "net.bytebuddy.agent.builder.AgentBuilder.StreamWriting",
+        "net.bytebuddy.agent.builder.AgentBuilder.LambdaMetafactoryFactory",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.agent.builder.AgentBuilder.RawMatcher",
+        "net.bytebuddy.build.SafeVarargsPlugin",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.dynamic.scaffold.InstrumentedType",
+        "net.bytebuddy.agent.builder.AgentBuilder.RedefinitionListenable",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.implementation.bytecode.member.MethodReturn",
+        "net.bytebuddy.agent.builder.AgentBuilder.ResubmissionImmediateMatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder.BatchAllocator",
+        "net.bytebuddy.matcher.LatentMatcher",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.implementation.Implementation"
       ]
     },
     {
       "package": "net.bytebuddy.agent.builder",
       "class": "AgentBuilder.Default",
       "dependencies": [
-        "net.bytebuddy.utility.JavaModule",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.matcher.LatentMatcher",
-        "net.bytebuddy.dynamic.VisibilityBridgeStrategy",
         "net.bytebuddy.agent.builder.AgentBuilder",
+        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
+        "net.bytebuddy.dynamic.VisibilityBridgeStrategy",
+        "net.bytebuddy.dynamic.scaffold.TypeValidation",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.agent.builder.ResettableClassFileTransformer",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.ByteBuddy",
+        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
+        "net.bytebuddy.pool.TypePool",
+        "net.bytebuddy.build.EntryPoint",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.NamingStrategy",
         "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer",
-        "net.bytebuddy.agent.builder.ResettableClassFileTransformer",
         "net.bytebuddy.dynamic.scaffold.InstrumentedType",
-        "net.bytebuddy.dynamic.TypeResolutionStrategy",
-        "net.bytebuddy.build.EntryPoint",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.utility.JavaType",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.dynamic.scaffold.TypeValidation",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.ByteBuddy",
-        "net.bytebuddy.dynamic.loading.ClassLoadingStrategy"
+        "net.bytebuddy.dynamic.TypeResolutionStrategy",
+        "net.bytebuddy.matcher.LatentMatcher",
+        "net.bytebuddy.utility.JavaModule",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.implementation.Implementation"
       ]
     },
     {
       "package": "net.bytebuddy.agent.builder",
       "class": "AgentBuilder.Dispatcher",
       "dependencies": [
+        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
+        "net.bytebuddy.utility.JavaConstant",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.implementation.bytecode.StackManipulation",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.method.MethodDescription",
         "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.loading.ClassInjector",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.implementation.bytecode.StackManipulation",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.dynamic.NexusAccessor",
-        "net.bytebuddy.utility.JavaConstant",
-        "net.bytebuddy.implementation.auxiliary.AuxiliaryType",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.dynamic.loading.ClassInjector"
+        "net.bytebuddy.dynamic.NexusAccessor"
       ]
     },
     {
       "package": "net.bytebuddy.agent.builder",
       "class": "AgentBuilder.RedefinitionStrategy",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.agent.builder.AgentBuilder",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.build.SafeVarargsPlugin",
-        "net.bytebuddy.agent.builder.AgentBuilder"
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.build.SafeVarargsPlugin"
       ]
     },
     {
       "package": "net.bytebuddy.agent.builder",
       "class": "AgentBuilder.Enabled",
       "dependencies": [
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.agent.builder.AgentBuilder",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.agent.builder",
       "class": "AgentBuilder.WarmupStrategy",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.build",
       "class": "DispatcherAnnotationPlugin",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
-        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.matcher.ElementMatchers",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.dynamic.DynamicType",
         "net.bytebuddy.build.Plugin",
-        "net.bytebuddy.asm.MemberAttributeExtension"
+        "net.bytebuddy.asm.MemberAttributeExtension",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.implementation.attribute.AnnotationValueFilter",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.implementation.attribute.MethodAttributeAppender",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
     },
     {
@@ -838,14 +838,14 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "JavaModule",
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.utility.JavaModule.Module",
-        "net.bytebuddy.utility.JavaModule.Resolver",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.PackageDescription",
-        "net.bytebuddy.ClassFileVersion",
         "net.bytebuddy.description.NamedElement",
         "net.bytebuddy.description.module.ModuleDescription",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.JavaModule.Resolver",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.utility.JavaModule.Module"
       ]
     },
     {
@@ -867,9 +867,9 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "QueueFactory",
       "dependencies": [
         "net.bytebuddy.utility.QueueFactory.Dispatcher",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -883,24 +883,24 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.utility",
       "class": "AsmClassReader",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.utility.AsmClassReader.Default",
-        "net.bytebuddy.utility.AsmClassReader.ForClassFileApi",
         "net.bytebuddy.utility.AsmClassReader.Factory",
+        "net.bytebuddy.utility.AsmClassReader.ForClassFileApi",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.AsmClassReader.Default",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.AsmClassReader.JdkClassReader"
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.AsmClassReader.JdkClassReader",
+        "net.bytebuddy.utility.OpenedClassReader"
       ]
     },
     {
       "package": "net.bytebuddy.utility",
       "class": "AsmClassReader.ForClassFileApi",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -914,22 +914,22 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.utility",
       "class": "FileSystem",
       "dependencies": [
+        "net.bytebuddy.build.CachedReturnPlugin",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.utility.FileSystem.Files",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.utility.FileSystem.Dispatcher",
-        "net.bytebuddy.build.CachedReturnPlugin",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.FileSystem.Dispatcher",
+        "net.bytebuddy.utility.FileSystem.StandardCopyOption",
         "net.bytebuddy.dynamic.loading.ClassLoadingStrategy",
-        "net.bytebuddy.utility.FileSystem.StandardCopyOption"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
       "package": "net.bytebuddy.utility",
       "class": "FileSystem.ForNio2CapableVm",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -957,46 +957,46 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.utility",
       "class": "JavaConstant",
       "dependencies": [
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.JavaConstant.OfMethodTypeDesc",
-        "net.bytebuddy.utility.JavaConstant.OfDirectMethodHandleDesc",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.JavaConstant.MethodHandleInfo",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.utility.JavaConstant.Dispatcher",
+        "net.bytebuddy.utility.JavaConstant.MethodHandle",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.utility.JavaConstant.MethodHandles",
         "net.bytebuddy.utility.JavaConstant.MethodType",
         "net.bytebuddy.utility.JavaConstant.Lookup",
-        "net.bytebuddy.utility.JavaConstant.Visitor",
+        "net.bytebuddy.utility.JavaConstant.OfMethodHandleDesc",
         "net.bytebuddy.utility.JavaConstant.OfClassDesc",
-        "net.bytebuddy.utility.JavaConstant.Dispatcher",
         "net.bytebuddy.utility.JavaConstant.OfTrivialValue",
         "net.bytebuddy.utility.JavaConstant.HandleType",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.utility.JavaConstant.Visitor",
+        "net.bytebuddy.utility.JavaConstant.OfDynamicConstantDesc",
+        "net.bytebuddy.utility.JavaConstant.MethodHandleInfo",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.JavaConstant.ForKind",
+        "net.bytebuddy.utility.JavaConstant.Simple",
         "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.utility.JavaConstant.OfMethodHandleDesc",
-        "net.bytebuddy.utility.JavaConstant.MethodHandles",
-        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.utility.JavaConstant.OfDirectMethodHandleDesc",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.description.enumeration.EnumerationDescription",
-        "net.bytebuddy.utility.JavaConstant.OfDynamicConstantDesc",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.utility.JavaConstant.Simple",
-        "net.bytebuddy.utility.JavaConstant.MethodHandle",
-        "net.bytebuddy.utility.JavaConstant.ForKind"
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.utility.JavaConstant.OfMethodTypeDesc"
       ]
     },
     {
       "package": "net.bytebuddy.utility",
       "class": "JavaConstant.Simple",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.utility.JavaType",
         "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.dynamic.ClassFileLocator"
       ]
     },
     {
@@ -1052,29 +1052,29 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.utility",
       "class": "JavaConstant.MethodType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.JavaType",
         "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.method.MethodDescription",
         "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.utility",
       "class": "JavaConstant.MethodHandle",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.JavaType",
         "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.utility.JavaConstant",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodDescription",
         "net.bytebuddy.ClassFileVersion",
         "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.utility.JavaConstant",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
@@ -1102,28 +1102,28 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.utility",
       "class": "AsmClassWriter",
       "dependencies": [
-        "net.bytebuddy.utility.AsmClassWriter.Factory",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.AsmClassWriter.EmptyAsmClassReader",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.AsmClassReader",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.utility.AsmClassWriter.Default",
-        "net.bytebuddy.utility.AsmClassWriter.JdkClassWriter",
         "net.bytebuddy.utility.AsmClassWriter.SuperClassResolvingJdkClassWriter",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.utility.AsmClassWriter.ForClassFileApi",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassWriter.JdkClassWriter",
+        "net.bytebuddy.utility.AsmClassWriter.Factory",
+        "net.bytebuddy.ClassFileVersion",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.AsmClassWriter.Default",
+        "net.bytebuddy.utility.AsmClassWriter.EmptyAsmClassReader",
         "net.bytebuddy.pool.TypePool",
-        "net.bytebuddy.utility.AsmClassWriter.ForClassFileApi"
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.utility.AsmClassReader"
       ]
     },
     {
       "package": "net.bytebuddy.utility",
       "class": "AsmClassWriter.ForClassFileApi",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1137,30 +1137,30 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "RecordComponentDescription",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.type.RecordComponentDescription.Token",
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.RecordComponentDescription.RecordComponent",
-        "net.bytebuddy.description.NamedElement",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.matcher.ElementMatcher",
-        "net.bytebuddy.build.CachedReturnPlugin"
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.RecordComponentDescription.RecordComponent",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.RecordComponentDescription.Token",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "RecordComponentDescription.ForLoadedRecordComponent",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
@@ -1174,25 +1174,25 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "TypeDefinition",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDefinition.AnnotatedType",
-        "net.bytebuddy.description.method.MethodList",
         "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.implementation.bytecode.StackSize",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.description.type.TypeDefinition.Sort",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.MethodList",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.description.type.RecordComponentList"
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.TypeDefinition.Sort",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.description.type.TypeDefinition.AnnotatedType",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDefinition.Sort",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
         "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.type.TypeDescription",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
@@ -1207,100 +1207,100 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription.Simple",
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.type.TypeDescription.OfNonGenericType",
-        "net.bytebuddy.description.type.PackageDescription",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.description.type.TypeDescription.AnnotationStripper",
-        "net.bytebuddy.description.type.TypeDescription.Generic",
-        "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.type.TypeDescription.ForTypeVariableBoundType",
-        "net.bytebuddy.description.type.TypeDescription.TypeErasing",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.description.annotation.AnnotationSource",
-        "net.bytebuddy.utility.FieldComparator",
-        "net.bytebuddy.description.type.TypeDescription.AbstractBase",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedParameterizedType",
+        "net.bytebuddy.description.type.TypeDescription.LazyProjection",
+        "net.bytebuddy.description.type.TypeDescription.OfNonGenericType",
+        "net.bytebuddy.description.type.TypeDescription.NoOp",
+        "net.bytebuddy.description.type.TypeDescription.ForLoadedType",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.type.TypeDescription.ParameterAssigner",
+        "net.bytebuddy.description.type.TypeDescription.Substitutor",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.description.type.TypeDescription.OfParameterizedType",
+        "net.bytebuddy.description.type.TypeDescription.WithEagerNavigation",
+        "net.bytebuddy.description.type.TypeDescription.Assigner",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.type.TypeDescription.RenderingDelegate",
         "net.bytebuddy.description.type.RecordComponentDescription",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.description.type.TypeDescription.ForLoadedRecordComponent",
-        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.description.type.TypeDescription.Visitor",
         "net.bytebuddy.description.type.TypeDescription.Dispatcher",
         "net.bytebuddy.dynamic.TargetType",
+        "net.bytebuddy.description.type.TypeDescription.Builder",
         "net.bytebuddy.description.type.TypeDescription.AnnotatedWildcardType",
-        "net.bytebuddy.description.type.TypeDescription.LazyProjection",
-        "net.bytebuddy.description.type.TypeDescription.OfGenericArray",
-        "net.bytebuddy.description.type.TypeDescription.Substitutor",
-        "net.bytebuddy.description.module.ModuleDescription",
-        "net.bytebuddy.description.type.TypeDescription.AnnotatedParameterizedType",
+        "net.bytebuddy.description.type.TypeDescription.TypeErasing",
+        "net.bytebuddy.description.type.TypeDescription.AbstractBase",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedTypeVariable",
+        "net.bytebuddy.description.type.TypeList",
         "net.bytebuddy.description.type.TypeDescription.Reifying",
         "net.bytebuddy.description.type.TypeDescription.WithLazyNavigation",
+        "net.bytebuddy.matcher.ElementMatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.description.type.TypeDescription.NoOp",
+        "net.bytebuddy.description.type.TypeDescription.OfGenericArray",
         "net.bytebuddy.description.type.TypeDescription.Delegator",
-        "net.bytebuddy.description.type.TypeDescription.ParameterAssigner",
-        "net.bytebuddy.description.type.TypeDescription.WithEagerNavigation",
-        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.type.TypeDescription.Generic",
+        "net.bytebuddy.description.type.RecordComponentList",
         "net.bytebuddy.description.type.TypeDescription.OfTypeVariable",
-        "net.bytebuddy.description.type.TypeDescription.AnnotatedTypeVariable",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDescription.AnnotationReader",
-        "net.bytebuddy.description.type.TypeDescription.AnnotatedType",
-        "net.bytebuddy.description.type.TypeDescription.RenderingDelegate",
+        "net.bytebuddy.utility.FieldComparator",
         "net.bytebuddy.description.type.TypeDescription.ClassLoadingDelegate",
+        "net.bytebuddy.description.type.TypeDescription.AnnotationReader",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.type.TypeDescription.ForTypeVariableBoundType",
         "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.description.method.MethodList",
-        "net.bytebuddy.description.type.TypeDescription.Builder",
+        "net.bytebuddy.description.type.TypeDescription.Simple",
         "net.bytebuddy.description.type.TypeDescription.FormalTypeVariable",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription.AnnotatedType",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.ClassFileVersion",
         "net.bytebuddy.description.type.TypeDescription.OfWildcardType",
-        "net.bytebuddy.description.type.TypeDescription.Assigner",
-        "net.bytebuddy.description.type.TypeDescription.Visitor",
+        "net.bytebuddy.description.type.TypeDescription.ForLoadedRecordComponent",
         "net.bytebuddy.implementation.bytecode.StackSize",
         "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.description.type.TypeDescription.ForLoadedType",
-        "net.bytebuddy.description.type.RecordComponentList",
-        "net.bytebuddy.description.type.TypeDescription.OfParameterizedType"
+        "net.bytebuddy.description.type.TypeDescription.AnnotationStripper"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.Generic",
       "dependencies": [
-        "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.description.annotation.AnnotationSource",
-        "net.bytebuddy.description.type.RecordComponentDescription",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.matcher.ElementMatcher",
-        "net.bytebuddy.dynamic.TargetType",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.TypeVariableSource",
-        "net.bytebuddy.description.method.MethodList",
-        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.build.CachedReturnPlugin",
         "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.dynamic.TargetType",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.matcher.ElementMatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.TypeVariableSource",
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.ClassFileVersion",
         "net.bytebuddy.implementation.bytecode.StackSize",
-        "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.description.type.RecordComponentList"
+        "net.bytebuddy.description.type.TypeDefinition"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.Dispatcher",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1309,9 +1309,9 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.description.type.RecordComponentDescription",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
@@ -1320,49 +1320,49 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
         "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
         "net.bytebuddy.description.type.RecordComponentDescription",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForLoadedField",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForLoadedMethodReturnType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForLoadedExecutableParameterType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForLoadedExecutableExceptionType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForWildcardUpperBoundType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1376,16 +1376,16 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForWildcardLowerBoundType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForTypeVariableBoundType",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1399,8 +1399,8 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.OfFormalTypeVariable",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1414,8 +1414,8 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForTypeArgument",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1450,21 +1450,21 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.type",
       "class": "TypeDescription.ForLoadedType",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.field.FieldDescription",
-        "net.bytebuddy.description.method.MethodList",
-        "net.bytebuddy.utility.FieldComparator",
-        "net.bytebuddy.description.type.PackageDescription",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.module.ModuleDescription",
-        "net.bytebuddy.description.type.RecordComponentDescription",
-        "net.bytebuddy.description.field.FieldList",
-        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.type.RecordComponentList"
+        "net.bytebuddy.description.field.FieldDescription",
+        "net.bytebuddy.description.module.ModuleDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.MethodList",
+        "net.bytebuddy.description.type.RecordComponentDescription",
+        "net.bytebuddy.description.type.RecordComponentList",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.field.FieldList",
+        "net.bytebuddy.description.type.PackageDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.utility.FieldComparator",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
@@ -1472,40 +1472,40 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "ModuleDescription",
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.module.ModuleDescription.Exports",
-        "net.bytebuddy.description.module.ModuleDescription.Opens",
-        "net.bytebuddy.description.module.ModuleDescription.Provides",
-        "net.bytebuddy.description.module.ModuleDescription.Requires",
-        "net.bytebuddy.description.module.ModuleDescription.Module",
-        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.description.module.ModuleDescription.ModuleDescriptor",
-        "net.bytebuddy.description.module.ModuleDescription.Optional"
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.module.ModuleDescription.Optional",
+        "net.bytebuddy.description.module.ModuleDescription.Provides",
+        "net.bytebuddy.description.module.ModuleDescription.Module",
+        "net.bytebuddy.description.module.ModuleDescription.Requires",
+        "net.bytebuddy.description.module.ModuleDescription.Opens",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.module.ModuleDescription.Exports",
+        "net.bytebuddy.description.ModifierReviewable"
       ]
     },
     {
       "package": "net.bytebuddy.description.module",
       "class": "ModuleDescription.Exports",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.ModifierReviewable"
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.module",
       "class": "ModuleDescription.Opens",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.ModifierReviewable"
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
       "package": "net.bytebuddy.description.module",
       "class": "ModuleDescription.Requires",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.ModifierReviewable"
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
       ]
     },
     {
@@ -1550,57 +1550,57 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "MethodDescription",
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
         "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.method.MethodDescription.Token",
-        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.description.method.MethodDescription.InDefinedShape",
         "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.MethodDescription.Token",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
         "net.bytebuddy.description.method.MethodDescription.Executable",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.method.MethodDescription.TypeToken",
         "net.bytebuddy.description.annotation.AnnotationDescription",
         "net.bytebuddy.description.method.ParameterList",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.description.modifier.ModifierContributor",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.TypeVariableSource",
         "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
+        "net.bytebuddy.description.TypeVariableSource",
         "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.method.MethodDescription.TypeToken",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.description.method.MethodDescription.InDefinedShape"
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.TypeDefinition"
       ]
     },
     {
       "package": "net.bytebuddy.description.method",
       "class": "MethodDescription.InDefinedShape",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.description.method.MethodDescription",
         "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.description.method",
       "class": "MethodDescription.AbstractBase",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.description.TypeVariableSource",
-        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.description.method.MethodDescription",
         "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.modifier.ModifierContributor",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
@@ -1614,36 +1614,36 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.method",
       "class": "ParameterDescription",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.description.ModifierReviewable",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.annotation.AnnotationList",
         "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.NamedElement",
-        "net.bytebuddy.description.method.ParameterDescription.Token",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.method.ParameterDescription.InDefinedShape",
-        "net.bytebuddy.implementation.bytecode.StackSize",
         "net.bytebuddy.description.method.ParameterList",
-        "net.bytebuddy.description.method.ParameterDescription.Parameter",
-        "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.build.CachedReturnPlugin",
         "net.bytebuddy.description.method.ParameterDescription.InGenericShape",
-        "net.bytebuddy.description.method.ParameterDescription.ParameterAnnotationSource"
+        "net.bytebuddy.description.NamedElement",
+        "net.bytebuddy.build.CachedReturnPlugin",
+        "net.bytebuddy.description.annotation.AnnotationList",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.method.ParameterDescription.Token",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.implementation.bytecode.StackSize",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.method.ParameterDescription.ParameterAnnotationSource",
+        "net.bytebuddy.description.method.ParameterDescription.Parameter",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.ParameterDescription.InDefinedShape"
       ]
     },
     {
       "package": "net.bytebuddy.description.method",
       "class": "ParameterDescription.ForLoadedParameter",
       "dependencies": [
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.type.TypeDescription",
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.description.method.MethodDescription",
         "net.bytebuddy.description.method.ParameterList",
-        "net.bytebuddy.build.AccessControllerPlugin"
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin"
       ]
     },
     {
@@ -1657,26 +1657,26 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.description.method",
       "class": "ParameterList",
       "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.method.ParameterDescription",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.matcher.FilterableList",
-        "net.bytebuddy.build.AccessControllerPlugin",
         "net.bytebuddy.matcher.ElementMatcher",
-        "net.bytebuddy.description.method.ParameterList.Executable"
+        "net.bytebuddy.description.method.ParameterList.Executable",
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.matcher.FilterableList",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.type.TypeDescription"
       ]
     },
     {
       "package": "net.bytebuddy.description.method",
       "class": "ParameterList.ForLoadedExecutable",
       "dependencies": [
-        "net.bytebuddy.description.method.ParameterDescription",
         "net.bytebuddy.description.method.ParameterList",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher"
+        "net.bytebuddy.description.method.ParameterDescription"
       ]
     },
     {

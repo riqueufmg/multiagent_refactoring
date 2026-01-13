@@ -22,8 +22,8 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
     "class": "StackAwareMethodVisitor",
     "dependencies": [
       "net.bytebuddy.implementation.bytecode.StackSize",
-      "net.bytebuddy.utility.OpenedClassReader",
       "net.bytebuddy.build.AccessControllerPlugin",
+      "net.bytebuddy.utility.OpenedClassReader",
       "net.bytebuddy.description.method.MethodDescription"
     ]
   },
@@ -32,8 +32,29 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "package": "net.bytebuddy.implementation.bytecode",
       "class": "StackSize",
       "dependencies": [
-        "net.bytebuddy.implementation.bytecode.StackManipulation",
-        "net.bytebuddy.description.type.TypeDefinition"
+        "net.bytebuddy.description.type.TypeDefinition",
+        "net.bytebuddy.implementation.bytecode.StackManipulation"
+      ]
+    },
+    {
+      "package": "net.bytebuddy.build",
+      "class": "AccessControllerPlugin",
+      "dependencies": [
+        "net.bytebuddy.build.AccessControllerPlugin.Initializer",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.build.Plugin",
+        "net.bytebuddy.asm.AsmVisitorWrapper",
+        "net.bytebuddy.utility.OpenedClassReader",
+        "net.bytebuddy.description.modifier.FieldManifestation",
+        "net.bytebuddy.dynamic.DynamicType",
+        "net.bytebuddy.description.method.MethodDescription",
+        "net.bytebuddy.matcher.ElementMatchers",
+        "net.bytebuddy.description.modifier.Ownership",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.implementation.Implementation",
+        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+        "net.bytebuddy.dynamic.ClassFileLocator",
+        "net.bytebuddy.description.modifier.Visibility"
       ]
     },
     {
@@ -41,29 +62,8 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "OpenedClassReader",
       "dependencies": [
         "net.bytebuddy.ClassFileVersion",
-        "net.bytebuddy.utility.AsmClassReader",
-        "net.bytebuddy.build.AccessControllerPlugin"
-      ]
-    },
-    {
-      "package": "net.bytebuddy.build",
-      "class": "AccessControllerPlugin",
-      "dependencies": [
-        "net.bytebuddy.description.type.TypeDescription",
-        "net.bytebuddy.build.HashCodeAndEqualsPlugin",
-        "net.bytebuddy.dynamic.ClassFileLocator",
-        "net.bytebuddy.matcher.ElementMatchers",
-        "net.bytebuddy.implementation.Implementation",
-        "net.bytebuddy.utility.OpenedClassReader",
-        "net.bytebuddy.description.method.MethodDescription",
-        "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.modifier.Ownership",
-        "net.bytebuddy.description.modifier.FieldManifestation",
-        "net.bytebuddy.asm.AsmVisitorWrapper",
-        "net.bytebuddy.build.AccessControllerPlugin.Initializer",
-        "net.bytebuddy.dynamic.DynamicType",
-        "net.bytebuddy.build.Plugin",
-        "net.bytebuddy.utility.JavaType"
+        "net.bytebuddy.build.AccessControllerPlugin",
+        "net.bytebuddy.utility.AsmClassReader"
       ]
     },
     {
@@ -71,29 +71,29 @@ Hub-like Modularization  arises when an abstraction has dependencies (both incom
       "class": "MethodDescription",
       "dependencies": [
         "net.bytebuddy.description.annotation.AnnotationList",
-        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
-        "net.bytebuddy.description.DeclaredByType",
-        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
         "net.bytebuddy.build.CachedReturnPlugin",
-        "net.bytebuddy.description.method.MethodDescription.Token",
-        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.modifier.ModifierContributor",
+        "net.bytebuddy.description.method.MethodDescription.InDefinedShape",
         "net.bytebuddy.description.ModifierReviewable",
+        "net.bytebuddy.description.method.MethodDescription.Token",
+        "net.bytebuddy.utility.JavaType",
+        "net.bytebuddy.description.method.MethodDescription.AbstractBase",
         "net.bytebuddy.description.method.MethodDescription.Executable",
-        "net.bytebuddy.description.ByteCodeElement",
-        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.description.type.TypeList",
+        "net.bytebuddy.description.method.MethodDescription.TypeToken",
         "net.bytebuddy.description.annotation.AnnotationDescription",
         "net.bytebuddy.description.method.ParameterList",
         "net.bytebuddy.build.AccessControllerPlugin",
-        "net.bytebuddy.description.modifier.ModifierContributor",
-        "net.bytebuddy.utility.JavaType",
-        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
-        "net.bytebuddy.description.TypeVariableSource",
         "net.bytebuddy.description.annotation.AnnotationValue",
+        "net.bytebuddy.description.DeclaredByType",
+        "net.bytebuddy.description.type.TypeDescription",
+        "net.bytebuddy.description.method.MethodDescription.SignatureToken",
+        "net.bytebuddy.description.TypeVariableSource",
         "net.bytebuddy.description.modifier.Visibility",
-        "net.bytebuddy.description.method.MethodDescription.TypeToken",
-        "net.bytebuddy.description.type.TypeList",
-        "net.bytebuddy.description.type.TypeDefinition",
-        "net.bytebuddy.description.method.MethodDescription.InDefinedShape"
+        "net.bytebuddy.description.method.ParameterDescription",
+        "net.bytebuddy.utility.dispatcher.JavaDispatcher",
+        "net.bytebuddy.description.ByteCodeElement",
+        "net.bytebuddy.description.type.TypeDefinition"
       ]
     }
   ],
