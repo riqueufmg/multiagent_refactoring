@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "DirectoryWalker",
+    "detection": false,
+    "justification": "DirectoryWalker is focused on a single, cohesive responsibility (walking a directory tree) and is organized using the template method pattern: it has a small, private recursive walk(File,int,Collection) that delegates behavior to many small protected hook methods (handleStart, handleEnd, handleDirectoryStart, handleDirectoryEnd, handleDirectory, handleFile, handleRestricted, handleCancelled, handleIsCancelled, filterDirectoryContents). State is minimal (two final fields: filter and depthLimit) and an inner CancelException is narrowly scoped to cancellation handling. Constructors encapsulate filter composition and the recursive algorithm remains concise, delegating extension points to subclasses. These characteristics indicate the class is sufficiently modularized rather than overly large or mixed-responsibility."
+}

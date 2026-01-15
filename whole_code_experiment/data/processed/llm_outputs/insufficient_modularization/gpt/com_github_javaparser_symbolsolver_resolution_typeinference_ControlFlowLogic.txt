@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ControlFlowLogic"],
+    "detection": true,
+    "justification": [
+        "The class centralizes multiple distinct responsibilities: break/continue target resolution (breakTarget, continueADoStatement), reachability determination (isReachable, isReachableBecauseOfPosition), and completion analysis (canCompleteNormally).",
+        "Contains multiple utility/inspection methods (contains, containedTryStmts, parentIs) that mix concerns with the core analysis logic, lowering cohesion.",
+        "The use of a large visitor (GenericVisitorAdapter) implementing many visit(...) methods for different statement types indicates the class handles many language constructs; this breadth suggests it could be decomposed into smaller analyzers per concern or statement family.",
+        "Extensive embedded JLS treatment comments and partially-implemented methods (several methods throw UnsupportedOperationException) increase class size and responsibility surface, making the class harder to understand and maintain.",
+        "Given these points, the class is a candidate for refactoring into smaller, more cohesive components (e.g., Break/Continue resolver, Reachability checker, Completion analyzer, Try/Finally inspector)."
+    ]
+}

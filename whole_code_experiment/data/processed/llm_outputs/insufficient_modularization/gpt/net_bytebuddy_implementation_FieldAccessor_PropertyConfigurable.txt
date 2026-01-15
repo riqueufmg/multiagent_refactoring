@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "FieldAccessor.PropertyConfigurable",
+    "detection": true,
+    "justification": [
+        "The PropertyConfigurable interface exposes a large, bloated API with many distinct responsibilities: methods for selecting a parameter index (setsArgumentAt), setting default values (setsDefaultValue), multiple overloads for setting literal/constant/class values (setsValue(Object), setsValue(TypeDescription), setsValue(ConstantValue), setsValue(JavaConstant), setsValue(StackManipulation,...)), reference-based setters (setsReference(...)), and multiple ways to set from other fields (setsFieldValueOf(Field), setsFieldValueOf(FieldDescription), setsFieldValueOf(String), setsFieldValueOf(FieldNameExtractor)).",
+        "This grouping mixes concerns (value provision, constant vs. reference handling, different type representations, and different field-location strategies) that could be split into smaller, focused interfaces (e.g. ValueSetter, ReferenceSetter, FieldSourceConfigurer), reducing the surface area and improving cohesion.",
+        "The enclosing FieldAccessor class further centralizes many related but separate responsibilities (FieldLocation/Prepared, FieldNameExtractor variants, ForImplicitProperty, ForSetter and many ForSetter.* subclasses and Appender implementations), indicating a single large abstraction that handles field-location, naming, bytecode appending, and many setter strategies instead of being decomposed into modular components.",
+        "Specific API size and variety (≈20 distinct configuration methods and many nested implementation classes) justify flagging Insufficient Modularization because the abstraction is large, hard to maintain, and concentrates multiple responsibilities that could be decomposed."
+    ]
+}

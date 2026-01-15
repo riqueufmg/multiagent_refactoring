@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.description.annotation.AnnotationValue",
+    "detection": true,
+    "justification": [
+        "The type contains an extremely large number of nested types and responsibilities in a single file: multiple enums (RenderingDispatcher, State, Sort), an abstract base (AbstractBase), many concrete implementations (ForConstant, ForAnnotationDescription, ForEnumerationDescription, ForTypeDescription, ForDescriptionArray, ForMissingType, ForMismatchedType, ForMissingValue, ForIncompatibleType) and many nested Loaded classes and delegate types (PropertyDelegate, ForArrayType, ForNonArrayType).",
+        "Responsibilities mixed together: value representation and resolution, class-loading and primitive mapping (ForTypeDescription.PRIMITIVE_TYPES and load logic), VM-specific rendering logic (RenderingDispatcher with multiple VM variants), array handling and cloning, equality/hashCode/toString semantics, and detailed error/exception handling for many runtime cases (ForMissingType, ForMismatchedType, ForMissingValue, ForIncompatibleType).",
+        "High cohesion violation: the single interface/class is implementing domain model (annotation value kinds), presentation (string rendering for many VM versions), loading mechanics (Class.forName, ClassLoader interactions), and error-state modeling all in one place instead of separate modules.",
+        "Practical effects visible in the code: many distinct code paths and specialized behavior (e.g. PropertyDelegate enums for array vs non-array, multiple Loaded.* inner classes implementing different exceptional behaviors), which increases size and complexity and makes understanding, testing and evolving any single concern harder.",
+        "Given these points, the class should be decomposed into smaller, cohesive classes (separate rendering, loading/resolution, and per-sort/value-type implementations) to address insufficient modularization."
+    ]
+}

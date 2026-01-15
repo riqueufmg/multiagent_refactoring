@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "CountingPathVisitor.Builder",
+    "detection": false,
+    "justification": [
+        "The Builder (and its AbstractBuilder) are narrowly focused on construction/configuration of CountingPathVisitor: fields are limited to pathCounters, fileFilter, directoryFilter, and directoryPostTransformer and setters only mutate these fields (setDirectoryFilter, setDirectoryPostTransformer, setFileFilter, setPathCounters).",
+        "Construction logic is delegated: Builder.get() returns a new CountingPathVisitor(this), and CountingPathVisitor contains the traversal and counting behavior, preserving separation of concerns between building and runtime behavior.",
+        "CountingPathVisitor itself is cohesive: methods are small and single-purpose (accept, visitFile, preVisitDirectory, postVisitDirectory, updateFileCounters, updateDirCounter) and it delegates counting and filtering to PathCounters and PathFilter rather than embedding those responsibilities.",
+        "There are no large monolithic methods, no mixing of unrelated responsibilities, and sensible defaults are provided via small static helpers (defaultDirectoryFilter, defaultFileFilter, defaultPathCounters, defaultDirectoryTransformer), indicating adequate decomposition and modularization."
+    ]
+}

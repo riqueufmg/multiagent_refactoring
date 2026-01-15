@@ -1,0 +1,8 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": [
+        "org.apache.commons.io.FilenameUtils"
+    ],
+    "detection": true,
+    "justification": "FilenameUtils is a large utility class that concentrates many distinct responsibilities rather than a single cohesive abstraction. Evidence: (1) Path parsing and normalization: large complex methods doNormalize (and many normalize/normalizeNoEndSeparator overloads), doGetFullPath, doGetPath and getPrefixLength perform extensive path/token manipulation and OS-specific prefix logic. (2) Name/extension handling API surface: getBaseName, getExtension, removeExtension, indexOfExtension, indexOfLastSeparator and related public helpers produce a broad public interface. (3) Wildcard matching logic: wildcardMatch and splitOnTokens implement a separate non-trivial pattern-matching subsystem with backtracking. (4) Network/hostname validation: private methods isIPv4Address, isIPv6Address, isRFC3986HostName and isValidHostName embed IP/hostname validation logic unrelated to basic filename string operations (used only to validate UNC hostnames in getPrefixLength). (5) Platform/ADS handling: getAdsCriticalOffset and isSystemWindows add NTFS/ADS and platform concerns. (6) Numerous private helpers and many public static methods create a bloated API surface. Several methods are long and complex (doNormalize, getPrefixLength, wildcardMatch) indicating mixed responsibilities that could be factored into smaller, focused classes (e.g., PathNormalizer, PrefixParser/HostValidator, WildcardMatcher, ExtensionUtils). These factors indicate insufficient modularization."
+}

@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["TypePool.TokenizedGenericType"],
+    "detection": true,
+    "justification": [
+        "Size / complexity: TokenizedGenericType is large and contains substantial logic (resolve(), asErasure(), static toErasure(...)) and numerous nested types. Its implementation spans many responsibilities rather than a single, focused concern.",
+        "Multiple responsibilities: the class both represents a tokenized generic type and implements eager/lazy resolution, conversion from descriptors to erasures, annotation handling, and provides collection implementations (nested TokenList, TypeVariableList). These nested types (TokenList, TypeVariableList, Malformed) encode separate behaviors that could be separate classes.",
+        "Deep nesting and coupling: TokenizedGenericType is declared deep inside LazyTypeDescription and depends on TypePool, GenericTypeToken, annotation token mappings and TypeVariableSource, increasing entanglement and making the abstraction harder to understand and maintain.",
+        "Duplication of roles: the presence of a dedicated Malformed subclass handling malformed generics and TokenList/TypeVariableList for list concerns shows the class aggregates distinct parsing, representation and error-handling roles that would be clearer if modularized.",
+        "Testability / maintainability impact: the combined responsibilities and many inner types indicate a bloated interface and implementation surface (multiple nested classes and methods) making reasoning, unit testing and future changes more difficult."
+    ]
+}

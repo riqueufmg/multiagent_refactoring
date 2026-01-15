@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["CodaBarReader"],
+    "detection": true,
+    "justification": [
+        "The class mixes multiple responsibilities in a single type: high-level decoding flow (decodeRow), low-level bit/run counting (setCounters, counterAppend), pattern recognition (toNarrowWidePattern), and statistical validation (validatePattern).",
+        "The central method decodeRow is large and orchestrates many distinct steps (scanning BitArray, decoding characters, validating patterns, trimming start/end, and constructing Result) rather than delegating to focused collaborators.",
+        "Several large, complex private methods (validatePattern, toNarrowWidePattern, setCounters) each encapsulate substantial, independent logic that could be separated into cohesive components (e.g., CounterBuffer/RunLengthScanner, PatternDecoder, PatternValidator).",
+        "The class maintains mutable parsing state across methods (counters[], counterLength, decodeRowResult) which couples the low-level buffer management with decoding logic, increasing class size and reducing cohesion.",
+        "Presence of multiple concerns and sizeable logic in one final class makes it harder to understand, test, and evolve specific responsibilities, indicating insufficient modularization."
+    ]
+}

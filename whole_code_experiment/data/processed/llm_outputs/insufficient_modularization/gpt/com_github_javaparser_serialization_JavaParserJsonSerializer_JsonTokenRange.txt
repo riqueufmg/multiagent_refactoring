@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "JavaParserJsonSerializer",
+    "detection": false,
+    "justification": "The class has a single, well-defined responsibility: serializing JavaParser AST nodes to JSON. Its public API is small (serialize(Node, JsonGenerator)), traversal logic is contained in a helper private method serialize(String, Node, JsonGenerator), and non-meta behaviors are factored into separate protected methods (writeNonMetaProperties, writeRange, writeTokens, writeToken) that can be overridden. The nested enums (JsonNode, JsonRange, JsonTokenRange, JsonToken) group related constants rather than add behavior. The class contains no instance fields and delegates node property inspection to JavaParserMetaModel, so concerns (model introspection vs JSON emission) are reasonably separated. There is no excessive size, bloated interface, or multiple unrelated responsibilities to justify marking it as insufficiently modularized."
+}

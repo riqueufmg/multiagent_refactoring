@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "CachedReturnPlugin.AdviceResolver",
+    "detection": true,
+    "justification": [
+        "The enum combines multiple responsibilities: selecting a resolver for a type (of(TypeDefinition)), constructing a complex ByteBuddy dynamicType per enum constant (large constructor logic), and producing Advice instances (toAdvice).",
+        "Each enum constant holds a dynamicType field produced by substantial bytecode-generation logic (ByteBuddy.with(...).subclass(...).defineMethod(...).intercept(...).make()), which makes the enum carry heavy implementation details rather than delegating to smaller classes.",
+        "The enum nests a substantial bytecode implementation class (ExitAdviceByteCodeAppender) with many opcode operations and stack/label management. This class is a detailed implementation of bytecode emission that increases the enum's size and complexity.",
+        "The enum directly wires offset mapping (toAdvice binds CacheField to CacheFieldOffsetMapping) and dynamic type resolution, concentrating factory, construction and low-level bytecode-appending logic in one type rather than separating concerns into distinct, cohesive classes.",
+        "Presence of many distinct concerns (type-dispatch, dynamic type construction, advice binding, ASM-level bytecode appending) inside a single enum indicates insufficient decomposition for maintainability and understandability."
+    ]
+}

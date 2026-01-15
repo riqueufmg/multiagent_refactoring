@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["FileWriterWithEncoding.Builder"],
+    "detection": false,
+    "justification": [
+        "Builder is small and focused: it contains only two configurable fields (append, charsetEncoder) and simple setters for them.",
+        "Single responsibility: the class's sole purpose is to configure and build FileWriterWithEncoding instances (get() returns a new FileWriterWithEncoding(this)).",
+        "Delegation to other abstractions: it extends AbstractStreamBuilder and uses AbstractOrigin for file lookup (checkOriginFile), so file handling and stream initialization are delegated elsewhere.",
+        "No bloated interface or large methods: there are only a few short methods (constructor, checkOriginFile, get, getEncoder, setAppend, setCharsetEncoder) and no complex logic beyond a small validation in getEncoder().",
+        "IO and resource cleanup logic is implemented in FileWriterWithEncoding.initWriter rather than in the Builder, indicating proper separation of responsibilities."
+    ]
+}

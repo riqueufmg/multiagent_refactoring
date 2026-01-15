@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["BoundSet"],
+    "detection": true,
+    "justification": [
+        "Class size and multiple responsibilities: BoundSet holds the bounds collection and implements complex inference algorithms (deriveImpliedBounds, performResolution) that include constraint generation, capture handling, dependency analysis, instantiation selection and recursive incorporation—violating single-responsibility and indicating a bloated abstraction.",
+        "Large, long methods with mixed concerns: deriveImpliedBounds and performResolution contain long, multi-step procedures (many sequential rule blocks, constraint construction, and recursive flows). These methods would be clearer if decomposed into smaller classes or services each responsible for a distinct rule or phase.",
+        "Repeated internal iteration/processing patterns: Several near-duplicate pair-iteration helper methods (forEachPairSameAs, forEachPairSameAndSubtype, forEachPairSubtypeAndSubtype) and an internal Processor interface suggest extractable strategy/visitor components rather than embedding processing logic in one class.",
+        "Multiple private utility responsibilities: BoundSet contains many unrelated helper methods (dependency graph construction, subset generation, set combinatorics, instantiation lookup, capture checks, proper-upper-bound checks) that could be modularized into dedicated classes (dependency resolver, subset enumerator, instantiation chooser).",
+        "Tight coupling and instance-of branching: The class makes heavy use of instanceof checks (SameAsBound, SubtypeOfBound, CapturesBound, FalseBound) and directly manages interactions with many other types (ConstraintFormulaSet, Substitution, InferenceVariable, TypeSolver), increasing cohesion issues and indicating logic that could be delegated.",
+        "Presence of unimplemented/exceptional branches: Several capture-related branches and other complex behaviors throw UnsupportedOperationException inside deriveImpliedBounds and performResolution, suggesting the class is overloaded with responsibilities that are partially implemented and should be split to manage complexity and completeness."
+    ]
+}

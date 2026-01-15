@@ -1,0 +1,14 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": [
+        "GeneratedJavaParserTokenManager"
+    ],
+    "detection": true,
+    "justification": [
+        "Class size and density: the class contains a very large amount of code including many long methods (e.g. jjMoveNfa_0, getNextToken, many jjMoveStringLiteralDfaX methods) and dozens of large static arrays (jjbitVec0..jjbitVec93, jjstrLiteralImages, jjnextStates, jjtoToken, jjtoSkip, etc.), indicating a single monolithic unit rather than multiple focused classes.",
+        "Multiple responsibilities concentrated in one class: it handles token production (getNextToken, jjFillToken), lexical state management (curLexState, SwitchTo, ReInit), DFA/NFA transition logic (jjMoveStringLiteralDfa*, jjMoveNfa_0, jjCanMove_*), token actions and skipping (TokenLexicalActions, SkipLexicalActions, MoreLexicalActions), and comment/markdown parsing and storage (createMarkdownComment, CommonTokenAction, commentsCollection, markdownCommentTokens). These are distinct concerns that would be better modularized.",
+        "Large, low-level data + behavior coupling: DFA tables and bitvectors are declared and used directly inside the class (many jjbitVec arrays and next-state tables), coupling huge static data with parsing logic rather than separating a generated automaton/data from token-management and comment-processing logic.",
+        "Complex internal state and many helper methods: numerous private helper methods and state variables (jjrounds, jjstateSet, jjimage, image, jjimageLen, lengthOfMatch, curChar, etc.) make the class difficult to understand and maintain, which is symptomatic of insufficient decomposition into smaller, more cohesive classes.",
+        "Missed opportunities for decomposition: identifiable subsystems (automaton engine, token storage & comment collection, markdown comment assembly, lexical-action handlers) are all implemented in the same class rather than split into focused classes or modules, increasing cognitive load and reducing maintainability."
+    ]
+}

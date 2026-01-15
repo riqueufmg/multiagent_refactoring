@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": [
+        "MemberSubstitution.Dispatcher"
+    ],
+    "detection": true,
+    "justification": [
+        "The analysed source (MemberSubstitution) is a very large, monolithic class that concentrates many responsibilities: type-pool resolution (TypePoolResolver and its implementations), member targeting (Target and its ForMember/ForDynamicInvocation), substitution creation and resolution (Substitution and many nested implementations and factories: Stubbing, ForValue, ForFieldAccess, ForMethodInvocation, Chain, Chain.Factory, many Step implementations), replacement selection (Replacement and many implementations and factories: ForElementMatchers, ForDynamicInvocation, ForFirstBinding), bytecode visiting (SubstitutingMethodVisitor and its LocalVariableTracingMethodVisitor), complex offset/argument mapping (OffsetMapping and many nested classes and factories), dispatcher logic and bootstrap argument resolution (Dispatcher and BootstrapArgumentResolver and their nested types), plus many annotations and enums (This, Argument, AllArguments, FieldValue, Origin, Source, etc.).",
+        "The class mixes high-level orchestration (matching/selecting replacements) with low-level bytecode emission and stack/local-variable management (visitFieldInsn/visitMethodInsn/visitInvokeDynamicInsn, StackManipulation creation and application).",
+        "There are numerous large nested classes and many separate concepts that could be separated into smaller cohesive classes/modules (e.g., separate classes for replacement matching, substitution factories, offset mapping, dispatcher/bootstrap handling and method visitor), which indicates insufficient decomposition and modularization.",
+        "Because of its size, depth of nested types and variety of responsibilities, the class is difficult to understand, test, maintain, and evolve — consistent with the Insufficient Modularization smell."
+    ]
+}

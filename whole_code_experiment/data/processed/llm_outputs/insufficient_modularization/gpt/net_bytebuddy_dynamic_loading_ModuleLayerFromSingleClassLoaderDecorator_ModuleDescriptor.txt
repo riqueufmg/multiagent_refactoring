@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.dynamic.loading.ModuleLayerFromSingleClassLoaderDecorator",
+    "detection": true,
+    "justification": "The class concentrates many distinct responsibilities and large unrelated implementation details: (1) module-layer orchestration (fields moduleLayer, name, packages; methods apply, isSkipped; Factory.INSTANCE.make), (2) numerous JavaDispatcher proxy interfaces for JVM module APIs (ModuleDescriptor, ModuleLayer, ModuleLayerController, Configuration, ModuleFinder, Path, Optional, Stream), (3) dynamic type generation and class loader creation (SimpleModuleReference and SimpleModuleFinder CreationAction enums with heavy ByteBuddy code), and (4) resource/reader and finder implementations (nested AbstractModuleReader and AbstractModuleFinder). This results in high size and complexity, mixing module-creation logic, proxy definitions, dynamic bytecode generation, privileged actions and I/O handling in one class, indicating inadequate decomposition and multiple responsibilities that should be split into smaller, cohesive classes or modules."
+}

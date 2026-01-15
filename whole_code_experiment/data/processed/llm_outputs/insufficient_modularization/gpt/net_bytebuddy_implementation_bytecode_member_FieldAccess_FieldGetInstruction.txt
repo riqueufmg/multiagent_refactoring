@@ -1,0 +1,10 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.implementation.bytecode.member.FieldAccess.FieldGetInstruction",
+    "detection": false,
+    "justification": [
+        "The analysed type is a small, focused inner class whose sole responsibility is to provide the getter opcode and compute the stack size change for a field read; it overrides two simple methods and contains no unrelated functionality.",
+        "Related responsibilities are cleanly separated: the enclosing enum FieldAccess holds mode-specific state (opcodes, target size), AccessDispatcher encapsulates field-specific dispatching, and OfGenericField handles generic casting. This separation prevents a single large class from accumulating unrelated duties.",
+        "There are no large methods, bloated interfaces, or multiple unrelated responsibilities in this class or its immediate enclosing types; the implementation is cohesive and modular."
+    ]
+}

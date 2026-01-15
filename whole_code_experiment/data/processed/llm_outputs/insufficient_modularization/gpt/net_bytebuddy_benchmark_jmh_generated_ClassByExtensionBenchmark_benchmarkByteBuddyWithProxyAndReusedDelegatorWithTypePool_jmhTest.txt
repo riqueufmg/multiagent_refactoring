@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ClassByExtensionBenchmark_benchmarkByteBuddyWithProxyAndReusedDelegatorWithTypePool_jmhTest"],
+    "detection": true,
+    "justification": [
+        "The class is large and bundles many different responsibilities: benchmark lifecycle management, measurement for multiple modes, sampling, and state initialization. Examples: methods benchmarkByteBuddyWithProxyAndReusedDelegatorWithTypePool_Throughput, _AverageTime, _SampleTime, _SingleShotTime and their corresponding *_jmhStub variants all live in the same class.",
+        "There is substantial duplicated and mode-specific logic mixed together (warmup/warmdown loops, notifyControl handling, blackhole consumption) across the multiple benchmark mode methods rather than isolated helpers (see repeated blocks in each mode method).",
+        "The class contains many fields that increase its size and surface area (p000..p255 padding fields, startRndMask, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, f_classbyextensionbenchmark0_0), indicating a bloated interface and state that could be partitioned.",
+        "Sample handling and sampling algorithm (benchmarkByteBuddyWithProxyAndReusedDelegatorWithTypePool_sample_jmhStub, SampleBuffer usage, rnd/rndMask logic) are embedded alongside lifecycle and measurement code instead of being separated into a dedicated sampler/collector component."
+    ]
+}

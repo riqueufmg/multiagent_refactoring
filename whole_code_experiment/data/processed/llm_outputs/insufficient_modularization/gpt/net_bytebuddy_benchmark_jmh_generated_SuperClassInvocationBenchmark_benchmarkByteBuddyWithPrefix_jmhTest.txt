@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["SuperClassInvocationBenchmark_benchmarkByteBuddyWithPrefix_jmhTest"],
+    "detection": true,
+    "justification": [
+        "The class contains an extremely large number of fields including p000..p255 (256 byte padding fields) plus several state fields (startRndMask, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, f_superclassinvocationbenchmark0_0). The bloated field set increases size and responsibility.",
+        "It mixes multiple distinct responsibilities: orchestration for different benchmark modes (benchmarkByteBuddyWithPrefix_Throughput, _AverageTime, _SampleTime, _SingleShotTime), associated static stubs for execution and sampling (benchmarkByteBuddyWithPrefix_thrpt_jmhStub, _avgt_jmhStub, _sample_jmhStub, _ss_jmhStub), initialization (_jmh_tryInit_f_superclassinvocationbenchmark0_0), result construction and Blackhole management. These could be separated into smaller cohesive classes/modules.",
+        "There is duplicated and similar control flow across the mode-specific methods (warmup/warmdown loops, result post-processing), indicating opportunities to extract common orchestration logic rather than keeping large, repetitive methods in one class.",
+        "The presence of sampling logic, result aggregation, and lifecycle (setup/teardown) combined in a single class creates a bloated interface and complexity that harms understandability and maintainability."
+    ]
+}

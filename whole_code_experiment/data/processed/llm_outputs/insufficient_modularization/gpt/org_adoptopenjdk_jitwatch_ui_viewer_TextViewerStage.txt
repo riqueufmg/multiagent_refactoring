@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["TextViewerStage"],
+    "detection": true,
+    "justification": [
+        "The constructor performs multiple distinct responsibilities instead of delegating: normalizing input (replace tabs), splitting into lines (source.split(S_NEWLINE)), formatting (aligning line numbers via StringUtil.alignRight and concatenation), measuring content (computing maxLineLength), creating UI elements (new Label(lines[i]) and collecting them), and wiring the view (setContent(labels, maxLineLength)).",
+        "All logic is implemented inline in the constructor with no helper/private methods to decompose the steps (parsing, formatting, measurement, UI creation), reducing cohesion and testability.",
+        "Mutating the lines array in-place to add line numbers mixes data transformation with presentation concerns, indicating conflated responsibilities.",
+        "The class combines text-processing utilities and UI assembly; these concerns could be separated into smaller, focused classes or methods (e.g., LineFormatter, LineMetrics, LabelFactory), which would improve modularity and reuse."
+    ]
+}

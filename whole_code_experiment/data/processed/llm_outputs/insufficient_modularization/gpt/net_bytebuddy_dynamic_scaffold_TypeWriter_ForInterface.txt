@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["TypeWriter.ForInterface"],
+    "detection": true,
+    "justification": [
+        "The provided TypeWriter implementation is extremely large and accumulates many unrelated responsibilities in one compilation unit: type writing, validation, inlining, creation, rebasing/redefinition, decoration, class dumping, module patching and initialization handling (see nested classes Default, ForInlining, ForCreation, WithFullProcessing, WithDecorationOnly, ClassDumpAction, PatchingModuleVisitor, InitializationHandler, etc.).",
+        "Numerous distinct subsystems are implemented as nested types instead of separate modules/classes: pools and their records (FieldPool, MethodPool, RecordComponentPool and many Record implementations), validation (ValidatingClassVisitor and Constraint hierarchy), frame writing (FrameWriter and variants), remapping and visitors (OpenClassRemapper, RedefinitionClassVisitor, DecorationClassVisitor, CreationClassVisitor), and code-preserving/redefining method visitors. This indicates concentrated, mixed responsibilities.",
+        "Large cohesive blocks belonging to different concerns are intermingled: Default contains many fields and factory methods; ForInlining.WithFullProcessing holds complex logic for method reprocessing and contains many nested helper classes (e.g. RedefinitionClassVisitor, CodePreservingMethodVisitor, AttributeObtaining* visitors). This makes comprehension, testing and maintenance harder.",
+        "Many deeply nested and specialized inner classes (several dozen) suggest the class was not decomposed into smaller, focused classes or packages. Examples: MethodPool.Record's multiple inner classes (WithBody, WithoutBody, WithAnnotationDefaultValue, OfVisibilityBridge, AccessBridgeWrapper and their inner helper classes), and InitializationHandler's multiple Appending/WithDrain/WithoutDrain variants.",
+        "The file mixes high-level orchestration (factory methods for different writer strategies: forCreation/forRedefinition/forRebasing/forDecoration) with low-level bytecode/ASM manipulation details (visitMethod/visitField logic, frame emission, reader/writer flags). This cross-cutting of abstraction levels is characteristic of insufficient modularization."
+    ]
+}

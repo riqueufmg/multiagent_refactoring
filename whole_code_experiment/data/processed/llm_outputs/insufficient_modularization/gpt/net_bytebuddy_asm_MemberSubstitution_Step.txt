@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.asm.MemberSubstitution"],
+    "detection": true,
+    "justification": [
+        "The class is extremely large and contains many distinct responsibilities that are better split into separate types: bytecode member matching and selection (WithoutSpecification, Replacement.ForElementMatchers, Replacement.ForDynamicInvocation), substitution creation and resolution (Substitution and many nested implementations: Stubbing, ForValue, ForFieldAccess, ForMethodInvocation, Chain), delegation/offset-mapping machinery (Substitution.Chain.Step and its many nested Step implementations, OffsetMapping and its many nested implementations), dispatch/bootstrap argument resolution (Dispatcher, BootstrapArgumentResolver), type-pool resolution (TypePoolResolver and its nested implementations), and the ASM MethodVisitor implementation (SubstitutingMethodVisitor and its LocalVariableTracingMethodVisitor).",
+        "There are numerous large nested classes and enums (e.g. WithoutSpecification and its ForMatched* subclasses, Substitution.Chain and dozens of Step and OffsetMapping inner classes, Replacement and its Factory/ForFirstBinding/ForElementMatchers/ForDynamicInvocation variants) which concentrates a lot of functionality in a single compilation unit instead of modular units.",
+        "Several long, complex methods implement multiple flows. For example SubstitutingMethodVisitor.visitMethodInsn contains resolution, candidate selection, replacement binding, size calculation for constructors and general method invocations — mixing bytecode parsing, type resolution, and substitution application logic in one method.",
+        "The class also declares many annotations (This, Argument, AllArguments, SelfCallHandle, Handle, DynamicConstant, FieldValue, FieldGetterHandle, FieldSetterHandle, Origin, Unused, StubValue, Current) which are API elements that could be separated into a dedicated annotations/contract module to reduce the single class's surface.",
+        "Because of its size and the multiplicity of concerns (matching, resolving, substitution-building, delegation mapping, visitor traversal, and many factories), the class is hard to read, test, and maintain. These symptoms match Insufficient Modularization: a bloated abstraction that should be decomposed into smaller, cohesive classes."
+    ]
+}

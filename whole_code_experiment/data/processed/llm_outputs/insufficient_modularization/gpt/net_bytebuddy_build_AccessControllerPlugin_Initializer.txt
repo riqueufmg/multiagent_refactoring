@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.build.AccessControllerPlugin.Initializer",
+    "detection": false,
+    "justification": [
+        "The Initializer class has a single, well-defined responsibility: to implement a ByteCodeAppender that creates an initializer segment determining AccessController availability (implements ByteCodeAppender, holds instrumentedType and name).",
+        "Its public surface is small and cohesive: a constructor, apply(MethodVisitor, Implementation.Context, MethodDescription) and an abstract helper onAccessController(MethodVisitor) that delegates variant behavior.",
+        "Variant behavior is factored into two tiny nested strategy classes (WithProperty and WithoutProperty) that only implement onAccessController; these are small and focused, avoiding mixing unrelated concerns in Initializer itself.",
+        "Related but separate responsibilities (method wrapping/visitor logic and signature mapping) are implemented in other nested classes (AccessControlWrapper, PrefixingMethodVisitor) and static fields, so Initializer does not concentrate unrelated functionality.",
+        "Overall the class size, structure and clear separation of the strategy implementations indicate adequate modularization rather than a bloated, multi-responsibility abstraction."
+    ]
+}

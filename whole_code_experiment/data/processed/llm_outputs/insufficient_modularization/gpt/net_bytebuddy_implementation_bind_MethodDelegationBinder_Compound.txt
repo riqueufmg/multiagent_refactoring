@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "MethodDelegationBinder",
+    "detection": true,
+    "justification": "The MethodDelegationBinder interface aggregates many distinct responsibilities and large amounts of implementation: it defines compilation and binding (Record), invocation strategies (MethodInvoker and Virtual), parameter binding types (ParameterBinding with Anonymous and Unique), method binding construction (MethodBinding with Builder and Build), binding resolution strategies (BindingResolver with Default, Unique, StreamWriting), ambiguity resolution (AmbiguityResolver with Resolution, NoOp, Directional, Compound and multiple resolvers), termination handling (TerminationHandler with Default), and a Processor orchestration class. These numerous nested interfaces, enums and concrete classes (e.g. Builder/Build, StreamWriting, AmbiguityResolver.Compound, BindingResolver.Default) indicate a bloated, multi-responsibility abstraction that would be clearer and more maintainable if decomposed into separate, cohesive types (e.g. separate ambiguity-resolver, binding-resolver, parameter-binding, invocation and processor classes). The concentration of many roles and implementation details in one top-level interface is characteristic of insufficient modularization."
+}

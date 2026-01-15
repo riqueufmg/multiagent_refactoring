@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "LastModifiedFileComparator",
+    "detection": false,
+    "justification": [
+        "The class is small and focused: it contains only a no-arg constructor, two static comparator instances, a serialVersionUID, and a single compare(File, File) method.",
+        "Single responsibility: its sole responsibility is comparing files by last-modified timestamp, so it is cohesive and not combining unrelated concerns.",
+        "Delegation is used for file timestamp access (FileUtils.lastModifiedUnchecked), so I/O/timestamp retrieval logic is not embedded in the comparator.",
+        "Reverse behavior is provided by a separate ReverseFileComparator wrapping this comparator, indicating responsibilities are separated rather than bloated into one class.",
+        "No large interface or numerous fields/methods that would indicate an undecomposed abstraction; therefore the class does not exhibit insufficient modularization."
+    ]
+}

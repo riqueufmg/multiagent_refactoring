@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "GeneralAppIdDecoder",
+    "detection": true,
+    "justification": [
+        "The class is large and handles multiple distinct responsibilities: bit-level extraction (extractNumericValueFromBitArray), parsing/control flow (decodeAllCodes, decodeGeneralPurposeField, parseBlocks), encoding-specific decoding (decodeNumeric, decodeAlphanumeric, decodeIsoIec646) and state/latch management (isStillNumeric, isStillAlpha, isStillIsoIec646, isAlphaOr646ToNumericLatch, isAlphaTo646ToAlphaLatch, isNumericToAlphaNumericLatch).",
+        "There is duplicated/related logic that could be split into cohesive components: three separate decoding strategies (numeric, alphanumeric, ISO/IEC 646) are all implemented in this single class rather than as specialized decoders, increasing complexity and reducing clarity.",
+        "Large conditional logic and long methods: parseBlocks orchestrates switching between modes and calls multiple block parsers; parseIsoIec646 and decodeIsoIec646 contain extensive branching and a long switch mapping many numeric codes to characters — a sign that mapping/data could be extracted into a table or separate mapper.",
+        "Mixed abstraction levels: low-level bit manipulation (extractNumericValueFromBitArray) and high-level parsing/format interpretation (FieldParser.parseFieldsInGeneralPurpose used in decodeAllCodes) coexist in the same class instead of being separated into utility/strategy classes.",
+        "Because responsibilities are concentrated here, maintenance and extension (e.g., adding new encodings or modifying mapping tables) will require changing a single large class rather than small focused modules, indicating inadequate decomposition."
+    ]
+}

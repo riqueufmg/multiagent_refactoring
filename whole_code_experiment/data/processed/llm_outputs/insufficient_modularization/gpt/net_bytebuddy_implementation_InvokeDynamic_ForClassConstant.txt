@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.implementation.InvokeDynamic"],
+    "detection": true,
+    "justification": [
+        "The class is very large and contains many distinct responsibilities: constructing a user-facing DSL (numerous withXValue/withArgument/withField/withType methods), providing argument/target/name/return-type provider abstractions (InvocationProvider, NameProvider, ReturnTypeProvider), many concrete ArgumentProvider implementations for distinct constant types (ForBooleanConstant, ForIntegerConstant, ForStringConstant, ForClassConstant, ForEnumerationValue, ForInstance, ForField, etc.), delegation/bridging logic (AbstractDelegator and nested WithImplicit* classes), and the bytecode generation (Appender).",
+        "There is dense nesting of many inner classes and enums (InvocationProvider, InvocationProvider.ArgumentProvider with many concrete implementations, InvocationProvider.Target and Resolved, NameProvider, ReturnTypeProvider, TerminationHandler, AbstractDelegator, WithImplicitArguments, WithImplicitTarget, WithImplicitType and its nested OfInstance/OfArgument/OfField, Appender). This indicates concentration of multiple abstractions in a single top-level class rather than separate modular components.",
+        "Repeated patterns and large switch-like branching across many tiny argument types (e.g. withBooleanValue/withByteValue/.../withDoubleValue, ConstantPoolWrapper enum mapping many wrapper types to providers) suggest opportunities to factor out separate builder/factory classes and to move constant-handling implementations out of the core class to reduce size and complexity.",
+        "Mixing high-level DSL/API surface (bootstrap/lambda/... builder methods) with low-level responsibilities (instrumented type preparation, field creation via ForInstance.prepare, and bytecode emission in Appender.apply) violates separation of concerns and makes the class hard to understand and maintain. For example, Appender directly depends on many nested provider implementations and on assigner/typing logic.",
+        "Because the class bundles many mutually independent variations (name/return-type providers, argument providers, target resolution and appending) it would benefit from decomposition into separate classes/modules (e.g., dedicated argument-provider hierarchy, a builder DSL class, and a bytecode-emission class) to improve cohesion and maintainability."
+    ]
+}

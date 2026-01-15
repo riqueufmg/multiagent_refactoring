@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["AbstractTopListVisitable"],
+    "detection": false,
+    "justification": [
+        "The class is small and focused: it holds three fields (model, topList, sortHighToLow) and provides a single high-level operation buildTopList() that coordinates traversal and sorting.",
+        "Traversal is delegated to TreeVisitor.walkTree(model, this), so the class does not embed tree-walking logic and therefore avoids mixing unrelated responsibilities.",
+        "Extension hooks (empty reset(), visitTag(...), and postProcess()) indicate designed points for subclassing rather than accumulating disparate responsibilities in one class.",
+        "Sorting is a simple, localized operation (anonymous Comparator inside buildTopList()) and does not indicate excessive size or complexity warranting further decomposition.",
+        "No large number of unrelated methods or many fields are present, and the class responsibilities (collecting scores and returning a sorted top list) are cohesive."
+    ]
+}

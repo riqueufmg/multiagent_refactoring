@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "JsonElement",
+    "detection": false,
+    "justification": [
+        "The class is small and cohesive: it represents the single abstraction 'JSON element' and provides a narrow set of related responsibilities (type checks, safe casts to concrete JsonObject/JsonArray/JsonPrimitive/JsonNull, conversion accessors, deepCopy contract, and toString serialization).",
+        "Many methods (getAsBoolean, getAsNumber, getAsString, getAsDouble, etc.) are thin stubs that throw UnsupportedOperationException and are intended to be overridden by concrete subclasses (JsonPrimitive, JsonArray, etc.), so behavior is properly delegated rather than centralized into a bloated implementation.",
+        "toString() delegates serialization to Streams/JsonWriter and does not introduce unrelated responsibilities or heavy logic within this class.",
+        "There are no large fields, lengthy methods, or mixed unrelated concerns that indicate a single class is doing work that should be split into multiple abstractions.",
+        "Therefore the class is adequately modularized for its purpose and does not exhibit the 'Insufficient Modularization' smell."
+    ]
+}

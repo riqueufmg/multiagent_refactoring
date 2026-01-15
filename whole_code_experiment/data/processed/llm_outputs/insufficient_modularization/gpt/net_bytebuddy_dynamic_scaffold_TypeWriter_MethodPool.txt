@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.dynamic.scaffold.TypeWriter.MethodPool"],
+    "detection": true,
+    "justification": [
+        "The MethodPool abstraction (and specifically its nested Record hierarchy) combines a large number of distinct responsibilities in a single interface/type: method sort semantics (Sort enum), representation of non-implemented/defined/implemented methods, byte-code appending, attribute/appender handling, bridge generation and accessor bridge wrapping.",
+        "There are many large, concrete nested classes inside MethodPool.Record: ForNonImplementedMethod; ForDefinedMethod (with nested WithBody, WithoutBody, WithAnnotationDefaultValue, OfVisibilityBridge and VisibilityBridge); AccessBridgeWrapper (with AccessorBridge and BridgeTarget). Each of these contains substantial logic (creating MethodVisitor/ClassVisitor calls, generating byte code via ByteCodeAppender, handling visibility/bridges, applying MethodAttributeAppender, annotation filtering, etc.).",
+        "The record implementations reach into low-level bytecode concerns and ASM APIs (ClassVisitor, MethodVisitor, AnnotationVisitor, ByteCodeAppender.Size, MethodInvocation, MethodVariableAccess, MethodReturn, TypeCasting, etc.), mixing high-level method-pool policy with low-level code emission and bridge-creation mechanics.",
+        "This concentration of many behaviors and concrete implementations inside a single nested hierarchy results in a bloated, complex component that is hard to understand and maintain; the different responsibilities (policy/sorts, code generation, attribute handling, bridge generation, wrapping/delegation) are natural candidates to be split into separate, focused types.",
+        "Therefore the class exhibits Insufficient Modularization: it is not adequately decomposed and centralizes too much functionality in one place."
+    ]
+}

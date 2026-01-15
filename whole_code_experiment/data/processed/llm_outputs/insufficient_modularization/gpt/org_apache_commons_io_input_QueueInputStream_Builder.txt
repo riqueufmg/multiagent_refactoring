@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "QueueInputStream.Builder",
+    "detection": false,
+    "justification": [
+        "The Builder class is small and focused: it only holds two configuration fields (blockingQueue, timeout) and provides setters for them plus a get() method to build the QueueInputStream.",
+        "Setter methods perform minimal, appropriate validation (non-negative timeout, null mapping for blockingQueue) and return the builder for chaining — no unrelated responsibilities are present.",
+        "Construction logic is delegated to QueueInputStream (via get()), and the class extends AbstractStreamBuilder, indicating proper use of the builder abstraction rather than embedding extra functionality.",
+        "There is no evidence of excessive size, bloated interface, or mixing of responsibilities that would indicate a need to decompose this class further."
+    ]
+}

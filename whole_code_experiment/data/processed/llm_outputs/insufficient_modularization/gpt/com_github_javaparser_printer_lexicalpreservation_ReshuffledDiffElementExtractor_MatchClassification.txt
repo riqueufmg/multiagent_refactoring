@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ReshuffledDiffElementExtractor"],
+    "detection": true,
+    "justification": [
+        "The extract(...) method is very large and does many distinct tasks: computing correspondences, building mappings (correspondanceBetweenNextOrderAndPreviousOrder), determining insertion points (elementsToAddBeforeGivenOriginalCSMElement / elementsToBeAddedAtTheEnd), iterating and mutating the input iterator (remove/add). The length and multiple responsibilities indicate low modularity and poor cohesion.",
+        "getCorrespondanceBetweenNextOrderAndPreviousOrder(...) contains nested iterators and search logic, including expensive contains(...) checks inside loops and management of syncNextIndex; this complex matching algorithm is a separate concern that could be extracted to a dedicated mapper class or utility.",
+        "findIndexOfCorrespondingNodeTextElement(...) mixes iteration over CSM elements and NodeText elements, match classification logic (building potentialMatches using MatchClassification enum), and priority selection. This method implements non-trivial matching policy and would be clearer as smaller methods or a matcher component.",
+        "The class bundles multiple responsibilities: correspondence mapping, classification (MatchClassification), index resolution between NodeText and CSM, and mutation of DifferenceElement sequences. Those distinct responsibilities suggest the class is doing more than a single cohesive job and should be decomposed.",
+        "Presence of the inner enum MatchClassification and its usage inside a large matching method reinforces that matching/classification logic is embedded in the extractor rather than being separated, contributing to the smell."
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.benchmark.jmh_generated.SuperClassInvocationBenchmark_benchmarkByteBuddyWithProxy_jmhTest",
+    "detection": true,
+    "justification": [
+        "The class is large and combines many responsibilities: benchmark mode orchestration, measurement stubs, sampling logic, lifecycle/init logic, result aggregation and Blackhole management (e.g. methods benchmarkByteBuddyWithProxy_Throughput, benchmarkByteBuddyWithProxy_AverageTime, benchmarkByteBuddyWithProxy_SampleTime, benchmarkByteBuddyWithProxy_SingleShotTime, and the various *_jmhStub methods).",
+        "There is substantial duplicated/parallel code across modes (nearly identical setup/warmup/teardown sequences repeated in each benchmarkByteBuddyWithProxy_* method), indicating poor decomposition of common behavior.",
+        "The presence of many low-level helper static stubs that implement distinct measurement strategies (benchmarkByteBuddyWithProxy_thrpt_jmhStub, _avgt_jmhStub, _sample_jmhStub, _ss_jmhStub) placed in the same class increases class complexity and mixes high-level orchestration with low-level sampling/measurement details.",
+        "A large set of padding fields (p000 .. p255) and multiple state fields (startRndMask, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, f_superclassinvocationbenchmark0_0) make the class's state bloated, contributing to a bloated interface and harder-to-understand class responsibilities.",
+        "Lifecycle and initialization for the benchmark subject are managed inside the same class (_jmh_tryInit_f_superclassinvocationbenchmark0_0 and direct calls to val.setUp()), coupling benchmark infrastructure with benchmark instance management instead of modularizing them."
+    ]
+}

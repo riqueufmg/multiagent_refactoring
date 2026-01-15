@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "TypeWriter.ForImplicitRecordComponent",
+    "detection": true,
+    "justification": "The analyzed source is a single top-level TypeWriter interface that contains a very large number of deeply nested interfaces and classes (FieldPool, MethodPool, RecordComponentPool, Default and many numerous nested implementations such as Default.ForInlining, Default.ForInlining.WithFullProcessing, RedefinitionClassVisitor, ValidatingClassVisitor, ClassDumpAction, etc.). Responsibilities span many concerns: field/method/record-component pool semantics, class validation, class file dumping, inlining/rebasing/redefinition logic, ASM visitor wiring, frame writing, module patching and auxiliary type management. The presence of extremely large classes and methods (e.g. Default and its nested ForInlining/WithFullProcessing and RedefinitionClassVisitor with many inner visitors and handlers) indicates a bloated abstraction that mixes multiple responsibilities and implementation details. The specific small class ForImplicitRecordComponent is embedded within this huge monolithic type rather than being placed in a more focused component, increasing coupling and reducing cohesion. These factors show the abstraction has not been adequately decomposed and therefore exhibits Insufficient Modularization."
+}

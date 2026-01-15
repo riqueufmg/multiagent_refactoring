@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "MethodRebaseResolver",
+    "detection": true,
+    "justification": [
+        "The interface file contains many distinct responsibilities packed together: the public API (MethodRebaseResolver), multiple Resolution variants (Preserved, ForRebasedMethod, ForRebasedConstructor), nested types describing rebased methods/constructors (RebasedMethod, RebasedConstructor) and a full Default implementation with construction logic.",
+        "Default.make(...) performs complex construction logic (placeholder auxiliary type creation, iterating declared methods, distinguishing constructors vs. methods, building resolutions and auxiliary types) which is more than a simple resolver behavior and mixes factory logic, bookkeeping, and type generation.",
+        "Nested RebasedMethod and RebasedConstructor implement method-description transformation logic (return types, parameters, modifiers, internal names) which represent separate concerns that could be extracted to dedicated classes to reduce the size and coupling of the interface file.",
+        "The large number of nested classes and responsibilities concentrated in one unit increases complexity, coupling and maintenance burden (mapping resolutions, auxiliary type lifecycle, signature transformation and token-map conversion), indicating insufficient decomposition into smaller, cohesive modules."
+    ]
+}

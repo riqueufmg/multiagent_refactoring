@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["InvokeDynamic.ForInterceptedMethodParameters"],
+    "detection": false,
+    "justification": [
+        "The analyzed class is a very small, focused enum singleton (INSTANCE) implementing ArgumentProvider with only two trivial methods: resolve(...) and prepare(...).",
+        "resolve(...) has a single clear responsibility: load all method arguments (MethodVariableAccess.allArgumentsOf(instrumentedMethod)) and provide their erased types (instrumentedMethod.getParameters().asTypeList().asErasures()).",
+        "prepare(...) is a no-op that returns the instrumented type, indicating minimal preparatory concern.",
+        "There are no extra fields, no large methods, and no unrelated responsibilities concentrated in this class. Its interface is minimal and cohesive, so it does not exhibit excessive size, complexity, or a bloated interface indicative of insufficient modularization."
+    ]
+}

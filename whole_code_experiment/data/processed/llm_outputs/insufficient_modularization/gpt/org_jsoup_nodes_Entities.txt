@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "Entities",
+    "detection": true,
+    "justification": "The Entities class bundles many distinct responsibilities into one large class: entity data storage and loading (load(), EscapeMode inner enum with nameKeys/codeVals/codeKeys/nameVals, multipoints map, BaseCount/baseSorted), escaping and unescaping logic (escape, escapeString, doEscape, appendEscaped, appendEncoded, appendNbsp, appendApos), charset/encoder handling and caching (CoreCharset, encoderFor, LocalEncoder, canEncode), XML character validation (isValidXmlChar), and prefix matching/parsing utilities (findPrefix, CharacterReader use in load). It also defines multiple configuration flags and large methods (doEscape, appendEscaped, load) that mix parsing, encoding, and formatting logic. The concentration of parsing, data construction, escaping algorithms, and encoding utilities in a single class indicates it is not adequately decomposed and would benefit from splitting into focused modules (e.g., entity data loader/model, escaper, encoder utility, XML validator)."
+}

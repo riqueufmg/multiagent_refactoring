@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "TypeWriter.WithDrain",
+    "detection": true,
+    "justification": "The analyzed class (the WithDrain inner class and its surrounding nested hierarchy within TypeWriter.Default) centralizes multiple, distinct responsibilities and is highly complex and tightly coupled to many concerns. Evidence: it defines its own control-flow labels (fields appended and original), manages ASM visitor lifecycle methods (visitCode, visitInsn, visitEnd, visitMaxs), computes and records stack/local sizes, coordinates frame writing via FrameWriter, applies method pool records and annotation filters (MethodPool.Record, AnnotationValueFilter.Factory), and contains multiple specialized nested subclasses (WithoutActiveRecord, WithActiveRecord) that duplicate and vary behavior. Moreover, it is embedded in a very large enclosing class that also implements many unrelated responsibilities (class creation, inlining, redefinition, validation, dumping, many visitor implementations). The combination of low-level bytecode manipulation, frame emission, initialization draining logic, and attribute/record handling in a single nested type indicates that the abstraction has not been decomposed into cohesive, smaller modules, making it hard to understand, test, and maintain."
+}

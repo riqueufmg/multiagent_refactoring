@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ClassInjector.UsingReflection"],
+    "detection": [true],
+    "justification": [
+        "The UsingReflection class is very large and contains many distinct responsibilities beyond a single abstraction: reflective class injection logic, security manager checks, package definition/sealing handling, dispatcher creation and strategy selection, and multiple platform-specific dispatch implementations.",
+        "It declares numerous static fields and factory-like behaviors (DISPATCHER, SYSTEM, CHECK_PERMISSION) and a complex injectRaw method that performs package resolution, sealing checks and class definition, indicating a mix of concerns (resource resolution, security, and definition).",
+        "The nested Dispatcher interface includes many nested types (Initializable, CreationAction, Direct with ForJava7CapableVm/ForLegacyVm, UsingUnsafeInjection, UsingUnsafeOverride and Unavailable) each implementing different injection strategies and low-level platform handling. This deep nesting concentrates a lot of platform-specific and fallback logic inside one class rather than separate, cohesive modules.",
+        "CreationAction.run() and other factory methods contain heavy branching and fallback logic (choosing between Unsafe, Unsafe override, direct reflection), increasing complexity and making the class hard to understand and maintain.",
+        "Multiple distinct implementation details (reflection access, Unsafe-based injection, injected accessor generation, security permission checks, package definition edge-case handling) suggest these concerns could be decomposed into separate classes/modules (e.g., separate dispatchers/strategies, package-definition helper, security/access-control helper)."
+    ]
+}

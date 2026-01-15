@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "FieldProxy.Binder.FieldSetter",
+    "detection": false,
+    "justification": "The FieldSetter class has a single, well-focused responsibility: to implement bytecode for a field setter. It implements Implementation and exposes only small, cohesive behavior (prepare and appender). Its state is limited to three related fields (fieldDescription, assigner, methodAccessorFactory) and it delegates the bytecode construction details to its nested Appender class (which implements ByteCodeAppender and contains the stack manipulation logic to load the instance/argument, perform assignments, invoke the setter and return). There is no sign of unrelated responsibilities, large branching logic, or a bloated API within this class, so it is adequately modularized."
+}

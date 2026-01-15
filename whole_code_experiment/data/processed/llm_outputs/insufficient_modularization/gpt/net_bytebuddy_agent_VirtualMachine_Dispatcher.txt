@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["VirtualMachine.Dispatcher"],
+    "detection": true,
+    "justification": [
+        "The Dispatcher abstraction contains multiple large, platform-specific implementations and many nested types in one place: ForJnaPosixEnvironment and ForJnaWindowsEnvironment are implemented as long inner classes inside the Dispatcher, each with their own native-binding interfaces (PosixLibrary, SolarisLibrary, WindowsLibrary, WindowsAttachLibrary) and many helper types (PosixOwnerProvider with UsingStat and UsingIStat, AttachmentHandle, etc.).",
+        "These implementations combine many distinct responsibilities: process inspection (pid, userId, isExistingProcess), file ownership/permissions (getOwnerIdOf, setPermissions, chownFileToUser), semaphore handling (incrementSemaphore, decrementSemaphore, notifySemaphore), temporary-folder resolution, and low-level native bindings. The mixing of platform logic, OS-specific system calls, IPC/semaphore management and file utilities indicates a bloated responsibility set.",
+        "Several large, complex methods and inner classes increase cognitive complexity and reduce cohesion: e.g., notifySemaphore (POSIX semaphore logic), getOwnerIdOf implementations (UsingStat and UsingIStat run external commands and parse output), and Windows openSemaphore with CreateMutex/OpenSemaphore/CreateSemaphore sequences and AttachmentHandle. These would be easier to maintain and test if split into focused modules.",
+        "The presence of many native/JNA bindings and platform-specific helpers nested under the Dispatcher makes reuse and testing harder (hard to mock or replace single concerns) and suggests these should be separated into dedicated platform adapters and native-binding classes.",
+        "Therefore Dispatcher is insufficiently modularized: it concentrates multiple responsibilities and large platform-specific implementations in one nested abstraction rather than decomposing them into smaller, cohesive components."
+    ]
+}

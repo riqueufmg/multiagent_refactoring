@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "TypeInitializer",
+    "detection": false,
+    "justification": "The TypeInitializer abstraction is small and cohesive: it defines a concise interface (isDefined, expandWith, wrap) and extends ByteCodeAppender to represent a type's static initializer. Related helper types are nested and focused: Drain (with Default implementation) encapsulates writing the initializer to a ClassVisitor; None is a singleton no-op implementation; Simple wraps a ByteCodeAppender and delegates apply/expandWith/wrap behavior. Responsibilities are closely related to the single concept of a type initializer, implementations delegate to ByteCodeAppender or method pool components, and there is no evidence of excessive size, unrelated functionality, or a bloated interface that would justify decomposing this abstraction further."
+}

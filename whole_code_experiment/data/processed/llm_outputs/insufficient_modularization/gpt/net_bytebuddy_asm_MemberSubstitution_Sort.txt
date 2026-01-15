@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.asm.MemberSubstitution",
+    "detection": true,
+    "justification": [
+        "Extremely large, monolithic class that combines many distinct responsibilities: API surface (builder-like methods: field(), method(), constructor(), lambdaExpression(), dynamic(...)), bytecode visiting/manipulation (SubstitutingMethodVisitor and its visitFieldInsn/visitMethodInsn/visitInvokeDynamicInsn implementations), substitution logic (Substitution, Substitution.Chain, Step and many Step implementations), replacement selection (Replacement and multiple Replacement implementations/factories), offset mapping and delegation (OffsetMapping and many nested implementations), dispatching/bootstrap resolution (Dispatcher and BootstrapArgumentResolver), and many nested annotation types (This, Argument, AllArguments, SelfCallHandle, Handle, DynamicConstant, FieldValue, FieldGetterHandle, FieldSetterHandle, Origin, Unused, StubValue, Current).",
+        "Very high internal complexity and deep nesting: dozens of inner classes, enums and interfaces (e.g. WithoutSpecification and its several ForMatched* subclasses, Substitution.* nested classes, Replacement.* nested classes, Substitution.Chain with many inner Step implementations and nested OffsetMapping types). This indicates multiple abstractions collapsed into one top-level class.",
+        "Long methods with multiple responsibilities: visitFieldInsn, visitMethodInsn and visitInvokeDynamicInsn implement resolution, matching, binding and writing of replacement bytecode plus stack/local variable bookkeeping, instead of delegating to smaller focused collaborators.",
+        "Many factory classes and resolution strategies are embedded as inner classes rather than separated modules, increasing coupling and making the single class hard to understand, test and maintain (e.g. Replacement.Factory.Compound, Replacement.ForElementMatchers.Factory, numerous Step.Factory and OffsetMapping.Factory implementations).",
+        "Contains both high-level configuration/building API and low-level bytecode generation details in one unit: this mixes concerns that should be modularized (API/specification vs. runtime/runtime-resolution vs. bytecode emission).",
+        "The breadth of functionality (type-pool resolution, method graph compiling, assigner/typing decisions, invokedynamic/bootstrap handling, delegation offset mappings, local variable tracing, stack size buffer management) demonstrates that the abstraction has not been decomposed into cohesive, smaller classes."
+    ]
+}

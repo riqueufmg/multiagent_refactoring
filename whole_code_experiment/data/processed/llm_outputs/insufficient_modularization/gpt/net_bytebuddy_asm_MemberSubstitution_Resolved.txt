@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.asm.MemberSubstitution",
+    "detection": true,
+    "justification": [
+        "The class is extremely large and contains a very high number of nested types and responsibilities (examples: WithoutSpecification and its ForMatched* subclasses; TypePoolResolver and its implementations; Target and its ForMember/ForDynamicInvocation; Substitution and its many nested implementations including Stubbing, ForValue, ForFieldAccess, ForMethodInvocation, Chain and many Step implementations; Replacement and its many Factory/Binding implementations; SubstitutingMethodVisitor and its LocalVariableTracingMethodVisitor).",
+        "Multiple distinct concerns are combined in one top-level type: API/builders for configuring substitutions, complex bytecode visitation and transformation (SubstitutingMethodVisitor.visitFieldInsn / visitMethodInsn / visitInvokeDynamicInsn / visitMaxs), numerous factory/resolver implementations, delegation/offset-mapping logic and many annotation definitions (This, Argument, AllArguments, SelfCallHandle, Handle, DynamicConstant, FieldValue, FieldGetterHandle, FieldSetterHandle, Origin, Unused, StubValue, Current). These are orthogonal responsibilities that should be separated.",
+        "The Substitution.Chain and its nested Step implementations alone encode a separate substitution-step pipeline with many factories and resolution flows (argument substitution, field access steps, invocation steps, delegation with offset mapping and dispatchers). That logic is complex enough to warrant its own module/class hierarchy instead of being embedded inside MemberSubstitution.",
+        "SubstitutingMethodVisitor mixes parsing/locating types via a TypePool, binding to Replacement, computing stack/local requirements and applying StackManipulations. These are implementation concerns for bytecode transformation and would be clearer and more maintainable if extracted into dedicated visitors/services.",
+        "The sheer breadth of nested classes, enums and factories (many named Factory, Resolver, For* etc.) and the presence of many detailed validation branches (e.g. in ForFieldAccess.resolve, ForMethodInvocation.resolve, many OffsetMapping resolution paths) indicate the class is doing work that could be decomposed into smaller, cohesive classes, improving readability, testability and modularity."
+    ]
+}

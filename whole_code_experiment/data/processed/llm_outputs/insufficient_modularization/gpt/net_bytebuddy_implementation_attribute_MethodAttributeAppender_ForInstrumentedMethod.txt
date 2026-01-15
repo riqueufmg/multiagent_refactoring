@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "MethodAttributeAppender.ForInstrumentedMethod",
+    "detection": false,
+    "justification": "The enum has a single clear responsibility: append annotations for an instrumented method. Its apply(...) method coordinates steps (return type, type variables, method annotations, parameter annotations, receiver, exceptions) but delegates type-specific work to AnnotationAppender.ForTypeAnnotations and uses small, focused helpers (per-parameter appenders, appendReceiver hook). The two enum constants only vary the receiver handling via a small overridden method. Related responsibilities are already separated into nested classes (Explicit, ForReceiverType, Compound) and external helpers, so the class is cohesive and not excessively bloated."
+}

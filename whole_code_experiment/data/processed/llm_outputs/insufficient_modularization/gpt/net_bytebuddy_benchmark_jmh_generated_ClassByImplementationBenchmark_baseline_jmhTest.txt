@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ClassByImplementationBenchmark_baseline_jmhTest"],
+    "detection": true,
+    "justification": [
+        "The class is very large and contains many distinct responsibilities: benchmark orchestration (baseline_* methods), measurement stubs (baseline_thrpt_jmhStub, baseline_avgt_jmhStub, baseline_sample_jmhStub, baseline_ss_jmhStub), initialization (_jmh_tryInit_f_classbyimplementationbenchmark0_0), and state/padding fields. These are separable concerns that could be modularized.",
+        "There is a bloated interface and duplicated structure across multiple methods: repeated setup/warmup/measurement/warmdown/teardown sequences exist in baseline_Throughput, baseline_AverageTime, baseline_SampleTime, baseline_SingleShotTime — indicating code that could be factored into shared helpers or smaller classes.",
+        "The class declares an excessive number of fields (byte p000 .. p255) alongside benchmark-related fields (benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, startRndMask, f_classbyimplementationbenchmark0_0), increasing size and reducing cohesion.",
+        "Large methods and long procedural code (e.g., sample collection logic, control loops, and result assembly) concentrate multiple responsibilities in a single class rather than delegating to specialized components (e.g., sampler, result assembler, lifecycle manager)."
+    ]
+}

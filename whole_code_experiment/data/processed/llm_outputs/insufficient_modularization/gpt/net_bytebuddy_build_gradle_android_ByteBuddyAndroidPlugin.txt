@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ByteBuddyAndroidPlugin"],
+    "detection": true,
+    "justification": [
+        "The class is very large and contains many distinct responsibilities: plugin application, variant handling, runtime classpath resolution, transformation dispatching, configuration/attribute wiring, dependency compatibility rules, and view configuration.",
+        "Numerous nested types implement different behaviors (VariantAction, RuntimeClassPathResolver with OfLegacyAgp and OfModernAgp, ByteBuddyTransformationConfiguration, multiple Action implementations, ByteBuddyDependencyRule, TransformationDispatcher with ForLegacyAndroid and ForApk74CompatibleAndroid, ByteBuddyViewConfiguration). This indicates multiple cohesive concerns concentrated in one top-level class.",
+        "Complex static initialization with reflection (RESOLUTION of TRANSFORMATION_DISPATCHER) and conditional logic increases class complexity and mixes platform-detection logic with plugin functionality.",
+        "Multiple unrelated APIs are handled here: Gradle plugin lifecycle (apply), configuration creation/caching (ConcurrentMap configurations), artifact/view setup, task registration, and attribute compatibility rules—suggesting opportunities to split into smaller, focused classes.",
+        "Because the class bundles configuration actions, runtime resolution strategies, task wiring, and compatibility rules, it will be harder to understand, test, and maintain compared to a design that separates these concerns."
+    ]
+}

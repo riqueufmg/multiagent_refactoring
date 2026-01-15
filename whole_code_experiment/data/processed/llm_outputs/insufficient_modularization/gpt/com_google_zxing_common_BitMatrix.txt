@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["BitMatrix"],
+    "detection": false,
+    "justification": [
+        "The class represents a single, well-defined abstraction (a 2D bit matrix) and most public methods operate on that abstraction: get, set, unset, flip, clear, xor, setRegion, getRow/setRow, rotate/rotate90/rotate180, getEnclosingRectangle, getTopLeftOnBit, getBottomRightOnBit, toString/parse, equals/hashCode/clone.",
+        "Row-level responsibilities are already delegated to a separate BitArray class (getRow, setRow use BitArray), showing deliberate decomposition rather than a monolithic implementation.",
+        "Methods are focused and relatively small; rotation logic is split into rotate/rotate90/rotate180 and parsing has dedicated static parse methods — these are cohesive utilities closely tied to the BitMatrix abstraction rather than unrelated concerns.",
+        "There is no evidence of unrelated responsibilities (e.g., I/O, persistence, UI) being mixed into the class; therefore it does not exhibit the hallmark signs of insufficient modularization (excessive unrelated responsibilities or an extremely bloated, unfocused interface)."
+    ]
+}

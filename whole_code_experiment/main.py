@@ -26,9 +26,9 @@ def main():
     ]
 
     smell_list = [
-        "God Component",
+        #"God Component",
         #"Unstable Dependency",
-        #"Insufficient Modularization",
+        "Insufficient Modularization",
         #"Hublike Modularization"
     ]
 
@@ -74,10 +74,15 @@ def main():
         input_csv = candidates_dir / f"{smell_name.replace(' ', '_').lower()}.csv"
         output_csv = sample_dir / f"{smell_name.replace(' ', '_').lower()}_sample.csv"
 
+        if smell_name == "God Component" or smell_name == "Unstable Dependency":
+            sample_size = 183
+        else:
+            sample_size = 360
+
         filter.sample_candidates(
             candidates_csv=input_csv,
             sample_csv=output_csv,
-            sample_size=100,
+            sample_size=sample_size,
             ratio_positive=0.1
         )'''
 
@@ -100,7 +105,7 @@ def main():
     inference.detect_gpt(list_of_prompt_files)'''
 
     # 5.2 Unstable Dependency
-    candidates_csv = Path("data/processed/candidates_sampled/unstable_dependency_sample.csv")
+    '''candidates_csv = Path("data/processed/candidates_sampled/unstable_dependency_sample.csv")
 
     list_of_prompt_files = []
     with open(candidates_csv, "r", encoding="utf-8") as f:
@@ -113,6 +118,23 @@ def main():
     print(f"Loaded {len(list_of_prompt_files)} prompt files for Unstable Dependency.")
 
     inference = Inference("unstable_dependency")
+    inference.detect_gpt(list_of_prompt_files)'''
+
+    # 5.3 Insufficient Modularization
+
+    candidates_csv = Path("data/processed/candidates_sampled/insufficient_modularization_sample.csv")
+
+    list_of_prompt_files = []
+    with open(candidates_csv, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            prompt_path = Path(row["prompt_file"])
+            if prompt_path.exists():
+                list_of_prompt_files.append(prompt_path)
+
+    print(f"Loaded {len(list_of_prompt_files)} prompt files for Insufficient Modularization.")
+
+    inference = Inference("insufficient_modularization")
     inference.detect_gpt(list_of_prompt_files)
 
 if __name__ == "__main__":

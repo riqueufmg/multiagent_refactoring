@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "CountingInputStream",
+    "detection": false,
+    "justification": [
+        "The class has a single clear responsibility: counting bytes that pass through an InputStream (field: private long count).",
+        "All methods relate directly to that responsibility: afterRead(...) and skip(...) update the count; getByteCount()/resetByteCount() expose and reset the count.",
+        "Deprecated methods getCount() and resetCount() are compatibility wrappers that delegate to the long-based methods and do not add unrelated behavior.",
+        "The class is small and cohesive (no large methods, no unrelated helper logic), and it delegates I/O behavior to its superclass ProxyInputStream, avoiding concentration of multiple responsibilities."
+    ]
+}

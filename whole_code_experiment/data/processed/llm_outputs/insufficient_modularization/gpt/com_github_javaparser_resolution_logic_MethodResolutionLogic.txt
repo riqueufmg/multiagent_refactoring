@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["MethodResolutionLogic"],
+    "detection": true,
+    "justification": [
+        "The class is very large and mixes many distinct responsibilities: method applicability checks (isApplicable overloads), type variable substitution (substituteDeclaringTypeParameters, substituteTypeVariables), type inference (inferTypes), method selection and ambiguity resolution (findMostApplicable, findMostApplicableUsage, isMoreSpecific), variadic argument grouping (groupTrailingArgumentsIntoArray, groupVariadicParamValues), and small utilities (distinctByKey).",
+        "Several very long, complex methods with high branching and different concerns: isApplicable(...) handles name checking, variadic grouping, lambda checks, type-parameter matching and wildcard tolerance all in one method; substituteDeclaringTypeParameters and substituteTypeVariables perform deep recursive type-substitution logic; isMoreSpecific contains many rules for specificity comparison. These indicate multiple orthogonal responsibilities that should be separated.",
+        "There is duplicated or overlapping logic across methods: two separate isApplicable implementations (one for ResolvedMethodDeclaration and one for MethodUsage) perform similar parameter/variadic/type-parameter processing, suggesting extractable shared components; findMostApplicable and findMostApplicableUsage duplicate selection heuristics.",
+        "The class depends on many domain types (ResolvedType, ResolvedMethodDeclaration, MethodUsage, TypeSolver, etc.) and implements detailed algorithms for different phases of method resolution; this coupling and concentration of algorithms increases maintenance difficulty and argues for splitting into cohesive modules (e.g., applicability checking, type substitution/inference, specificity comparison, variadic handling).",
+        "Presence of many TODOs and UnsupportedOperationExceptions inside this large class further shows it is a growth point for multiple concerns rather than a narrowly focused abstraction, supporting the detection of insufficient modularization."
+    ]
+}

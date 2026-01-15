@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.description.type.RecordComponentDescription"],
+    "detection": false,
+    "justification": [
+        "The abstraction is decomposed into focused nested types with clear responsibilities: AbstractBase provides shared behavior, ForLoadedRecordComponent handles reflection/priviliged access, Latent models synthetic/constructed components, TypeSubstituting handles type substitution, and Token encapsulates detached properties.",
+        "Methods and fields are small and cohesive (e.g. getType, getAccessor, getActualName, getDeclaredAnnotations, getGenericSignature) and duplication is reduced via AbstractBase and nested interfaces (InGenericShape, InDefinedShape).",
+        "Related functionality is colocated in the same API surface (record component descriptions) but separated into specific classes rather than merged into a single large class, avoiding a bloated interface or mixed responsibilities.",
+        "Use of helper patterns (dispatchers, visitors, explicit token objects) further modularizes behavior instead of concentrating complexity in one class."
+    ]
+}

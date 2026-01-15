@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "SourceFileInfoExtractor",
+    "detection": true,
+    "justification": [
+        "The class mixes multiple responsibilities: file system traversal and IO (solve(Path), solveMethodCalls(Path) using Files.walkFileTree), parsing (parse(file) into CompilationUnit), AST traversal/collection (collectAllNodes, node.walk), semantic resolution (solve(Node), solveTypeDecl, toString(MethodCallExpr)), and reporting/metrics (out/err fields, successes/failures/unsupported counters, printing logic).",
+        "State and configuration are combined with behavior: the constructor configures the StaticJavaParser symbol resolver while the same class also holds flags and streams (printFileName, out, err, verbose) alongside resolution counters, indicating low cohesion.",
+        "Methods conflate high-level orchestration and low-level details: solve(Path) both walks files and resolves nodes; solve(Node) inspects node context, performs resolution, updates counters and prints results; toString(MethodCallExpr) performs resolution and error handling. These mixed concerns are candidates for extraction.",
+        "Presence of many helper methods (collectAllNodes, lineNr, overloaded toString, recursive solveMethodCalls) and the overall size/variety of responsibilities suggest the class could be decomposed into smaller, more cohesive abstractions (e.g., FileWalker/Parser, NodeResolver, Reporter/Formatter, Metrics), so insufficient modularization is present."
+    ]
+}

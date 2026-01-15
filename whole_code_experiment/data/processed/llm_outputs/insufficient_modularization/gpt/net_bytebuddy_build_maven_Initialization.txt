@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "Initialization",
+    "detection": true,
+    "justification": "The Initialization class mixes multiple responsibilities that could be separated: it exposes public mutable configuration fields (entryPoint, validated) used by Maven, provides default construction logic, resolves coordinates (via inherited CoordinateConfiguration/asCoordinate and ClassLoaderResolver), locates and instantiates entry point implementations (enum matching and reflective Class.forName/constructor/newInstance), and wraps validation behavior (returning EntryPoint.Unvalidated). The getEntryPoint method performs distinct tasks (validation of input, enum lookup, reflection-based loading, instantiation and wrapping, and exception translation), indicating a bloated responsibility and a non-cohesive interface. The combination of configuration storage, class-loading/instantiation, and validation-wrapping suggests the class should be decomposed (e.g., separate configuration holder, entry-point factory/loader, and validation wrapper) to improve modularity."
+}

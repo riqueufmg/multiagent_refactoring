@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.dynamic.ClassFileLocator"],
+    "detection": true,
+    "justification": [
+        "The ClassFileLocator interface file contains a very large number of nested implementations and helpers (MultiReleaseAware, Simple, ForClassLoader (+ WeaklyReferenced), ForModule (+ WeaklyReferenced), ForJarFile, ForModuleFile, ForFolder, ForUrl, ForInstrumentation (with Dispatcher, ClassLoadingDelegate and many nested delegates), PackageDiscriminating, Filtering, Compound, etc.), concentrating many responsibilities in one top-level type.",
+        "These nested types address orthogonal concerns: filesystem and archive I/O (ForFolder, ForJarFile, ForModuleFile), class loader/resource lookup (ForClassLoader, ForUrl), Java module/jmod support (ForModule, ForModuleFile, boot layer logic), multi-release JAR handling (MultiReleaseAware logic), instrumentation and retransformation (ForInstrumentation, ExtractionClassFileTransformer, Dispatcher), and composition/filtering of locators (Compound, Filtering, PackageDiscriminating).",
+        "There is deep nesting and complex internal logic (reflection, privileged actions, manifest parsing, version detection, dispatcher patterns), which increases class size and coupling and reduces cohesion; many of these concern implementations are better split into separate top-level classes or packages to respect the single-responsibility principle.",
+        "Multiple static factory methods and platform-specific detection logic are embedded in the same artifact rather than modularized, making the file hard to understand, test, and maintain."
+    ]
+}

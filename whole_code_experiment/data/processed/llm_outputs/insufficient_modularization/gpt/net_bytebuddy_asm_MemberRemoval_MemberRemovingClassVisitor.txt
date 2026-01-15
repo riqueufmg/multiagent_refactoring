@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.asm.MemberRemoval.MemberRemovingClassVisitor",
+    "detection": false,
+    "justification": "The analyzed class and its enclosing MemberRemoval are small and focused on a single cohesive responsibility: removing fields and methods that match provided ElementMatchers. MemberRemoval holds only two matcher fields and factory/fluency methods (stripFields/stripMethods/stripConstructors/stripInvokables) plus wrap(...) which builds lookup maps. The private static inner MemberRemovingClassVisitor contains only two overridden methods (visitField and visitMethod) that delegate removal decisions to the matchers and the superclass. There is no sign of a large, bloated interface, unrelated responsibilities, or excessive complexity that would warrant further decomposition."
+}

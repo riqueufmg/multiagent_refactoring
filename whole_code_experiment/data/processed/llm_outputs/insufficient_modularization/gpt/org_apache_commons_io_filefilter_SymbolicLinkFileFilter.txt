@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "SymbolicLinkFileFilter",
+    "detection": false,
+    "justification": [
+        "Class is small and cohesive: it focuses solely on identifying symbolic links (accept(File), accept(Path, BasicFileAttributes), and isSymbolicLink(Path)).",
+        "Interface is minimal: only a singleton INSTANCE, a protected default constructor, an overload accepting FileVisitResult values, and the symbolic-link check method—no bloated API surface.",
+        "No concentrated unrelated responsibilities: logic delegates to Files.isSymbolicLink(Path) (via package-private isSymbolicLink for testability) and to AbstractFileFilter for FileVisitResult handling, indicating proper separation of concerns.",
+        "No excessive state or complexity: the class has no fields (other than the singleton) and contains straightforward, short methods, so it does not require further decomposition."
+    ]
+}

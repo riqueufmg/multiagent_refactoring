@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "Strings",
+    "detection": true,
+    "justification": "The Strings class centralizes a large set of responsibilities and a bloated public API: many unrelated string operations (comparison: compare, eq, isNullIsLess; searching: indexOf, lastIndexOf, contains, containsAny, startsWith, endsWith, startsWithAny, endsWithAny; modification: replace, replaceOnce, remove, removeStart, removeEnd, appendIfMissing, prependIfMissing; equality helpers: equals/equalsAny for CharSequence and String) are implemented in a single class. It also contains nested subclasses (CiStrings, CsStrings) that duplicate variant logic for case sensitivity, a Builder, and private static helpers (containsAny, eq). The presence of long, distinct method groups and duplicated/variant implementations indicate multiple cohesive concerns (searching, comparing, mutating, equality) that could be decomposed into smaller, focused modules or strategy classes (e.g., Comparer, Searcher, Replacer, Prefix/Suffix utilities, case-sensitivity strategy). The class size, varied responsibilities and duplicated conditional logic (ignoreCase handling across many methods and parallel inner classes) justify that this class exhibits Insufficient Modularization."
+}

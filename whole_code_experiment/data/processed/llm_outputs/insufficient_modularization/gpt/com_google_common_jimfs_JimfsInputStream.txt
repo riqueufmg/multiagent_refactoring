@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "JimfsInputStream",
+    "detection": false,
+    "justification": "JimfsInputStream is focused and concise: it implements InputStream behavior for a RegularFile and manages stream state (fields: file, pos, finished) and lifecycle with FileSystemState (fileSystemState.register/unregister). It delegates file I/O and locking to RegularFile (file.read, file.read(pos, b, ...), file.readLock(), file.size(), file.setLastAccessTime()) rather than embedding those concerns. The public API is the expected InputStream surface (read variants, skip, available, close) with a small private helper (readInternal) and simple synchronization helpers (checkNotClosed, isOpen). There are no extra unrelated responsibilities, large switch logic, or many disparate fields/methods that would indicate a bloated class. Therefore there is no evidence of insufficient modularization."
+}

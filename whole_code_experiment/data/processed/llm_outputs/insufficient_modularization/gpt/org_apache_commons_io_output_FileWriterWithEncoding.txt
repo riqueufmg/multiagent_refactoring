@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "FileWriterWithEncoding",
+    "detection": false,
+    "justification": "The class is cohesive and focused on a single responsibility: creating/wrapping a file writer with a specified encoding. Encoding and initialization logic is centralized in the private initWriter(File,Object,boolean) helper (including cleanup on failure). Construction/configuration concerns are separated into the nested Builder (extends AbstractStreamBuilder) and the static builder() factory. The remaining public API consists largely of deprecated convenience constructors that forward to the same initialization logic rather than introducing unrelated responsibilities. The class delegates I/O details to FileUtils and IOUtils and does not contain unrelated functionality, so it is not insufficiently modularized."
+}

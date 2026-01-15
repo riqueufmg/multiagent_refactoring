@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "Validate",
+    "detection": true,
+    "justification": "The Validate class aggregates a very large and diverse set of validation responsibilities into a single utility: numeric range checks (exclusiveBetween/inclusiveBetween for double/long/Comparable), numeric predicates (finite, notNaN), type checks (isAssignableFrom, isInstanceOf), boolean/state checks (isTrue, validState), pattern checks (matchesPattern), null/emptiness checks across arrays/collections/maps/CharSequence (noNullElements, notEmpty, notBlank), index validation for multiple containers (validIndex for array/Collection/CharSequence), message handling helpers (getMessage, toSupplier) and many default message constants. This results in a bloated interface and a long class that mixes multiple concerns (numbers, types, collections, strings, state, and message formatting). The presence of many grouped method variants for different types and many dedicated default message constants indicates the class could be decomposed into smaller, cohesive modules (e.g., NumberValidate, CollectionValidate, StringValidate, TypeValidate, MessageUtils). Such decomposition would improve cohesion, reduce class size/complexity, and make maintenance and evolution easier. Therefore the class exhibits Insufficient Modularization."
+}

@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "NamingStrategy",
+    "detection": false,
+    "justification": [
+        "The NamingStrategy interface itself is small and focused, exposing only three methods (subclass, redefine, rebase), so its public surface is not bloated.",
+        "Behavior is decomposed into multiple cohesive nested types: AbstractBase (shared behavior), Suffixing, SuffixingRandom, and PrefixingRandom, each representing a distinct naming strategy.",
+        "Suffixing defines a BaseNameResolver with several focused implementations (ForUnnamedType, ForGivenType, ForFixedValue, WithCallerSuffix), keeping different name-resolution concerns separated.",
+        "Randomization concerns are encapsulated in SuffixingRandom and PrefixingRandom via a RandomString dependency rather than mixed into the main abstraction.",
+        "Overall responsibilities are well-separated and localized to specific classes/implementations rather than concentrated in a single large class, so the code does not demonstrate insufficient modularization."
+    ]
+}

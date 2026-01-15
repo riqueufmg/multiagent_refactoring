@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["Navigator"],
+    "detection": true,
+    "justification": [
+        "The class centralizes many distinct responsibilities into a single static utility: type lookup (findType, demandClass, demandClassOrInterface, demandEnum, getOuterTypeName/getInnerTypeName), member accessors (demandConstructor, demandField, demandMethod), general AST navigation/search (demandParentNode, demandNodeOfGivenClass, demandReturnStmt, demandSwitch, findMethodCall, findNameExpression, findSimpleName, demandVariableDeclaration), and small helpers (findSwitchHelper).",
+        "Multiple methods perform different, potentially unrelated domain tasks (e.g. textual qualified-type parsing in getOuterTypeName/getInnerTypeName vs. node searches like findMethodCall), indicating low cohesion and a bloated interface.",
+        "Repetitive iteration and type-checking logic appears in several places (demandConstructor, demandField, demandMethod, findType(TypeDeclaration<?>)), which suggests these responsibilities could be decomposed into focused components (e.g. TypeNavigator, MemberNavigator, SearchNavigator) to improve modularity.",
+        "Presence of deprecated wrapper methods (findNodeOfGivenClass, findReturnStmt, findSwitch, requireParentNode) increases surface area and indicates legacy/overlapping APIs retained in the same class rather than separated or refactored.",
+        "A TODO comment in demandConstructor ('Refactor to use `td.findAll(ConstructorDeclaration.class);` - potential difference re: searching only immediate children?') signals recognized maintenance/refactoring needs and complexity that would benefit from modularization.",
+        "The class is final with a private constructor and only static methods, acting as a large ‘god’ utility class rather than smaller cohesive modules — a typical sign of insufficient modularization."
+    ]
+}

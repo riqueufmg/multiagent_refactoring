@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "ThreadUtils",
+    "detection": true,
+    "justification": [
+        "The class concentrates multiple distinct responsibilities: locating threads (findThreads*, findThreadById, findThreadsByName), locating thread groups (findThreadGroups*, findThreadGroupsByName), time-related helpers (sleep, sleepQuietly, join), and low-level utilities (getSystemThreadGroup, namePredicate).",
+        "Large, mixed public API surface and many overloads increase cohesion pressure: multiple overloads for findThreads/findThreadGroups (Predicate vs deprecated ThreadPredicate/ThreadGroupPredicate), findThreadById variants, and name-based helpers (predicateThread, predicateThreadGroup).",
+        "Contains several nested classes and interfaces (AlwaysTruePredicate, NamePredicate, ThreadIdPredicate, ThreadPredicate, ThreadGroupPredicate) — many marked @Deprecated — which bloat the class and mix legacy compatibility code with current implementations.",
+        "Helper implementation details (generic namePredicate, Duration-based join/sleep wrappers using DurationUtils) coexist with high-level query logic and deprecated compatibility shims, indicating mixed abstraction levels that would be better decomposed (e.g., separate Finder, Predicate-compatibility, and Timing utility components).",
+        "Because responsibilities are concentrated in a single utility class, it is harder to maintain, test, and evolve individual behaviors independently, matching the definition of Insufficient Modularization."
+    ]
+}

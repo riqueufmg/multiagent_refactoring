@@ -1,0 +1,10 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["org.tensorflow.op.Ops"],
+    "detection": true,
+    "justification": [
+        "The Ops class provides a very large, monolithic API surface exposing hundreds of public factory methods for many unrelated operations (examples: constant(...), assign(...), reshape(...), gather(...), scatterNd(...), tensorArray..., resourceScatter..., etc.).",
+        "It imports and directly delegates to a huge number of operation classes (many org.tensorflow.op.core.* and other op packages) and centralizes creation logic via a single Scope instance, concentrating many responsibilities that span math, io, image, linalg, random, signal, train, quantization, and more.",
+        "Although it declares subgroup fields (nn, summary, image, data, io, ...), the class still contains an excessively large flat set of methods rather than cleanly partitioning functionality into cohesive modules. The size and breadth of the class (and its bloated public interface) make it hard to understand, maintain, and evolve — matching the Insufficient Modularization smell."
+    ]
+}

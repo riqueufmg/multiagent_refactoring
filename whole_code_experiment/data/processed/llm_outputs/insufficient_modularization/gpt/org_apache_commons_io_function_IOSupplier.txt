@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["IOSupplier"],
+    "detection": false,
+    "justification": [
+        "The interface is small and focused: it defines a single primary operation T get() throws IOException and two small convenience/default methods (getUnchecked() and asSupplier()).",
+        "It has a single responsibility: supply a value while allowing an IOException to be thrown or converted to UncheckedIOException; there is no evidence of multiple, unrelated responsibilities or a bloated API.",
+        "Default methods delegate to a single helper (Uncheck.get(this)) or return method references (this::getUnchecked), indicating modular delegation rather than internal monolithy.",
+        "The annotation @FunctionalInterface and the generic parameter T further indicate a cohesive abstraction intended for single-purpose use, not an under-modularized class needing decomposition."
+    ]
+}

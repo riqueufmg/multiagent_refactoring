@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["com.github.javaparser.ast.Node"],
+    "detection": true,
+    "justification": [
+        "The class aggregates many distinct responsibilities: AST state (range, tokenRange, parent/children), comment/orphan comment management, observer registration/propagation, arbitrary data storage (DataKey map), printing/printer-configuration, symbol resolution linkage, phantom-node detection/caching, traversal APIs and iterator implementations, and visitor/clone/equals/hashCode delegation.",
+        "Multiple unrelated concerns are implemented in the same class: printer creation and configuration (getPrinter, createDefaultPrinter, PRINTER_KEY), symbol resolution access (SYMBOL_RESOLVER_KEY and getSymbolResolver), and line-ending configuration (LINE_SEPARATOR_KEY and getLineEndingStyle), which couple I/O/formatting configuration to the AST model.",
+        "Traversal logic and algorithms are embedded as several nested iterator classes (BreadthFirstIterator, DirectChildrenIterator, ParentsVisitor, PreOrderIterator, PostOrderIterator with Level helper), inflating the class and mixing traversal mechanics with node state.",
+        "Observer management (ObserverRegistrationMode, register/registerForSubtree, PropagatingAstObserver usage) and child lifecycle methods (setParentNode, setAsParentNodeOf, remove/replace) together enlarge the public surface and violate single-responsibility principles.",
+        "Specialized utilities such as phantom detection (PHANTOM_KEY, isPhantom, inPhantomNode, LEVELS_TO_EXPLORE) and data-key manipulation further demonstrate orthogonal concerns present in one monolithic class, making it hard to understand, maintain, and evolve."
+    ]
+}

@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "HistoryActivity",
+    "detection": true,
+    "justification": "HistoryActivity mixes multiple responsibilities and contains several distinct concerns that should be decomposed. It handles UI lifecycle and list setup (onCreate, reloadHistoryItems), list interaction and navigation (onListItemClick), context-menu creation and item deletion (onCreateContextMenu, onContextItemSelected), menu inflation (onCreateOptionsMenu) and complex option actions (onOptionsItemSelected). onOptionsItemSelected alone includes export/file operations (HistoryManager.saveHistory), email intent construction and launch (Intent.ACTION_SEND, EXTRA_STREAM), exception handling (ActivityNotFoundException), and alert dialog construction; elsewhere the class also builds and updates adapter state and a dummy empty item. These responsibilities (presentation/list management, history persistence/export, dialog creation, and intent/communication) are tightly coupled in one class, increasing size and complexity and indicating insufficient modularization."
+}

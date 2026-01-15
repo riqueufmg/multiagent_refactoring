@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["org.apache.commons.lang3.time.FastDateParser.NumberStrategy"],
+    "detection": false,
+    "justification": [
+        "NumberStrategy is small and focused: it has a single field (field), a constructor, and a small set of behavior methods (isNumber, modify, parse, toString).",
+        "The parse method implements a single responsibility (parsing a numeric field from the input and setting the Calendar), with clear, limited logic for trimming whitespace, enforcing maxWidth, digit extraction and integer parsing.",
+        "Extensibility is provided via the protected modify(parser, iValue) hook which allows concise customization in anonymous subclasses (as used elsewhere in this class), showing modular design rather than monolithic functionality.",
+        "There are no large switch statements, multiple unrelated responsibilities, or bloated public API on NumberStrategy — it delegates locale/text handling to other Strategy subclasses (PatternStrategy, CaseInsensitiveTextStrategy, TimeZoneStrategy), indicating proper decomposition at the class hierarchy level."
+    ]
+}

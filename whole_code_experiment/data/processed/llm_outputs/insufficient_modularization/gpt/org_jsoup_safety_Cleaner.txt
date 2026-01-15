@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "Cleaner",
+    "detection": false,
+    "justification": [
+        "The class has a single, well-defined responsibility: sanitize HTML using a Safelist. Public API methods (clean, isValid, isValidBodyHtml) are small and focused on orchestration.",
+        "Traversal and node-handling logic are factored into a private inner class (CleaningVisitor) that implements NodeVisitor, keeping traversal concerns separate from element creation and attribute filtering.",
+        "Element creation and attribute filtering are encapsulated in a dedicated private method (createSafeElement) and a small helper data holder (ElementMeta). Special-case logic (e.g. anchor rel=nofollow handling) is localized within that method.",
+        "The class delegates policy decisions to Safelist (safelist.isSafeTag, safelist.isSafeAttribute, safelist.getEnforcedAttributes), avoiding mixing policy and enforcement into the Cleaner itself.",
+        "Overall method sizes and responsibilities are limited and cohesive; there is no evidence of a single bloated method or a large set of unrelated responsibilities that would indicate insufficient modularization."
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "HttpClientExecutor",
+    "detection": true,
+    "justification": [
+        "The class centralizes multiple distinct responsibilities in one place: HTTP client creation/reuse (client()), request building and sending (execute()), request body construction (requestBody()), response mapping (execute() sets Response fields, StatusMessage()), proxy selection management (static ThreadLocal perRequestProxy and nested ProxyWrap), and resource lifecycle (responseBody(), safeClose()).",
+        "Large methods combining concerns: execute() handles URI/timeout/cookies/headers, per-request proxy setup, sending the request, reading headers and mapping them into a Response object, and exception handling — mixing I/O, mapping, and control-flow concerns.",
+        "Client construction mixes configuration concerns (authenticator, sslContext, redirect policy) with reuse logic tied to connection state (req.connection.client, req.connection.lastAuth), indicating a separate ClientFactory or builder would be a clearer split.",
+        "Proxy handling is implemented as thread-local state plus an inner ProxyWrap selector, which is a distinct responsibility that could be extracted to a dedicated proxy strategy/selector class.",
+        "Utility-like functionality (StatusMessage mapping, requestBody byte array creation via writePost) resides alongside network execution logic, suggesting these helpers could be modularized to reduce the class's size and surface area.",
+        "Presence of mutable global-ish state (static ThreadLocal perRequestProxy) and the nested selector increases coupling and makes the class harder to test and evolve; separating concerns would improve cohesion and maintainability."
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "HashCodeVisitor",
+    "detection": true,
+    "justification": [
+        "The class is very large and contains an extremely high number of visit(...) methods (one for each AST node type). This concentration of functionality makes the class hard to read, maintain, and extend.",
+        "Many responsibilities are mixed into this single class: hashing logic for expressions, statements, types, declarations, module directives, comments, etc. (e.g. visit methods for MethodDeclaration, IfStmt, ClassOrInterfaceDeclaration, ModuleDeclaration, TraditionalJavadocComment, MarkdownComment).",
+        "Significant code duplication across methods: the same pattern is repeated in almost every visit method, notably the comment handling expression (n.getComment().isPresent() ? n.getComment().get().accept(this, arg) : 0) and the repeated multiply-by-31 combine logic. Repetition indicates opportunity to extract shared helpers or split by concern.",
+        "Singletons and global usage (private static final HashCodeVisitor SINGLETON and public static int hashCode(Node)) centralize all hash-computation logic in one giant class rather than composing smaller, focused components.",
+        "The presence of a NodeList-specific visit that iterates and dispatches to the visitor further shows the visitor handles composite traversal and hash composition in one place; responsibilities could be modularized (e.g. separate visitors or helper classes for node categories: expressions, statements, types, declarations, comments, and common combination logic)."
+    ]
+}

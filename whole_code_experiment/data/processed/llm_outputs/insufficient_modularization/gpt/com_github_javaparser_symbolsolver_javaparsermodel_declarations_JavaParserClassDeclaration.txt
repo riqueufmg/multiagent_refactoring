@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["JavaParserClassDeclaration"],
+    "detection": true,
+    "justification": [
+        "The class mixes many responsibilities: AST declaration wrapping, type/method/symbol resolution, ancestor traversal, field collection and on-the-fly wrapper creation, and reference-type conversion (e.g. getAllFields, getAncestors, solveMethod/solveType/solveSymbol, toReferenceType).",
+        "Contains large, complex methods implementing distinct behaviors: getAllFields (creates anonymous ResolvedFieldDeclaration wrappers), getAncestors (resolution with incomplete-list handling and exception control flow), canBeAssignedTo (class/interface assignment logic), and toReferenceType (complex type resolution including LazyType creation).",
+        "Partial delegation to JavaParserTypeAdapter shows uneven decomposition: many capabilities are delegated while substantial resolution logic remains in this class, indicating responsibilities are not cleanly separated.",
+        "Presence of a deprecated comment advocating moving resolution out of declarations suggests existing design already recognizes mixed responsibilities and the class is a candidate for refactoring.",
+        "Overall size and varied public API (many unrelated methods) indicate the class is bloated and would benefit from decomposition into smaller, cohesive components (e.g., method resolver, type resolver/adapter, ancestor/heritance resolver, field collector)."
+    ]
+}

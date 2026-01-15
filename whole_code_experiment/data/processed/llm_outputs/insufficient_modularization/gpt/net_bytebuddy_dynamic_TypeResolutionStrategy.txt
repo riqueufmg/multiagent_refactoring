@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "TypeResolutionStrategy",
+    "detection": false,
+    "justification": "The abstraction is well decomposed: the interface itself is small (one method resolve()) and the nested Resolved interface isolates initialization behavior (injectedInto, initialize). Concrete strategies are separated into distinct nested types (Passive, Lazy, Disabled enums for singletons and Active class with its own Resolved nested class). Each implementation delegates most work (e.g., to ClassLoadingStrategy, LoadedTypeInitializer, NexusAccessor) and methods are short and focused (e.g., Passive.initialize, Lazy.initialize, Active.resolve, Active.Resolved.initialize). There is no single large class concentrating unrelated responsibilities or a bloated public interface—responsibilities are split across the strategy variants—so insufficient modularization is not detected."
+}

@@ -1,0 +1,10 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "RegularFile",
+    "detection": true,
+    "justification": [
+        "The class mixes multiple distinct responsibilities instead of delegating them to smaller, cohesive abstractions: block storage management (fields: blocks, blockCount; methods: expandIfNecessary, addBlock, truncateBlocks, copyBlocksTo, transferBlocksTo, getBlock), I/O and data transfer (read/write overloads, transferFrom, transferTo, put/get/zero helpers, prepareForWrite), disk allocation/lifecycle management (disk.allocate/disk.free usage, deleteContents, opened/closed/deleted, openCount, deleted flag), and concurrency control (lock, readLock, writeLock, contentLock).",
+        "Many low-level concerns are implemented inline: block addressing and sizing calculations (blockIndex, offsetInBlock, length, bytesToRead), zero-filling logic, and direct array copies. These helper methods and direct manipulations indicate opportunities to extract a BlockStorage/BufferManager and a separate IO/transfer layer.",
+        "The class is large and dense with varied functionality (allocation, resizing, copying, truncation, reads/writes with ByteBuffer and channels, lifecycle state), making it hard to understand, test, and evolve. The concentration of these responsibilities in one class fits the definition of insufficient modularization."
+    ]
+}

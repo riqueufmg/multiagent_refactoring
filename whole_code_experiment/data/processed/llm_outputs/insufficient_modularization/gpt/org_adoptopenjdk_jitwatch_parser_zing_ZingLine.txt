@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["org.adoptopenjdk.jitwatch.parser.zing.ZingLine"],
+    "detection": [true],
+    "justification": [
+        "The class mixes multiple responsibilities: it is a data holder (many fields with getters/setters) and also performs serialization/formatting by building Tag and Task objects (toTagQueued, toTagNMethod, toTagTask).",
+        "Contains utility/formatting logic (millisToSecondsString using BigDecimal), string assembly (toString), and decision logic (tier == 3 ? FALCON : ZING) — these are orthogonal concerns that increase class complexity.",
+        "Methods toTag* each construct attribute maps and call StringUtil.attributeMapToString, coupling the domain model to tag formatting and Tag/Task construction rather than delegating to a dedicated converter or builder.",
+        "The class surface is bloated with varied behavior (state management, formatting, mapping to external Tag/Task structures), making it harder to understand, maintain, and evolve — indicating insufficient decomposition into cohesive abstractions."
+    ]
+}

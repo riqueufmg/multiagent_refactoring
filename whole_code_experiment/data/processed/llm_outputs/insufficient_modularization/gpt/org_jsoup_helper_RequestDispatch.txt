@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "RequestDispatch",
+    "detection": false,
+    "justification": [
+        "The class is small and focused: one static field (clientConstructor), a static initialization block, and a single get(Request, Response) method.",
+        "It has a single responsibility (selecting/creating the appropriate RequestExecutor) and delegates actual request handling to HttpClientExecutor or UrlConnectionExecutor, so concerns are separated.",
+        "No large/bloated interface or many unrelated methods/fields are present; the reflection-based loading of HttpClientExecutor is a lightweight optional-integration mechanism, not evidence of poor decomposition.",
+        "There is clear modularization: concrete executors encapsulate transport-specific behavior and RequestDispatch acts only as a factory/dispatcher."
+    ]
+}

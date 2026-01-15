@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["TypeDescription.ForErasure"],
+    "detection": true,
+    "justification": [
+        "The analyzed TypeDescription type (as provided) contains an extremely large amount of functionality and many nested types in a single compilation unit: Generic and its many nested visitor enums and classes, Generic.AnnotationReader and many Delegator/Chained implementations, LazyProjection variants, Builder and many Builder subtypes, ForLoadedType (including Dispatcher), LazyProxy, ArrayProjection, SuperTypeLoading (with ClassLoading delegates and projections), Latent, ForPackageDescription, etc.",
+        "These nested classes cover multiple distinct responsibilities: generic-type representation and visiting, signature generation and parsing, annotation reading and delegation, reflective loaded-type adapters and dispatchers, array projections, building and normalization of types, class-loading strategies and projections. That is a combination of concerns that should be split across separate modules/classes.",
+        "The interface and its nested types present a very large, bloated API surface (many methods, numerous inner classes/enums) making comprehension and maintenance difficult and increasing coupling between unrelated features (e.g. class-loading logic mixed with generic-type visitors and annotation reading).",
+        "Many of the nested classes implement specialized behaviors (e.g. Visitor subtypes like Reifying, Assigner, ForSignatureVisitor, AnnotationStripper; AnnotationReader delegators; ClassLoadingTypeProjection) that are independent and strong candidates for extraction into focused classes/packages.",
+        "Because of the breadth and depth of responsibilities concentrated in this single type, it meets the criteria for Insufficient Modularization: it has not been adequately decomposed into cohesive, smaller abstractions."
+    ]
+}

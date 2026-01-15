@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "JimfsFileStore",
+    "detection": false,
+    "justification": [
+        "JimfsFileStore primarily acts as a thin facade/coordinator rather than a bloated, monolithic class: most methods immediately delegate to specialized collaborators (examples: tree.lookUp(...), factory.regularFileCreator(), factory.directoryCreator(), factory.symbolicLinkCreator(...), attributes.readAttributes(...), attributes.setAttribute(...), disk.getTotalSpace(), disk.getUnallocatedSpace()).",
+        "Its fields represent clearly separated responsibilities (FileTree tree, FileFactory factory, HeapDisk disk, AttributeService attributes, FileSystemState state), indicating functionality has been modularized into distinct classes rather than concentrated here.",
+        "Methods are short and focused (e.g., lookUp, setInitialAttributes, readAttributes, getRootDirectoryNames) and contain little internal logic, reducing cognitive load and avoiding mixed responsibilities.",
+        "Concurrency/state concerns are limited and well-scoped (it creates and exposes ReadWriteLock and calls state.checkOpen()), rather than being intermixed with unrelated business logic.",
+        "Given the delegation pattern and clear separation of concerns, the class does not exhibit the characteristics of Insufficient Modularization."
+    ]
+}

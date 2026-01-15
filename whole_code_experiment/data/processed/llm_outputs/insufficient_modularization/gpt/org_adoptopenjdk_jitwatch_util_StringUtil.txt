@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "StringUtil",
+    "detection": true,
+    "justification": "The StringUtil class aggregates many distinct responsibilities in a single utility: time formatting (formatTimestamp), XML entity handling (replaceXMLEntities), character/line utilities (repeat, rtrim, wordWrap), padding and alignment (pad, padZero, alignLeft, alignRight, padLineNumber), attribute parsing/serialization (attributeMapToString, attributeStringToMap, getLineAttributesDoubleQuote), collection/list/string conversions (textToList, listToText, arrayToString, listToString), name utilities (getUnqualifiedClassName, getPackageName, getAbbreviatedFQName, getUnqualifiedMemberName), numeric formatting (formatThousands), and small helpers (getSubstringBetween, getSortedKeys). Several groups show duplicated or highly related logic that should be separated (e.g., attributeStringToMap and getLineAttributesDoubleQuote share nearly identical parsing logic; pad/padZero/align* are overlapping formatting utilities). The class is large, mixes orthogonal concerns, and would be easier to understand and maintain if decomposed into focused modules (e.g., TimeUtil, XmlUtil, PaddingUtil, AttrParser, CollectionStringUtil, NameUtil, NumberUtil). These factors indicate Insufficient Modularization."
+}

@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.build.gradle.AbstractByteBuddyTask"],
+    "detection": true,
+    "justification": [
+        "The AbstractByteBuddyTask class is large and mixes many responsibilities: task configuration (numerous fields and getters/setters), plugin discovery and registration, class loader construction, class file locator composition, plugin factory resolution, engine construction and execution, logging, resource cleanup, and file-system utilities (deleteRecursively).",
+        "The static apply(...) method is very long and performs multiple distinct concerns: discovery of plugins, resolving and instantiating Plugin.Factory instances, building a composite ClassFileLocator, configuring and applying the Plugin.Engine, error handling, and closing resources. Its long parameter list and complex internal logic indicate too many responsibilities concentrated in one routine.",
+        "The class defines unrelated helper methods and nested types that could be modularized: deleteRecursively methods (file-IO utility), the ByteBuddySkippingUrlClassLoader (class loader construction/behavior), and the TransformationLogger (logging listener). These elements suggest separable responsibilities that would be clearer as small, focused classes or services.",
+        "Several cohesive modules can be extracted (e.g., PluginDiscovery/Registration, PluginFactoryResolver, ClassFileLocatorBuilder, EngineConfigurator, FileDeletionUtil, and a ClassLoaderFactory). The current monolithic structure makes the class hard to understand, test, and maintain."
+    ]
+}

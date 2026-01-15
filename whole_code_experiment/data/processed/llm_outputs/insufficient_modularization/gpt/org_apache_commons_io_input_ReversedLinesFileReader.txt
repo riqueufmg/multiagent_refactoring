@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ReversedLinesFileReader"],
+    "detection": true,
+    "justification": [
+        "The class combines multiple distinct responsibilities: builder/API surface (Builder and many deprecated constructors), file/channel management (channel, totalByteLength, totalBlockCount, close()), charset/encoding decision logic (CharsetEncoder, maxBytesPerChar checks and multiple Charset.forName checks, UnsupportedEncodingException paths), byte-level buffering and newline matching (newLineSequences, avoidNewlineSplitBufferSize, byteDecrement), iteration/API delivery (iterator(), IOIterable implementation, readLines(), toString()), and block rollover/leftover management.",
+        "The private inner FilePart class is large and implements low-level buffer reading, newline detection (getNewLineMatchByteCount), line extraction (readLine), leftover handling (createLeftOver), and block rollover (rollOver). This substantial, low-level functionality would be better modularized into its own class or helper to separate concerns.",
+        "The main constructor contains complex encoding-specific branching (several hard-coded Charset checks and byteDecrement calculation) and initialization of low-level parsing state (newLineSequences array and avoidNewlineSplitBufferSize). This mixes configuration and parsing logic in one class.",
+        "There are many API entry points and helpers co-located (builder, multiple deprecated constructors, iterator implementation, readLine/readLines/toString) which increases the class size and surface area and indicates multiple roles rather than a single cohesive abstraction.",
+        "These combined factors (large inner class with low-level logic, complex constructor logic, and varied public APIs) show the class is doing more than one cohesive job and would benefit from decomposition (e.g., separate buffer/line-parsing component, separate charset/encoding strategy, and a thinner public facade)."
+    ]
+}

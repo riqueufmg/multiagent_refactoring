@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "MemberSubstitution.ForThisReference",
+    "detection": true,
+    "justification": [
+        "The class (MemberSubstitution and its nested types) is extremely large and contains many distinct responsibilities: bytecode visiting and transformation, replacement/substitution resolution, offset mapping, delegation dispatching, bootstrap argument resolving, annotation type definitions, and many factories and resolvers.",
+        "There are numerous deep nested types and components (e.g. WithoutSpecification and its ForMatched* subclasses, Target (ForMember, ForDynamicInvocation), Substitution (many implementations including Chain, ForFieldAccess, ForMethodInvocation and many Step implementations), Replacement (ForElementMatchers, ForDynamicInvocation, ForFirstBinding), SubstitutingMethodVisitor, many OffsetMapping implementations and Dispatcher/BuootstrapArgumentResolver families). This indicates concentration of unrelated concerns within one top-level abstraction.",
+        "Methods and logic mix high-level API configuration (element(), method(), field(), replaceWith* builders) with low-level bytecode handling (SubstitutingMethodVisitor.visitFieldInsn, visitMethodInsn, visitInvokeDynamicInsn) and complex resolution logic, violating single responsibility and hindering comprehension and reuse.",
+        "High coupling to many external components (TypePool, MethodGraph.Compiler, Implementation.Context, Assigner, JavaConstant, etc.) across many inner classes increases the class's complexity and suggests it should be split into smaller, focused modules.",
+        "Presence of many factory classes, resolver classes, and numerous specialized nested implementations implies the class should be decomposed into separate classes/modules (e.g. separate visitor, replacement resolution, substitution chain, offset mapping and delegation modules) to improve cohesion and maintainability."
+    ]
+}

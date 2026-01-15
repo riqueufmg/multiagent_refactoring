@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.agent.ByteBuddyAgent"],
+    "detection": true,
+    "justification": [
+        "The class consolidates many distinct responsibilities into a single top-level utility: agent installation/attachment, external-process orchestration, temporary JAR creation and manifest handling, instrumentation lookup, privileged action invocation, process id resolution, and multiple provider strategies (AttachmentProvider, ProcessProvider, AgentProvider, AttachmentTypeEvaluator).",
+        "Large amount of code and nested types: ByteBuddyAgent contains numerous large nested interfaces/enums/classes (AttachmentProvider with many implementations and Accessor inner classes, ProcessProvider with legacy and Java9 strategies, AgentProvider with jar creation/self-resolve logic, AttachmentTypeEvaluator implementations, etc.), indicating functionality that would be better separated into multiple cohesive classes.",
+        "Examples of mixed concerns: installExternal performs I/O (creating temp jars, streams), process launching (ProcessBuilder), and orchestration logic; AgentProvider.ForByteBuddyAgent.createJarFile deals with manifest construction and JarOutputStream manipulation; doPrivileged performs security wrapper resolution via reflection. These are different domains (I/O, process management, security) mixed in one class.",
+        "The public API exposes many static high-level methods (install, attach, attachNative, getInstrumentation) while also embedding provider implementations and helpers as protected/private nested types, increasing the class size and reducing clarity and testability.",
+        "High coupling and conditional complexity: use of reflection, class loader resolution, platform-specific logic (OS_NAME checks), and many constants all in one place complicate understanding and evolution; these behaviors are natural candidates for modularization into e.g. AttachmentManager, AgentJarBuilder, ProcessLauncher, InstrumentationResolver, and provider strategy classes."
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["org.apache.commons.lang3.ArrayUtils"],
+    "detection": true,
+    "justification": [
+        "Class is extremely large and monolithic: contains hundreds of static methods handling many responsibilities (creation, cloning, searching, inserting, removing, shifting, reversing, swapping, shuffling, conversion between primitive/object arrays, subarray, mapping, toMap, toString, etc.).",
+        "Heavy duplication of similar logic across primitive types: many nearly-identical method families repeated for boolean, byte, char, double, float, int, long, short and Object (e.g. add/addAll/insert/remove/removeAll/indexesOf/indexOf/lastIndexOf/reverse/shift/shuffle/swap/toObject/toPrimitive for each primitive type), indicating the class groups multiple concerns instead of modular components.",
+        "Concentration of unrelated responsibilities: ArrayUtils mixes low-level array copying/allocating helpers (arraycopy, copyArrayGrow1, newInstance), search utilities, mutation algorithms (shift, swap, reverse), randomization (shuffle with Random/SecureRandom), and conversion utilities (toPrimitive/toObject/toMap) in one class rather than separate focused modules.",
+        "Large public API surface (many public static methods and constants such as EMPTY_* arrays and INDEX_NOT_FOUND) increases coupling and makes the class hard to understand, maintain, test, and evolve.",
+        "Presence of deprecated methods and many overloads suggests evolutionary growth without decomposition (e.g. many @Deprecated add(...) insert variants), further evidence the class has accreted responsibilities over time.",
+        "Refactoring candidates: split by responsibility and/or element type (e.g. PrimitiveArrayUtils per primitive, ObjectArrayUtils, ArraySearchUtils, ArrayTransformUtils, ArrayMutationUtils, and small internal helpers for allocation/copying) to reduce size, remove duplication, and improve cohesion and maintainability."
+    ]
+}

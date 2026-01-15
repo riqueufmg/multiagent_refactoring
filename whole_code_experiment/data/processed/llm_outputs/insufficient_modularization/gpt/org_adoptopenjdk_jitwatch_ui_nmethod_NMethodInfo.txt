@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "NMethodInfo",
+    "detection": true,
+    "justification": "NMethodInfo mixes many responsibilities and contains a bloated set of UI state and construction logic that would be better decomposed. Evidence: it maintains numerous Label fields (lblCompileID, lblClass, lblMember, lblCompilationNumber, lblCompiler, lblAddress, lblBytecodeSize, lblNativeSize, lblQueuedTime, lblCompilationStartTime, lblNMethodEmittedTime, lblCompileDuration) and a clearable list of labels, indicating heavy state. It implements layout construction (makeLeftColumn, makeRightColumn, makeLabel, makeSizeInfo, makeTimingInfo, makeCompilationNavigator) plus event wiring for navigation buttons (btnPrev/btnNext handlers) and presentation/data binding logic (width bindings in multiple places). The setInfo method mixes data formatting and UI population (e.g., formatting timestamps and compiler strings, conditional logic for failed compilations). These combined concerns (view composition, event handling, data formatting and population) increase size and complexity and justify refactoring into smaller, more cohesive components (e.g., navigator component, size/timing subcomponents, a label factory or view-model updater)."
+}

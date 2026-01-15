@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "org.adoptopenjdk.jitwatch.ui.Dialogs",
+    "detection": true,
+    "justification": [
+        "Multiple distinct responsibilities collected in one class: Dialogs contains a nested Dialog Stage class plus four different dialog-construction methods (showYesNoDialog, showYesNoDialogNever, showTextInputDialog, showOKDialog) that build layouts, create controls, and wire event handlers.",
+        "Significant code duplication across methods: repeated creation/configuration of VBox/HBox, Insets, alignment, button creation and event handler wiring, and scene sizing logic — indicating lack of decomposition into reusable components or helper classes.",
+        "Use of shared mutable static state: the static fields 'response' and 'textInput' are used to communicate dialog results, coupling all dialog types and preventing safe concurrent/instance-based usage (should be instance-scoped or returned via callbacks/futures).",
+        "Large, imperative methods that mix UI layout, sizing logic, and event handling (e.g. manual message splitting, width calculation, and inline EventHandler implementations) rather than delegating to smaller cohesive abstractions (Dialog subclasses, builders, or controller objects)."
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": [
+        "DynamicType.MethodDefinition"
+    ],
+    "detection": true,
+    "justification": [
+        "The MethodDefinition nested type contains a very large API surface with numerous nested interfaces and many concrete nested classes (ReceiverTypeDefinition, ImplementationDefinition, TypeVariableDefinition, ExceptionDefinition, ParameterDefinition, Initial, Simple, Annotatable, AbstractBase, Adapter, AnnotationAdapter, ParameterAnnotationAdapter, TypeVariableAnnotationAdapter, etc.).",
+        "Responsibilities are mixed: it handles method declaration semantics (name, return type, modifiers), parameter and parameter-annotation handling, type variable definition, thrown exceptions, implementation selection (intercept/withoutCode/defaultValue), attribute appending, transformation, and materialization into method registry handlers. This violates single-responsibility and concentrates multiple concerns in one type.",
+        "The Adapter/AbstractBase implementations embed complex materialization logic, method registry wiring, attribute/transformer composition and auxiliary behavior (e.g. interface method optional implementation), indicating multiple roles that could be split into smaller components.",
+        "The nested type hierarchy and many helper adapters significantly increase size and cognitive complexity, making the unit hard to understand, maintain and evolve (e.g., many small inner classes implementing fine-grained behavior rather than being separate modular classes).",
+        "Given the volume and diversity of functionality implemented inside MethodDefinition (and its adapters), the code is a candidate for refactoring into multiple cohesive modules/classes (e.g., separate builders, matchers, materializers and attribute/transformer handlers)."
+    ]
+}

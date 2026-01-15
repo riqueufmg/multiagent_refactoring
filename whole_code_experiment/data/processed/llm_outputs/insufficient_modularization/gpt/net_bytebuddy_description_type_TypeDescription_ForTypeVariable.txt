@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["TypeDescription.ForTypeVariable"],
+    "detection": true,
+    "justification": [
+        "The analysed class is extremely large and aggregates many distinct responsibilities instead of being split into cohesive units. The file contains a top-level TypeDescription interface plus a very large hierarchy of nested types (Generic and many nested classes: OfNonGenericType, OfGenericArray, OfWildcardType, OfParameterizedType, OfTypeVariable, LazyProjection, Builder, LazyProxy, ForLoadedType, ArrayProjection, Latent, ForPackageDescription, SuperTypeLoading, and many inner utility and dispatcher types).",
+        "Numerous independent concerns are mixed together: generic-type representation and visiting (Generic.Visitor and many nested visitor implementations such as Assigner, Validator, Reifying, Substitutor, ForSignatureVisitor), annotation reading and delegation (Generic.AnnotationReader and many Delegator/Chained subclasses like ForLoadedField, ForLoadedMethodReturnType, ForTypeArgument, etc.), loading/caching dispatchers (ForLoadedType.DISPATCHER, JavaDispatcher proxies), class-loading projection logic (SuperTypeLoading and its ClassLoadingTypeProjection/ClassLoadingTypeList), builder functionality for constructing generic types (Generic.Builder and its many nested builder classes), and array/package projections.",
+        "Examples of excessive decomposition within one class: Generic.Visitor contains many nested enums and classes (Assigner with multiple Dispatcher implementations and nested ParameterAssigner classes), AnnotationReader includes many delegated inner classes and JavaDispatcher proxies, and Of* inner classes each implement specialized behavior for loaded/latent/erasure/reified variants. These are logically separable modules that would be easier to understand, test, and maintain if placed in separate classes/files.",
+        "The breadth of responsibilities (type description, generic handling, signature generation, annotation reading, caching, proxying, class loading, builder pattern, assignability logic, array projection, record & module handling) indicates that this abstraction was not adequately decomposed and thus has a bloated interface and implementation surface, which is characteristic of Insufficient Modularization."
+    ]
+}

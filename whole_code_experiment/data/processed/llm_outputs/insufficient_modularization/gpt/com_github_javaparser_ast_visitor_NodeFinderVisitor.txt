@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "NodeFinderVisitor",
+    "detection": true,
+    "justification": "The class is very large and bundles a huge number of responsibilities: it implements visit(...) for almost every AST node type (dozens of visit methods such as visit(AnnotationDeclaration), visit(MethodDeclaration), visit(IfStmt), visit(ModuleDeclaration), visit(RecordDeclaration), etc.). The methods are highly repetitive (repeated patterns: traverse child nodes, check selectedNode, then apply fn and set selectedNode) indicating duplicated control flow that could be extracted or delegated. The class holds global/static state (private static BiFunction<Node, Range, Boolean> fn and public static fConveringNode) and instance state (selectedNode) while performing traversal for all node categories instead of splitting concerns (for example by node-family visitors, delegating traversal, or composing smaller visitors). The large import list and size/complexity make it hard to understand and maintain, supporting that the class is insufficiently modularized and should be decomposed or refactored to reduce size and duplicate logic."
+}

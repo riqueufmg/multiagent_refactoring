@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "HashCodeBuilder",
+    "detection": true,
+    "justification": "The HashCodeBuilder class mixes multiple distinct responsibilities instead of delegating them to smaller, focused classes. In addition to the core builder behavior (iTotal/iConstant, append(...), appendSuper(...), toHashCode(), build()), it contains substantial reflection-based logic (reflectionAppend, many reflectionHashCode(...) overloads, use of AccessibleObject/Field, field exclusion logic), a thread-local cyclical-reference registry (REGISTRY, getRegistry(), isRegistered(), register(), unregister()), and array-type dispatching (appendArray and many primitive-array append overloads). This results in a large, bloated interface and class body that handles: (1) building hash codes, (2) reflection traversal and field access, (3) registry lifecycle for cycle detection, and (4) array type dispatch. These concerns could be modularized (e.g., separate ReflectionHashCode helper, Registry/IDKey manager, and array-handling utilities), improving cohesion and maintainability. The presence of many unrelated helper responsibilities and numerous overloads justifies flagging Insufficient Modularization."
+}

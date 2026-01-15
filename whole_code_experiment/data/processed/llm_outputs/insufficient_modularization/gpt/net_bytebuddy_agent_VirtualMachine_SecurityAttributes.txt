@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.agent.VirtualMachine"],
+    "detection": true,
+    "justification": [
+        "The VirtualMachine type combines a public interface with a very large number of nested implementations and platform-specific native bindings (ForHotSpot, ForOpenJ9, Connection and many nested Connection.* implementations), concentrating many responsibilities in one top-level class.",
+        "Platform-specific plumbing is intermixed: POSIX socket handling (Connection.ForJnaPosixSocket, PosixLibrary), Solaris door handling (ForJnaSolarisDoor, SolarisLibrary), Windows named-pipe and remote-thread injection (ForJnaWindowsNamedPipe, WindowsLibrary, WindowsAttachLibrary), and OpenJ9-specific file/semaphore dispatchers (Dispatcher and its ForJnaPosixEnvironment / ForJnaWindowsEnvironment) all live inside the same class, rather than in separate modules.",
+        "Numerous distinct concerns are present: high-level VM attach API, socket and pipe IO, file-system and lock coordination (ForOpenJ9.attach with FileLock, reply files), security descriptor and ACL creation (createSecurityAttributesToAllowMediumIntegrity), semaphore manipulation, and external process interactions (stat/istat wrappers). This bloats the class and violates single-responsibility principles.",
+        "Many large, complex methods and classes (e.g. ForOpenJ9.attach with extensive file/synchronization logic, ForJnaWindowsNamedPipe.execute with remote code allocation and thread creation, PosixOwnerProvider implementations invoking external commands) increase cognitive load and make the unit hard to understand, test, and maintain.",
+        "The class-level packaging of all OS-specific bindings, utility logic and protocol handling into one nested hierarchy indicates a lack of decomposition; these elements are natural candidates to be split into separate classes/modules (e.g., separate connector implementations, native-binding adapters, and file/semaphore utilities)."
+    ]
+}

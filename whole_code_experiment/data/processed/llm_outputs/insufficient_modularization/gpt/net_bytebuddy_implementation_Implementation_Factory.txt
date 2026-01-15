@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": [
+        "Implementation"
+    ],
+    "detection": true,
+    "justification": [
+        "The Implementation interface contains an extremely large set of nested types and responsibilities rather than a focused abstraction: Target (and Target.Factory, Target.AbstractBase, DefaultMethodInvocation), Context (and Context.Factory, Context.ExtractableView, Disabled, Default, many Default inner classes like CacheValueField, FieldCacheEntry, AccessorMethod, FieldGetter, FieldSetter, DelegationRecord and its subclasses), compound composition (Compound, Compound.Composable) and Simple implementations (Simple, Dispatcher, ForDispatcher, Appender).",
+        "These nested types implement many separate concerns: byte-code appending, special method invocation logic, target creation, default-method resolution, context lifecycle and frame generation, auxiliary type registration, static value caching, accessor/getter/setter generation and method-pool record creation. This concentration of unrelated responsibilities reduces cohesion and indicates a bloated, monolithic abstraction.",
+        "The file defines many concrete helper classes and factories (e.g. Default implementation context with caching maps, accessor naming strategies, FieldCacheEntry logic) that could be separated into their own classes/modules. The presence of multiple factories, enums, and complex inner implementations inside a single top-level interface is a sign that the abstraction has not been decomposed sufficiently."
+    ]
+}

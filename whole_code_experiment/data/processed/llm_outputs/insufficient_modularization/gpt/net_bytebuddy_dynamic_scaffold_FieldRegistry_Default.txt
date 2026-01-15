@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "FieldRegistry.Default",
+    "detection": false,
+    "justification": "The class is focused on a single responsibility: managing a registry of field definitions and preparing (compiling) them for an instrumented type. Its API surface is small (constructors, prepend, compile) and state is minimal (a final List<Entry>). Related but distinct concerns are separated into nested types: Entry (latent matcher + metadata) and Compiled (compiled entries with its own Entry type), which encapsulate the compile-time vs. configuration-time behavior. Methods are small and delegate to factories/transformers rather than entangling logic. Use of immutable fields and small helper classes indicates adequate decomposition rather than a bloated, monolithic class."
+}

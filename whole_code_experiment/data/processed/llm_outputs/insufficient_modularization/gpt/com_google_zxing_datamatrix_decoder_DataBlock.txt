@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "DataBlock",
+    "detection": true,
+    "justification": "The class mixes a simple data-holder (fields numDataCodewords, codewords, private constructor, and simple getters) with a large, complex static factory method getDataBlocks that performs many distinct responsibilities. getDataBlocks contains lengthy control flow (multiple nested loops), special-case logic (specialVersion check for version.getVersionNumber() == 24), magic numbers (24, 8), manual byte distribution and indexing via rawCodewordsOffset, construction of block arrays, de-interleaving of data and error-correction bytes, and final validation (throwing IllegalArgumentException). This concentration of parsing/assembly logic in the DataBlock class makes it large and multifaceted rather than a cohesive abstraction; those responsibilities would be better modularized into smaller helper methods or a separate builder/decoder class."
+}

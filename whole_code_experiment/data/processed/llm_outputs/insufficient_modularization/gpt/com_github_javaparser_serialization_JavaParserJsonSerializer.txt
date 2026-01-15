@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "JavaParserJsonSerializer",
+    "detection": true,
+    "justification": "The class concentrates multiple responsibilities that could be separated: it implements AST traversal/serialization (serialize, recursive handling of PropertyMetaModel and NodeList), low-level JSON writing for non-meta properties (writeNonMetaProperties), dedicated formatting of ranges and tokens (writeRange, writeTokens, writeToken), and defines several JSON-key enums (JsonNode, JsonRange, JsonTokenRange, JsonToken). The serialize method contains complex logic mixing traversal, meta-model inspection and value formatting. The presence of protected hooks (writeNonMetaProperties) and tightly coupled token/range logic indicate clear candidates for extraction (e.g., separate RangeSerializer, TokenSerializer, and a JSON-key constants holder). These factors show insufficient decomposition into smaller, cohesive abstractions."
+}

@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.build.maven.ByteBuddyMojo"],
+    "detection": true,
+    "justification": [
+        "The class is excessively large and contains many distinct responsibilities: Maven mojo parameter handling, plugin discovery and class loader creation (execute), classpath resolution, transformation orchestration (transform), file I/O and staleness handling, dependency resolution, and logging.",
+        "Numerous nested static classes and inner classes implement disparate concerns (ForLifecycleTypes and its many subclasses, ForExplicitLocations and variants, ForDependencyFolder, Transformer and multiple Transformer implementations, MavenBuildLogger, TransformationLogger, Coordinate, StalenessFilter, FilePrefixMatcher). This concentration of functionality indicates poor separation of concerns.",
+        "Critical methods are long and multipart: execute() performs initialization, discovery, class loader creation and error handling; transform() handles staleness detection, class file locator construction, plugin factory creation, entry point resolution, Java version detection, and summary/error handling. These are candidates for extraction to dedicated classes.",
+        "Mixing high-level orchestration with low-level details (e.g., creating URLClassLoader, resolving Maven dependencies, filesystem operations, logging adapters) increases complexity and reduces cohesion, making the class hard to understand, test, and maintain."
+    ]
+}

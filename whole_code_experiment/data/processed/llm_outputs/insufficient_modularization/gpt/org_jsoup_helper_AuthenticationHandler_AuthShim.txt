@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "AuthenticationHandler",
+    "detection": false,
+    "justification": [
+        "The class is small and focused: it primarily implements authentication delegation (getPasswordAuthentication), holds minimal state (auth, attemptCount, handler), and defines a small AuthShim interface and a compact GlobalHandler fallback.",
+        "There is a clear modular boundary: AuthShim abstracts per-request vs global behavior, and the static initializer/reflection delegates loading of a RequestAuthHandler implementation when available, demonstrating separation of concerns rather than a bloated single class.",
+        "Nested GlobalHandler is concise (manages a ThreadLocal and installs the system Authenticator) and encapsulates Java 8 fallback behavior; it does not introduce an excessive interface or unrelated responsibilities.",
+        "No large number of unrelated methods or fields are present; the behavior and responsibilities are cohesive and appropriately decomposed for this purpose."
+    ]
+}

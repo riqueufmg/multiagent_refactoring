@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "CountingPathVisitor",
+    "detection": false,
+    "justification": [
+        "Class has a focused responsibility: counting files, directories and bytes while visiting a file tree (single cohesive abstraction).",
+        "Functionality is decomposed and delegated: counting logic is delegated to PathCounters, filtering to PathFilter/IOFileFilter, and directory transformation to a UnaryOperator<Path>.",
+        "Construction concerns are separated into nested builder classes (AbstractBuilder and Builder) rather than inflating the main class.",
+        "Methods are small and purpose-specific (accept, updateFileCounters, updateDirCounter, visitFile, preVisitDirectory, postVisitDirectory) and mostly act as thin orchestration around delegated components.",
+        "Presence of small static factory/default methods (defaultFileFilter, defaultDirectoryFilter, defaultPathCounters, withBigIntegerCounters, withLongCounters) keeps configuration logic separate and avoids bloating core behavior."
+    ]
+}

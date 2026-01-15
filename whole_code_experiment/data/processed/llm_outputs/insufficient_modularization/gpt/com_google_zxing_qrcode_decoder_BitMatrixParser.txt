@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "BitMatrixParser",
+    "detection": true,
+    "justification": "BitMatrixParser combines multiple distinct responsibilities that could be decomposed: it parses format information (readFormatInformation), parses version information (readVersion), extracts codewords including unmasking and traversing the data region (readCodewords), and also performs matrix transformations/mirroring (mirror, remask, setMirror). It holds multiple pieces of parser state (parsedVersion, parsedFormatInfo, mirror) and directly mutates the BitMatrix. The class contains complex, independent algorithms (nested loops for reading codewords and version bits, bit-copying via copyBit with mirror semantics, and DataMask/unmasking logic) which increases complexity and reduces cohesion. These separate concerns (format/version bit extraction, data-bit iteration & unmasking, and matrix transformation) indicate the class is doing more than one cohesive job and would be better modularized into smaller classes (e.g., FormatInformationParser, VersionParser, CodewordReader, BitMatrixTransformer) to improve readability, testability, and maintainability."
+}

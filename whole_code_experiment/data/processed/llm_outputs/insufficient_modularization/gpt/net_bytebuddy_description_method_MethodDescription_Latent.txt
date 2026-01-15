@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["MethodDescription.Latent"],
+    "detection": false,
+    "justification": [
+        "Cohesive single responsibility: Latent encapsulates a detached representation of a method (declaringType, internalName, modifiers, typeVariables, returnType, parameterTokens, exceptionTypes, declaredAnnotations, defaultValue, receiverType) and exposes a focused set of accessors for that purpose (getTypeVariables, getReturnType, getParameters, getExceptionTypes, getDeclaredAnnotations, getInternalName, getDeclaringType, getModifiers, getDefaultValue, getReceiverType).",
+        "Delegates complexity: Latent defers non-trivial behavior to other modular components (TypeList.Generic.ForDetachedTypes.attach, ParameterList.ForTokens, AnnotationList.Explicit and TypeDescription.Generic.Visitor.Substitutor.ForAttachment), indicating responsibilities are separated rather than concentrated in this class.",
+        "Immutability and small API surface: Fields are final and the class provides simple, well-scoped methods rather than a large, mixed set of unrelated behaviors, reducing maintenance complexity.",
+        "Contained special-case is modularized: the nested TypeInitializer class isolates the distinct concept of a type initializer, rather than bloating Latent with that logic."
+    ]
+}

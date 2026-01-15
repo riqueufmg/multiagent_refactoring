@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "WordUtils",
+    "detection": true,
+    "justification": "WordUtils groups many distinct responsibilities into a single large utility class: capitalization (capitalize, capitalize(String,char...), capitalizeFully, uncapitalize, uncapitalize(String,char...)), case transformations (swapCase), token/initial extraction (initials, initials(String,char...)), searching (containsAllWords using per-word regex compilation), and complex line-wrapping logic (multiple overloads of wrap that build Patterns, use Matchers and substantial control flow). The wrap(...) method alone contains complex algorithmic logic that could be factored into a dedicated wrapping/TextFormatter class; containsAllWords performs regex compilation inside a loop (search responsibility) that is orthogonal to simple word utilities. The class exposes many public static methods covering multiple cohesive areas of behavior, and even provides a public constructor despite being a static utility. These indicate a bloated interface and multiple responsibilities that should be decomposed into smaller, more focused classes/modules."
+}

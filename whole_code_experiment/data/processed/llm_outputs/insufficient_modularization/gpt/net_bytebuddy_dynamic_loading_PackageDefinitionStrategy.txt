@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["PackageDefinitionStrategy"],
+    "detection": [true],
+    "justification": [
+        "The interface aggregates many distinct responsibilities and implementations in one type: top-level strategy (PackageDefinitionStrategy), multiple strategy singletons (NoOp, Trivial), the Definition abstraction with several nested variants (Undefined, Trivial, Simple) and a feature-rich ManifestReading implementation with its own SealBaseLocator hierarchy (NonSealing, ForFixedValue, ForTypeResourceUrl).",
+        "ManifestReading.define(...) contains complex logic for reading and merging manifest attributes and deciding sealing, coupling manifest parsing with package definition creation instead of delegating to separate parser/mapper classes.",
+        "SealBaseLocator.ForTypeResourceUrl.findSealBase(...) encapsulates protocol-specific resource resolution (handling 'jar', 'file', 'jrt'), URI/URL manipulation and fallback behavior, representing a separate concern that inflates the containing class.",
+        "Definition.Simple packs data representation, compatibility logic (isCompatibleTo), and equals/hashCode implementations, making the nested type large and multi-faceted.",
+        "These clustered responsibilities (strategy orchestration, manifest parsing, seal base location, data representation and equality logic) increase class size and complexity and would be more maintainable, testable and understandable if decomposed into smaller cohesive classes/modules."
+    ]
+}

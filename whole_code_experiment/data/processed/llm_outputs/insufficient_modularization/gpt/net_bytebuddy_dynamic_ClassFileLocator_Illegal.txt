@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.dynamic.ClassFileLocator"],
+    "detection": true,
+    "justification": [
+        "The ClassFileLocator interface file contains an excessive number of nested concrete types and helpers (Resolution, Resolution.Illegal, Resolution.Explicit, NoOp, MultiReleaseAware, Simple, ForClassLoader (+ WeaklyReferenced), ForModule (+ WeaklyReferenced), ForJarFile, ForModuleFile, ForFolder, ForUrl (+ ClassLoaderCreationAction), ForInstrumentation (+ Dispatcher, ClassLoadingDelegate with Default, ForDelegatingClassLoader, Explicit), ExtractionClassFileTransformer, PackageDiscriminating, Filtering, Compound).",
+        "These nested types implement many distinct responsibilities: class loader resource lookup, module resource lookup, jar/jmod/zip handling, folder traversal, URL-based class loading, multi-release JAR/version resolution, instrumentation-based extraction, dispatcher/reflection plumbing, and composition/filtering of locators. Concentrating all of these concerns in one type violates separation of concerns and results in a very large, complex abstraction.",
+        "Several nested classes contain substantial, independent logic (e.g. ForInstrumentation and its Dispatcher/ClassLoadingDelegate hierarchy, ForJarFile multi-release manifest parsing, ForFolder multi-release folder scanning, ExtractionClassFileTransformer), indicating functionality that would be better modularized into separate top-level classes or packages.",
+        "The interface file also includes I/O, class-loading, reflection, security/privileged-action, and agent/instrumentation-specific code. The variety and volume of unrelated responsibilities and helper implementations justify the classification as insufficiently modularized."
+    ]
+}

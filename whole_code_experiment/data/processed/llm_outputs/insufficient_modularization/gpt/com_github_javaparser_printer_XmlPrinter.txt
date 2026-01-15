@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "XmlPrinter",
+    "detection": true,
+    "justification": "The XmlPrinter class concentrates multiple responsibilities that could be separated: it manages XML stream creation/closing (outputDocument( Node, String, Writer ), outputDocument( Node, String, XMLStreamWriter )), high-level document framing (outputDocument(...)), node traversal and AST property inspection, and the detailed emission of attributes, singular child nodes and node lists all inside a single large method (outputNode). The outputNode method is long and handles distinct concerns (writing attributes, writing singular subnodes, writing list subnodes, constructing element names, and exception wrapping) using multiple inline predicates and stream pipelines, which reduces cohesion. The class also contains exception-wrapping logic (RuntimeXMLStreamException) and a deprecated compatibility API (deprecated output(...) method), further mixing concerns. These signs (a large multi-purpose outputNode, stream creation + traversal + formatting in one class, inline predicate logic and exception wrapper) indicate insufficient modularization and candidates for refactoring into smaller, cohesive helpers or collaborators (e.g., separate XmlWriter/stream management, attribute-emitter, node-traverser)."
+}

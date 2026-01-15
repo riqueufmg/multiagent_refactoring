@@ -1,0 +1,13 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.pool.TypePool"],
+    "detection": true,
+    "justification": [
+        "The TypePool interface file is extremely large and contains many unrelated responsibilities folded into a single top-level abstraction (type lookup/cache API) and its inner classes.",
+        "Numerous major responsibilities are implemented as nested types: cache management (CacheProvider, Simple, UsingSoftReference, WithIllegalResolutionReattempt, Discriminating), byte-code parsing and class-file reading (Default, ReaderMode, TypeExtractor, ModuleExtractor, FieldExtractor, MethodExtractor, RecordComponentExtractor), lazy resolution and representations (WithLazyResolution, LazyResolution, LazyTypeDescription, ExtendedLazyTypeDescription and many nested Delegate/Lazy* classes), generic signature parsing and representation (GenericTypeExtractor, GenericTypeToken and many token/resolution classes, TokenizedGenericType), annotations and annotation-value handling (AnnotationRegistrant, AnnotationToken, LazyAnnotationDescription, LazyAnnotationValue), component type/location logic (ComponentTypeLocator implementations), and many others (ClassLoading, Explicit, LazyFacade, ParameterBag, ModuleToken, FieldToken, MethodToken, RecordComponentToken, etc.).",
+        "The aggregation of parsing logic, tokenization, lazy-loading, caching strategies, module description, generic-type resolution, annotation extraction, and class-loading within a single interface/class hierarchy leads to high coupling and low cohesion: many pieces could be independently developed, tested, and maintained but are instead tightly nested and interleaved.",
+        "Specific examples showing modularity issues: TypePool.Default.TypeExtractor alone implements full ASM ClassVisitor traversal and collects data; LazyTypeDescription contains dozens of nested classes (FieldTokenList, MethodTokenList, many Lazy* descriptors); GenericTypeToken and TokenizedGenericType implement a complex generic-signature parsing/representation system. These are substantial subsystems that should be decoupled into separate classes/modules.",
+        "Maintaining or extending any single concern (e.g., cache strategies, signature parsing, annotation value resolution, or class file extraction) requires navigating a monolithic source with many inner classes, increasing cognitive load and reducing testability and reusability.",
+        "Therefore this class exhibits the Insufficient Modularization smell and would benefit from splitting large nested subsystems into separate, focused top-level classes or packages (e.g., separate parser, lazy-representation, cache, annotation, and generic-signature modules)."
+    ]
+}

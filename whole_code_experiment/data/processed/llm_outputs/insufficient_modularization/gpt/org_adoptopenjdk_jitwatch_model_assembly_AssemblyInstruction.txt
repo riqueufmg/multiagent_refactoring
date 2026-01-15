@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "AssemblyInstruction",
+    "detection": true,
+    "justification": [
+        "Class mixes data model and presentation: it stores instruction state (annotation, address, prefixes, mnemonic, operands, commentLines, labels, isSafePoint) and contains extensive string-formatting/printing logic (two overloaded toString methods with nearly duplicate StringBuilder code).",
+        "Duplicated and complex formatting code: toString(int, boolean) and toString(int, int, boolean) contain largely repeated logic for building output, making the class harder to maintain and violating single responsibility.",
+        "Multiple responsibilities around comments and semantics: methods addCommentLine, appendToLastCommentLine, getComment/getCommentLines, isSafePoint and isOptimizedVCall combine comment storage, mutation, and semantic detection (safepoint and optimized vcall) instead of delegating to smaller cohesive classes (e.g. Comment, SafePointDetector).",
+        "Formatting concerns partially delegated but still entangled: the class delegates address/operand label formatting to AssemblyLabels yet retains most presentation details (hex padding, spacing, newline handling, alignment), indicating a poor separation of concerns and a bloated interface.",
+        "Refactoring candidates: extract a Renderer/Formatter for string output, extract a Comment object (with safepoint/optimized-call detection), and remove duplicated toString logic to improve modularity and cohesion."
+    ]
+}

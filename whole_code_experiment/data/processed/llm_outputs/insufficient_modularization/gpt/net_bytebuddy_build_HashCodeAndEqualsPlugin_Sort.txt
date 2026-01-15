@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.build.HashCodeAndEqualsPlugin",
+    "detection": true,
+    "justification": "The class combines many responsibilities and large, unrelated concerns in one type: it implements Plugin, Plugin.Factory, MethodAttributeAppender.Factory and MethodAttributeAppender, contains heavy static initialization resolving multiple annotation properties (ENHANCE_*, VALUE_HANDLING_VALUE, SORTED_VALUE), and its apply(...) method both configures hashCode and equals generation and returns an attribute appender. It also declares multiple nested annotation types (Enhance, ValueHandling, Sorted, Identity), a nested enum (AnnotationOrderComparator) and a nested matcher class (ValueMatcher) plus a specialized subclass (WithNonNullableFields). The presence of comparator logic, annotation definitions, matching logic, plugin factory behavior and bytecode-visitor logic (apply(MethodVisitor,...)) in one class indicates excessive size and mixed responsibilities that should be decomposed into smaller, cohesive abstractions."
+}

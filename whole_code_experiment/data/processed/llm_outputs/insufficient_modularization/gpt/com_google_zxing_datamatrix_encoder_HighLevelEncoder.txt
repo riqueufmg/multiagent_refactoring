@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "HighLevelEncoder",
+    "detection": true,
+    "justification": [
+        "The class centralizes many distinct responsibilities: high-level orchestration of the encoding process (encodeHighLevel), look-ahead/encoding-mode cost calculation (lookAheadTest and lookAheadTestIntern), character classification utilities (isDigit, isExtendedASCII, isNativeC40, isNativeText, isNativeX12, isNativeEDIFACT, isX12TermSep), padding/randomization (randomize253State), and error/utility helpers (determineConsecutiveDigitCount, illegalCharacter).",
+        "lookAheadTestIntern is a very large, complex method implementing multiple labeled algorithmic steps (step J..R) and heavy branching; it should be decomposed into smaller units or strategy objects to improve readability and testability.",
+        "encodeHighLevel mixes macro detection, encoder instantiation, the main encoding loop, unlatch logic and padding — i.e., control flow, resource setup, and multiple encoding concerns are all in one class/method rather than separated.",
+        "The class also contains many constants, special-case logic (e.g. macro headers/trailers), and a not-yet-implemented placeholder (isSpecialB256 returns false //TODO), indicating a bloated interface and mixed concerns that would benefit from modularization.",
+        "HighLevelEncoder constructs and coordinates various Encoder implementations (ASCIIEncoder, C40Encoder, TextEncoder, X12Encoder, EdifactEncoder, Base256Encoder) and decision logic for choosing among them; that selection and look-ahead logic are strong candidates for extraction into separate classes/strategies."
+    ]
+}

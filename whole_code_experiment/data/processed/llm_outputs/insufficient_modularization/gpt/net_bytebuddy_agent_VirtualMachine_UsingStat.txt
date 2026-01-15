@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["VirtualMachine.UsingStat"],
+    "detection": false,
+    "justification": [
+        "The class is small and focused: it declares three fields (attempts, pause, timeUnit), a constructor, and a single public method getOwnerIdOf(File).",
+        "Single responsibility: the class only implements logic to obtain a file owner's UID by invoking a platform stat command and parsing its output; there are no unrelated responsibilities or large unrelated code paths.",
+        "Low complexity: the method contains a straightforward loop to wait for the external process to finish and parse its output; there are no many branches, large switch statements, or multiple responsibilities that would justify decomposition.",
+        "No bloated interface or many public methods: the class exposes only the functionality required by PosixOwnerProvider and does not aggregate different concerns that should be split into separate abstractions."
+    ]
+}

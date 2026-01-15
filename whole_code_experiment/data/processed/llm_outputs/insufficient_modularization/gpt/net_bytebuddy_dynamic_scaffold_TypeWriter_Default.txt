@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.dynamic.scaffold.TypeWriter.Default"],
+    "detection": true,
+    "justification": [
+        "Extremely large class with many nested types and responsibilities: contains numerous inner classes and interfaces such as UnresolvedType, SignatureKey, ValidatingClassVisitor (and its Constraint hierarchy), ForInlining (with many nested visitors like RedefinitionClassVisitor, CodePreservingMethodVisitor, AttributeObtainingMethodVisitor), ForCreation (CreationClassVisitor), WithDecorationOnly (DecorationClassVisitor), ClassDumpAction (and Dispatcher/Enabled), InitializationHandler (with many subtypes), ContextRegistry, FrameWriter implementations, PatchingModuleVisitor, DeduplicatingClassVisitor, AttributeObtainingFieldVisitor, AttributeObtainingRecordComponentVisitor, etc.",
+        "Multiple distinct responsibilities concentrated in one abstraction: writing/creating/redefining/rebasing/decorating types, class file dumping, validation, method/field/record-component pool handling, implementation context management, frame writing, module patching and auxiliary type management are all implemented inside this single class and its inner types.",
+        "Numerous factory/static constructors for different use cases (forCreation, forRedefinition, forRebasing, forDecoration) and very large constructors with many parameters indicate the class is acting as a composition of several distinct workflows rather than a cohesive single responsibility.",
+        "High internal complexity and coupling: heavy use of large switch/decision logic across nested visitors (e.g., RedefinitionClassVisitor and CreationClassVisitor) and tight coupling between visitor logic, initialization handling and pools make the class hard to understand, test and evolve independently.",
+        "Many opportunities for modularization are visible: large inner visitors and handler implementations are logically separable (validators, dumpers, inlining/redefinition visitors, module patcher, frame writers, initialization handlers) and could be extracted into smaller, focused top-level classes or packages to improve cohesion and maintainability."
+    ]
+}

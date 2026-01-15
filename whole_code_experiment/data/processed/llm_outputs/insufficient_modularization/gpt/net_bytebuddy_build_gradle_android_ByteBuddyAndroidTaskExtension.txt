@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ByteBuddyAndroidTaskExtension"],
+    "detection": false,
+    "justification": [
+        "The class is a cohesive configuration/extension holder: all fields (entryPoint, suffix, failOnLiveInitializer, warnOnEmptyTypeSet, failFast, extendedParsing, discovery, threads, discoverySet, transformations) represent related configuration for a Byte Buddy Android task.",
+        "Most methods are simple getters/setters and small helpers (transformation(Closure), transformation(Action)) with no large monolithic logic, so responsibilities are not mixed or bloated into complex methods.",
+        "Behavior that is non-trivial is delegated to other types: transformations are instances of Transformation, EntryPoint is a separate abstraction, and configure(...) merely maps these properties onto a ByteBuddyLocalClassesEnhancerTask, indicating clear separation of concerns.",
+        "The class size and interface are appropriate for an extension object; it groups related configuration rather than combining unrelated responsibilities, so it does not exhibit excessive size or lack of decomposition."
+    ]
+}

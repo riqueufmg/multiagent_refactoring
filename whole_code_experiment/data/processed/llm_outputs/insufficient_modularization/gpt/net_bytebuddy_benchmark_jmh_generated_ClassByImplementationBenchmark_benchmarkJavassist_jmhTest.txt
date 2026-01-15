@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "ClassByImplementationBenchmark_benchmarkJavassist_jmhTest",
+    "detection": true,
+    "justification": [
+        "The class is large and combines many distinct responsibilities: benchmark orchestration (warmup, measurement, warmdown), result aggregation, sampling logic, and instance lifecycle management (setup/teardown). Evidence: methods benchmarkJavassist_Throughput, benchmarkJavassist_AverageTime, benchmarkJavassist_SampleTime, benchmarkJavassist_SingleShotTime and their corresponding stub methods (_thrpt_jmhStub, _avgt_jmhStub, _sample_jmhStub, _ss_jmhStub) all live in the same class.",
+        "It contains numerous fields that bloat the class state: 256 byte padding fields p000..p255 plus several shared fields (benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, startRndMask, f_classbyimplementationbenchmark0_0), indicating mixed concerns and large state.",
+        "Sampling and measurement mechanics are implemented inline (use of SampleBuffer, rnd/rndMask logic, RawResults population, control flags) instead of being factored into smaller, focused components, increasing complexity and reducing cohesion.",
+        "Because multiple orthogonal concerns (measurement modes, sampling, threading/control handling, blackhole management, and lifecycle) are concentrated in one generated class, it exhibits insufficient modularization and would benefit from separating measurement strategies, sampling utilities, and lifecycle/state into smaller classes or helpers."
+    ]
+}

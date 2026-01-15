@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "ClassMemberList",
+    "detection": true,
+    "justification": [
+        "The class centralizes multiple distinct responsibilities rather than a single cohesive one: UI construction/layout (constructor adding CheckBox and ListView), selection management (selectedProgrammatically flag, selectMember, clearClassMembers, notifyListeners), context menu creation and event wiring (buildContextMenuCompiledMember, buildContextMenuUncompiledMember, getEventHandlerContextMenu, getEventHandlerMenuItem* methods), and domain logic for intrinsics (findIntrinsicsUsedByMember, addArrowWithNewLineToEachIntrinsicEntry using IntrinsicFinder).",
+        "Mixing UI concerns with configuration persistence: the CheckBox listener directly updates and saves JITWatchConfig (changed(...) calls config.setShowOnlyCompiledMembers and config.saveConfig()), coupling UI to config persistence.",
+        "Presence of many small, unrelated helper methods and multiple factories for event handlers increases class size and complexity (numerous private methods that could be delegated), reducing cohesion and making the class harder to understand and test.",
+        "Use of domain/service code (IntrinsicFinder and string-building of intrinsic results) inside the UI class indicates business logic is embedded in the UI component rather than separated into a service.",
+        "Given these factors (multiple responsibilities, UI + domain logic + config handling + event wiring), the class should be decomposed—e.g. split context-menu building/event handling, selection management, and intrinsic-finding into separate, smaller classes—to address insufficient modularization."
+    ]
+}

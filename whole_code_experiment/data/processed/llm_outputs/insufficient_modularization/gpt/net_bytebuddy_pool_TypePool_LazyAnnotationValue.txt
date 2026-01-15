@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["TypePool.LazyAnnotationValue"],
+    "detection": true,
+    "justification": [
+        "The analyzed type (private abstract static class LazyAnnotationValue<U,V>) encapsulates multiple distinct responsibilities that are implemented as numerous inner subclasses rather than separate classes: ForMismatchedType, ForTypeValue, ForAnnotationValue, ForEnumerationValue and ForArray. Each of these nested classes implements different resolution/load/filtering behaviors (e.g. type resolution, annotation resolution, enum handling, array element resolution).",
+        "LazyAnnotationValue provides both the high-level proxy API (doResolve(), getState(), filter(), resolve(), load()) and detailed resolving logic (cached resolution, construction of specific AnnotationValue implementations) which mixes concerns of representation, resolution, loading and error handling.",
+        "The class is deeply nested inside LazyTypeDescription inside Default TypePool, which itself is a very large container with many responsibilities. Coupling these varied behaviors into a single nested abstraction increases size and complexity at that location and makes the code harder to understand and maintain (many private nested classes and specialized logic in one place).",
+        "Code evidence: presence of multiple specialized inner classes (ForTypeValue.doResolve uses TypePool.describe(), ForAnnotationValue.doResolve inspects annotation tokens, ForEnumerationValue.doResolve checks enum constants, ForArray.doResolve performs component-type lookup and iterates values), plus caching annotations (@CachedReturnPlugin.Enhance) and string/error handling logic, all inside the same LazyAnnotationValue abstraction."
+    ]
+}

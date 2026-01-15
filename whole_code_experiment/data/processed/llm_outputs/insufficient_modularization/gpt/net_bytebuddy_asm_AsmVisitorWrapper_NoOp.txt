@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "AsmVisitorWrapper",
+    "detection": true,
+    "justification": "The AsmVisitorWrapper type concentrates many distinct responsibilities and large nested implementations in a single abstraction: it declares the core interface and also contains multiple full-featured nested implementations (NoOp, AbstractBase, ForDeclaredFields, ForDeclaredMethods, Compound) plus many inner types (Entry classes, FieldVisitorWrapper, MethodVisitorWrapper, DispatchingVisitor implementations). ForDeclaredFields and ForDeclaredMethods each implement complex mapping logic, dispatch visitors, matcher entries and wrapping chains (e.g., mapping fields/methods by internalName+descriptor, iterating entries to wrap visitors, managing reader/writer flags). Compound implements chain composition logic and flag merging. This results in a bloated, multi-responsibility class grouping unrelated concerns (interface contract, multiple concrete strategies, builder-like APIs, and dispatch/runtime mapping internals) rather than decomposed, cohesive classes, indicating insufficient modularization."
+}

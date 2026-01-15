@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ClassLoadingStrategy.WrappingDispatcher"],
+    "detection": false,
+    "justification": [
+        "The WrappingDispatcher has a single, well-defined responsibility: configuring and dispatching a wrapping ByteArrayClassLoader. Its fields (protectionDomain, persistenceHandler, packageDefinitionStrategy, classLoaderDecoratorFactory, childFirst, forbidExisting, sealed) are all configuration properties directly related to that responsibility.",
+        "Behavior is modular and delegated: the load(...) method delegates actual class loading to ByteArrayClassLoader.load(...) or ByteArrayClassLoader.ChildFirst.load(...), avoiding mixed responsibilities or inlined complex logic.",
+        "Configuration methods (with(...), allowExistingTypes(), opened()) follow a clear immutable/builder-like pattern that returns new WrappingDispatcher instances with a single changed concern, indicating cohesive decomposition of configuration concerns.",
+        "Related alternative strategies and injection mechanics are defined in separate nested dispatchers (InjectionDispatcher) or other classes (UsingLookup, ForUnsafeInjection, etc.), so WrappingDispatcher does not accumulate unrelated functionality from other strategies."
+    ]
+}

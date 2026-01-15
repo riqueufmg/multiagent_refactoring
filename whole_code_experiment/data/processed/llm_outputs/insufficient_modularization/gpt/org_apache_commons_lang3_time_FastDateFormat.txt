@@ -1,0 +1,12 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "FastDateFormat",
+    "detection": false,
+    "justification": [
+        "The class is small and primarily delegates responsibilities: it holds two private final fields 'printer' (FastDatePrinter) and 'parser' (FastDateParser) which encapsulate the formatting and parsing logic respectively.",
+        "Constructors immediately create FastDatePrinter and FastDateParser (protected FastDateFormat(...)), indicating decomposition of behavior into separate classes rather than consolidating logic here.",
+        "Nearly all public methods are thin wrappers that delegate to printer or parser (e.g. format(Calendar), format(Date), format(long), parse(String), parse(String, ParsePosition), parse(String, ParsePosition, Calendar)), showing single-responsibility and modular design.",
+        "The class uses a dedicated cache (private static final AbstractFormatCache<FastDateFormat> CACHE) and static factory methods to obtain instances, keeping caching and creation concerns separated from formatting/parsing implementations.",
+        "There are no large monolithic methods or duplicated responsibilities inside FastDateFormat; it acts as a façade that composes smaller cohesive components (FastDatePrinter/FastDateParser), so insufficient modularization is not present."
+    ]
+}

@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "InjectionClassLoader",
+    "detection": false,
+    "justification": "The class is cohesive and focused on a single abstraction: enabling runtime injection of classes. Its responsibilities are limited and separated: it manages a sealed state (private AtomicBoolean sealed, isSealed(), seal()), exposes safe public APIs for defining classes (defineClass, defineClasses) while delegating the actual loading to an abstract doDefineClasses(Map) for subclass-specific behavior, and contains a nested Strategy enum that performs straightforward mapping logic and delegates to defineClasses. The static initialization and private doRegisterAsParallelCapable() are small, self-contained implementation details related to class loader behavior. There are no large, unrelated methods or multiple distinct responsibilities that would indicate a need to split the class into smaller abstractions."
+}

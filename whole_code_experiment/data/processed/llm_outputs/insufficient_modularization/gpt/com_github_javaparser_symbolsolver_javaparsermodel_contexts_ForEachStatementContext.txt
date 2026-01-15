@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["ForEachStatementContext"],
+    "detection": false,
+    "justification": [
+        "The class is small and focused: it only implements symbol resolution behavior for a ForEachStmt (constructor + solveSymbol, solveMethod, localVariablesExposedToChild).",
+        "Each method has a single, cohesive responsibility: solveSymbol handles the foreach loop variable lookup and delegates to block/parent contexts; solveMethod delegates to the parent context; localVariablesExposedToChild exposes the loop variable to the body.",
+        "No large methods, duplicated responsibilities, or multiple unrelated concerns are present — behavior is delegated to StatementContext and parent contexts (use of StatementContext.solveInBlock, solveSymbolInParentContext, solveMethodInParentContext).",
+        "There is no bloated interface or evidence that this class aggregates many responsibilities that should be split; it represents a single, well-scoped abstraction (the context of a for-each statement)."
+    ]
+}

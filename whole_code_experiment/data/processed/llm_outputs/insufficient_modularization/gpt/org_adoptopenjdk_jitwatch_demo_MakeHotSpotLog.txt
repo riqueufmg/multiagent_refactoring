@@ -1,0 +1,6 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": "MakeHotSpotLog",
+    "detection": true,
+    "justification": "The MakeHotSpotLog class consolidates many distinct responsibilities and unrelated behaviors into a single large class, indicating insufficient modularization. It contains numerous independent test routines and helpers (addVariable, addConstant, randomBranchTest, changingBranchTest, intrinsicTest, intrinsicTestMin, testSort, testCallChain, testOptimizedVCall, testCallChain3, testLeaf, testToUpperCase, testLoopUnrolling, padMethod, etc.), call-chain groups (chainA1..A4, chainB1..B3, chainC1..C3), low-level utility methods (add, sub, bigMethod, timesTen, timesHundred, toUpper), and public entry points (constructor, main, testCallChainReturn, tooBigToInline). The class mixes demo orchestration, microbenchmarks, collection sorting, string manipulation, loop/unrolling tests, and threading/sleep logic in one place. This breadth of responsibilities and the large number of unrelated methods reduce cohesion, make the class hard to understand and maintain, and suggest it should be split into multiple smaller, focused classes (e.g., BranchTests, IntrinsicTests, CollectionTests, StringTests, CallChainTests, Utilities). These factors justify detecting the Insufficient Modularization smell."
+}

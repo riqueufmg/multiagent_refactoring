@@ -1,0 +1,11 @@
+{
+    "smell": "Insufficient Modularization",
+    "class": ["net.bytebuddy.build.Plugin"],
+    "detection": true,
+    "justification": [
+        "The Plugin type aggregates a very large number of distinct responsibilities and many nested types instead of being decomposed into separate top-level classes/interfaces. It defines factories, reflection-based instantiation (Factory.UsingReflection and Instantiator variants), engine orchestration (Engine and Engine.Default), type strategy and pool strategy, I/O sources/targets (Source, Target and many ForFolder/ForJarFile/InMemory implementations), dispatchers (Dispatcher, ForSerialTransformation, ForParallelTransformation), listeners and error handlers (Listener, ErrorHandler, Compound, StreamWriting, adapters), plus preprocessing/initialization logic (WithPreprocessor, WithInitialization, Preprocessor inner class).",
+        "Large, complex inner classes contain unrelated concerns: Engine.Default includes scanning, manifest handling, reading/writing archives, threading/Executor management (Dispatcher.ForParallelTransformation.WithThrowawayExecutorService), and transformation application logic (Preprocessor and its nested Resolved/Ignored/Unresolved classes). These are multiple responsibilities that could be modularized.",
+        "The class surface is bloated with many nested concrete implementations (e.g. Source.ForFolder, Source.ForJarFile, Target.ForFolder, Target.ForJarFile, Target.InMemory, Dispatcher factories) that mix I/O, concurrency, and domain logic rather than residing in focused, single-responsibility classes.",
+        "Such concentration of responsibilities increases cognitive complexity and maintenance cost; the design would benefit from extracting Engine, Source/Target implementations, Dispatcher variants, listeners and error handlers into separate modules/classes."
+    ]
+}
