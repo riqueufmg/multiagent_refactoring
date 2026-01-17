@@ -1,0 +1,5 @@
+{
+    "class": "org.apache.commons.io.build.AbstractOrigin.AbstractRandomAccessFileOrigin",
+    "detection": true,
+    "justification": "The abstraction serves as a conversion hub with many incoming/outgoing dependencies. Evidence in this class: methods expose/require multiple unrelated abstractions — getByteArray() uses RandomAccessFiles.read and returns byte[]; getChannel(...) returns a Channel via getRandomAccessFile(...).getChannel(); getInputStream(...) builds a BufferedFileChannelInputStream from origin.getChannel(); getOutputStream(...) builds a RandomAccessFileOutputStream; getCharSequence(Charset) constructs a String from byte[]; getReader(...) constructs an InputStreamReader; getWriter(...) constructs an OutputStreamWriter; size() and other methods call RandomAccessFile APIs. It depends on many types (RandomAccessFile, Channel, byte[], CharSequence/String, InputStream, OutputStream, Reader, Writer, Charset, RandomAccessFiles, BufferedFileChannelInputStream, RandomAccessFileOutputStream), and sits inside AbstractOrigin which centralizes conversions for many origin types — characteristic of a hub-like modularization smell."
+}

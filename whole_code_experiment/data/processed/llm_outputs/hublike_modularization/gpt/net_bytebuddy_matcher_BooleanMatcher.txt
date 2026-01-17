@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.matcher.BooleanMatcher",
+    "detection": false,
+    "justification": "BooleanMatcher has a very small set of outgoing dependencies: it extends ElementMatcher.Junction.AbstractBase<T> (dependency on ElementMatcher types), is annotated with @HashCodeAndEqualsPlugin.Enhance (dependency on net.bytebuddy.build.HashCodeAndEqualsPlugin), and uses MaybeNull (net.bytebuddy.utility.nullability.MaybeNull). Incoming references are primarily call sites from a single large utility class (net.bytebuddy.matcher.ElementMatchers) such as ElementMatchers.any(), ElementMatchers.none(), and a few other places that call BooleanMatcher.of(true/false). While it is reused at many call sites, those are mostly within the ElementMatchers utility class (one major abstraction) rather than many distinct abstractions. Because the class does not maintain dependencies (both incoming and outgoing) with a large number of different abstractions, it does not exhibit Hub-like Modularization."
+}

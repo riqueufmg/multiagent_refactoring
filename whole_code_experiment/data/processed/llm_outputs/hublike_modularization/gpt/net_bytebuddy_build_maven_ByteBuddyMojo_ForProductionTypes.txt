@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.build.maven.ByteBuddyMojo.ForProductionTypes",
+    "detection": false,
+    "justification": "ForProductionTypes has a focused, limited set of dependencies and responsibilities. It primarily delegates to the containing Mojo (project.getBuild().getOutputDirectory(), project.getBuild().getSourceDirectory()) and exposes three small nested implementations (WithoutRuntimeDependencies, WithRuntimeDependencies, WithExtendedDependencies) that resolve class path elements via project.getCompileClasspathElements(), project.getRuntimeClasspathElements(), or iteration over project.getArtifacts() (using Artifact, Artifact.getArtifactHandler(), Artifact.SCOPE_TEST / SCOPE_IMPORT). It does not itself maintain incoming/outgoing relationships with a large number of distinct abstractions (unlike the outer ByteBuddyMojo which interacts with many systems such as repositorySystem, ClassLoaderResolver, Plugin.Engine, etc.), so it does not exhibit a hub-like modularization smell."
+}

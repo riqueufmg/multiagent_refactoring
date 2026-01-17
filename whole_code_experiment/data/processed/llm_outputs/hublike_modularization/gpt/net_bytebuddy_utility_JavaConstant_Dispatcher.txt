@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.utility.JavaConstant.Dispatcher",
+    "detection": true,
+    "justification": "The Dispatcher abstraction in JavaConstant (Simple.Dispatcher) acts as a hub: Simple defines multiple static dispatcher fields (CONSTANT_DESC, CLASS_DESC, METHOD_TYPE_DESC, METHOD_HANDLE_DESC, DIRECT_METHOD_HANDLE_DESC, DIRECT_METHOD_HANDLE_DESC_KIND, DYNAMIC_CONSTANT_DESC) obtained via JavaDispatcher.of(...), and the Dispatcher interface contains many nested/proxied sub-interfaces (OfClassDesc, OfMethodTypeDesc, OfMethodHandleDesc, OfDirectMethodHandleDesc (and ForKind), OfDynamicConstantDesc). The Simple.ofDescription/ofAsm and related factories use these dispatchers extensively to handle many distinct external types (java.lang.constant.* descriptors, org.objectweb.asm.ConstantDynamic/Handle/Type, TypePool, TypeDescription, MethodHandle, MethodType, Dynamic). This single abstraction has incoming/outgoing dependencies to a large number of other abstractions (JavaDispatcher, multiple java.lang.constant descriptor types, ASM types, TypePool/TypeDescription, MethodHandle/MethodType representations), matching the Hub-like Modularization smell."
+}

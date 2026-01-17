@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.agent.ByteBuddyAgent",
+    "detection": true,
+    "justification": "ByteBuddyAgent acts as a central hub: it declares and composes many nested interfaces/classes (AttachmentProvider with multiple implementations and Compound, AttachmentProvider.Accessor and its nested Simple/Unavailable/ExternalAttachment, ProcessProvider with ForCurrentVm/ForJava9CapableVm/ForLegacyVm, AgentProvider with ForByteBuddyAgent/ForExistingAgent, AttachmentTypeEvaluator with InstallationAction/ForJava9CapableVm/Disabled) and coordinates them in its public API (attach/attachNative/install/getInstrumentation). It delegates to many other abstractions (Attacher, Installer, VirtualMachine resolver) and uses numerous JDK subsystems (Instrumentation, ClassLoader/URLClassLoader, ProcessHandle reflection, Manifest/Jar streams, ProcessBuilder). The class both depends on many components (outgoing dependencies) and exposes functionality that other modules rely on (incoming dependencies), indicating hub-like modularization (high coupling and many responsibilities concentrated in one abstraction)."
+}

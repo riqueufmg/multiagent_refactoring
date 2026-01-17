@@ -1,0 +1,11 @@
+{
+    "class": "com.google.googlejavaformat.java.JavaInputAstVisitor",
+    "detection": true,
+    "justification": [
+        "High number of direct dependencies: the class imports and references many other abstractions (examples: OpsBuilder, Doc, Indent, Input, Newlines, Output.BreakTag, DimensionHelpers, Trees, FormattingError, OpenOp, CloseOp and many com.google.common classes).",
+        "Depends on a very large set of AST types from the JDK (many com.sun.source.tree.* types are used: AnnotationTree, ArrayTypeTree, AssertTree, BinaryTree, ClassTree, CompilationUnitTree, MethodTree, MethodInvocationTree, MemberSelectTree, LambdaExpressionTree, LiteralTree, SwitchTree, TryTree, etc.), showing outgoing edges to dozens of node types.",
+        "Provides visit/handling logic for dozens of distinct AST node kinds (visitMethod, visitClass/visitEnum/visitRecord, visitIf, visitSwitch, visitLambdaExpression, visitAnnotation, visitArrayInitializer, visitTry, visitCatchClause, visitMemberSelect, visitMethodInvocation, ...), indicating it coordinates behaviour across many modules/concepts.",
+        "Encapsulates many responsibilities (token synchronization, formatting rules, annotation/modifier handling, argument/layout heuristics, array-dimension handling, type-annotation heuristics, etc.), making it a central orchestration point that other modules (the builder, input/token maps, Trees helpers) rely on and that itself calls into many helpers.",
+        "Because of its very large fan-out (many types and helpers it calls) and the central coordinating role in formatting, this class functions as a hub in the dependency graph — matching the Hub-like Modularization smell."
+    ]
+}

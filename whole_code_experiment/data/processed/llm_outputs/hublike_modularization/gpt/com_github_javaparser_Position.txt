@@ -1,0 +1,5 @@
+{
+    "class": "com.github.javaparser.Position",
+    "detection": false,
+    "justification": "Position is referenced by many other abstractions (incoming): Range (Range.range / constructor uses Position), com.github.javaparser.ast.Node (deprecated constants delegating to Position), CompilationUnit.recalculatePositions (uses Position.HOME, right(), nextLine()), SourcePrinter (cursor field of type Position), PositionUtils (comparisons and helpers use Position), JavaParserJsonDeserializer.readRange (constructs Position during deserialization), etc. However Position itself has very few outgoing dependencies: it only uses Utils.assertNotNull (static import) and java.util.Objects for equals/hashCode and otherwise implements simple position logic. Because Hub-like Modularization requires an abstraction to have dependencies both incoming and outgoing with a large number of other abstractions, Position does not meet the criterion (many incoming but not many outgoing), so the smell is not detected for com.github.javaparser.Position."
+}

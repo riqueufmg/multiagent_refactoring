@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from pathlib import Path
 from utils.filter_prompts import FilterPrompts
 from utils.inferences import Inference
-from utils.openrouter_engine import OpenRouterEngine
 from smells_detection.god_component import GodComponentDetector
 from smells_detection.hublike_modularization import HublikeModularizationDetector
 from smells_detection.insufficient_modularization import InsufficientModularizationDetector
@@ -26,10 +25,10 @@ def main():
     ]
 
     smell_list = [
-        #"God Component",
-        #"Unstable Dependency",
+        "God Component",
+        "Unstable Dependency",
         "Insufficient Modularization",
-        #"Hublike Modularization"
+        "Hublike Modularization"
     ]
 
     ## Project by project
@@ -51,21 +50,23 @@ def main():
                 detector = HublikeModularizationDetector(project)
                 output_path = Path(f"data/processed/prompts/hublike_modularization/{project}")
 
-            ## TODO: I removed to don't generate the prompts again
+            ## TODO: Remove comments after the inferences
             #list_of_prompt_files = detector.generate_prompts()
             #print(f"Generated {len(list_of_prompt_files)} prompts for project {project}")
 
             max_context_size = 100_000
             list_of_prompt_files = sorted(output_path.glob("*.txt"))
 
-            filter = FilterPrompts(max_context_size)
-            filter.save_context_sizes_csv(list_of_prompt_files, output_path)
+            ## TODO: Remove comments after the inferences
+            #filter = FilterPrompts(max_context_size)
+            #filter.save_context_sizes_csv(list_of_prompt_files, output_path)
     
     ## 3. Generate the candidates
-    filter.merge_all_candidates(projects_list)
+    ## TODO: Remove comments after the inferences
+    #filter.merge_all_candidates(projects_list)
 
     ## 4. Select samples
-    ## TODO: I removed to don't change the samples
+    ## TODO: Remove comments after the inferences
     '''candidates_dir = Path("data/processed/candidates")
     sample_dir = Path("data/processed/candidates_sampled")
     sample_dir.mkdir(parents=True, exist_ok=True)
@@ -89,7 +90,7 @@ def main():
     # 5. Detect Smells
 
     ## 5.1 God Component
-    '''candidates_csv = Path("data/processed/candidates_sampled/god_component_sample.csv")
+    candidates_csv = Path("data/processed/candidates_sampled/god_component_sample.csv")
 
     list_of_prompt_files = []
     with open(candidates_csv, "r", encoding="utf-8") as f:
@@ -102,10 +103,12 @@ def main():
     print(f"Loaded {len(list_of_prompt_files)} prompt files for God Component.")
 
     inference = Inference("god_component")
-    inference.detect_gpt(list_of_prompt_files)'''
+    #inference.detect_gpt(list_of_prompt_files)
+    #inference.detect_qwen(list_of_prompt_files)
+    inference.detect_deepseek(list_of_prompt_files)
 
     # 5.2 Unstable Dependency
-    '''candidates_csv = Path("data/processed/candidates_sampled/unstable_dependency_sample.csv")
+    candidates_csv = Path("data/processed/candidates_sampled/unstable_dependency_sample.csv")
 
     list_of_prompt_files = []
     with open(candidates_csv, "r", encoding="utf-8") as f:
@@ -118,10 +121,11 @@ def main():
     print(f"Loaded {len(list_of_prompt_files)} prompt files for Unstable Dependency.")
 
     inference = Inference("unstable_dependency")
-    inference.detect_gpt(list_of_prompt_files)'''
+    #inference.detect_gpt(list_of_prompt_files)
+    #inference.detect_qwen(list_of_prompt_files)
+    inference.detect_deepseek(list_of_prompt_files)
 
     # 5.3 Insufficient Modularization
-
     candidates_csv = Path("data/processed/candidates_sampled/insufficient_modularization_sample.csv")
 
     list_of_prompt_files = []
@@ -135,7 +139,27 @@ def main():
     print(f"Loaded {len(list_of_prompt_files)} prompt files for Insufficient Modularization.")
 
     inference = Inference("insufficient_modularization")
-    inference.detect_gpt(list_of_prompt_files)
+    #inference.detect_gpt(list_of_prompt_files)
+    #inference.detect_qwen(list_of_prompt_files)
+    inference.detect_deepseek(list_of_prompt_files)
+
+    # 5.4 Hub-like Modularization
+    candidates_csv = Path("data/processed/candidates_sampled/hublike_modularization_sample.csv")
+
+    list_of_prompt_files = []
+    with open(candidates_csv, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            prompt_path = Path(row["prompt_file"])
+            if prompt_path.exists():
+                list_of_prompt_files.append(prompt_path)
+
+    print(f"Loaded {len(list_of_prompt_files)} prompt files for Hublike Modularization.")
+
+    inference = Inference("hublike_modularization")
+    #inference.detect_gpt(list_of_prompt_files)
+    #inference.detect_qwen(list_of_prompt_files)
+    inference.detect_deepseek(list_of_prompt_files)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,5 @@
+{
+    "class": "com.google.gson.JsonArray",
+    "detection": true,
+    "justification": "JsonArray acts as a central hub in the JSON model: it has outgoing dependencies to many element abstractions (JsonElement, JsonNull, JsonPrimitive, JsonObject via getAs* methods, and helper types like NonNullElementWrapperList) and is referenced by numerous other components (incoming dependencies) across the codebase. Examples: JsonElement contains instanceof checks and getAsJsonArray() that treat JsonArray specially; JsonTreeReader and JsonTreeWriter push/pop and create JsonArray instances and iterate over them (beginArray(), endArray(), put/add usage); ProtoTypeAdapter constructs and reads JsonArray when serializing/deserializing enum collections; RawCollectionsExample obtains a JsonArray from JsonParser and uses its elements. The class also exposes many conversion convenience methods (getAsNumber, getAsString, getAsInt, etc.) delegating to contained JsonElement(s), increasing coupling. The combination of many incoming references from parsers/writers/adapters and many outgoing ties to element subtypes shows hub-like modularization."
+}

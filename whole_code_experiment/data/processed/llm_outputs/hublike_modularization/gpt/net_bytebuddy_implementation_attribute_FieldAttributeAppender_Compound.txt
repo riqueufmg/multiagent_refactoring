@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.implementation.attribute.FieldAttributeAppender.Compound",
+    "detection": false,
+    "justification": "The Compound class is an aggregator/delegator for FieldAttributeAppender instances rather than a hub coupled to many unrelated abstractions. Its state and behavior are confined to: (1) a private List<FieldAttributeAppender> fieldAttributeAppenders, (2) constructors that accept/flatten collections of FieldAttributeAppender (merging nested Compound instances and ignoring NoOp), and (3) an apply(FieldVisitor, FieldDescription, AnnotationValueFilter) method that simply iterates and delegates to contained appenders. Its direct dependencies are limited to the FieldAttributeAppender interface (and its NoOp/Compound nested types) and standard Java collection utilities (ArrayList, Arrays.asList). It does not show incoming/outgoing dependencies to a large number of diverse abstractions (no broad cross-package coupling or many external type references), so it does not exhibit Hub-like Modularization."
+}

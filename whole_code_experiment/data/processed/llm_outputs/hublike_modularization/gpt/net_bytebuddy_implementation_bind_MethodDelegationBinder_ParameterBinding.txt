@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.implementation.bind.MethodDelegationBinder.ParameterBinding",
+    "detection": false,
+    "justification": "ParameterBinding has a small, focused set of dependencies and responsibilities rather than acting as a hub. Outgoing dependencies are limited: it extends/uses StackManipulation (and its nested Size), references org.objectweb.asm.MethodVisitor and Implementation.Context in apply(...), and uses annotations (HashCodeAndEqualsPlugin, MaybeNull). Incoming usages are also limited and local: MethodBinding.Builder.append consumes ParameterBinding, and MethodBinding/MethodBinding.Builder use its identification tokens (Anonymous/Unique) to build bindings. There is no evidence in the provided code that ParameterBinding has incoming and outgoing relationships with a large number of other abstractions across the codebase, so it does not exhibit a hub-like modularization smell."
+}

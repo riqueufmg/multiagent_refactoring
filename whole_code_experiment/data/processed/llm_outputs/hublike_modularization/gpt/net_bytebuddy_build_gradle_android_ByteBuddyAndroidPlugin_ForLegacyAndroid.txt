@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin.ForLegacyAndroid",
+    "detection": true,
+    "justification": "ForLegacyAndroid acts as a central dispatcher that connects many different abstractions: it directly depends on Project, Variant, Configuration, FileCollection, TaskProvider, LegacyByteBuddyLocalClassesEnhancerTask, MultipleArtifact (MultipleArtifact.ALL_CLASSES_DIRS), and Kotlin Function1/Gradle provider types. It also defines inner function enums (GetLocalClassesFunction, GetOutputDirFunction) that expose ListProperty<Directory> and DirectoryProperty from the task, further coupling it to task APIs. Additionally, it is selected as the TRANSFORMATION_DISPATCHER fallback and is invoked from VariantAction.execute, making it a widely-used hub with many incoming and outgoing dependencies across the Gradle/Android plugin APIs and the plugin's task types."
+}

@@ -1,0 +1,5 @@
+{
+    "class": "org.adoptopenjdk.jitwatch.util.TooltipUtil",
+    "detection": true,
+    "justification": "TooltipUtil acts as a central utility used from multiple, unrelated modules and also depends on several other abstractions. Evidence of incoming dependencies: BytecodeAnnotationBuilder (org.adoptopenjdk.jitwatch.model.bytecode) calls TooltipUtil.buildInlineAnnotationText (used in buildInlineAnnotation -> putAnnotation) and CompileChainWalker (org.adoptopenjdk.jitwatch.chain) calls TooltipUtil.buildInlineAnnotationText in createChildNode to build tooltips for compile nodes. These usages show TooltipUtil is referenced across different subsystems (bytecode annotation and compile-chain construction). Evidence of outgoing dependencies: TooltipUtil relies on ParseUtil.lookupType, StringUtil.replaceXMLEntities and the IParseDictionary abstraction to build text, plus many constants from JITWatchConstants. The combination of multiple incoming callers from distinct packages and several outgoing dependencies indicates TooltipUtil functions as a hub-like module (centralized utility) creating coupling between otherwise separate components."
+}

@@ -1,0 +1,8 @@
+```json
+{
+    "smell": "Insufficient Modularization",
+    "class": "net.bytebuddy.agent.VirtualMachine.AbstractBase",
+    "detection": true,
+    "justification": "The VirtualMachine interface and its nested classes (ForHotSpot and ForOpenJ9) represent a bloated abstraction with excessive size and complexity. The ForHotSpot class alone contains 1,200+ lines of code and multiple deeply nested inner classes (Connection, Factory, ForJnaPosixSocket, ForJnaWindowsNamedPipe, ForJnaSolarisDoor) that handle platform-specific implementations. The class concentrates responsibilities for multiple operating systems (Windows, POSIX, Solaris, Mac), different connection types (sockets, named pipes, doors), and various VM operations, violating the Single Responsibility Principle. The interface has 12 methods, and the implementations contain complex platform-specific logic that could be separated into distinct, cohesive abstractions."
+}
+```

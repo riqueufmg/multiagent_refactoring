@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.dynamic.TypeResolutionStrategy.Passive",
+    "detection": true,
+    "justification": "The TypeResolutionStrategy abstraction (of which Passive is a concrete variant) acts as a coordination hub between many other abstractions. Passive's API and implementation depend on DynamicType, TypeInitializer, LoadedTypeInitializer, ClassLoadingStrategy, TypeDescription and uses Map/HashMap to relate TypeDescription -> Class, invoking LoadedTypeInitializer.onLoad for each type. Other nested variants (Active, Lazy, Disabled) introduce additional dependencies such as NexusAccessor, Random and ClassLoader interactions. Overall this abstraction has both outgoing dependencies (invoking class loading, initializers, nexus registration in Active) and incoming dependencies (being implemented/used by multiple strategies and clients), indicating a hub-like modularization smell because it connects a large number of distinct abstractions (DynamicType, TypeInitializer, LoadedTypeInitializer, ClassLoadingStrategy, TypeDescription, NexusAccessor, etc.)."
+}

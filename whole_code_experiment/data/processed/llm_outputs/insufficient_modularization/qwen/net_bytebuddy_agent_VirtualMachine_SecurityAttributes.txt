@@ -1,0 +1,15 @@
+```json
+{
+    "smell": "Insufficient Modularization",
+    "class": "VirtualMachine",
+    "detection": true,
+    "justification": [
+        "The VirtualMachine class is excessively large with 21485 lines, containing multiple nested classes (ForHotSpot, ForOpenJ9, Connection hierarchy, Dispatcher hierarchy) that implement different platform-specific attachment mechanisms",
+        "The class violates the Single Responsibility Principle by combining interface definitions, multiple platform-specific implementations, abstract base classes, and utility classes all within a single file",
+        "The class has a bloated interface with numerous methods (getSystemProperties, getAgentProperties, loadAgent, loadAgentPath, loadAgentLibrary, startManagementAgent, startLocalManagementAgent, detach) that are implemented differently across nested classes",
+        "Platform-specific logic for Windows, POSIX, Solaris, and OpenJ9 is all contained within the same class structure rather than being properly decomposed into separate modules",
+        "The nested class hierarchy creates excessive complexity with multiple levels of abstraction (Connection -> ForJnaPosixSocket -> PosixLibrary, etc.) making the class difficult to understand and maintain",
+        "The class concentrates too many responsibilities including VM attachment, property management, socket communication, security attributes handling, and platform-specific process management"
+    ]
+}
+```

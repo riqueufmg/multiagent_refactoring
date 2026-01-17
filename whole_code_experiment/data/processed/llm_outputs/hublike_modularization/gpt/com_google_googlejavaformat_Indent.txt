@@ -1,0 +1,5 @@
+{
+    "class": "com.google.googlejavaformat.Indent",
+    "detection": true,
+    "justification": "The Indent abstraction is referenced by a large number of other abstractions across the codebase, making it a hub. Examples: JavaInputAstVisitor repeatedly creates and uses Indent variants (Indent.Const.ZERO, Indent.Const.make(...), Indent.If.make(...)) and stores many Indent-valued fields (minusTwo, plusTwo, plusFour) and uses eval() for layout decisions. Doc and its nested classes (Doc.Level, Doc.Break, Doc.Token, Doc.Tok) include Indent in their APIs/fields (Doc.Level.plusIndent of type Indent; Doc.Break stores an Indent plusIndent and calls plusIndent.eval(); Doc.Token exposes breakAndIndentTrailingComment Optional<Indent>). OpenOp.make(Indent) and DocBuilder.open(Indent) accept Indent parameters. OpsBuilder references Indent.Const.ZERO and emits breaks with Indent arguments. This widespread incoming and outgoing dependency (construction, storage, method calls, parameters) across many classes indicates Hub-like Modularization for com.google.googlejavaformat.Indent."
+}

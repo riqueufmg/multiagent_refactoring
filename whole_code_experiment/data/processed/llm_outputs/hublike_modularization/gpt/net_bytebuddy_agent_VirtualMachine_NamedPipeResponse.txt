@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.agent.VirtualMachine.NamedPipeResponse",
+    "detection": false,
+    "justification": "NamedPipeResponse is a small, focused nested implementation of Connection.Response with a single field (WinNT.HANDLE pipe) and two methods (read, close). Its outgoing dependencies are limited to a handful of native/JNA types and functions (Kernel32.INSTANCE.ReadFile, Kernel32.INSTANCE.DisconnectNamedPipe, Kernel32.INSTANCE.CloseHandle, Native.getLastError, WinError.ERROR_BROKEN_PIPE, Win32Exception, WinNT.HANDLE). Its incoming usage is narrow: it is instantiated and returned only by ForJnaWindowsNamedPipe.execute as the response implementation for a Windows named-pipe connection. It does not depend on or reference a large number of other abstractions, nor is it referenced broadly across many modules, so it does not exhibit hub-like modularization."
+}

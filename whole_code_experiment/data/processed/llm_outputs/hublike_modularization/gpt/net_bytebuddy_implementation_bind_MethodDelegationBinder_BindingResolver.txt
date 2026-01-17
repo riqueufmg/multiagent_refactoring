@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.implementation.bind.MethodDelegationBinder.BindingResolver",
+    "detection": true,
+    "justification": "BindingResolver serves as a central coordinator connecting many different abstractions: its resolve(...) API links AmbiguityResolver, MethodDescription and MethodBinding (List<MethodBinding>); the Default implementation implements a non-trivial selection algorithm that repeatedly invokes AmbiguityResolver and manipulates lists of MethodBinding; Unique enforces unique selection semantics; StreamWriting couples to PrintStream/System and delegates to another BindingResolver. Additionally, BindingResolver is consumed by the Processor (which collects MethodBinding instances) making it the central decision hub for method-binding selection. These incoming and outgoing dependencies (AmbiguityResolver, MethodBinding, MethodDescription, Processor, PrintStream/System and collection types) indicate a hub-like modularization smell."
+}

@@ -1,7 +1,7 @@
 {
     "smell": "Insufficient Modularization",
-    "class": ["GeneratedJavaParserBase"],
-    "detection": [true],
+    "class": "GeneratedJavaParserBase",
+    "detection": true,
     "justification": [
         "GeneratedJavaParserBase accumulates many distinct responsibilities in one class, indicating insufficient modularization. Examples include: token/token-range management (methods: token(), tokenRange(), range(...), orIfInvalid(...), nodeListBegin(...), setTokenKind(...), setStoreTokens(...)); parser recovery and error reporting (recover(...), recoverStatement(...), addProblem(...), problems field, makeMessageForParseException(...)); AST construction and transformation helpers (generateLambda(...), juggleArrayCreation(...), juggleArrayType(...), scopeToName(...)); small utility/string helpers (unquote(...), unTripleQuote(...)); and propagation of token-range changes (propagateRangeGrowthOnRight(...)).",
         "The class mixes parsing control flow, token management, error-message formatting, and AST-building logic rather than delegating those concerns to cohesive helper/strategy classes. This leads to a large surface area (many unrelated methods and state like 'problems' and 'storeTokens'), reduced cohesion, and harder maintainability and testability.",

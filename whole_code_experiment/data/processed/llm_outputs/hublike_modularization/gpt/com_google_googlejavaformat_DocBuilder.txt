@@ -1,0 +1,5 @@
+{
+    "class": "com.google.googlejavaformat.DocBuilder",
+    "detection": true,
+    "justification": "DocBuilder acts as a central hub: many Op implementations and other components invoke it (incoming deps) while it itself manipulates many Doc/Indent abstractions (outgoing deps). Evidence: withOps(List<Op>) calls op.add(this) so all Op implementations (Doc.Token/Doc.Space/Doc.Break/Doc.Tok, OpenOp, CloseOp, etc.) call into DocBuilder (incoming links). OpenOp.add and CloseOp.add call builder.open/close; Doc.Token/Space/Tok/BREAK implement Op.add to call builder.add or builder.breakDoc. Formatter constructs and uses new DocBuilder().withOps(...). Outgoing dependencies include Doc.Level (Doc.Level.make, stack of Doc.Level), Doc and its subclasses (Break, Token, Tok, Space), Indent (used by open and break handling), and collection types (ArrayDeque, List). Because it has many incoming connections from Op implementations and multiple outgoing connections to Doc/Indent abstractions, it exhibits a hub-like modularization smell."
+}

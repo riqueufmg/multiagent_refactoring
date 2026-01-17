@@ -1,7 +1,7 @@
 {
     "smell": "Insufficient Modularization",
-    "class": ["net.bytebuddy.asm.MemberSubstitution"],
-    "detection": [true],
+    "class": "net.bytebuddy.asm.MemberSubstitution",
+    "detection": true,
     "justification": [
         "The class is extremely large and contains many unrelated responsibilities and numerous deeply nested classes, enums and interfaces (e.g. TypePoolResolver and its implementations, Target and its ForMember/ForDynamicInvocation, Substitution with many implementations and a heavy Chain and Step hierarchy, Replacement and many Replacement.Factory implementations, Dispatcher and BootstrapArgumentResolver, OffsetMapping and many nested factories/resolved classes, SubstitutingMethodVisitor and LocalVariableTracingMethodVisitor, plus many annotations like This/Argument/AllArguments/etc.).",
         "Multiple distinct concerns are combined: ASM method visiting and bytecode rewriting logic (SubstitutingMethodVisitor/visit* methods), member/method/field resolution, substitution chaining and assignment logic, delegation/offset mapping and bootstrap argument resolution, and a public builder-like API surface for configuring replacements. This violates single-responsibility and indicates the abstraction has not been decomposed.",

@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.asm.TypeReferenceAdjustment.TypeReferenceMethodVisitor",
+    "detection": false,
+    "justification": "Although TypeReferenceMethodVisitor has many outgoing dependencies (it references numerous ASM types such as org.objectweb.asm.AnnotationVisitor, MethodVisitor, FieldVisitor, Label, Type, Handle, ConstantDynamic, TypePath and Byte Buddy types like OpenedClassReader, TypePool, TypeDescription, ElementMatcher, FieldList, MethodList and utility classes), it does not act as a hub with many incoming dependencies. It is a protected inner class instantiated and returned only by its enclosing TypeReferenceClassVisitor (see visitMethod returning new TypeReferenceMethodVisitor(methodVisitor)) and used internally by the TypeReferenceAdjustment wrapper. There is no evidence in the analyzed code of a large number of other abstractions depending on this class. Therefore it does not meet the Hub-like Modularization smell (many incoming and outgoing dependencies)."
+}

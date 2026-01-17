@@ -1,8 +1,6 @@
 {
     "smell": "Insufficient Modularization",
-    "class": [
-        "net.bytebuddy.build.Plugin.Source"
-    ],
+    "class": "net.bytebuddy.build.Plugin.Source",
     "detection": true,
     "justification": "The Source abstraction contains a very large and varied set of nested types and responsibilities that indicate inadequate decomposition: it declares the Origin sub-interface plus many concrete Origin implementations (ForJarFile, Filtering, Compound.Origin, InMemory, ForFolder), the Element sub-interface plus multiple Element implementations (ForByteArray, ForFile, ForJarEntry), numerous iterator implementations (JarFileIterator, FilteringIterator, CompoundIterator, MapEntryIterator, FolderIterator), and additional matcher/helper types (Filtering.MultiReleaseVersionMatcher, Filtering.NoFolderMatcher). These nested types implement different concerns: I/O (reading jars/folders), in-memory storage, filtering logic, iteration strategies, manifest handling and class-file-locating. Concentrating all of these distinct responsibilities inside the single Source abstraction (and as nested classes) increases size and complexity, mixes I/O, filtering and iteration policy, and makes the abstraction harder to understand, test and extend. The variety and number of specialized classes and iterators suggest the code should be split into smaller, cohesive types (e.g., separate Element/Origin implementations, dedicated iterator/visitor classes, and distinct filtering/strategy components)."
 }

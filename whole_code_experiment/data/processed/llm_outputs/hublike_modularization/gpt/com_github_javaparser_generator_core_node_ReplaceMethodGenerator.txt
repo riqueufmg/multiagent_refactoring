@@ -1,0 +1,5 @@
+{
+    "class": "com.github.javaparser.generator.core.node.ReplaceMethodGenerator",
+    "detection": true,
+    "justification": "ReplaceMethodGenerator directly depends on many distinct abstractions in the AST and metamodel: Node, CompilationUnit, ClassOrInterfaceDeclaration, MethodDeclaration, BlockStmt, BaseNodeMetaModel, PropertyMetaModel, SourceRoot (and utility types like StaticJavaParser / CodeGenerationUtils). Its generateNode(BaseNodeMetaModel, CompilationUnit, ClassOrInterfaceDeclaration) iterates over nodeMetaModel.getDeclaredPropertyMetaModels() and emits code that touches many different AST node types (setting/removing/setting elements in NodeList properties and attributes). It also mutates ClassOrInterfaceDeclaration (removeMethodWithSameSignature / addOrReplaceWhenSameSignature) and adds imports to CompilationUnit. Because it both depends on many node/metamodel abstractions and is responsible for producing/altering replace methods across many AST node classes, it acts as a hub with numerous incoming/outgoing relationships, matching the Hub-like Modularization smell."
+}

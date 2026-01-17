@@ -1,0 +1,5 @@
+{
+    "class": "org.apache.commons.io.function.IOBiConsumer",
+    "detection": false,
+    "justification": "IOBiConsumer is a small functional interface with multiple incoming references (usage sites) but only a handful of outgoing dependencies. Incoming references include: Constants (Constants.IO_BI_CONSUMER), Uncheck.accept (Uncheck), Erase.accept (Erase), IOStream.collect (method signature), BoundedInputStream.AbstractBuilder / BoundedInputStream (setOnMaxCount / onMaxCount usage). Outgoing dependencies from IOBiConsumer itself are minimal: java.io.IOException, java.io.UncheckedIOException, java.util.Objects, java.util.function.BiConsumer, and a reference to Constants and Uncheck in noop() / asBiConsumer(). Because the interface is intentionally a central, lightweight functional abstraction and its outgoing dependency set is small while incoming uses are expected and limited in number, it does not exhibit the Hub-like Modularization smell (not a hub with many both incoming and outgoing dependencies)."
+}

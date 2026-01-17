@@ -1,0 +1,5 @@
+{
+    "class": "com.google.zxing.common.reedsolomon.GenericGF",
+    "detection": true,
+    "justification": "GenericGF acts as a central hub: many decoders/encoders across barcode formats depend on it (incoming deps). Examples in the analyzed code: com.google.zxing.qrcode.decoder.Decoder constructs a ReedSolomonDecoder(GenericGF.QR_CODE_FIELD_256); com.google.zxing.datamatrix.decoder.Decoder uses GenericGF.DATA_MATRIX_FIELD_256; com.google.zxing.aztec.decoder.Decoder and aztec.encoder use AZTEC_DATA_6/8/10/12 and AZTEC_PARAM; com.google.zxing.maxicode.decoder.Decoder uses GenericGF.MAXICODE_FIELD_64. ReedSolomonEncoder and ReedSolomonDecoder both hold a GenericGF field and call many GenericGF methods. GenericGF also creates/uses GenericGFPoly instances (outgoing deps) and exposes many static field constants for different GFs used throughout the system. This class therefore has many incoming dependencies from multiple packages and a few outgoing ties (GenericGFPoly), matching the Hub-like Modularization smell."
+}

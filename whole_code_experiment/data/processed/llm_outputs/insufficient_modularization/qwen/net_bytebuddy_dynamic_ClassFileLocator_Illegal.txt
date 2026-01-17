@@ -1,0 +1,25 @@
+```json
+{
+    "smell": "Insufficient Modularization",
+    "class": "ClassFileLocator",
+    "detection": false,
+    "justification": [
+        "The ClassFileLocator interface is well-decomposed into multiple cohesive nested classes and interfaces, each handling specific concerns:",
+        "- Resolution interface with Illegal and Explicit implementations for handling class file resolution states",
+        "- NoOp enum for null object pattern implementation",
+        "- MultiReleaseAware abstract class for multi-release JAR handling",
+        "- Simple class for in-memory class file mapping",
+        "- ForClassLoader with WeaklyReferenced nested class for class loader-based location",
+        "- ForModule with WeaklyReferenced nested class for module-based location",
+        "- ForJarFile for JAR file-based location",
+        "- ForModuleFile for jmod file-based location",
+        "- ForFolder for folder-based location",
+        "- ForUrl for URL-based location",
+        "- ForInstrumentation with ClassLoadingDelegate implementations for agent-based location",
+        "- PackageDiscriminating for package-based routing",
+        "- Filtering for name-based filtering",
+        "- Compound for chaining multiple locators",
+        "Each nested class has clear, single responsibilities and the interface follows the interface segregation principle. The decomposition is appropriate for the complexity of class file location strategies."
+    ]
+}
+```

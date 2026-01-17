@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.dynamic.loading.ClassReloadingStrategy",
+    "detection": true,
+    "justification": "ClassReloadingStrategy acts as a central coordinator with many incoming and outgoing dependencies. Evidence: numerous imports and collaborations (Instrumentation, ClassDefinition, ClassFileTransformer, ClassFileLocator, ClassInjector, TypeDescription, JavaModule, AgentBuilder, JavaDispatcher), nested types that expose/mediate behavior (protected Dispatcher, enum Strategy with ClassRedefinitionTransformer and ClassResettingTransformer, BootstrapInjection with Disabled/Enabled), and many public methods that orchestrate redefinition/retransformation, bootstrap injection, resetting and preregistration (load(...), reset(...), enableBootstrapInjection(...), preregistered(...)). It uses and exposes a wide set of abstractions (DISPATCHER, strategy, bootstrapInjection, preregisteredTypes) and manipulates collections/maps of classes and definitions across class loaders, indicating both many incoming collaborators and many outgoing interactions — matching the Hub-like Modularization smell."
+}

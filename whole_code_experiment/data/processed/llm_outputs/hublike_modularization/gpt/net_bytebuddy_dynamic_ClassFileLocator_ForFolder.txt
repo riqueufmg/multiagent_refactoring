@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.dynamic.ClassFileLocator.ForFolder",
+    "detection": true,
+    "justification": "ForFolder both depends on many abstractions (outgoing) and is referenced by many other abstractions (incoming). Outgoing dependencies: extends MultiReleaseAware and uses ClassFileVersion, Manifest, FileInputStream, StreamDrainer, Pattern, SortedSet/TreeSet, Iterator, File and other java.io/java.util APIs to implement multi-release and folder scanning logic (methods: of(File, ClassFileVersion), doLocate(String)). Incoming dependencies: multiple factory/locator implementations create or call ForFolder.of(...) (see ForJarFile.ofClassPath -> ForFolder.of, ForModuleFile.ofBootPath -> ForFolder.of, ForModuleFile.ofModulePath -> ForFolder.of, ForJarFile.ofModulePath/ofClassPath usages and Compound composition where folder-based locators are added). Because ForFolder serves as a central connector between file-system based class resolution and many higher-level locators and factory methods, it exhibits hub-like modularization."
+}

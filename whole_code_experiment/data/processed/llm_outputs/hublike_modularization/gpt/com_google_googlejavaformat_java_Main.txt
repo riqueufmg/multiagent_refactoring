@@ -1,0 +1,5 @@
+{
+    "class": "com.google.googlejavaformat.java.Main",
+    "detection": true,
+    "justification": "Main acts as a central coordinator with many incoming and outgoing dependencies. Outgoing dependencies: it calls CommandLineOptionsParser.parse(...) in processArgs; constructs JavaFormatterOptions via JavaFormatterOptions.builder(); creates and submits FormatFileCallable tasks in formatFiles; instantiates Formatter and uses Formatter.formatSource in FormatFileCallable.call(); calls RemoveUnusedImports.removeUnusedImports and ImportOrderer.reorderImports in fixImports; uses StringWrapper.wrap; uses Executors/ExecutorService/ExecutorCompletionService and MoreExecutors.shutdownAndAwaitTermination for concurrency; reads stdin via ByteStreams.toByteArray; and references GoogleJavaFormatVersion.version() via versionString(). Incoming dependency: UsageException.buildMessage() calls Main.versionString(), so other classes reference Main as well. The class therefore has many (10+) relationships to other abstractions in the package and libraries, matching the Hub-like Modularization smell."
+}

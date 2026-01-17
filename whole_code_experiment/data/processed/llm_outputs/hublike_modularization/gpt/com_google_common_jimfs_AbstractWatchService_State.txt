@@ -1,0 +1,5 @@
+{
+    "class": "com.google.common.jimfs.AbstractWatchService",
+    "detection": true,
+    "justification": "AbstractWatchService has many outgoing dependencies: java.nio.file types (WatchService, WatchKey, WatchEvent, Watchable), concurrency primitives and collections (BlockingQueue, LinkedBlockingQueue, ArrayBlockingQueue, TimeUnit, AtomicBoolean, AtomicInteger, AtomicReference), and Guava utilities (ImmutableList, ImmutableSet, MoreObjects, Preconditions). It also has incoming dependencies (two‑way relationships) from its nested Key and Event implementations: Key holds a reference to AbstractWatchService and invokes watcher.enqueue(this), watcher.cancelled(this) and watcher.isOpen(), while the service coordinates enqueuing, signalling, registration, event posting and lifecycle (open/close). The class therefore centralizes and mediates interactions among many distinct abstractions, exhibiting the hub-like modularization smell."
+}

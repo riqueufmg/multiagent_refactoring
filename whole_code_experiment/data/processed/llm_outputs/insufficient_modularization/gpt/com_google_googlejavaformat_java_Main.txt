@@ -1,6 +1,6 @@
 {
     "smell": "Insufficient Modularization",
-    "class": ["Main"],
+    "class": "Main",
     "detection": true,
     "justification": "The Main class concentrates many separate responsibilities rather than delegating them: command-line entry points and overloads (static main methods), argument parsing/validation (processArgs), orchestration of formatting (format), per-file I/O and task submission (formatFiles reads files, submits FormatFileCallable tasks), concurrency management (creates ExecutorService, ExecutorCompletionService, shutdown handling), result collection/sorting/inspection (collects FormatFileCallable.Result, sorts and handles exceptions), file writing/dry-run/in-place logic, and stdin processing (formatStdin). Several large methods (formatFiles and formatStdin) contain duplicated and complex logic for handling FormatFileCallable.Result, exit codes, and output behavior, increasing size and complexity. The presence of I/O, concurrency, CLI parsing, error-reporting, and business orchestration all in one class indicates insufficient decomposition into smaller, more cohesive modules (e.g., a file-processing coordinator, a stdin handler, a result handler, and a CLI/argument handler). These factors justify detecting the Insufficient Modularization smell."
 }

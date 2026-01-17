@@ -1,0 +1,5 @@
+{
+    "class": "net.bytebuddy.ByteBuddy.InitializationAppender",
+    "detection": true,
+    "justification": "The InitializationAppender acts as a central hub: it has outgoing dependencies on many distinct abstractions across multiple packages (examples in the class body include TypeDescription, FieldDescription, MethodDescription, StackManipulation, TypeCreation, Duplication, TextConstant, IntegerConstant, ArrayFactory, FieldAccess, MethodInvocation, MethodReturn, MethodVariableAccess and org.objectweb.asm.MethodVisitor / Implementation.Context). It is created and used by the enclosing EnumerationImplementation (instrumentedType.withInitializer(new InitializationAppender(values))) and therefore has incoming coupling from that higher-level abstraction. The class therefore connects many unrelated modules (description.*, implementation.bytecode.*, implementation.*, dynamic/*, org.objectweb.asm, etc.), exhibiting both numerous incoming and outgoing dependencies and serving as a focal point for functionality — matching the Hub-like Modularization smell."
+}

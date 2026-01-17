@@ -1,0 +1,14 @@
+```json
+{
+    "smell": "Insufficient Modularization",
+    "class": "VirtualMachine",
+    "detection": true,
+    "justification": [
+        "The VirtualMachine class has excessive size with multiple nested classes (ForHotSpot, ForOpenJ9, AbstractBase) and interfaces (Connection, Dispatcher) that could be separated into distinct modules.",
+        "The class contains multiple responsibilities including virtual machine abstraction, platform-specific implementations for HotSpot and OpenJ9, various connection mechanisms (POSIX sockets, Windows named pipes, Solaris doors), and native library interactions.",
+        "The ForHotSpot nested class alone contains extensive platform-specific code for different operating systems (Windows, Solaris, POSIX) with complex connection logic that should be decomposed.",
+        "The class has a bloated interface with numerous methods for different agent loading operations (loadAgent, loadAgentPath, loadAgentLibrary) and management operations (startManagementAgent, startLocalManagementAgent).",
+        "Platform-specific implementations are tightly coupled within the class hierarchy rather than being properly modularized into separate, cohesive abstractions."
+    ]
+}
+```

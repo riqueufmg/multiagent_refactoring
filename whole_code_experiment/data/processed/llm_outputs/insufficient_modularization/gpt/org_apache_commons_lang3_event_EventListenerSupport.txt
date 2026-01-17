@@ -1,6 +1,6 @@
 {
     "smell": "Insufficient Modularization",
-    "class": ["EventListenerSupport"],
+    "class": "EventListenerSupport",
     "detection": false,
     "justification": "The class is focused on a single cohesive abstraction: managing and dispatching to event listeners. Responsibilities (listener storage 'private List<L> listeners', proxy creation 'createProxy', invocation dispatch 'ProxyInvocationHandler' and the public API addListener/removeListener/fire/getListeners) are all directly related to that abstraction. The ProxyInvocationHandler is a small, encapsulated inner class and there is an extension point 'createInvocationHandler' for customization. Serialization concerns are isolated to readObject/writeObject helper methods and only handle filtering/rehydration of listeners, which is appropriate for a Serializable implementation. Methods are short and well-factored (initializeTransientFields, createProxy, getListeners), so there is no evidence of a bloated class mixing unrelated responsibilities that would indicate insufficient modularization."
 }

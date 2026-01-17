@@ -1,0 +1,5 @@
+{
+    "class": "org.adoptopenjdk.jitwatch.chain.CompileNode",
+    "detection": true,
+    "justification": "CompileNode holds direct references to multiple distinct abstractions (fields: IParseDictionary parseDictionary, IReadOnlyJITDataModel model, Compilation compilation) and repeatedly calls/utilizes other modules (ParseUtil.lookupMember/Lookup methods, IMetaMember). It also participates in a tree structure (children/parent) and is heavily used by higher-level components (CompileChainWalker constructs nodes and sets model/parseDictionary/compilation; CompileChainStage reads member/children/state for UI). This places CompileNode at the center of many incoming (CompileChainWalker, CompileChainStage, UI) and outgoing dependencies (parse dictionary, data model, compilation, ParseUtil, IMetaMember), making it a hub-like abstraction coupling many modules."
+}

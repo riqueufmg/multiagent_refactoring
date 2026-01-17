@@ -1,0 +1,5 @@
+{
+    "class": "org.adoptopenjdk.jitwatch.ui.graphing.CodeCacheStage",
+    "detection": false,
+    "justification": "CodeCacheStage has a small set of direct dependencies (outgoing): it uses JITWatchUI (mainUI) to obtain model data, UserInterfaceUtil for scene and utility methods, model classes CodeCacheEvent and Tag, and standard JavaFX types (Scene, StackPane, Color) and collections utilities. These are visible in the class (calls to mainUI.getJITDataModel(), getStampFromTag(endOfLogTag), UserInterfaceUtil.getScene(...), processing of List<CodeCacheEvent>). Incoming dependencies are minimal: JITWatchUI constructs CodeCacheStage in the btnCodeCacheTimeline action handler (new CodeCacheStage(JITWatchUI.this)) and StageManager handles its lifecycle (handleStageClosed checks instanceof CodeCacheStage). There is no evidence of a large number of other abstractions depending on CodeCacheStage or vice versa, so it does not act as a hub-like module."
+}
