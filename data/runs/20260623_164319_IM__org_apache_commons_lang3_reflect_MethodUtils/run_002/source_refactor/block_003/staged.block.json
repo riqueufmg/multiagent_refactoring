@@ -1,0 +1,58 @@
+{
+  "id": 3,
+  "goal": "Introduce an explicit small façade in MethodUtils so the class remains a stable thin adapter for the new internal modules and to ease future dependency inversion.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+      ],
+      "details": "Keep MethodUtils as a small public façade that preserves all existing public signatures. Implement each MethodUtils public method as a single-line delegator to either MethodInvocationUtils or MethodUtilsCore. Mark the default constructor as deprecated (unchanged). This maintains binary compatibility while ensuring that most implementation lives in smaller cohesive classes.",
+      "risk": "low"
+    },
+    {
+      "op": "DEPENDENCY_INVERSION",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "details": "Where appropriate, ensure MethodInvocationUtils depends on the abstractions (public static APIs) of MethodUtilsCore rather than on its internal details. No new interfaces are created to keep the refactoring minimal; this step is to document the inversion and ensure the new classes call MethodUtilsCore public methods rather than duplicating logic.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ]
+}

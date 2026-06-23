@@ -1,0 +1,206 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.reflect.TypeUtils",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the internal Type implementation classes and the related factory methods/constant out of TypeUtils into a dedicated helper class to reduce the size and responsibilities of TypeUtils.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.reflect.TypeUtils$GenericArrayTypeImpl",
+            "org.apache.commons.lang3.reflect.TypeUtils$ParameterizedTypeImpl",
+            "org.apache.commons.lang3.reflect.TypeUtils$WildcardTypeImpl",
+            "org.apache.commons.lang3.reflect.TypeUtils$WildcardTypeBuilder"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "details": "Create a new top-level class org.apache.commons.lang3.reflect.TypeUtilsImpls containing the four implementation types that were nested private static classes inside TypeUtils: GenericArrayTypeImpl, ParameterizedTypeImpl, WildcardTypeImpl, and WildcardTypeBuilder. Preserve the implementations but make them package-private or public as needed so they can be referenced from the original TypeUtils. Keep their toString() implementations delegating to TypeUtils.toString(...) (no change) to minimize ripple effects. Place the new file in the same package (org.apache.commons.lang3.reflect).",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static GenericArrayType genericArrayType(final Type componentType)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static WildcardTypeBuilder wildcardType()",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static final ParameterizedType parameterize(final Class<?> rawClass, final Map<TypeVariable<?>, Type> typeVariableMap)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static final ParameterizedType parameterize(final Class<?> rawClass, final Type... typeArguments)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static final ParameterizedType parameterizeWithOwner(final Type owner, final Class<?> rawClass, final Map<TypeVariable<?>, Type> typeVariableMap)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static final ParameterizedType parameterizeWithOwner(final Type owner, final Class<?> rawClass, final Type... typeArguments)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "details": "Move the factory methods that construct instances of the implementation classes into TypeUtilsImpls. The moved methods will use the moved implementation classes (e.g. new GenericArrayTypeImpl(...), new ParameterizedTypeImpl(...), WildcardTypeBuilder). Adjust visibility as necessary so TypeUtils can still delegate to these factory methods. These methods form a cohesive factory responsibility and are good candidates to be colocated with the implementation classes.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static final WildcardType WILDCARD_ALL"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "details": "Move the public constant WILDCARD_ALL (which is constructed via wildcardType().withUpperBounds(Object.class).build()) into TypeUtilsImpls so the implementation types and their canonical instances are colocated.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+          ],
+          "details": "Update references inside TypeUtils to call the factory methods and constant from TypeUtilsImpls. For example, replace calls to genericArrayType(...) with TypeUtilsImpls.genericArrayType(...), wildcardType() with TypeUtilsImpls.wildcardType(), parameterize(...) with TypeUtilsImpls.parameterize(...), and replace uses of WILDCARD_ALL with TypeUtilsImpls.WILDCARD_ALL. Keep TypeUtils API methods that previously exposed these factories as thin delegating methods that call into TypeUtilsImpls (preserve backwards compatibility of public API signatures). Add necessary imports or qualify references as TypeUtilsImpls where appropriate.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+          ],
+          "details": "Ensure required imports (java.lang.reflect.*, java.util.*, org.apache.commons.lang3.*) are present in both files after extraction/moves. Add import statements if necessary so both files compile.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+            "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+            "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+            "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+            "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the assignability/equality decision code into a dedicated utility class to separate 'analysis' concerns from the remaining API surface of TypeUtils and reduce the number of methods in the original class.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeAssignability.java",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final Type toType)",
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final Type toType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final Class<?> toClass)",
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final ParameterizedType toParameterizedType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final GenericArrayType toGenericArrayType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final WildcardType toWildcardType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "org.apache.commons.lang3.reflect.TypeUtils#isAssignable(final Type type, final TypeVariable<?> toTypeVariable, final Map<TypeVariable<?>, Type> typeVarAssigns)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeAssignability.java"
+          ],
+          "details": "Create a new helper class TypeAssignability in the same package that contains the complete suite of isAssignable(...) overloads (public entry points and the private/auxiliary overloads) that implement the generics assignability rules. Keep the same method signatures and behavior. The new class will depend on a small set of other TypeUtils helper methods (getTypeArguments, getImplicitUpperBounds, getImplicitLowerBounds, getRawType, substituteTypeVariables, unrollVariableAssignments, etc.); for any of these that remain in TypeUtils after this block, add TypeUtils.<method> references or move additional helper methods as needed. The extraction groups together logically related algorithmic code (assignability checks) into a single class.",
+          "risk": "high"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:public static boolean isAssignable(final Type type, final Type toType)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:private static boolean isAssignable(final Type type, final Type toType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:private static boolean isAssignable(final Type type, final Class<?> toClass)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:private static boolean isAssignable(final Type type, final ParameterizedType toParameterizedType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:private static boolean isAssignable(final Type type, final GenericArrayType toGenericArrayType, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:private static boolean isAssignable(final Type type, final TypeVariable<?> toTypeVariable, final Map<TypeVariable<?>, Type> typeVarAssigns)",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:private static boolean isAssignable(final Type type, final WildcardType toWildcardType, final Map<TypeVariable<?>, Type> typeVarAssigns)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeAssignability.java"
+          ],
+          "details": "Move the listed isAssignable methods into TypeAssignability. Preserve signatures and visibility chosen for the new helper class: keep the public entry-point isAssignable(Type, Type) as public so existing callers continue to work through delegation. Helper overloads can be package-private or private within the new class as appropriate.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "details": "Replace internal calls that invoked isAssignable(...) methods to call TypeAssignability.isAssignable(...). In TypeUtils keep a delegating public method (if necessary) that forwards to TypeAssignability to preserve the original public API. Also update any references from TypeUtilsImpls to refer to TypeAssignability for assignability checks (for example, any code moved into TypeUtilsImpls that previously called TypeUtils.isAssignable should call TypeAssignability.isAssignable). Add necessary imports or qualify references with the new class.",
+          "risk": "high"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeAssignability.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/TypeAssignability.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/TypeUtilsImpls.java"
+          ],
+          "details": "Add/update imports required by TypeAssignability and update TypeUtils/TypeUtilsImpls imports to refer to TypeAssignability. Ensure java.lang.reflect.*, java.util.* and org.apache.commons.lang3.* imports are present where needed.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+            "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+            "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+            "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+            "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ]
+    }
+  ]
+}

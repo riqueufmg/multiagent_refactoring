@@ -1,0 +1,489 @@
+commit a549465ab9047989174e7fe26e9c3ecbbb9e045f
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 17:40:04 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java b/src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java
+new file mode 100644
+index 000000000..43c6112d4
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java
+@@ -0,0 +1,190 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.lang3.reflect;
++
++import java.lang.reflect.GenericArrayType;
++import java.lang.reflect.GenericDeclaration;
++import java.lang.reflect.ParameterizedType;
++import java.lang.reflect.Type;
++import java.lang.reflect.TypeVariable;
++import java.lang.reflect.WildcardType;
++import java.util.Arrays;
++import java.util.Objects;
++
++import org.apache.commons.lang3.AppendableJoiner;
++import org.apache.commons.lang3.ArrayUtils;
++
++/**
++ * Helper utilities for formatting Types to Strings extracted from TypeUtils.
++ */
++public final class TypeFormatter {
++
++    // @formatter:off
++    public static final AppendableJoiner<Type> AMP_JOINER = AppendableJoiner.<Type>builder()
++            .setDelimiter(" & ")
++            .setElementAppender((a, e) -> a.append(TypeUtils.toString(e)))
++            .get();
++    // @formatter:on
++
++    // @formatter:off
++    public static final AppendableJoiner<TypeVariable<Class<?>>> CTJ_JOINER = AppendableJoiner.<TypeVariable<Class<?>>>builder()
++        .setDelimiter(", ")
++        .setElementAppender((a, e) -> a.append(anyToString(e)))
++        .get();
++    // @formatter:on
++
++    // @formatter:off
++    public static final AppendableJoiner<Object> GT_JOINER = AppendableJoiner.builder()
++            .setPrefix("<")
++            .setSuffix(">")
++            .setDelimiter(", ")
++            .setElementAppender((a, e) -> a.append(anyToString(e)))
++            .get();
++    // @formatter:on
++
++    private TypeFormatter() {
++        // utility
++    }
++
++    public static <T> String anyToString(final T object) {
++        return object instanceof Type ? TypeUtils.toString((Type) object) : object.toString();
++    }
++
++    public static void appendRecursiveTypes(final StringBuilder builder, final int[] recursiveTypeIndexes, final Type[] argumentTypes) {
++        for (final Type type : argumentTypes) {
++            // toString() or you get a SO
++            GT_JOINER.join(builder, Objects.toString(type));
++        }
++        final Type[] argumentsFiltered = ArrayUtils.removeAll(argumentTypes, recursiveTypeIndexes);
++        if (argumentsFiltered.length > 0) {
++            GT_JOINER.join(builder, (Object[]) argumentsFiltered);
++        }
++    }
++
++    /**
++     * Formats a {@link Class} as a {@link String}.
++     *
++     * @param cls {@link Class} to format.
++     * @return The class as a String.
++     */
++    public static <T> String classToString(final Class<T> cls) {
++        if (cls.isArray()) {
++            return TypeUtils.toString(cls.getComponentType()) + "[]";
++        }
++        if (TypeUtils.isCyclical(cls)) {
++            return cls.getSimpleName() + "(cycle)";
++        }
++        final StringBuilder buf = new StringBuilder();
++        if (cls.getEnclosingClass() != null) {
++            buf.append(classToString(cls.getEnclosingClass())).append('.').append(cls.getSimpleName());
++        } else {
++            buf.append(cls.getName());
++        }
++        if (cls.getTypeParameters().length > 0) {
++            GT_JOINER.join(buf, (Object[]) cls.getTypeParameters());
++        }
++        return buf.toString();
++    }
++
++    /**
++     * Formats a {@link GenericArrayType} as a {@link String}.
++     *
++     * @param genericArrayType {@link GenericArrayType} to format.
++     * @return String.
++     */
++    public static String genericArrayTypeToString(final GenericArrayType genericArrayType) {
++        return String.format("%s[]", TypeUtils.toString(genericArrayType.getGenericComponentType()));
++    }
++
++    /**
++     * Formats a {@link ParameterizedType} as a {@link String}.
++     *
++     * @param parameterizedType {@link ParameterizedType} to format.
++     * @return String.
++     */
++    public static String parameterizedTypeToString(final ParameterizedType parameterizedType) {
++        final StringBuilder builder = new StringBuilder();
++        final Type useOwner = parameterizedType.getOwnerType();
++        final Class<?> raw = (Class<?>) parameterizedType.getRawType();
++        if (useOwner == null) {
++            builder.append(raw.getName());
++        } else {
++            if (useOwner instanceof Class<?>) {
++                builder.append(((Class<?>) useOwner).getName());
++            } else {
++                builder.append(useOwner);
++            }
++            builder.append('.').append(raw.getSimpleName());
++        }
++        final int[] recursiveTypeIndexes = TypeUtils.findRecursiveTypes(parameterizedType);
++        if (recursiveTypeIndexes.length > 0) {
++            appendRecursiveTypes(builder, recursiveTypeIndexes, parameterizedType.getActualTypeArguments());
++        } else {
++            GT_JOINER.join(builder, (Object[]) parameterizedType.getActualTypeArguments());
++        }
++        return builder.toString();
++    }
++
++    /**
++     * Formats a {@link WildcardType} as a {@link String}.
++     *
++     * @param wildcardType {@link WildcardType} to format.
++     * @return String.
++     */
++    public static String wildcardTypeToString(final WildcardType wildcardType) {
++        final StringBuilder builder = new StringBuilder().append('?');
++        final Type[] lowerBounds = wildcardType.getLowerBounds();
++        final Type[] upperBounds = wildcardType.getUpperBounds();
++        if (lowerBounds.length > 1 || lowerBounds.length == 1 && lowerBounds[0] != null) {
++            AMP_JOINER.join(builder.append(" super "), lowerBounds);
++        } else if (upperBounds.length > 1 || upperBounds.length == 1 && !Object.class.equals(upperBounds[0])) {
++            AMP_JOINER.join(builder.append(" extends "), upperBounds);
++        }
++        return builder.toString();
++    }
++
++    /**
++     * Formats a {@link TypeVariable} as a {@link String}.
++     *
++     * @param typeVariable {@link TypeVariable} to format.
++     * @return String.
++     */
++    public static String typeVariableToString(final TypeVariable<?> typeVariable) {
++        final StringBuilder builder = new StringBuilder(typeVariable.getName());
++        final Type[] bounds = typeVariable.getBounds();
++        if (bounds.length > 0 && !(bounds.length == 1 && Object.class.equals(bounds[0]))) {
++            // https://issues.apache.org/jira/projects/LANG/issues/LANG-1698
++            // There must be a better way to avoid a stack overflow on Java 17 and up.
++            // Bounds are different in Java 17 and up where instead of Object you can get an interface like Comparable.
++            final Type bound = bounds[0];
++            boolean append = true;
++            if (bound instanceof ParameterizedType) {
++                final Type rawType = ((ParameterizedType) bound).getRawType();
++                if (rawType instanceof Class && ((Class<?>) rawType).isInterface()) {
++                    // Avoid recursion and stack overflow on Java 17 and up.
++                    append = false;
++                }
++            }
++            if (append) {
++                builder.append(" extends ");
++                AMP_JOINER.join(builder, bounds);
++            }
++        }
++        return builder.toString();
++    }
++
++}
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java b/src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java
+index ee045ab1c..75c4e914b 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java
+@@ -41,6 +41,8 @@
+ import org.apache.commons.lang3.Validate;
+ import org.apache.commons.lang3.builder.Builder;
+ 
++import org.apache.commons.lang3.reflect.TypeFormatter;
++
+ /**
+  * Utility methods focusing on type inspection, particularly with regard to generics.
+  *
+@@ -284,38 +286,6 @@ public String toString() {
+         }
+     }
+ 
+-    /**
+-     * Ampersand sign joiner.
+-     */
+-    // @formatter:off
+-    private static final AppendableJoiner<Type> AMP_JOINER = AppendableJoiner.<Type>builder()
+-            .setDelimiter(" & ")
+-            .setElementAppender((a, e) -> a.append(toString(e)))
+-            .get();
+-    // @formatter:on
+-
+-    /**
+-     * Method classToString joiner.
+-     */
+-    // @formatter:off
+-    private static final AppendableJoiner<TypeVariable<Class<?>>> CTJ_JOINER = AppendableJoiner.<TypeVariable<Class<?>>>builder()
+-        .setDelimiter(", ")
+-        .setElementAppender((a, e) -> a.append(anyToString(e)))
+-        .get();
+-    // @formatter:on
+-
+-    /**
+-     * Greater than and lesser than sign joiner.
+-     */
+-    // @formatter:off
+-    private static final AppendableJoiner<Object> GT_JOINER = AppendableJoiner.builder()
+-            .setPrefix("<")
+-            .setSuffix(">")
+-            .setDelimiter(", ")
+-            .setElementAppender((a, e) -> a.append(anyToString(e)))
+-            .get();
+-    // @formatter:on
+-
+     /**
+      * A wildcard instance matching {@code ?}.
+      *
+@@ -323,46 +293,6 @@ public String toString() {
+      */
+     public static final WildcardType WILDCARD_ALL = wildcardType().withUpperBounds(Object.class).build();
+ 
+-    private static <T> String anyToString(final T object) {
+-        return object instanceof Type ? toString((Type) object) : object.toString();
+-    }
+-
+-    private static void appendRecursiveTypes(final StringBuilder builder, final int[] recursiveTypeIndexes, final Type[] argumentTypes) {
+-        for (final Type type : argumentTypes) {
+-            // toString() or you get a SO
+-            GT_JOINER.join(builder, Objects.toString(type));
+-        }
+-        final Type[] argumentsFiltered = ArrayUtils.removeAll(argumentTypes, recursiveTypeIndexes);
+-        if (argumentsFiltered.length > 0) {
+-            GT_JOINER.join(builder, (Object[]) argumentsFiltered);
+-        }
+-    }
+-
+-    /**
+-     * Formats a {@link Class} as a {@link String}.
+-     *
+-     * @param cls {@link Class} to format.
+-     * @return The class as a String.
+-     */
+-    private static <T> String classToString(final Class<T> cls) {
+-        if (cls.isArray()) {
+-            return toString(cls.getComponentType()) + "[]";
+-        }
+-        if (isCyclical(cls)) {
+-            return cls.getSimpleName() + "(cycle)";
+-        }
+-        final StringBuilder buf = new StringBuilder();
+-        if (cls.getEnclosingClass() != null) {
+-            buf.append(classToString(cls.getEnclosingClass())).append('.').append(cls.getSimpleName());
+-        } else {
+-            buf.append(cls.getName());
+-        }
+-        if (cls.getTypeParameters().length > 0) {
+-            GT_JOINER.join(buf, (Object[]) cls.getTypeParameters());
+-        }
+-        return buf.toString();
+-    }
+-
+     /**
+      * Tests, recursively, whether any of the type parameters associated with {@code type} are bound to variables.
+      *
+@@ -545,13 +475,13 @@ private static Type[] extractTypeArgumentsFrom(final Map<TypeVariable<?>, Type>
+         final Type[] result = new Type[variables.length];
+         int index = 0;
+         for (final TypeVariable<?> var : variables) {
+-            Validate.isTrue(mappings.containsKey(var), () -> String.format("missing argument mapping for %s", toString(var)));
++            Validate.isTrue(mappings.containsKey(var), () -> String.format("missing argument mapping for %s", TypeUtils.toString(var)));
+             result[index++] = mappings.get(var);
+         }
+         return result;
+     }
+ 
+-    private static int[] findRecursiveTypes(final ParameterizedType parameterizedType) {
++    static int[] findRecursiveTypes(final ParameterizedType parameterizedType) {
+         final Type[] filteredArgumentTypes = Arrays.copyOf(parameterizedType.getActualTypeArguments(), parameterizedType.getActualTypeArguments().length);
+         int[] indexesToRemove = {};
+         for (int i = 0; i < filteredArgumentTypes.length; i++) {
+@@ -574,16 +504,6 @@ public static GenericArrayType genericArrayType(final Type componentType) {
+         return new GenericArrayTypeImpl(Objects.requireNonNull(componentType, "componentType"));
+     }
+ 
+-    /**
+-     * Formats a {@link GenericArrayType} as a {@link String}.
+-     *
+-     * @param genericArrayType {@link GenericArrayType} to format.
+-     * @return String.
+-     */
+-    private static String genericArrayTypeToString(final GenericArrayType genericArrayType) {
+-        return String.format("%s[]", toString(genericArrayType.getGenericComponentType()));
+-    }
+-
+     /**
+      * Gets the array component type of {@code type}.
+      *
+@@ -1277,7 +1197,7 @@ private static boolean isAssignable(final Type type, final WildcardType toWildca
+      * @param cls the class to test.
+      * @return whether the class contains a cyclical reference.
+      */
+-    private static boolean isCyclical(final Class<?> cls) {
++    static boolean isCyclical(final Class<?> cls) {
+         for (final TypeVariable<?> typeParameter : cls.getTypeParameters()) {
+             for (final Type bound : typeParameter.getBounds()) {
+                 if (bound.getTypeName().contains(cls.getName())) {
+@@ -1417,7 +1337,7 @@ public static final ParameterizedType parameterize(final Class<?> rawClass, fina
+     /**
+      * Creates a parameterized type instance.
+      *
+-     * @param rawClass      the raw class to create a parameterized type instance for.
++     * @param rawClass        the raw class to create a parameterized type instance for.
+      * @param typeArguments the types used for parameterization.
+      * @return {@link ParameterizedType}.
+      * @throws NullPointerException if {@code rawClass} is {@code null}.
+@@ -1427,35 +1347,6 @@ public static final ParameterizedType parameterize(final Class<?> rawClass, fina
+         return parameterizeWithOwner(null, rawClass, typeArguments);
+     }
+ 
+-    /**
+-     * Formats a {@link ParameterizedType} as a {@link String}.
+-     *
+-     * @param parameterizedType {@link ParameterizedType} to format.
+-     * @return String.
+-     */
+-    private static String parameterizedTypeToString(final ParameterizedType parameterizedType) {
+-        final StringBuilder builder = new StringBuilder();
+-        final Type useOwner = parameterizedType.getOwnerType();
+-        final Class<?> raw = (Class<?>) parameterizedType.getRawType();
+-        if (useOwner == null) {
+-            builder.append(raw.getName());
+-        } else {
+-            if (useOwner instanceof Class<?>) {
+-                builder.append(((Class<?>) useOwner).getName());
+-            } else {
+-                builder.append(useOwner);
+-            }
+-            builder.append('.').append(raw.getSimpleName());
+-        }
+-        final int[] recursiveTypeIndexes = findRecursiveTypes(parameterizedType);
+-        if (recursiveTypeIndexes.length > 0) {
+-            appendRecursiveTypes(builder, recursiveTypeIndexes, parameterizedType.getActualTypeArguments());
+-        } else {
+-            GT_JOINER.join(builder, (Object[]) parameterizedType.getActualTypeArguments());
+-        }
+-        return builder.toString();
+-    }
+-
+     /**
+      * Creates a parameterized type instance.
+      *
+@@ -1542,11 +1433,11 @@ public static String toLongString(final TypeVariable<?> typeVariable) {
+                 c = c.getEnclosingClass();
+             }
+         } else if (d instanceof Type) { // not possible as of now
+-            buf.append(toString((Type) d));
++            buf.append(TypeUtils.toString((Type) d));
+         } else {
+             buf.append(d);
+         }
+-        return buf.append(':').append(typeVariableToString(typeVariable)).toString();
++        return buf.append(':').append(TypeFormatter.typeVariableToString(typeVariable)).toString();
+     }
+ 
+     /**
+@@ -1560,19 +1451,19 @@ public static String toLongString(final TypeVariable<?> typeVariable) {
+     public static String toString(final Type type) {
+         Objects.requireNonNull(type, "type");
+         if (type instanceof Class<?>) {
+-            return classToString((Class<?>) type);
++            return TypeFormatter.classToString((Class<?>) type);
+         }
+         if (type instanceof ParameterizedType) {
+-            return parameterizedTypeToString((ParameterizedType) type);
++            return TypeFormatter.parameterizedTypeToString((ParameterizedType) type);
+         }
+         if (type instanceof WildcardType) {
+-            return wildcardTypeToString((WildcardType) type);
++            return TypeFormatter.wildcardTypeToString((WildcardType) type);
+         }
+         if (type instanceof TypeVariable<?>) {
+-            return typeVariableToString((TypeVariable<?>) type);
++            return TypeFormatter.typeVariableToString((TypeVariable<?>) type);
+         }
+         if (type instanceof GenericArrayType) {
+-            return genericArrayTypeToString((GenericArrayType) type);
++            return TypeFormatter.genericArrayTypeToString((GenericArrayType) type);
+         }
+         throw new IllegalArgumentException(ObjectUtils.identityToString(type));
+     }
+@@ -1602,36 +1493,6 @@ public static boolean typesSatisfyVariables(final Map<TypeVariable<?>, Type> typ
+         return true;
+     }
+ 
+-    /**
+-     * Formats a {@link TypeVariable} as a {@link String}.
+-     *
+-     * @param typeVariable {@link TypeVariable} to format.
+-     * @return String.
+-     */
+-    private static String typeVariableToString(final TypeVariable<?> typeVariable) {
+-        final StringBuilder builder = new StringBuilder(typeVariable.getName());
+-        final Type[] bounds = typeVariable.getBounds();
+-        if (bounds.length > 0 && !(bounds.length == 1 && Object.class.equals(bounds[0]))) {
+-            // https://issues.apache.org/jira/projects/LANG/issues/LANG-1698
+-            // There must be a better way to avoid a stack overflow on Java 17 and up.
+-            // Bounds are different in Java 17 and up where instead of Object you can get an interface like Comparable.
+-            final Type bound = bounds[0];
+-            boolean append = true;
+-            if (bound instanceof ParameterizedType) {
+-                final Type rawType = ((ParameterizedType) bound).getRawType();
+-                if (rawType instanceof Class && ((Class<?>) rawType).isInterface()) {
+-                    // Avoid recursion and stack overflow on Java 17 and up.
+-                    append = false;
+-                }
+-            }
+-            if (append) {
+-                builder.append(" extends ");
+-                AMP_JOINER.join(builder, bounds);
+-            }
+-        }
+-        return builder.toString();
+-    }
+-
+     /**
+      * Unrolls variables in a type bounds array.
+      *
+@@ -1733,24 +1594,6 @@ public static WildcardTypeBuilder wildcardType() {
+         return new WildcardTypeBuilder();
+     }
+ 
+-    /**
+-     * Formats a {@link WildcardType} as a {@link String}.
+-     *
+-     * @param wildcardType {@link WildcardType} to format.
+-     * @return String.
+-     */
+-    private static String wildcardTypeToString(final WildcardType wildcardType) {
+-        final StringBuilder builder = new StringBuilder().append('?');
+-        final Type[] lowerBounds = wildcardType.getLowerBounds();
+-        final Type[] upperBounds = wildcardType.getUpperBounds();
+-        if (lowerBounds.length > 1 || lowerBounds.length == 1 && lowerBounds[0] != null) {
+-            AMP_JOINER.join(builder.append(" super "), lowerBounds);
+-        } else if (upperBounds.length > 1 || upperBounds.length == 1 && !Object.class.equals(upperBounds[0])) {
+-            AMP_JOINER.join(builder.append(" extends "), upperBounds);
+-        }
+-        return builder.toString();
+-    }
+-
+     /**
+      * Wraps the specified {@link Class} in a {@link Typed} wrapper.
+      *

@@ -1,0 +1,71 @@
+{
+  "id": 2,
+  "goal": "Further reduce the public API surface of TypeUtils by moving public formatting operations to TypeFormatter while preserving the original API via a lightweight façade (TypeUtils delegating to TypeFormatter). This isolates formatting responsibilities entirely.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java",
+    "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:toString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:toLongString"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:toString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:toLongString"
+      ],
+      "details": "Move the public formatting methods toString(Type) and toLongString(TypeVariable<?>) implementations into TypeFormatter as public static methods. Keep implementations identical. These methods are cohesive with the previously moved helpers.",
+      "risk": "medium"
+    },
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "details": "In TypeUtils, replace the moved public methods with small delegating methods that call TypeFormatter.toString(...) and TypeFormatter.toLongString(...). This preserves the public API of TypeUtils while the implementation is now in TypeFormatter. Example: public static String toString(Type type) { return TypeFormatter.toString(type); }",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "details": "Ensure all internal uses within TypeUtils and other classes in the same package use the new delegator or TypeFormatter methods as appropriate. Update any direct references that might have previously referenced moved methods to call TypeFormatter when appropriate. This step finalizes the separation and ensures compilation.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+  ]
+}

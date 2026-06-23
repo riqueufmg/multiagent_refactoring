@@ -1,0 +1,107 @@
+{
+  "id": 1,
+  "goal": "Extract formatting and type-to-string helper utilities into a dedicated TypeFormatter class and update TypeUtils to call those helpers. This groups cohesive string/formatting functionality to reduce TypeUtils size and complexity.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java",
+    "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java"
+      ],
+      "details": "Create a new class org.apache.commons.lang3.reflect.TypeFormatter in the same package. This class will contain formatting-related static fields and helper methods extracted from TypeUtils: AMP_JOINER, CTJ_JOINER, GT_JOINER, anyToString, appendRecursiveTypes, classToString, genericArrayTypeToString, parameterizedTypeToString, wildcardTypeToString, typeVariableToString. The new class provides public static methods with the same signatures as the moved helpers (but methods that were originally private become package-private or public static as needed) so they can be reused from TypeUtils and other classes in the package.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:AMP_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:CTJ_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:GT_JOINER"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:AMP_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:CTJ_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:GT_JOINER"
+      ],
+      "details": "Move the three AppendableJoiner constants (AMP_JOINER, CTJ_JOINER, GT_JOINER) from TypeUtils into TypeFormatter. Adjust visibility to package-private or public static final as required by use from TypeUtils.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:anyToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:appendRecursiveTypes",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:classToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:genericArrayTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:parameterizedTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:wildcardTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:typeVariableToString"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:anyToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:appendRecursiveTypes",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:classToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:genericArrayTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:parameterizedTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:wildcardTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeFormatter.java:typeVariableToString"
+      ],
+      "details": "Move the private helper methods that implement type-to-string logic into TypeFormatter as static methods. Keep method signatures equivalent; adjust visibility so TypeUtils can call them (package-private or public). Preserve method implementations without behavioral change.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "details": "Add import for org.apache.commons.lang3.reflect.TypeFormatter in TypeUtils and any other necessary imports introduced by the moved methods (if any).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "details": "Update all internal references in TypeUtils that previously invoked the moved helper methods/fields to call TypeFormatter.<methodName> or reference TypeFormatter.<field>. For example, replace calls to classToString(...) with TypeFormatter.classToString(...). Ensure TypeUtils continues to compile and behave the same.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+  ]
+}

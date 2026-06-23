@@ -1,0 +1,436 @@
+commit d5e86d3c5af7bf7291ce5115fbd4d12b95920a62
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 17:17:09 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java b/src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java
+new file mode 100644
+index 000000000..f8feef2fa
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java
+@@ -0,0 +1,188 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.lang3.reflect;
++
++import java.lang.annotation.Annotation;
++import java.lang.reflect.Executable;
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++import java.lang.reflect.TypeVariable;
++import java.util.List;
++import java.util.Map;
++
++import org.apache.commons.lang3.ClassUtils;
++import org.apache.commons.lang3.ClassUtils.Interfaces;
++
++/**
++ * Utilities for method lookup, matching and invocation. Extracted from MethodUtils to group invocation-related APIs.
++ * Methods typically delegate to MethodUtilsCore or MethodInvoker as appropriate.
++ *
++ * @since 3.0 (extracted)
++ */
++public class MethodInvocationUtils {
++
++    private MethodInvocationUtils() {
++        // private utility class
++    }
++
++    public static Method getAccessibleMethod(final Class<?> cls, final Method method) {
++        if (!MemberUtils.isPublic(method)) {
++            return null;
++        }
++        // If the declaring class is public, we are done
++        if (ClassUtils.isPublic(cls)) {
++            return method;
++        }
++        final String methodName = method.getName();
++        final Class<?>[] parameterTypes = method.getParameterTypes();
++        // Check the implemented interfaces and subinterfaces
++        final Method method2 = MethodUtilsCore.getAccessibleMethodFromInterfaceNest(cls, methodName, parameterTypes);
++        // Check the superclass chain
++        return method2 != null ? method2 : MethodUtilsCore.getAccessibleMethodFromSuperclass(cls, methodName, parameterTypes);
++    }
++
++    public static Method getAccessibleMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
++        return getAccessibleMethod(getMethodObject(cls, methodName, parameterTypes));
++    }
++
++    public static Method getAccessibleMethod(final Method method) {
++        return method != null ? getAccessibleMethod(method.getDeclaringClass(), method) : null;
++    }
++
++    public static <A extends Annotation> A getAnnotation(final Method method, final Class<A> annotationCls, final boolean searchSupers,
++            final boolean ignoreAccess) {
++        return MethodInvoker.getAnnotation(method, annotationCls, searchSupers, ignoreAccess);
++    }
++
++    public static Method getMatchingAccessibleMethod(final Class<?> cls, final String methodName, final Class<?>... requestTypes) {
++        return MethodInvoker.getMatchingAccessibleMethod(cls, methodName, requestTypes);
++    }
++
++    public static Method getMatchingMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
++        return MethodInvoker.getMatchingMethod(cls, methodName, parameterTypes);
++    }
++
++    public static Method getMethodObject(final Class<?> cls, final String name, final Class<?>... parameterTypes) {
++        return MethodInvoker.getMethodObject(cls, name, parameterTypes);
++    }
++
++    public static List<Method> getMethodsListWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls) {
++        return getMethodsListWithAnnotation(cls, annotationCls, false, false);
++    }
++
++    public static List<Method> getMethodsListWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls,
++            final boolean searchSupers, final boolean ignoreAccess) {
++        return MethodInvoker.getMethodsListWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess);
++    }
++
++    public static Method[] getMethodsWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls) {
++        return getMethodsWithAnnotation(cls, annotationCls, false, false);
++    }
++
++    public static Method[] getMethodsWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls,
++            final boolean searchSupers, final boolean ignoreAccess) {
++        return MethodInvoker.getMethodsWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess);
++    }
++
++    public static Object invokeExactMethod(final Object object, final String methodName)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeExactMethod(object, methodName);
++    }
++
++    public static Object invokeExactMethod(final Object object, final String methodName, final Object... args)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeExactMethod(object, methodName, args);
++    }
++
++    public static Object invokeExactMethod(final Object object, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeExactMethod(object, methodName, args, parameterTypes);
++    }
++
++    public static Object invokeExactStaticMethod(final Class<?> cls, final String methodName, final Object... args)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeExactStaticMethod(cls, methodName, args);
++    }
++
++    public static Object invokeExactStaticMethod(final Class<?> cls, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeExactStaticMethod(cls, methodName, args, parameterTypes);
++    }
++
++    public static Object invokeMethod(final Object object, final boolean forceAccess, final String methodName)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeMethod(object, forceAccess, methodName);
++    }
++
++    public static Object invokeMethod(final Object object, final boolean forceAccess, final String methodName, final Object... args)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeMethod(object, forceAccess, methodName, args);
++    }
++
++    public static Object invokeMethod(final Object object, final boolean forceAccess, final String methodName, final Object[] args,
++            final Class<?>[] parameterTypes) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeMethod(object, forceAccess, methodName, args, parameterTypes);
++    }
++
++    public static Object invokeMethod(final Object object, final String methodName)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeMethod(object, methodName);
++    }
++
++    public static Object invokeMethod(final Object object, final String methodName, final Object... args)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeMethod(object, methodName, args);
++    }
++
++    public static Object invokeMethod(final Object object, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeMethod(object, methodName, args, parameterTypes);
++    }
++
++    public static Object invokeStaticMethod(final Class<?> cls, final String methodName, final Object... args)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeStaticMethod(cls, methodName, args);
++    }
++
++    public static Object invokeStaticMethod(final Class<?> cls, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
++            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
++        return MethodInvoker.invokeStaticMethod(cls, methodName, args, parameterTypes);
++    }
++
++    static Object[] toVarArgs(final Executable executable, final Object[] args)
++            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
++        return MethodUtilsCore.toVarArgs(executable, args);
++    }
++
++    private static Object[] toVarArgs(final Object[] args, final Class<?>[] methodParameterTypes)
++            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
++        return MethodUtilsCore.toVarArgs(args, methodParameterTypes);
++    }
++
++    public static int distance(final Class<?>[] fromClassArray, final Class<?>[] toClassArray) {
++        return MethodUtilsCore.distance(fromClassArray, toClassArray);
++    }
++
++    public static java.util.List<Class<?>> getAllSuperclassesAndInterfaces(final Class<?> cls) {
++        return MethodUtilsCore.getAllSuperclassesAndInterfaces(cls);
++    }
++
++    public static java.util.Set<Method> getOverrideHierarchy(final Method method, final Interfaces interfacesBehavior) {
++        // Delegate to existing higher-level implementation in MethodUtils for override hierarchy
++        return MethodUtils.getOverrideHierarchy(method, interfacesBehavior);
++    }
++}
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java b/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
+index be55b1d56..5b7668dd4 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
+@@ -91,19 +91,7 @@ private static int distance(final Class<?>[] fromClassArray, final Class<?>[] to
+      * @since 3.19.0
+      */
+     public static Method getAccessibleMethod(final Class<?> cls, final Method method) {
+-        if (!MemberUtils.isPublic(method)) {
+-            return null;
+-        }
+-        // If the declaring class is public, we are done
+-        if (ClassUtils.isPublic(cls)) {
+-            return method;
+-        }
+-        final String methodName = method.getName();
+-        final Class<?>[] parameterTypes = method.getParameterTypes();
+-        // Check the implemented interfaces and subinterfaces
+-        final Method method2 = getAccessibleMethodFromInterfaceNest(cls, methodName, parameterTypes);
+-        // Check the superclass chain
+-        return method2 != null ? method2 : getAccessibleMethodFromSuperclass(cls, methodName, parameterTypes);
++        return MethodInvocationUtils.getAccessibleMethod(cls, method);
+     }
+ 
+     /**
+@@ -116,7 +104,7 @@ public static Method getAccessibleMethod(final Class<?> cls, final Method method
+      * @return The accessible method.
+      */
+     public static Method getAccessibleMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
+-        return getAccessibleMethod(getMethodObject(cls, methodName, parameterTypes));
++        return MethodInvocationUtils.getAccessibleMethod(cls, methodName, parameterTypes);
+     }
+ 
+     /**
+@@ -127,7 +115,7 @@ public static Method getAccessibleMethod(final Class<?> cls, final String method
+      * @return The accessible method
+      */
+     public static Method getAccessibleMethod(final Method method) {
+-        return method != null ? getAccessibleMethod(method.getDeclaringClass(), method) : null;
++        return MethodInvocationUtils.getAccessibleMethod(method);
+     }
+ 
+     /**
+@@ -199,7 +187,7 @@ private static List<Class<?>> getAllSuperclassesAndInterfaces(final Class<?> cls
+      */
+     public static <A extends Annotation> A getAnnotation(final Method method, final Class<A> annotationCls, final boolean searchSupers,
+             final boolean ignoreAccess) {
+-        return MethodInvoker.getAnnotation(method, annotationCls, searchSupers, ignoreAccess);
++        return MethodInvocationUtils.getAnnotation(method, annotationCls, searchSupers, ignoreAccess);
+     }
+ 
+     private static Method getInvokeMethod(final boolean forceAccess, final String methodName, final Class<?>[] parameterTypes, final Class<?> cls) {
+@@ -225,7 +213,7 @@ private static Method getInvokeMethod(final boolean forceAccess, final String me
+      * @see SecurityManager#checkPermission
+      */
+     public static Method getMatchingAccessibleMethod(final Class<?> cls, final String methodName, final Class<?>... requestTypes) {
+-        return MethodInvoker.getMatchingAccessibleMethod(cls, methodName, requestTypes);
++        return MethodInvocationUtils.getMatchingAccessibleMethod(cls, methodName, requestTypes);
+     }
+ 
+     /**
+@@ -240,7 +228,7 @@ public static Method getMatchingAccessibleMethod(final Class<?> cls, final Strin
+      * @since 3.5
+      */
+     public static Method getMatchingMethod(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
+-        return MethodInvoker.getMatchingMethod(cls, methodName, parameterTypes);
++        return MethodInvocationUtils.getMatchingMethod(cls, methodName, parameterTypes);
+     }
+ 
+     /**
+@@ -255,7 +243,7 @@ public static Method getMatchingMethod(final Class<?> cls, final String methodNa
+      * @since 3.15.0
+      */
+     public static Method getMethodObject(final Class<?> cls, final String name, final Class<?>... parameterTypes) {
+-        return MethodInvoker.getMethodObject(cls, name, parameterTypes);
++        return MethodInvocationUtils.getMethodObject(cls, name, parameterTypes);
+     }
+ 
+     /**
+@@ -268,7 +256,7 @@ public static Method getMethodObject(final Class<?> cls, final String name, fina
+      * @since 3.4
+      */
+     public static List<Method> getMethodsListWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls) {
+-        return getMethodsListWithAnnotation(cls, annotationCls, false, false);
++        return MethodInvocationUtils.getMethodsListWithAnnotation(cls, annotationCls);
+     }
+ 
+     /**
+@@ -284,7 +272,7 @@ public static List<Method> getMethodsListWithAnnotation(final Class<?> cls, fina
+      */
+     public static List<Method> getMethodsListWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls, final boolean searchSupers,
+             final boolean ignoreAccess) {
+-        return MethodInvoker.getMethodsListWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess);
++        return MethodInvocationUtils.getMethodsListWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess);
+     }
+ 
+     /**
+@@ -297,7 +285,7 @@ public static List<Method> getMethodsListWithAnnotation(final Class<?> cls, fina
+      * @since 3.4
+      */
+     public static Method[] getMethodsWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls) {
+-        return getMethodsWithAnnotation(cls, annotationCls, false, false);
++        return MethodInvocationUtils.getMethodsWithAnnotation(cls, annotationCls);
+     }
+ 
+     /**
+@@ -313,7 +301,7 @@ public static Method[] getMethodsWithAnnotation(final Class<?> cls, final Class<
+      */
+     public static Method[] getMethodsWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls, final boolean searchSupers,
+             final boolean ignoreAccess) {
+-        return MethodInvoker.getMethodsWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess);
++        return MethodInvocationUtils.getMethodsWithAnnotation(cls, annotationCls, searchSupers, ignoreAccess);
+     }
+ 
+     /**
+@@ -387,7 +375,7 @@ public static Set<Method> getOverrideHierarchy(final Method method, final Interf
+      */
+     public static Object invokeExactMethod(final Object object, final String methodName)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeExactMethod(object, methodName);
++        return MethodInvocationUtils.invokeExactMethod(object, methodName);
+     }
+ 
+     /**
+@@ -419,7 +407,7 @@ public static Object invokeExactMethod(final Object object, final String methodN
+      */
+     public static Object invokeExactMethod(final Object object, final String methodName, final Object... args)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeExactMethod(object, methodName, args);
++        return MethodInvocationUtils.invokeExactMethod(object, methodName, args);
+     }
+ 
+     /**
+@@ -452,7 +440,7 @@ public static Object invokeExactMethod(final Object object, final String methodN
+      */
+     public static Object invokeExactMethod(final Object object, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeExactMethod(object, methodName, args, parameterTypes);
++        return MethodInvocationUtils.invokeExactMethod(object, methodName, args, parameterTypes);
+     }
+ 
+     /**
+@@ -483,7 +471,7 @@ public static Object invokeExactMethod(final Object object, final String methodN
+      */
+     public static Object invokeExactStaticMethod(final Class<?> cls, final String methodName, final Object... args)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeExactStaticMethod(cls, methodName, args);
++        return MethodInvocationUtils.invokeExactStaticMethod(cls, methodName, args);
+     }
+ 
+     /**
+@@ -515,7 +503,7 @@ public static Object invokeExactStaticMethod(final Class<?> cls, final String me
+      */
+     public static Object invokeExactStaticMethod(final Class<?> cls, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeExactStaticMethod(cls, methodName, args, parameterTypes);
++        return MethodInvocationUtils.invokeExactStaticMethod(cls, methodName, args, parameterTypes);
+     }
+ 
+     /**
+@@ -550,7 +538,7 @@ public static Object invokeExactStaticMethod(final Class<?> cls, final String me
+      */
+     public static Object invokeMethod(final Object object, final boolean forceAccess, final String methodName)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeMethod(object, forceAccess, methodName);
++        return MethodInvocationUtils.invokeMethod(object, forceAccess, methodName);
+     }
+ 
+     /**
+@@ -591,7 +579,7 @@ public static Object invokeMethod(final Object object, final boolean forceAccess
+      */
+     public static Object invokeMethod(final Object object, final boolean forceAccess, final String methodName, final Object... args)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeMethod(object, forceAccess, methodName, args);
++        return MethodInvocationUtils.invokeMethod(object, forceAccess, methodName, args);
+     }
+ 
+     /**
+@@ -625,11 +613,10 @@ public static Object invokeMethod(final Object object, final boolean forceAccess
+      * @throws NullPointerException        Thrown if the specified {@code object} is null.
+      * @throws ExceptionInInitializerError Thrown if the initialization provoked by this method fails.
+      * @see SecurityManager#checkPermission
+-     * @since 3.5
+      */
+     public static Object invokeMethod(final Object object, final boolean forceAccess, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeMethod(object, forceAccess, methodName, args, parameterTypes);
++        return MethodInvocationUtils.invokeMethod(object, forceAccess, methodName, args, parameterTypes);
+     }
+ 
+     /**
+@@ -655,7 +642,7 @@ public static Object invokeMethod(final Object object, final boolean forceAccess
+      */
+     public static Object invokeMethod(final Object object, final String methodName) throws NoSuchMethodException,
+             IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeMethod(object, methodName);
++        return MethodInvocationUtils.invokeMethod(object, methodName);
+     }
+ 
+     /**
+@@ -687,7 +674,7 @@ public static Object invokeMethod(final Object object, final String methodName)
+      */
+     public static Object invokeMethod(final Object object, final String methodName, final Object... args)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeMethod(object, methodName, args);
++        return MethodInvocationUtils.invokeMethod(object, methodName, args);
+     }
+ 
+     /**
+@@ -726,7 +713,7 @@ public static Object invokeMethod(final Object object, final String methodName,
+      */
+     public static Object invokeMethod(final Object object, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeMethod(object, methodName, args, parameterTypes);
++        return MethodInvocationUtils.invokeMethod(object, methodName, args, parameterTypes);
+     }
+ 
+     /**
+@@ -767,7 +754,7 @@ public static Object invokeMethod(final Object object, final String methodName,
+      */
+     public static Object invokeStaticMethod(final Class<?> cls, final String methodName, final Object... args)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeStaticMethod(cls, methodName, args);
++        return MethodInvocationUtils.invokeStaticMethod(cls, methodName, args);
+     }
+ 
+     /**
+@@ -805,7 +792,7 @@ public static Object invokeStaticMethod(final Class<?> cls, final String methodN
+      */
+     public static Object invokeStaticMethod(final Class<?> cls, final String methodName, final Object[] args, final Class<?>[] parameterTypes)
+             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+-        return MethodInvoker.invokeStaticMethod(cls, methodName, args, parameterTypes);
++        return MethodInvocationUtils.invokeStaticMethod(cls, methodName, args, parameterTypes);
+     }
+ 
+     private static Method requireNonNull(final Method method, final Class<?> cls, final String methodName, final Class<?>[] parameterTypes)
