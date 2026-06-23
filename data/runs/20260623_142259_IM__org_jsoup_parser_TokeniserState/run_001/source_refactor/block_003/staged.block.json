@@ -1,0 +1,46 @@
+{
+  "id": 3,
+  "goal": "Finalize modularization by keeping TokeniserState focused on state definitions and delegating complex behavior to the helper; optionally introduce a facade if further decoupling is needed.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateHelper.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "If desired, provide a small facade API on TokeniserStateHelper that exposes a minimal set of methods used by TokeniserState (e.g., readRawData, handleDataEndTag) and keeps any lower-level helper internals private. This step is optional but recommended for future maintainability to explicitly control the helper surface area.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "details": "Verify and update any remaining references in the TokeniserState enum to use the facade surface (if introduced) instead of helper internals. Ensure TokeniserState now contains only the enum state implementations invoking small helpers, improving cohesion and reducing the class size.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": 3,
+  "goal": "Extract attribute-related parsing logic into a dedicated Attribute facade to reduce the number of responsibilities inside the enum and improve cohesion.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java"
+      ],
+      "details": "Create org.jsoup.parser.TokeniserStateAttributeFacade with static methods covering BeforeAttributeName, AttributeName, AfterAttributeName, BeforeAttributeValue, AttributeValue_doubleQuoted, AttributeValue_singleQuoted, AttributeValue_unquoted, AfterAttributeValue_quoted and SelfClosingStartTag. The facade methods will encapsulate long switch and consume logic, call Tokeniser APIs (tagPending manipulation, transition, error, eofError, emitTagPending), and delegate any character reference handling to Tokeniser where required.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "details": "Update the enum constants listed above so each read(...) implementation is a simple delegation to the corresponding TokeniserStateAttributeFacade method (for example TokeniserStateAttributeFacade.readAttributeName(t, r); ). This centralizes attribute parsing and reduces enum size. Ensure behavior is preserved: the facade must use Tokeniser.tagPending and other Tokeniser state exactly as the original code does.",
+      "risk": "high"
+    }
+  ],
+  "test_files": []
+}

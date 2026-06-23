@@ -1,0 +1,915 @@
+commit d74d9c731453fc456001c2e85e49a2e2b492d6aa
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 13:58:35 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index d2391a76..aa1abd2c 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -1006,438 +1006,37 @@ enum HtmlTreeBuilderState {
+     },
+     InTable {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (t.isCharacter() && inSorted(tb.currentElement().normalName(), InTableFoster)) {
+-                tb.resetPendingTableCharacters();
+-                tb.markInsertionMode();
+-                tb.transition(InTableText);
+-                return tb.process(t);
+-            } else if (t.isComment()) {
+-                tb.insertCommentNode(t.asComment());
+-                return true;
+-            } else if (t.isDoctype()) {
+-                tb.error(this);
+-                return false;
+-            } else if (t.isStartTag()) {
+-                Token.StartTag startTag = t.asStartTag();
+-                String name = startTag.normalName();
+-                if (name.equals("caption")) {
+-                    tb.clearStackToTableContext();
+-                    tb.insertMarkerToFormattingElements();
+-                    tb.insertElementFor(startTag);
+-                    tb.transition(InCaption);
+-                } else if (name.equals("colgroup")) {
+-                    tb.clearStackToTableContext();
+-                    tb.insertElementFor(startTag);
+-                    tb.transition(InColumnGroup);
+-                } else if (name.equals("col")) {
+-                    tb.clearStackToTableContext();
+-                    tb.processStartTag("colgroup");
+-                    return tb.process(t);
+-                } else if (inSorted(name, InTableToBody)) {
+-                    tb.clearStackToTableContext();
+-                    tb.insertElementFor(startTag);
+-                    tb.transition(InTableBody);
+-                } else if (inSorted(name, InTableAddBody)) {
+-                    tb.clearStackToTableContext();
+-                    tb.processStartTag("tbody");
+-                    return tb.process(t);
+-                } else if (name.equals("table")) {
+-                    tb.error(this);
+-                    if (!tb.inTableScope(name)) { // ignore it
+-                        return false;
+-                    } else {
+-                        tb.popStackToClose(name);
+-                        if (!tb.resetInsertionMode()) {
+-                            // not per spec - but haven't transitioned out of table. so try something else
+-                            tb.insertElementFor(startTag);
+-                            return true;
+-                        }
+-                        return tb.process(t);
+-                    }
+-                } else if (inSorted(name, InTableToHead)) {
+-                    return tb.process(t, InHead);
+-                } else if (name.equals("input")) {
+-                    if (!(startTag.hasAttributes() && startTag.attributes.get("type").equalsIgnoreCase("hidden"))) {
+-                        return anythingElse(t, tb);
+-                    } else {
+-                        tb.insertEmptyElementFor(startTag);
+-                    }
+-                } else if (name.equals("form")) {
+-                    tb.error(this);
+-                    if (tb.getFormElement() != null || tb.onStack("template"))
+-                        return false;
+-                    else {
+-                        tb.insertFormElement(startTag, false, false); // not added to stack. can associate to template
+-                    }
+-                } else {
+-                    return anythingElse(t, tb);
+-                }
+-                return true; // todo: check if should return processed http://www.whatwg.org/specs/web-apps/current-work/multipage/tree-construction.html#parsing-main-intable
+-            } else if (t.isEndTag()) {
+-                Token.EndTag endTag = t.asEndTag();
+-                String name = endTag.normalName();
+-
+-                if (name.equals("table")) {
+-                    if (!tb.inTableScope(name)) {
+-                        tb.error(this);
+-                        return false;
+-                    } else {
+-                        tb.popStackToClose("table");
+-                        tb.resetInsertionMode();
+-                    }
+-                } else if (inSorted(name, InTableEndErr)) {
+-                    tb.error(this);
+-                    return false;
+-                } else if (name.equals("template")) {
+-                    tb.process(t, InHead);
+-                } else {
+-                    return anythingElse(t, tb);
+-                }
+-                return true; // todo: as above todo
+-            } else if (t.isEOF()) {
+-                if (tb.currentElementIs("html"))
+-                    tb.error(this);
+-                return true; // stops parsing
+-            }
+-            return anythingElse(t, tb);
+-        }
+-
+-        boolean anythingElse(Token t, HtmlTreeBuilder tb) {
+-            tb.error(this);
+-            tb.setFosterInserts(true);
+-            tb.process(t, InBody);
+-            tb.setFosterInserts(false);
+-            return true;
++            return HtmlTreeBuilderStateTableHandlers.processInTable(t, tb);
+         }
+     },
+     InTableText {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (t.type == Token.TokenType.Character) {
+-                tb.addPendingTableCharacters(t.asCharacter()); // gets to insertCharacterNode, which strips nulls
+-            } else {
+-                // insert gathered table text into the correct element:
+-                if (tb.getPendingTableCharacters().size() > 0) {
+-                    final Token og = tb.currentToken; // update current token, so we can track cursor pos correctly
+-                    for (Token.Character c : tb.getPendingTableCharacters()) {
+-                        tb.currentToken = c;
+-                        if (!HtmlTreeBuilderStateHelper.isWhitespace(c)) {
+-                            // InTable anything else section:
+-                            tb.error(this);
+-                            if (inSorted(tb.currentElement().normalName(), InTableFoster)) {
+-                                tb.setFosterInserts(true);
+-                                tb.process(c, InBody);
+-                                tb.setFosterInserts(false);
+-                            } else {
+-                                tb.process(c, InBody);
+-                            }
+-                        } else
+-                            tb.insertCharacterNode(c);
+-                    }
+-                    tb.currentToken = og;
+-                    tb.resetPendingTableCharacters();
+-                }
+-                tb.transition(tb.originalState());
+-                return tb.process(t);
+-            }
+-            return true;
++            return HtmlTreeBuilderStateTableHandlers.processInTableText(t, tb);
+         }
+     },
+     InCaption {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (t.isEndTag() && t.asEndTag().normalName().equals("caption")) {
+-                if (!tb.inTableScope("caption")) { // fragment case
+-                    tb.error(this);
+-                    return false;
+-                } else {
+-                    tb.generateImpliedEndTags();
+-                    if (!tb.currentElementIs("caption")) tb.error(this);
+-                    tb.popStackToClose("caption");
+-                    tb.clearFormattingElementsToLastMarker();
+-                    tb.transition(InTable);
+-                }
+-            } else if ((
+-                    t.isStartTag() && inSorted(t.asStartTag().normalName(), InCellCol) ||
+-                            t.isEndTag() && t.asEndTag().normalName().equals("table"))
+-                    ) {
+-                // same as above but processes after transition
+-                if (!tb.inTableScope("caption")) { // fragment case
+-                    tb.error(this);
+-                    return false;
+-                }
+-                tb.generateImpliedEndTags(false);
+-                if (!tb.currentElementIs("caption")) tb.error(this);
+-                tb.popStackToClose("caption");
+-                tb.clearFormattingElementsToLastMarker();
+-                tb.transition(InTable);
+-                InTable.process(t, tb); // doesn't check foreign context
+-            } else if (t.isEndTag() && inSorted(t.asEndTag().normalName(), InCaptionIgnore)) {
+-                tb.error(this);
+-                return false;
+-            } else {
+-                return tb.process(t, InBody);
+-            }
+-            return true;
++            return HtmlTreeBuilderStateTableHandlers.processInCaption(t, tb);
+         }
+     },
+     InColumnGroup {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+-                tb.insertCharacterNode(t.asCharacter());
+-                return true;
+-            }
+-            switch (t.type) {
+-                case Comment:
+-                    tb.insertCommentNode(t.asComment());
+-                    break;
+-                case Doctype:
+-                    tb.error(this);
+-                    break;
+-                case StartTag:
+-                    Token.StartTag startTag = t.asStartTag();
+-                    switch (startTag.normalName()) {
+-                        case "html":
+-                            return tb.process(t, InBody);
+-                        case "col":
+-                            tb.insertEmptyElementFor(startTag);
+-                            break;
+-                        case "template":
+-                            tb.process(t, InHead);
+-                            break;
+-                        default:
+-                            return anythingElse(t, tb);
+-                    }
+-                    break;
+-                case EndTag:
+-                    Token.EndTag endTag = t.asEndTag();
+-                    String name = endTag.normalName();
+-                    switch (name) {
+-                        case "colgroup":
+-                            if (!tb.currentElementIs(name)) {
+-                                tb.error(this);
+-                                return false;
+-                            } else {
+-                                tb.pop();
+-                                tb.transition(InTable);
+-                            }
+-                            break;
+-                        case "template":
+-                            tb.process(t, InHead);
+-                            break;
+-                        default:
+-                            return anythingElse(t, tb);
+-                    }
+-                    break;
+-                case EOF:
+-                    if (tb.currentElementIs("html"))
+-                        return true; // stop parsing; frag case
+-                    else
+-                        return anythingElse(t, tb);
+-                default:
+-                    return anythingElse(t, tb);
+-            }
+-            return true;
+-        }
+-
+-        private boolean anythingElse(Token t, HtmlTreeBuilder tb) {
+-            if (!tb.currentElementIs("colgroup")) {
+-                tb.error(this);
+-                return false;
+-            }
+-            tb.pop();
+-            tb.transition(InTable);
+-            tb.process(t);
+-            return true;
++            return HtmlTreeBuilderStateTableHandlers.processInColumnGroup(t, tb);
+         }
+     },
+     InTableBody {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            final String name;
+-
+-            switch (t.type) {
+-                case StartTag:
+-                    Token.StartTag startTag = t.asStartTag();
+-                    name = startTag.normalName();
+-                    if (name.equals("tr")) {
+-                        tb.clearStackToTableBodyContext();
+-                        tb.insertElementFor(startTag);
+-                        tb.transition(InRow);
+-                    } else if (inSorted(name, InCellNames)) {
+-                        tb.error(this);
+-                        tb.processStartTag("tr");
+-                        return tb.process(startTag);
+-                    } else if (inSorted(name, InTableBodyExit)) {
+-                        return exitTableBody(t, tb);
+-                    } else
+-                        return anythingElse(t, tb);
+-                    break;
+-                case EndTag:
+-                    Token.EndTag endTag = t.asEndTag();
+-                    name = endTag.normalName();
+-                    if (inSorted(name, InTableEndIgnore)) {
+-                        if (!tb.inTableScope(name)) {
+-                            tb.error(this);
+-                            return false;
+-                        } else {
+-                            tb.clearStackToTableBodyContext();
+-                            tb.pop();
+-                            tb.transition(InTable);
+-                        }
+-                    } else if (name.equals("table")) {
+-                        return exitTableBody(t, tb);
+-                    } else if (inSorted(name, InTableBodyEndIgnore)) {
+-                        tb.error(this);
+-                        return false;
+-                    } else
+-                        return anythingElse(t, tb);
+-                    break;
+-                default:
+-                    return anythingElse(t, tb);
+-            }
+-            return true;
+-        }
+-
+-        private boolean exitTableBody(Token t, HtmlTreeBuilder tb) {
+-            if (!(tb.inTableScope("tbody") || tb.inTableScope("thead") || tb.inTableScope("tfoot"))) {
+-                // frag case
+-                tb.error(this);
+-                return false;
+-            }
+-            tb.clearStackToTableBodyContext();
+-            tb.processEndTag(tb.currentElement().normalName()); // tbody, tfoot, thead
+-            return tb.process(t);
+-        }
+-
+-        private boolean anythingElse(Token t, HtmlTreeBuilder tb) {
+-            return tb.process(t, InTable);
++            return HtmlTreeBuilderStateTableHandlers.processInTableBody(t, tb);
+         }
+     },
+     InRow {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (t.isStartTag()) {
+-                Token.StartTag startTag = t.asStartTag();
+-                String name = startTag.normalName();
+-
+-                if (inSorted(name, InCellNames)) { // td, th
+-                    tb.clearStackToTableRowContext();
+-                    tb.insertElementFor(startTag);
+-                    tb.transition(InCell);
+-                    tb.insertMarkerToFormattingElements();
+-                } else if (inSorted(name, InRowMissing)) { // "caption", "col", "colgroup", "tbody", "tfoot", "thead", "tr"
+-                    if (!tb.inTableScope("tr")) {
+-                        tb.error(this);
+-                        return false;
+-                    }
+-                    tb.clearStackToTableRowContext();
+-                    tb.pop(); // tr
+-                    tb.transition(InTableBody);
+-                    return tb.process(t);
+-                } else {
+-                    return anythingElse(t, tb);
+-                }
+-            } else if (t.isEndTag()) {
+-                Token.EndTag endTag = t.asEndTag();
+-                String name = endTag.normalName();
+-
+-                if (name.equals("tr")) {
+-                    if (!tb.inTableScope(name)) {
+-                        tb.error(this); // frag
+-                        return false;
+-                    }
+-                    tb.clearStackToTableRowContext();
+-                    tb.pop(); // tr
+-                    tb.transition(InTableBody);
+-                } else if (name.equals("table")) {
+-                    if (!tb.inTableScope("tr")) {
+-                        tb.error(this);
+-                        return false;
+-                    }
+-                    tb.clearStackToTableRowContext();
+-                    tb.pop(); // tr
+-                    tb.transition(InTableBody);
+-                    return tb.process(t);
+-                } else if (inSorted(name, InTableToBody)) { // "tbody", "tfoot", "thead"
+-                    if (!tb.inTableScope(name)) {
+-                        tb.error(this);
+-                        return false;
+-                    }
+-                    if (!tb.inTableScope("tr")) {
+-                        // not an error per spec?
+-                        return false;
+-                    }
+-                    tb.clearStackToTableRowContext();
+-                    tb.pop(); // tr
+-                    tb.transition(InTableBody);
+-                    return tb.process(t);
+-                } else if (inSorted(name, InRowIgnore)) {
+-                    tb.error(this);
+-                    return false;
+-                } else {
+-                    return anythingElse(t, tb);
+-                }
+-            } else {
+-                return anythingElse(t, tb);
+-            }
+-            return true;
+-        }
+-
+-        private boolean anythingElse(Token t, HtmlTreeBuilder tb) {
+-            return tb.process(t, InTable);
++            return HtmlTreeBuilderStateTableHandlers.processInRow(t, tb);
+         }
+     },
+     InCell {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (t.isEndTag()) {
+-                Token.EndTag endTag = t.asEndTag();
+-                String name = endTag.normalName();
+-
+-                if (inSorted(name, InCellNames)) { // td, th
+-                    if (!tb.inTableScope(name)) {
+-                        tb.error(this);
+-                        tb.transition(InRow); // might not be in scope if empty: <td /> and processing fake end tag
+-                        return false;
+-                    }
+-                    tb.generateImpliedEndTags();
+-                    if (!tb.currentElementIs(name))
+-                        tb.error(this);
+-                    tb.popStackToClose(name);
+-                    tb.clearFormattingElementsToLastMarker();
+-                    tb.transition(InRow);
+-                } else if (inSorted(name, InCellBody)) {
+-                    tb.error(this);
+-                    return false;
+-                } else if (inSorted(name, InCellTable)) {
+-                    if (!tb.inTableScope(name)) {
+-                        tb.error(this);
+-                        return false;
+-                    }
+-                    closeCell(tb);
+-                    return tb.process(t);
+-                } else {
+-                    return anythingElse(t, tb);
+-                }
+-            } else if (t.isStartTag() &&
+-                    inSorted(t.asStartTag().normalName(), InCellCol)) {
+-                if (!(tb.inTableScope("td") || tb.inTableScope("th"))) {
+-                    tb.error(this);
+-                    return false;
+-                }
+-                closeCell(tb);
+-                return tb.process(t);
+-            } else {
+-                return anythingElse(t, tb);
+-            }
+-            return true;
+-        }
+-
+-        private boolean anythingElse(Token t, HtmlTreeBuilder tb) {
+-            return tb.process(t, InBody);
+-        }
+-
+-        private void closeCell(HtmlTreeBuilder tb) {
+-            if (tb.inTableScope("td"))
+-                tb.processEndTag("td");
+-            else
+-                tb.processEndTag("th"); // only here if th or td in scope
++            return HtmlTreeBuilderStateTableHandlers.processInCell(t, tb);
+         }
+     },
+     InSelect {
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java
+index 5cf89a63..8cc566ae 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java
+@@ -5,44 +5,443 @@ import org.jsoup.nodes.Node;
+ import org.jsoup.nodes.Document;
+ import java.util.ArrayList;
+ 
++import static org.jsoup.internal.StringUtil.inSorted;
++import static org.jsoup.parser.HtmlTreeBuilder.isSpecial;
++import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;
++
+ /**
+  * Helper holder for table-related handlers extracted from HtmlTreeBuilderState.
+  *
+- * This class provides static method signatures so subsequent refactor blocks can
+- * move logic out of the large enum into here. For this block, these methods
+- * delegate to the corresponding enum-state implementations so behavior is
+- * preserved and the project compiles.
++ * This class provides static method implementations for table-related states
++ * that were moved out of the large enum. The logic is a verbatim move from
++ * the enum constants, adjusted to reference the enum states by qualified
++ * names where needed.
+  */
+ public final class HtmlTreeBuilderStateTableHandlers {
+ 
+     private HtmlTreeBuilderStateTableHandlers() {}
+ 
+     public static boolean processInTable(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InTable.process(t, tb);
++        if (t.isCharacter() && inSorted(tb.currentElement().normalName(), InTableFoster)) {
++            tb.resetPendingTableCharacters();
++            tb.markInsertionMode();
++            tb.transition(HtmlTreeBuilderState.InTableText);
++            return tb.process(t);
++        } else if (t.isComment()) {
++            tb.insertCommentNode(t.asComment());
++            return true;
++        } else if (t.isDoctype()) {
++            tb.error(HtmlTreeBuilderState.InTable);
++            return false;
++        } else if (t.isStartTag()) {
++            Token.StartTag startTag = t.asStartTag();
++            String name = startTag.normalName();
++            if (name.equals("caption")) {
++                tb.clearStackToTableContext();
++                tb.insertMarkerToFormattingElements();
++                tb.insertElementFor(startTag);
++                tb.transition(HtmlTreeBuilderState.InCaption);
++            } else if (name.equals("colgroup")) {
++                tb.clearStackToTableContext();
++                tb.insertElementFor(startTag);
++                tb.transition(HtmlTreeBuilderState.InColumnGroup);
++            } else if (name.equals("col")) {
++                tb.clearStackToTableContext();
++                tb.processStartTag("colgroup");
++                return tb.process(t);
++            } else if (inSorted(name, InTableToBody)) {
++                tb.clearStackToTableContext();
++                tb.insertElementFor(startTag);
++                tb.transition(HtmlTreeBuilderState.InTableBody);
++            } else if (inSorted(name, InTableAddBody)) {
++                tb.clearStackToTableContext();
++                tb.processStartTag("tbody");
++                return tb.process(t);
++            } else if (name.equals("table")) {
++                tb.error(HtmlTreeBuilderState.InTable);
++                if (!tb.inTableScope(name)) { // ignore it
++                    return false;
++                } else {
++                    tb.popStackToClose(name);
++                    if (!tb.resetInsertionMode()) {
++                        // not per spec - but haven't transitioned out of table. so try something else
++                        tb.insertElementFor(startTag);
++                        return true;
++                    }
++                    return tb.process(t);
++                }
++            } else if (inSorted(name, InTableToHead)) {
++                return tb.process(t, HtmlTreeBuilderState.InHead);
++            } else if (name.equals("input")) {
++                if (!(startTag.hasAttributes() && startTag.attributes.get("type").equalsIgnoreCase("hidden"))) {
++                    return anythingElseInTable(t, tb);
++                } else {
++                    tb.insertEmptyElementFor(startTag);
++                }
++            } else if (name.equals("form")) {
++                tb.error(HtmlTreeBuilderState.InTable);
++                if (tb.getFormElement() != null || tb.onStack("template"))
++                    return false;
++                else {
++                    tb.insertFormElement(startTag, false, false); // not added to stack. can associate to template
++                }
++            } else {
++                return anythingElseInTable(t, tb);
++            }
++            return true; // todo: check if should return processed http://www.whatwg.org/specs/web-apps/current-work/multipage/tree-construction.html#parsing-main-intable
++        } else if (t.isEndTag()) {
++            Token.EndTag endTag = t.asEndTag();
++            String name = endTag.normalName();
++
++            if (name.equals("table")) {
++                if (!tb.inTableScope(name)) {
++                    tb.error(HtmlTreeBuilderState.InTable);
++                    return false;
++                } else {
++                    tb.popStackToClose("table");
++                    tb.resetInsertionMode();
++                }
++            } else if (inSorted(name, InTableEndErr)) {
++                tb.error(HtmlTreeBuilderState.InTable);
++                return false;
++            } else if (name.equals("template")) {
++                tb.process(t, HtmlTreeBuilderState.InHead);
++            } else {
++                return anythingElseInTable(t, tb);
++            }
++            return true; // todo: as above todo
++        } else if (t.isEOF()) {
++            if (tb.currentElementIs("html"))
++                tb.error(HtmlTreeBuilderState.InTable);
++            return true; // stops parsing
++        }
++        return anythingElseInTable(t, tb);
++    }
++
++    private static boolean anythingElseInTable(Token t, HtmlTreeBuilder tb) {
++        tb.error(HtmlTreeBuilderState.InTable);
++        tb.setFosterInserts(true);
++        tb.process(t, HtmlTreeBuilderState.InBody);
++        tb.setFosterInserts(false);
++        return true;
+     }
+ 
+     public static boolean processInTableText(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InTableText.process(t, tb);
++        if (t.type == Token.TokenType.Character) {
++            tb.addPendingTableCharacters(t.asCharacter()); // gets to insertCharacterNode, which strips nulls
++        } else {
++            // insert gathered table text into the correct element:
++            if (tb.getPendingTableCharacters().size() > 0) {
++                final Token og = tb.currentToken; // update current token, so we can track cursor pos correctly
++                for (Token.Character c : tb.getPendingTableCharacters()) {
++                    tb.currentToken = c;
++                    if (!HtmlTreeBuilderStateHelper.isWhitespace(c)) {
++                        // InTable anything else section:
++                        tb.error(HtmlTreeBuilderState.InTableText);
++                        if (inSorted(tb.currentElement().normalName(), InTableFoster)) {
++                            tb.setFosterInserts(true);
++                            tb.process(c, HtmlTreeBuilderState.InBody);
++                            tb.setFosterInserts(false);
++                        } else {
++                            tb.process(c, HtmlTreeBuilderState.InBody);
++                        }
++                    } else
++                        tb.insertCharacterNode(c);
++                }
++                tb.currentToken = og;
++                tb.resetPendingTableCharacters();
++            }
++            tb.transition(tb.originalState());
++            return tb.process(t);
++        }
++        return true;
+     }
+ 
+     public static boolean processInCaption(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InCaption.process(t, tb);
++        if (t.isEndTag() && t.asEndTag().normalName().equals("caption")) {
++            if (!tb.inTableScope("caption")) { // fragment case
++                tb.error(HtmlTreeBuilderState.InCaption);
++                return false;
++            } else {
++                tb.generateImpliedEndTags();
++                if (!tb.currentElementIs("caption")) tb.error(HtmlTreeBuilderState.InCaption);
++                tb.popStackToClose("caption");
++                tb.clearFormattingElementsToLastMarker();
++                tb.transition(HtmlTreeBuilderState.InTable);
++            }
++        } else if ((
++                t.isStartTag() && inSorted(t.asStartTag().normalName(), InCellCol) ||
++                        t.isEndTag() && t.asEndTag().normalName().equals("table"))
++                ) {
++            // same as above but processes after transition
++            if (!tb.inTableScope("caption")) { // fragment case
++                tb.error(HtmlTreeBuilderState.InCaption);
++                return false;
++            }
++            tb.generateImpliedEndTags(false);
++            if (!tb.currentElementIs("caption")) tb.error(HtmlTreeBuilderState.InCaption);
++            tb.popStackToClose("caption");
++            tb.clearFormattingElementsToLastMarker();
++            tb.transition(HtmlTreeBuilderState.InTable);
++            HtmlTreeBuilderState.InTable.process(t, tb); // doesn't check foreign context
++        } else if (t.isEndTag() && inSorted(t.asEndTag().normalName(), InCaptionIgnore)) {
++            tb.error(HtmlTreeBuilderState.InCaption);
++            return false;
++        } else {
++            return tb.process(t, HtmlTreeBuilderState.InBody);
++        }
++        return true;
+     }
+ 
+     public static boolean processInColumnGroup(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InColumnGroup.process(t, tb);
++        if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
++            tb.insertCharacterNode(t.asCharacter());
++            return true;
++        }
++        switch (t.type) {
++            case Comment:
++                tb.insertCommentNode(t.asComment());
++                break;
++            case Doctype:
++                tb.error(HtmlTreeBuilderState.InColumnGroup);
++                break;
++            case StartTag:
++                Token.StartTag startTag = t.asStartTag();
++                switch (startTag.normalName()) {
++                    case "html":
++                        return tb.process(t, HtmlTreeBuilderState.InBody);
++                    case "col":
++                        tb.insertEmptyElementFor(startTag);
++                        break;
++                    case "template":
++                        tb.process(t, HtmlTreeBuilderState.InHead);
++                        break;
++                    default:
++                        return anythingElseInColumnGroup(t, tb);
++                }
++                break;
++            case EndTag:
++                Token.EndTag endTag = t.asEndTag();
++                String name = endTag.normalName();
++                switch (name) {
++                    case "colgroup":
++                        if (!tb.currentElementIs(name)) {
++                            tb.error(HtmlTreeBuilderState.InColumnGroup);
++                            return false;
++                        } else {
++                            tb.pop();
++                            tb.transition(HtmlTreeBuilderState.InTable);
++                        }
++                        break;
++                    case "template":
++                        tb.process(t, HtmlTreeBuilderState.InHead);
++                        break;
++                    default:
++                        return anythingElseInColumnGroup(t, tb);
++                }
++                break;
++            case EOF:
++                if (tb.currentElementIs("html"))
++                    return true; // stop parsing; frag case
++                else
++                    return anythingElseInColumnGroup(t, tb);
++            default:
++                return anythingElseInColumnGroup(t, tb);
++        }
++        return true;
++    }
++
++    private static boolean anythingElseInColumnGroup(Token t, HtmlTreeBuilder tb) {
++        if (!tb.currentElementIs("colgroup")) {
++            tb.error(HtmlTreeBuilderState.InColumnGroup);
++            return false;
++        }
++        tb.pop();
++        tb.transition(HtmlTreeBuilderState.InTable);
++        tb.process(t);
++        return true;
+     }
+ 
+     public static boolean processInTableBody(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InTableBody.process(t, tb);
++        final String name;
++
++        switch (t.type) {
++            case StartTag:
++                Token.StartTag startTag = t.asStartTag();
++                name = startTag.normalName();
++                if (name.equals("tr")) {
++                    tb.clearStackToTableBodyContext();
++                    tb.insertElementFor(startTag);
++                    tb.transition(HtmlTreeBuilderState.InRow);
++                } else if (inSorted(name, InCellNames)) {
++                    tb.error(HtmlTreeBuilderState.InTableBody);
++                    tb.processStartTag("tr");
++                    return tb.process(startTag);
++                } else if (inSorted(name, InTableBodyExit)) {
++                    return exitTableBody(t, tb);
++                } else
++                    return anythingElseInTableBody(t, tb);
++                break;
++            case EndTag:
++                Token.EndTag endTag = t.asEndTag();
++                name = endTag.normalName();
++                if (inSorted(name, InTableEndIgnore)) {
++                    if (!tb.inTableScope(name)) {
++                        tb.error(HtmlTreeBuilderState.InTableBody);
++                        return false;
++                    } else {
++                        tb.clearStackToTableBodyContext();
++                        tb.pop();
++                        tb.transition(HtmlTreeBuilderState.InTable);
++                    }
++                } else if (name.equals("table")) {
++                    return exitTableBody(t, tb);
++                } else if (inSorted(name, InTableBodyEndIgnore)) {
++                    tb.error(HtmlTreeBuilderState.InTableBody);
++                    return false;
++                } else
++                    return anythingElseInTableBody(t, tb);
++                break;
++            default:
++                return anythingElseInTableBody(t, tb);
++        }
++        return true;
++    }
++
++    private static boolean exitTableBody(Token t, HtmlTreeBuilder tb) {
++        if (!(tb.inTableScope("tbody") || tb.inTableScope("thead") || tb.inTableScope("tfoot"))) {
++            // frag case
++            tb.error(HtmlTreeBuilderState.InTableBody);
++            return false;
++        }
++        tb.clearStackToTableBodyContext();
++        tb.processEndTag(tb.currentElement().normalName()); // tbody, tfoot, thead
++        return tb.process(t);
++    }
++
++    private static boolean anythingElseInTableBody(Token t, HtmlTreeBuilder tb) {
++        return tb.process(t, HtmlTreeBuilderState.InTable);
+     }
+ 
+     public static boolean processInRow(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InRow.process(t, tb);
++        if (t.isStartTag()) {
++            Token.StartTag startTag = t.asStartTag();
++            String name = startTag.normalName();
++
++            if (inSorted(name, InCellNames)) { // td, th
++                tb.clearStackToTableRowContext();
++                tb.insertElementFor(startTag);
++                tb.transition(HtmlTreeBuilderState.InCell);
++                tb.insertMarkerToFormattingElements();
++            } else if (inSorted(name, InRowMissing)) { // "caption", "col", "colgroup", "tbody", "tfoot", "thead", "tr"
++                if (!tb.inTableScope("tr")) {
++                    tb.error(HtmlTreeBuilderState.InRow);
++                    return false;
++                }
++                tb.clearStackToTableRowContext();
++                tb.pop(); // tr
++                tb.transition(HtmlTreeBuilderState.InTableBody);
++                return tb.process(t);
++            } else {
++                return anythingElseInRow(t, tb);
++            }
++        } else if (t.isEndTag()) {
++            Token.EndTag endTag = t.asEndTag();
++            String name = endTag.normalName();
++
++            if (name.equals("tr")) {
++                if (!tb.inTableScope(name)) {
++                    tb.error(HtmlTreeBuilderState.InRow); // frag
++                    return false;
++                }
++                tb.clearStackToTableRowContext();
++                tb.pop(); // tr
++                tb.transition(HtmlTreeBuilderState.InTableBody);
++            } else if (name.equals("table")) {
++                if (!tb.inTableScope("tr")) {
++                    tb.error(HtmlTreeBuilderState.InRow);
++                    return false;
++                }
++                tb.clearStackToTableRowContext();
++                tb.pop(); // tr
++                tb.transition(HtmlTreeBuilderState.InTableBody);
++                return tb.process(t);
++            } else if (inSorted(name, InTableToBody)) { // "tbody", "tfoot", "thead"
++                if (!tb.inTableScope(name)) {
++                    tb.error(HtmlTreeBuilderState.InRow);
++                    return false;
++                }
++                if (!tb.inTableScope("tr")) {
++                    // not an error per spec?
++                    return false;
++                }
++                tb.clearStackToTableRowContext();
++                tb.pop(); // tr
++                tb.transition(HtmlTreeBuilderState.InTableBody);
++                return tb.process(t);
++            } else if (inSorted(name, InRowIgnore)) {
++                tb.error(HtmlTreeBuilderState.InRow);
++                return false;
++            } else {
++                return anythingElseInRow(t, tb);
++            }
++        } else {
++            return anythingElseInRow(t, tb);
++        }
++        return true;
++    }
++
++    private static boolean anythingElseInRow(Token t, HtmlTreeBuilder tb) {
++        return tb.process(t, HtmlTreeBuilderState.InTable);
+     }
+ 
+     public static boolean processInCell(Token t, HtmlTreeBuilder tb) {
+-        return HtmlTreeBuilderState.InCell.process(t, tb);
++        if (t.isEndTag()) {
++            Token.EndTag endTag = t.asEndTag();
++            String name = endTag.normalName();
++
++            if (inSorted(name, InCellNames)) { // td, th
++                if (!tb.inTableScope(name)) {
++                    tb.error(HtmlTreeBuilderState.InCell);
++                    tb.transition(HtmlTreeBuilderState.InRow); // might not be in scope if empty: <td /> and processing fake end tag
++                    return false;
++                }
++                tb.generateImpliedEndTags();
++                if (!tb.currentElementIs(name))
++                    tb.error(HtmlTreeBuilderState.InCell);
++                tb.popStackToClose(name);
++                tb.clearFormattingElementsToLastMarker();
++                tb.transition(HtmlTreeBuilderState.InRow);
++            } else if (inSorted(name, InCellBody)) {
++                tb.error(HtmlTreeBuilderState.InCell);
++                return false;
++            } else if (inSorted(name, InCellTable)) {
++                if (!tb.inTableScope(name)) {
++                    tb.error(HtmlTreeBuilderState.InCell);
++                    return false;
++                }
++                closeCell(t, tb);
++                return tb.process(t);
++            } else {
++                return anythingElseInCell(t, tb);
++            }
++        } else if (t.isStartTag() &&
++                inSorted(t.asStartTag().normalName(), InCellCol)) {
++            if (!(tb.inTableScope("td") || tb.inTableScope("th"))) {
++                tb.error(HtmlTreeBuilderState.InCell);
++                return false;
++            }
++            closeCell(t, tb);
++            return tb.process(t);
++        } else {
++            return anythingElseInCell(t, tb);
++        }
++        // unreachable
++        return true;
++    }
++
++    private static boolean anythingElseInCell(Token t, HtmlTreeBuilder tb) {
++        return tb.process(t, HtmlTreeBuilderState.InBody);
+     }
+ 
+     /**

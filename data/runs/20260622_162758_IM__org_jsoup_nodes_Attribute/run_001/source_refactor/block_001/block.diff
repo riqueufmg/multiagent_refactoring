@@ -1,0 +1,102 @@
+commit 7a9ec88596e25f8b89f46e8e0d65bb46009d4e8f
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Jun 22 16:29:29 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/nodes/AttributeUtil.java b/src/main/java/org/jsoup/nodes/AttributeUtil.java
+new file mode 100644
+index 00000000..ad6c50cd
+--- /dev/null
++++ b/src/main/java/org/jsoup/nodes/AttributeUtil.java
+@@ -0,0 +1,90 @@
++package org.jsoup.nodes;
++
++import org.jsoup.internal.StringUtil;
++import org.jsoup.internal.QuietAppendable;
++import org.jsoup.internal.Normalizer;
++import org.jsoup.internal.SharedConstants;
++import org.jspecify.annotations.Nullable;
++
++import java.util.regex.Pattern;
++import java.util.Arrays;
++
++/**
++ * Utility helpers for Attribute rendering and validation. These methods are duplicates of the
++ * static helpers present on Attribute to allow delegation and future refactor.
++ */
++public final class AttributeUtil {
++    private AttributeUtil() {}
++
++    private static final String[] booleanAttributes = {
++            "allowfullscreen", "async", "autofocus", "checked", "compact", "declare", "default", "defer", "disabled",
++            "formnovalidate", "hidden", "inert", "ismap", "itemscope", "multiple", "muted", "nohref", "noresize",
++            "noshade", "novalidate", "nowrap", "open", "readonly", "required", "reversed", "seamless", "selected",
++            "sortable", "truespeed", "typemustmatch"
++    };
++
++    private static final Pattern xmlKeyReplace = Pattern.compile("[^-a-zA-Z0-9_:.]+");
++    private static final Pattern htmlKeyReplace = Pattern.compile("[\\x00-\\x1f\\x7f-\\x9f \"'/=]+");
++
++    @Nullable
++    public static String getValidKey(String key, Document.OutputSettings.Syntax syntax) {
++        if (syntax == Document.OutputSettings.Syntax.xml && !isValidXmlKey(key)) {
++            key = xmlKeyReplace.matcher(key).replaceAll("_");
++            return isValidXmlKey(key) ? key : null; // null if could not be coerced
++        }
++        else if (syntax == Document.OutputSettings.Syntax.html && !isValidHtmlKey(key)) {
++            key = htmlKeyReplace.matcher(key).replaceAll("_");
++            return isValidHtmlKey(key) ? key : null; // null if could not be coerced
++        }
++        return key;
++    }
++
++    // perf critical in html() so using manual scan vs regex:
++    // note that we aren't using anything in supplemental space, so OK to iter charAt
++    private static boolean isValidXmlKey(String key) {
++        // =~ [a-zA-Z_:][-a-zA-Z0-9_:.]*
++        final int length = key.length();
++        if (length == 0) return false;
++        char c = key.charAt(0);
++        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == ':'))
++            return false;
++        for (int i = 1; i < length; i++) {
++            c = key.charAt(i);
++            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == ':' || c == '.'))
++                return false;
++        }
++        return true;
++    }
++
++    private static boolean isValidHtmlKey(String key) {
++        // =~ [\x00-\x1f\x7f-\x9f "'/=]+
++        final int length = key.length();
++        if (length == 0) return false;
++        for (int i = 0; i < length; i++) {
++            char c = key.charAt(i);
++            if ((c <= 0x1f) || (c >= 0x7f && c <= 0x9f) || c == ' ' || c == '"' || c == '\'' || c == '/' || c == '=')
++                return false;
++        }
++        return true;
++    }
++
++    static void html(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) {
++        key = getValidKey(key, out.syntax());
++        if (key == null) return; // can't write it :(
++        htmlNoValidate(key, val, accum, out);
++    }
++
++    static void htmlNoValidate(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) {
++        // structured like this so that Attributes can check we can write first, so it can add whitespace correctly
++        accum.append(key);
++        if (!Attribute.shouldCollapseAttribute(key, val, out)) {
++            accum.append("=\"");
++            Entities.escape(accum, Attributes.checkNotNull(val), out, Entities.ForAttribute); // preserves whitespace
++            accum.append('"');
++        }
++    }
++
++    public static boolean isBooleanAttribute(final String key) {
++        return Arrays.binarySearch(booleanAttributes, Normalizer.lowerCase(key)) >= 0;
++    }
++}

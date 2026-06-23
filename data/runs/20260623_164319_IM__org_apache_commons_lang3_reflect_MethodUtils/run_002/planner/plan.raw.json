@@ -1,0 +1,112 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.reflect.MethodUtils",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract low-level private helper methods from MethodUtils into a new small utility class to reduce the size and complexity of MethodUtils and to group cohesive reflection helpers.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+          ],
+          "details": "Move the following private static helper methods from MethodUtils into a new package-private class MethodUtilsCore in the same package (org.apache.commons.lang3.reflect). Make the moved methods public static in MethodUtilsCore so callers in the original file can reference them: distance(Class<?>[], Class<?>[]), getAccessibleMethodFromInterfaceNest(Class<?>, String, Class<?>...), getAccessibleMethodFromSuperclass(Class<?>, String, Class<?>...), getAllSuperclassesAndInterfaces(Class<?>), requireNonNull(Method, Class<?>, String, Class<?>[]), toVarArgs(Executable, Object[]), toVarArgs(Object[], Class<?>[]), getInvokeMethod(boolean, String, Class<?>[], Class<?>). Update MethodUtils.java to replace direct definitions with calls to MethodUtilsCore (e.g., MethodUtilsCore.distance(...)). Update imports in both files as necessary (retain existing imports). Keep both classes in org.apache.commons.lang3.reflect package. This reduces size and groups low-level reflection helpers separately.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+          ],
+          "details": "Adjust imports so MethodUtilsCore compiles independently: include java.lang.reflect.* and java.util.* imports used by the moved methods, plus references to org.apache.commons.lang3.* utilities already used by MethodUtils. Ensure MethodUtils imports MethodUtilsCore if needed (same package so no import needed).",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Group the large cohesive set of public method-invocation APIs currently in MethodUtils into a dedicated class to reduce MethodUtils public surface area and improve cohesion.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+          ],
+          "details": "Extract the cohesive group of public (and related package/private) methods that implement method lookup, matching and invocation into a new utility class MethodInvocationUtils (package org.apache.commons.lang3.reflect). Move the following public static methods (and any small private helpers they require that are not already moved to MethodUtilsCore) from MethodUtils to MethodInvocationUtils: getAccessibleMethod(Class, Method), getAccessibleMethod(Class, String, Class<?>...), getAccessibleMethod(Method), getMatchingAccessibleMethod(Class, String, Class<?>...), getMatchingMethod(Class, String, Class<?>...), getMethodObject(Class, String, Class<?>...), getMethodsListWithAnnotation(Class, Class<? extends Annotation> , boolean, boolean) and its overload, getMethodsWithAnnotation(Class, Class<? extends Annotation>, boolean, boolean) and its overload, getAnnotation(Method, Class<A>, boolean, boolean), invokeExactMethod (all overloads), invokeExactStaticMethod (overloads), invokeMethod (all overloads), invokeStaticMethod (overloads), invokeMethod variants that delegate to MethodInvoker, and any small helpers used exclusively by these methods. In MethodUtils.java replace the moved method bodies with simple delegating calls to MethodInvocationUtils (keeping the original signatures) to preserve the public API. Ensure moved methods reference MethodUtilsCore for helper operations where appropriate. Update or add imports as needed. This groups all invocation-related APIs and greatly reduces the number of public methods in MethodUtils, improving modularization.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+          ],
+          "details": "Replace internal direct calls within the moved code and remaining MethodUtils to refer to the new class boundaries: calls that used the extracted helper methods should call MethodUtilsCore.*, and MethodUtils public methods should delegate to MethodInvocationUtils.*. Ensure any external callers (within the same module) that previously referenced MethodUtils methods continue to work because MethodUtils retains delegating methods with original signatures.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Introduce an explicit small fa\u00e7ade in MethodUtils so the class remains a stable thin adapter for the new internal modules and to ease future dependency inversion.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "details": "Keep MethodUtils as a small public fa\u00e7ade that preserves all existing public signatures. Implement each MethodUtils public method as a single-line delegator to either MethodInvocationUtils or MethodUtilsCore. Mark the default constructor as deprecated (unchanged). This maintains binary compatibility while ensuring that most implementation lives in smaller cohesive classes.",
+          "risk": "low"
+        },
+        {
+          "op": "DEPENDENCY_INVERSION",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+          ],
+          "details": "Where appropriate, ensure MethodInvocationUtils depends on the abstractions (public static APIs) of MethodUtilsCore rather than on its internal details. No new interfaces are created to keep the refactoring minimal; this step is to document the inversion and ensure the new classes call MethodUtilsCore public methods rather than duplicating logic.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

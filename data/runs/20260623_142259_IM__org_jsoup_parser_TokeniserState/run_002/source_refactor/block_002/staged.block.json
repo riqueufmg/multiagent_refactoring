@@ -1,0 +1,34 @@
+{
+  "id": 2,
+  "goal": "Group tag-opening and name handling into a Tag facade to decouple tag-parsing complexity from the TokeniserState enum.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java"
+      ],
+      "details": "Create org.jsoup.parser.TokeniserStateTagFacade with static methods encapsulating logic for TagOpen, EndTagOpen, TagName and the small helper RCDATA-related lessthan handling that directly routes into tag creation. Methods should be named to reflect intent (e.g., readTagOpen, readEndTagOpen, readTagName) and accept Tokeniser and CharacterReader parameters. The new class sits in the same package and calls existing Tokeniser APIs (createTagPending, transition, advanceTransition, emit, error, eofError) as needed.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "details": "Change the read(...) bodies for TagOpen, EndTagOpen and TagName to delegate to TokeniserStateTagFacade methods (for example, TokeniserStateTagFacade.readTagOpen(t, r); ). Preserve existing transitions between TokeniserState constants (the facade should invoke transitions on the passed Tokeniser instance).",
+      "risk": "medium"
+    }
+  ],
+  "test_files": []
+}

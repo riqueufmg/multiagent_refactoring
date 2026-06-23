@@ -1,0 +1,90 @@
+commit 4f2922fd4b8048fecf11950286b7a05c9f41d6f8
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 16:36:09 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+index 7422f9fa3..613cf7b01 100644
+--- a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+@@ -31,7 +31,7 @@
+  * @see AtomicInteger
+  * @since 2.1
+  */
+-public class MutableByte extends Number implements Comparable<MutableByte>, Mutable<Number> {
++public class MutableByte extends Number implements Comparable<MutableByte>, Mutable<Number>, MutableByteAccessor {
+ 
+     /**
+      * Required for serialization support.
+@@ -390,4 +390,24 @@ public String toString() {
+         return String.valueOf(value);
+     }
+ 
++    /**
++     * Returns the raw byte value. Implements {@link MutableByteAccessor#getRaw()}.
++     *
++     * @return the raw byte
++     */
++    @Override
++    public byte getRaw() {
++        return byteValue();
++    }
++
++    /**
++     * Sets the raw byte value. Implements {@link MutableByteAccessor#setRaw(byte)}.
++     *
++     * @param value the value to set
++     */
++    @Override
++    public void setRaw(final byte value) {
++        setValue(value);
++    }
++
+ }
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java
+new file mode 100644
+index 000000000..640c2a0d2
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java
+@@ -0,0 +1,40 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.lang3.mutable;
++
++/**
++ * Narrow accessor interface exposing raw get/set access to a byte storage.
++ * This is intended to decouple operation implementations from MutableByte internals.
++ *
++ * @since 3.0
++ */
++public interface MutableByteAccessor {
++
++    /**
++     * Gets the raw byte value.
++     *
++     * @return the raw byte
++     */
++    byte getRaw();
++
++    /**
++     * Sets the raw byte value.
++     *
++     * @param value the value to set
++     */
++    void setRaw(byte value);
++}

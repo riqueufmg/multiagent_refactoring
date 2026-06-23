@@ -1,0 +1,34 @@
+{
+  "id": 5,
+  "goal": "Extract DOCTYPE parsing logic into a Doctype facade to isolate and simplify the enum by delegating the long state machine that handles DOCTYPE parsing.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java"
+      ],
+      "details": "Create org.jsoup.parser.TokeniserStateDoctypeFacade with static methods encapsulating the logic for Doctype, BeforeDoctypeName, DoctypeName, AfterDoctypeName, AfterDoctypePublicKeyword, BeforeDoctypePublicIdentifier, DoctypePublicIdentifier_doubleQuoted, DoctypePublicIdentifier_singleQuoted, AfterDoctypePublicIdentifier, BetweenDoctypePublicAndSystemIdentifiers, AfterDoctypeSystemKeyword, BeforeDoctypeSystemIdentifier, DoctypeSystemIdentifier_doubleQuoted, DoctypeSystemIdentifier_singleQuoted, AfterDoctypeSystemIdentifier, BogusDoctype, and DoctypeInternalSubset. Facade methods should construct and manipulate Tokeniser.doctypePending, set forceQuirks or sawInternalSubset as appropriate, call emitDoctypePending, and preserve Tokeniser error/eof handling.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "details": "Delegate read(...) implementations for the DOCTYPE-related states to TokeniserStateDoctypeFacade (for example TokeniserStateDoctypeFacade.readDoctype(t, r); ). The facade must preserve the same calls to t.createDoctypePending(), t.doctypePending manipulation, t.emitDoctypePending(), and transition/error behavior as the original code.",
+      "risk": "high"
+    }
+  ],
+  "test_files": []
+}

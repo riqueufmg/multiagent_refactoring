@@ -1,0 +1,180 @@
+commit 0f65b234221a46d078cb8eabcd75fe88e2cf4a0b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 15:18:25 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/apache/commons/lang3/BitField.java b/src/main/java/org/apache/commons/lang3/BitField.java
+index 6ca8f3732..8f1e7e0f3 100644
+--- a/src/main/java/org/apache/commons/lang3/BitField.java
++++ b/src/main/java/org/apache/commons/lang3/BitField.java
+@@ -79,6 +79,9 @@ public class BitField {
+     /* Helper handling primitive-size convenience methods. Delegates moved implementations to keep BitField small. */
+     private final BitFieldPrimitives primitives;
+ 
++    /* Core extracted masking logic for int/long operations. */
++    private final BitFieldCore core;
++
+     /**
+      * Creates a BitField instance.
+      *
+@@ -88,6 +91,7 @@ public BitField(final int mask) {
+         this.mask = Integer.toUnsignedLong(mask);
+         this.shiftCount = this.mask == 0 ? 0 : Long.numberOfTrailingZeros(this.mask);
+         this.primitives = new BitFieldPrimitives(this);
++        this.core = new BitFieldCore(this.mask, this.shiftCount);
+     }
+ 
+     /**
+@@ -100,6 +104,7 @@ public BitField(final long mask) {
+         this.mask = mask;
+         this.shiftCount = mask == 0 ? 0 : Long.numberOfTrailingZeros(mask);
+         this.primitives = new BitFieldPrimitives(this);
++        this.core = new BitFieldCore(this.mask, this.shiftCount);
+     }
+ 
+     /**
+@@ -109,7 +114,7 @@ public BitField(final long mask) {
+      * @return the value of holder with the specified bits cleared (set to {@code 0}).
+      */
+     public int clear(final int holder) {
+-        return (int) (holder & ~mask);
++        return core.clear(holder);
+     }
+ 
+     /**
+@@ -120,7 +125,7 @@ public int clear(final int holder) {
+      * @since 3.21.0
+      */
+     public long clear(final long holder) {
+-        return holder & ~mask;
++        return core.clear(holder);
+     }
+ 
+     /**
+@@ -130,7 +135,7 @@ public long clear(final long holder) {
+      * @return the selected bits.
+      */
+     public int getRawValue(final int holder) {
+-        return (int) (holder & mask);
++        return core.getRawValue(holder);
+     }
+ 
+     /**
+@@ -141,7 +146,7 @@ public int getRawValue(final int holder) {
+      * @since 3.21.0
+      */
+     public long getRawValue(final long holder) {
+-        return holder & mask;
++        return core.getRawValue(holder);
+     }
+ 
+     /**
+@@ -156,7 +161,7 @@ public long getRawValue(final long holder) {
+      * @see #setValue(int,int)
+      */
+     public int getValue(final int holder) {
+-        return getRawValue(holder) >> shiftCount;
++        return core.getValue(holder);
+     }
+ 
+     /**
+@@ -172,7 +177,7 @@ public int getValue(final int holder) {
+      * @since 3.21.0
+      */
+     public long getValue(final long holder) {
+-        return getRawValue(holder) >> shiftCount;
++        return core.getValue(holder);
+     }
+ 
+     /**
+@@ -284,7 +289,7 @@ public long setBoolean(final long holder, final boolean flag) {
+      * @see #getValue(int)
+      */
+     public int setValue(final int holder, final int value) {
+-        return (int) (holder & ~mask | value << shiftCount & mask);
++        return core.setValue(holder, value);
+     }
+ 
+     /**
+@@ -297,7 +302,7 @@ public int setValue(final int holder, final int value) {
+      * @since 3.21.0
+      */
+     public long setValue(final long holder, final long value) {
+-        return holder & ~mask | value << shiftCount & mask;
++        return core.setValue(holder, value);
+     }
+ 
+     /* Delegate primitive convenience methods to BitFieldPrimitives to keep this class small but preserve API. */
+diff --git a/src/main/java/org/apache/commons/lang3/BitFieldCore.java b/src/main/java/org/apache/commons/lang3/BitFieldCore.java
+new file mode 100644
+index 000000000..ad1ed881e
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/BitFieldCore.java
+@@ -0,0 +1,66 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.apache.commons.lang3;
++
++/**
++ * Extracted core masking logic that operates on int/long holders.
++ * This class is package-private and intended to be used by BitField to delegate
++ * the primitive int/long masking operations.
++ */
++class BitFieldCore {
++
++    private final long mask;
++    private final int shiftCount;
++
++    BitFieldCore(final long mask, final int shiftCount) {
++        this.mask = mask;
++        this.shiftCount = shiftCount;
++    }
++
++    int clear(final int holder) {
++        return (int) (holder & ~mask);
++    }
++
++    long clear(final long holder) {
++        return holder & ~mask;
++    }
++
++    int getRawValue(final int holder) {
++        return (int) (holder & mask);
++    }
++
++    long getRawValue(final long holder) {
++        return holder & mask;
++    }
++
++    int getValue(final int holder) {
++        return getRawValue(holder) >> shiftCount;
++    }
++
++    long getValue(final long holder) {
++        return getRawValue(holder) >> shiftCount;
++    }
++
++    int setValue(final int holder, final int value) {
++        return (int) (holder & ~mask | value << shiftCount & mask);
++    }
++
++    long setValue(final long holder, final long value) {
++        return holder & ~mask | value << shiftCount & mask;
++    }
++}

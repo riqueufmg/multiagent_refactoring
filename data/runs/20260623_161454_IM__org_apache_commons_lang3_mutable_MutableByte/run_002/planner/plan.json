@@ -1,0 +1,107 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.mutable.MutableByte",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a narrow interface that exposes only raw get/set access to the byte storage. This decouples future operation implementations from MutableByte internals and enables moving cohesive operation implementations out of the class.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java",
+        "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+        "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "details": "Create a new interface MutableByteAccessor in package org.apache.commons.lang3.mutable with two methods: byte getRaw(); void setRaw(byte value); Update MutableByte to implement MutableByteAccessor by adding implementations that delegate to the existing field 'value' (getRaw -> byteValue(), setRaw -> setValue(byte)). Do not change other logic. This prepares a stable API for extracted operation classes to depend on.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+            "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+        "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move the cohesive group of mutation and atomic-style methods out of MutableByte into a separate helper class that depends only on the new interface. Remove the private ARITH field from MutableByte and place it with the new helper to keep arithmetic logic local to the operations implementation. Replace original methods in MutableByte with small delegating calls to the new helper to reduce the class size and public API surface.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteAtomicOperations.java",
+        "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+        "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteAtomicOperations.java",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "details": "Create a new class MutableByteAtomicOperations in the same package. The class has a constructor taking MutableByteAccessor (the interface created earlier). Move the following mutation and atomic-style methods from MutableByte into this class, rewriting them to operate via the provided MutableByteAccessor instance and to use a local ARITH field: add(byte), add(Number), addAndGet(byte), addAndGet(Number), getAndAdd(byte), getAndAdd(Number), increment(), incrementAndGet(), getAndIncrement(), decrement(), decrementAndGet(), getAndDecrement(), subtract(byte), subtract(Number). Also declare within MutableByteAtomicOperations: private static final ByteArithmetic ARITH = new MutableByteArithmetic(); Ensure method semantics are preserved. The new class encapsulates all logic that previously used ARITH and the raw 'value' field.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java:ARITH"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteAtomicOperations.java:ARITH"
+          ],
+          "details": "Move the private static final ByteArithmetic ARITH = new MutableByteArithmetic(); out of MutableByte and recreate it as a private static final field inside MutableByteAtomicOperations so that all arithmetic helpers reside with the operations implementation.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "details": "In MutableByte, add a private final field: private final MutableByteAtomicOperations ops = new MutableByteAtomicOperations(this); Replace bodies of the moved methods with delegating calls to ops (for example, add(byte operand) -> ops.add(operand); addAndGet(byte operand) -> return ops.addAndGet(operand); etc.). Ensure remaining MutableByte methods no longer reference ARITH or perform the moved logic. Keep non-mutable accessor methods (byteValue, intValue, longValue, doubleValue, floatValue, compareTo, equals, hashCode, toString, toByte, getValue (deprecated), setValue(Number), setValue(byte) if desired) in MutableByte.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+            "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+        "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+      ]
+    }
+  ]
+}

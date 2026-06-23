@@ -1,0 +1,33 @@
+mvp:
+  name: planner
+  run_id: auto
+
+project:
+  name: commons-lang
+  repo_path: /absolute/path/to/repositories/commons-lang
+
+target:
+  smell: IM
+  smell_name: Insufficient Modularization
+  target_type: class
+  target_name: org.apache.commons.lang3.Functions
+
+models:
+  planner: gpt-5-mini
+
+prompts:
+  system: /absolute/path/to/ArchAgent/mvp/planner/prompts/system.prompt
+  smell: /absolute/path/to/ArchAgent/mvp/planner/prompts/planner_IM.prompt
+
+planner:
+  temperature: 0.0
+  timeout: 120
+  max_retries: 2
+
+designite:
+  java_path: /usr/lib/jvm/jdk-22.0.2-oracle-x64/bin/java
+  jar_path: /absolute/path/to/ArchAgent/tools/DesigniteJava2.8.3.jar
+  smells_csv: DesignSmells.csv
+
+output:
+  runs_dir: /absolute/path/to/ArchAgent/data/runs

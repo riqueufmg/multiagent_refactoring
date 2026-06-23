@@ -1,0 +1,60 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Document",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce size and complexity of org.jsoup.nodes.Document by extracting the nested OutputSettings static class to a top-level class in the same package.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Document.java",
+        "src/main/java/org/jsoup/nodes/OutputSettings.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Document.java: nested static class OutputSettings (all fields, methods, inner enum Syntax)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/OutputSettings.java: new top-level class OutputSettings with same package (org.jsoup.nodes) and same API as the former nested class",
+            "src/main/java/org/jsoup/nodes/Document.java: updated to reference top-level OutputSettings and remove the nested OutputSettings declaration"
+          ],
+          "details": "Move the entire nested static class OutputSettings (including its inner enum Syntax and methods like escapeMode, charset, syntax, prettyPrint, outline, indentAmount, maxPaddingWidth, clone) into a new top-level class OutputSettings in package org.jsoup.nodes. Adjust visibility to public so Document continues to access it. Update Document.java by removing the nested class definition and changing any references that relied on the nested context to the new top-level OutputSettings (e.g., field declaration 'private OutputSettings outputSettings = new OutputSettings();', method return types, and uses in clone/shallowClone). Preserve imports used by the extracted code and the original behavior (Entities, DataUtil, Validate, Charset). Ensure the new OutputSettings.java compiles on its own in the package and maintains the same API surface as before.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Update all project call sites to use the new top-level OutputSettings type and ensure necessary imports are present.",
+      "files": [
+        "src/main/java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Search for references to 'Document.OutputSettings' and unqualified references that previously relied on the nested class"
+          ],
+          "outputs": [
+            "All files that referred to Document.OutputSettings or relied on the nested OutputSettings are updated to refer to 'OutputSettings' (top-level) or to import org.jsoup.nodes.OutputSettings as needed"
+          ],
+          "details": "Replace qualified usages of Document.OutputSettings with OutputSettings. For files outside org.jsoup.nodes that now reference OutputSettings, add an import 'org.jsoup.nodes.OutputSettings' (see next operation). For any occurrence where the nested name was used inside Document (already updated in block 1), no change is required. This step ensures the rest of the codebase compiles against the new top-level class.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "Files updated in the previous step that now reference OutputSettings without fully-qualified names"
+          ],
+          "outputs": [
+            "Updated files with 'import org.jsoup.nodes.OutputSettings;' added where required"
+          ],
+          "details": "Add imports for the new top-level OutputSettings in source files outside the org.jsoup.nodes package that reference OutputSettings. Remove any imports or references that pointed to the nested class form if present. Keep import changes minimal and only where necessary.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

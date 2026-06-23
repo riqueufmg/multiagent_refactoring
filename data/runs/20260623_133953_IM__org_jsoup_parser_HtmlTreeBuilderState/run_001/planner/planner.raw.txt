@@ -1,0 +1,106 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.HtmlTreeBuilderState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the large nested Constants holder out of the enum into a separate top-level class to reduce the size and responsibilities of HtmlTreeBuilderState.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::Constants"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java"
+          ],
+          "details": "Create a new top-level class org.jsoup.parser.HtmlTreeBuilderStateConstants containing the arrays and static constant declarations that were previously in the nested Constants class of HtmlTreeBuilderState. The new class will expose the same static String[] fields (InHeadEmpty, InHeadRaw, InHeadEnd, AfterHeadBody, BeforeHtmlToHead, InHeadNoScriptHead, InBodyStartToHead, InBodyStartPClosers, Headings, InBodyStartLiBreakers, DdDt, InBodyStartApplets, InBodyStartMedia, InBodyStartInputAttribs, InBodyStartDrop, InBodyEndClosers, InBodyEndOtherErrors, InBodyEndAdoptionFormatters, InTableToBody, InTableAddBody, InTableToHead, InCellNames, InCellBody, InCellTable, InCellCol, InTableEndErr, InTableFoster, InTableBodyExit, InTableBodyEndIgnore, InRowMissing, InRowIgnore, InSelectEnd, InSelectTableEnd, InTableEndIgnore, InHeadNoscriptIgnore, InCaptionIgnore, InTemplateToHead, InTemplateToTable, InForeignToHtml) with the same values so existing logic can reference them. Update HtmlTreeBuilderState to remove the nested Constants class and replace the static import 'import static org.jsoup.parser.HtmlTreeBuilderState.Constants.*;' with 'import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;'. This produces a compileable state where constant data is in its own class.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Replace the existing static import of the nested Constants (import static org.jsoup.parser.HtmlTreeBuilderState.Constants.*;) with a static import of the new class (import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;). Keep other imports unchanged.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move utility routines (mergeAttributes, isWhitespace, HandleTextState and the nullString constant) out of HtmlTreeBuilderState into a focused helper class to reduce the enum's implementation complexity and group cohesive helper behavior.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::mergeAttributes",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::isWhitespace",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HandleTextState",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::nullString"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java"
+          ],
+          "details": "Create a new helper class org.jsoup.parser.HtmlTreeBuilderStateHelper with public static methods: mergeAttributes(Token.StartTag source, Element dest), boolean isWhitespace(Token t), void HandleTextState(Token.StartTag startTag, HtmlTreeBuilder tb, @Nullable TokeniserState state) and a public static final String nullString equal to the previous nullString value. The helper methods will have identical implementations and signatures (adjusted for being static utility methods). Do not change semantics. Keep the helper class in the same package (org.jsoup.parser).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Update HtmlTreeBuilderState to call the newly extracted helper methods: replace calls to mergeAttributes(...) with HtmlTreeBuilderStateHelper.mergeAttributes(...), calls to isWhitespace(...) with HtmlTreeBuilderStateHelper.isWhitespace(...), calls to HandleTextState(...) with HtmlTreeBuilderStateHelper.HandleTextState(...), and references to nullString with HtmlTreeBuilderStateHelper.nullString. Add any required imports or fully qualify calls as simple static calls to the helper class. Ensure the enum remains compilable by referencing the new helper class.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Add an import for org.jsoup.parser.HtmlTreeBuilderStateHelper if desired, or use fully qualified calls. No external package changes; keep everything in org.jsoup.parser.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Reduce public surface and clarify responsibilities by creating a minimal facade for external use if future splits are needed (prepares for further extraction of state implementations).",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::process"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java"
+          ],
+          "details": "Introduce a thin facade class org.jsoup.parser.HtmlTreeBuilderStateFacade that offers a single public entry method (e.g. boolean handle(Token t, HtmlTreeBuilder tb, HtmlTreeBuilderState state)) that delegates to state.process(t, tb). The facade centralizes external calls and prepares for future refactorings where some state-processing responsibilities could be moved out of the enum while keeping a stable external API to HtmlTreeBuilder. Update callers (if any within the same repository, e.g., HtmlTreeBuilder) to use the facade where appropriate in a later step. This step only creates the facade and leaves existing enum behavior intact (the facade delegates to the enum's process), so compilation is preserved.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

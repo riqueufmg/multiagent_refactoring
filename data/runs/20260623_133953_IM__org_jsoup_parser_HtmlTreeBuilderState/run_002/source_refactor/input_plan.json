@@ -1,0 +1,444 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.HtmlTreeBuilderState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Create a dedicated helper class to host table-related state processing logic (initial preparation). This reduces size of the enum by providing a target for subsequent method moves.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+          ],
+          "details": "Create a new class org.jsoup.parser.HtmlTreeBuilderStateTableHandlers in the same package. Add static method signatures to receive (Token t, HtmlTreeBuilder tb) for table-related state processing: processInTable, processInTableText, processInCaption, processInColumnGroup, processInTableBody, processInRow, processInCell, and helper closeCell(Token t, HtmlTreeBuilder tb) as needed. No changes to the enum are done in this step; this only adds the new helper class file so subsequent refactors can move logic into it.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+          ],
+          "details": "Add imports needed by the helper: org.jsoup.nodes.Element, java.util.ArrayList and other referenced types (Token, TokeniserState, Parser, etc.) mirroring those already used in HtmlTreeBuilderState so the new class compiles standalone.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move the table-related processing method bodies from enum constants into the new HtmlTreeBuilderStateTableHandlers, and update enum constants to delegate to these helper methods.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+          ],
+          "details": "For enum constants InTable, InTableText, InCaption, InColumnGroup, InTableBody, InRow, InCell: move their process(Token t, HtmlTreeBuilder tb) method bodies into the corresponding static methods in HtmlTreeBuilderStateTableHandlers (processInTable, processInTableText, etc.). For helper-only routines used by these states (e.g., closeCell logic), move them as private static methods into the new helper class. Keep method signatures taking (Token, HtmlTreeBuilder).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Replace the moved bodies in the enum constants with a single-line delegation to the helper e.g. return HtmlTreeBuilderStateTableHandlers.processInTable(t, tb); ensuring the enum compiles against the new static helper methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Create a dedicated helper class to host head-related state processing logic (initial preparation). This prepares for moving InHead-family logic out of the enum.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+          ],
+          "details": "Create a new class org.jsoup.parser.HtmlTreeBuilderStateHeadHandlers containing static method signatures for head-related states: processInHead, processInHeadNoscript, processBeforeHead, processAfterHead (signatures: Token, HtmlTreeBuilder). This file is created first so it can be referenced when moving logic out of the enum.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+          ],
+          "details": "Add necessary imports mirroring those used in the head-related code in HtmlTreeBuilderState (Token, Element, HtmlTreeBuilderStateHelper, etc.).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Move head-related state logic into HtmlTreeBuilderStateHeadHandlers and delegate enum constants to the helper methods.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+          ],
+          "details": "Move the process bodies for Initial, BeforeHtml, BeforeHead, InHead, InHeadNoscript, AfterHead from the enum into corresponding static methods in HtmlTreeBuilderStateHeadHandlers (processInitial, processBeforeHtml, etc.). Adjust moved code to reference passed-in Token and HtmlTreeBuilder parameters. Preserve existing calls to HtmlTreeBuilderStateHelper and other helpers by importing them in the new class.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Replace the moved bodies in the enum constants with delegating calls to HtmlTreeBuilderStateHeadHandlers, e.g. return HtmlTreeBuilderStateHeadHandlers.processInHead(t, tb); Ensures enum constants remain thin delegators.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 5,
+      "goal": "Create a dedicated helper class for body-related state processing (initial preparation) to reduce enum size and group cohesive methods.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+          ],
+          "details": "Create a new class org.jsoup.parser.HtmlTreeBuilderStateBodyHandlers containing static method signatures for InBody, Text, AfterBody, AfterAfterBody, AfterAfterFrameset, InFrameset and other body/adjoining states as appropriate (processInBody, processText, etc.). This file is created so that large bodies of logic can be moved in the next step.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+          ],
+          "details": "Add imports needed by body-related logic (org.jsoup.nodes.Element, ArrayList, TokeniserState references, HtmlTreeBuilderStateHelper, etc.) so the helper compiles standalone.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 6,
+      "goal": "Move body-related processing into HtmlTreeBuilderStateBodyHandlers and update enum constants to delegate to these helper methods.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+          ],
+          "details": "Move the process method bodies for InBody, Text, AfterBody, AfterAfterBody, AfterFrameset, AfterAfterFrameset, InFrameset, and related helper methods (anyOtherEndTag, inBodyStartTag, inBodyEndTag, inBodyEndTagAdoption, etc.) into static methods in HtmlTreeBuilderStateBodyHandlers. Preserve their logic but adapt to static helper form (parameters: Token, HtmlTreeBuilder).",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Replace the bodies in the moved enum constants with delegating calls into HtmlTreeBuilderStateBodyHandlers (e.g. return HtmlTreeBuilderStateBodyHandlers.processInBody(t, tb);). Ensure the enum remains a thin dispatch surface.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 7,
+      "goal": "Extract remaining specialized groups (ForeignContent, InSelect-family, Template, Caption-adjacent states) into their own helper classes to further modularize and reduce enum size.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java"
+          ],
+          "details": "Create new helper classes for foreign content, select-related logic, and template-related logic. Provide static method signatures mirroring the enum process methods for those states (e.g. processForeignContent, processInSelect, processInSelectInTable, processInTemplate). These new classes reduce the remaining enum code to delegating calls.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java"
+          ],
+          "details": "Add necessary imports for the newly created handler classes mirroring those used in the moved code to ensure standalone compilation.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 8,
+      "goal": "Move the remaining state logic into the new helper classes and update HtmlTreeBuilderState enum to be a small dispatcher delegating to those helpers. Final cleanup to ensure compilation.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandlers.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTemplateHandlers.java"
+          ],
+          "details": "Move process bodies for ForeignContent, InSelect, InSelectInTable, InTemplate, InCaption-adjacent small helpers and any remaining state-specific methods into their respective handler classes. Replace enum bodies with delegations to these helpers (e.g. return HtmlTreeBuilderStateForeignHandlers.processForeignContent(t, tb);).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Make final updates to the enum so each constant's process method is a delegating call into a helper. Verify imports are present and adjust any visibility (private -> package-private) as required so the helper classes and enum compile in the same package.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 9,
+      "goal": "Optional: Introduce a facade or interface if future extensibility is desired (dependency inversion) so external code can depend on a small processing interface rather than the large enum implementation.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateProcessor.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateProcessor.java"
+          ],
+          "details": "Introduce an interface org.jsoup.parser.HtmlTreeBuilderStateProcessor with a single method boolean process(Token t, HtmlTreeBuilder tb). Make each helper class optionally implement or expose methods compatible with this interface. This allows future inversion of dependency if callers should use processors instead of depending on the enum directly.",
+          "risk": "medium"
+        },
+        {
+          "op": "DEPENDENCY_INVERSION",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateProcessor.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "If desired, adapt references within HtmlTreeBuilder (call sites) to depend on the interface rather than concrete enum where feasible. This step is optional and should be applied conservatively to avoid breaking existing API expectations.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+commit d5982edae737bdeef81570b65adc46b9e22ebdda
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 17:09:39 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java b/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
+index d01dff7e4..be55b1d56 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
+@@ -78,24 +78,7 @@ public class MethodUtils {
+      * @return the aggregate number of inheritance hops between assignable argument class types.
+      */
+     private static int distance(final Class<?>[] fromClassArray, final Class<?>[] toClassArray) {
+-        int answer = 0;
+-        if (!ClassUtils.isAssignable(fromClassArray, toClassArray, true)) {
+-            return -1;
+-        }
+-        for (int offset = 0; offset < fromClassArray.length; offset++) {
+-            // Note InheritanceUtils.distance() uses different scoring system.
+-            final Class<?> aClass = fromClassArray[offset];
+-            final Class<?> toClass = toClassArray[offset];
+-            if (aClass == null || aClass.equals(toClass)) {
+-                continue;
+-            }
+-            if (ClassUtils.isAssignable(aClass, toClass, true) && !ClassUtils.isAssignable(aClass, toClass, false)) {
+-                answer++;
+-            } else {
+-                answer += 2;
+-            }
+-        }
+-        return answer;
++        return MethodUtilsCore.distance(fromClassArray, toClassArray);
+     }
+ 
+     /**
+@@ -165,31 +148,7 @@ public static Method getAccessibleMethod(final Method method) {
+      * @return the accessible method or {@code null} if not found.
+      */
+     private static Method getAccessibleMethodFromInterfaceNest(Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
+-        // Search up the superclass chain
+-        for (; cls != null; cls = cls.getSuperclass()) {
+-            // Check the implemented interfaces of the parent class
+-            final Class<?>[] interfaces = cls.getInterfaces();
+-            for (final Class<?> anInterface : interfaces) {
+-                // Is this interface public?
+-                if (!ClassUtils.isPublic(anInterface)) {
+-                    continue;
+-                }
+-                // Does the method exist on this interface?
+-                try {
+-                    return anInterface.getDeclaredMethod(methodName, parameterTypes);
+-                } catch (final NoSuchMethodException ignored) {
+-                    /*
+-                     * Swallow, if no method is found after the loop then this method returns null.
+-                     */
+-                }
+-                // Recursively check our parent interfaces
+-                final Method method = getAccessibleMethodFromInterfaceNest(anInterface, methodName, parameterTypes);
+-                if (method != null) {
+-                    return method;
+-                }
+-            }
+-        }
+-        return null;
++        return MethodUtilsCore.getAccessibleMethodFromInterfaceNest(cls, methodName, parameterTypes);
+     }
+ 
+     /**
+@@ -203,14 +162,7 @@ private static Method getAccessibleMethodFromInterfaceNest(Class<?> cls, final S
+      * @return the accessible method or {@code null} if not found.
+      */
+     private static Method getAccessibleMethodFromSuperclass(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
+-        Class<?> parentClass = cls.getSuperclass();
+-        while (parentClass != null) {
+-            if (ClassUtils.isPublic(parentClass)) {
+-                return getMethodObject(parentClass, methodName, parameterTypes);
+-            }
+-            parentClass = parentClass.getSuperclass();
+-        }
+-        return null;
++        return MethodUtilsCore.getAccessibleMethodFromSuperclass(cls, methodName, parameterTypes);
+     }
+ 
+     /**
+@@ -221,24 +173,7 @@ private static Method getAccessibleMethodFromSuperclass(final Class<?> cls, fina
+      * @return the combined {@link List} of superclasses and interfaces in order going up from this one {@code null} if null input.
+      */
+     private static List<Class<?>> getAllSuperclassesAndInterfaces(final Class<?> cls) {
+-        if (cls == null) {
+-            return null;
+-        }
+-        final List<Class<?>> allSuperClassesAndInterfaces = new ArrayList<>();
+-        final List<Class<?>> allSuperclasses = ClassUtils.getAllSuperclasses(cls);
+-        int superClassIndex = 0;
+-        final List<Class<?>> allInterfaces = ClassUtils.getAllInterfaces(cls);
+-        int interfaceIndex = 0;
+-        while (interfaceIndex < allInterfaces.size() || superClassIndex < allSuperclasses.size()) {
+-            final Class<?> acls;
+-            if (interfaceIndex >= allInterfaces.size() || superClassIndex < allSuperclasses.size() && superClassIndex < interfaceIndex) {
+-                acls = allSuperclasses.get(superClassIndex++);
+-            } else {
+-                acls = allInterfaces.get(interfaceIndex++);
+-            }
+-            allSuperClassesAndInterfaces.add(acls);
+-        }
+-        return allSuperClassesAndInterfaces;
++        return MethodUtilsCore.getAllSuperclassesAndInterfaces(cls);
+     }
+ 
+     /**
+@@ -268,7 +203,7 @@ public static <A extends Annotation> A getAnnotation(final Method method, final
+     }
+ 
+     private static Method getInvokeMethod(final boolean forceAccess, final String methodName, final Class<?>[] parameterTypes, final Class<?> cls) {
+-        return MethodInvoker.getInvokeMethod(forceAccess, methodName, parameterTypes, cls);
++        return MethodUtilsCore.getInvokeMethod(forceAccess, methodName, parameterTypes, cls);
+     }
+ 
+     /**
+@@ -875,17 +810,17 @@ public static Object invokeStaticMethod(final Class<?> cls, final String methodN
+ 
+     private static Method requireNonNull(final Method method, final Class<?> cls, final String methodName, final Class<?>[] parameterTypes)
+             throws NoSuchMethodException {
+-        return MethodInvoker.requireNonNull(method, cls, methodName, parameterTypes);
++        return MethodUtilsCore.requireNonNull(method, cls, methodName, parameterTypes);
+     }
+ 
+     static Object[] toVarArgs(final Executable executable, final Object[] args)
+             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+-        return MethodInvoker.toVarArgs(executable, args);
++        return MethodUtilsCore.toVarArgs(executable, args);
+     }
+ 
+     private static Object[] toVarArgs(final Object[] args, final Class<?>[] methodParameterTypes)
+             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+-        return MethodInvoker.toVarArgs(args, methodParameterTypes);
++        return MethodUtilsCore.toVarArgs(args, methodParameterTypes);
+     }
+ 
+     /**
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java b/src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java
+new file mode 100644
+index 000000000..67eb68846
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java
+@@ -0,0 +1,134 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.lang3.reflect;
++
++import java.lang.reflect.Executable;
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++import java.util.ArrayList;
++import java.util.List;
++
++import org.apache.commons.lang3.ClassUtils;
++
++/*
++ * Package-private core helpers extracted from MethodUtils to group low-level
++ * reflection helpers. Methods are public static so MethodUtils can delegate
++ * to them.
++ */
++class MethodUtilsCore {
++
++    public static int distance(final Class<?>[] fromClassArray, final Class<?>[] toClassArray) {
++        int answer = 0;
++        if (!ClassUtils.isAssignable(fromClassArray, toClassArray, true)) {
++            return -1;
++        }
++        for (int offset = 0; offset < fromClassArray.length; offset++) {
++            // Note InheritanceUtils.distance() uses different scoring system.
++            final Class<?> aClass = fromClassArray[offset];
++            final Class<?> toClass = toClassArray[offset];
++            if (aClass == null || aClass.equals(toClass)) {
++                continue;
++            }
++            if (ClassUtils.isAssignable(aClass, toClass, true) && !ClassUtils.isAssignable(aClass, toClass, false)) {
++                answer++;
++            } else {
++                answer += 2;
++            }
++        }
++        return answer;
++    }
++
++    public static Method getAccessibleMethodFromInterfaceNest(Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
++        // Search up the superclass chain
++        for (; cls != null; cls = cls.getSuperclass()) {
++            // Check the implemented interfaces of the parent class
++            final Class<?>[] interfaces = cls.getInterfaces();
++            for (final Class<?> anInterface : interfaces) {
++                // Is this interface public?
++                if (!ClassUtils.isPublic(anInterface)) {
++                    continue;
++                }
++                // Does the method exist on this interface?
++                try {
++                    return anInterface.getDeclaredMethod(methodName, parameterTypes);
++                } catch (final NoSuchMethodException ignored) {
++                    /*
++                     * Swallow, if no method is found after the loop then this method returns null.
++                     */
++                }
++                // Recursively check our parent interfaces
++                final Method method = getAccessibleMethodFromInterfaceNest(anInterface, methodName, parameterTypes);
++                if (method != null) {
++                    return method;
++                }
++            }
++        }
++        return null;
++    }
++
++    public static Method getAccessibleMethodFromSuperclass(final Class<?> cls, final String methodName, final Class<?>... parameterTypes) {
++        Class<?> parentClass = cls.getSuperclass();
++        while (parentClass != null) {
++            if (ClassUtils.isPublic(parentClass)) {
++                return MethodInvoker.getMethodObject(parentClass, methodName, parameterTypes);
++            }
++            parentClass = parentClass.getSuperclass();
++        }
++        return null;
++    }
++
++    public static List<Class<?>> getAllSuperclassesAndInterfaces(final Class<?> cls) {
++        if (cls == null) {
++            return null;
++        }
++        final List<Class<?>> allSuperClassesAndInterfaces = new ArrayList<>();
++        final List<Class<?>> allSuperclasses = ClassUtils.getAllSuperclasses(cls);
++        int superClassIndex = 0;
++        final List<Class<?>> allInterfaces = ClassUtils.getAllInterfaces(cls);
++        int interfaceIndex = 0;
++        while (interfaceIndex < allInterfaces.size() || superClassIndex < allSuperclasses.size()) {
++            final Class<?> acls;
++            if (interfaceIndex >= allInterfaces.size() || superClassIndex < allSuperclasses.size() && superClassIndex < interfaceIndex) {
++                acls = allSuperclasses.get(superClassIndex++);
++            } else {
++                acls = allInterfaces.get(interfaceIndex++);
++            }
++            allSuperClassesAndInterfaces.add(acls);
++        }
++        return allSuperClassesAndInterfaces;
++    }
++
++    public static Method requireNonNull(final Method method, final Class<?> cls, final String methodName, final Class<?>[] parameterTypes)
++            throws NoSuchMethodException {
++        return MethodInvoker.requireNonNull(method, cls, methodName, parameterTypes);
++    }
++
++    public static Object[] toVarArgs(final Executable executable, final Object[] args)
++            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
++        return MethodInvoker.toVarArgs(executable, args);
++    }
++
++    public static Object[] toVarArgs(final Object[] args, final Class<?>[] methodParameterTypes)
++            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
++        return MethodInvoker.toVarArgs(args, methodParameterTypes);
++    }
++
++    public static Method getInvokeMethod(final boolean forceAccess, final String methodName, final Class<?>[] parameterTypes,
++            final Class<?> cls) {
++        return MethodInvoker.getInvokeMethod(forceAccess, methodName, parameterTypes, cls);
++    }
++}
+diff --git a/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java b/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java
+index d6c250fde..a47f3987d 100644
+--- a/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java
+@@ -565,7 +565,7 @@ void testConstructor() throws Exception {
+ 
+     @Test
+     void testDistance() throws Exception {
+-        final Method distanceMethod = MethodUtils.getMatchingMethod(MethodUtils.class, "distance", Class[].class, Class[].class);
++        final Method distanceMethod = MethodUtils.getMatchingMethod(MethodUtilsCore.class, "distance", Class[].class, Class[].class);
+         distanceMethod.setAccessible(true);
+         assertEquals(-1, distanceMethod.invoke(null, new Class[] { String.class }, new Class[] { Date.class }));
+         assertEquals(0, distanceMethod.invoke(null, new Class[] { Date.class }, new Class[] { Date.class }));

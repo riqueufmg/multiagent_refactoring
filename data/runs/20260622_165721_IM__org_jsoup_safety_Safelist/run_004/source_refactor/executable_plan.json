@@ -1,0 +1,160 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.safety.Safelist",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move low-level constants and the private URL helper out of Safelist into SafelistConfig to reduce Safelist internal state and private implementation surface.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistConfig.java",
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "org.jsoup.safety.Safelist#All",
+            "org.jsoup.safety.Safelist#AllTag"
+          ],
+          "outputs": [
+            "org.jsoup.safety.SafelistConfig#All",
+            "org.jsoup.safety.SafelistConfig#AllTag"
+          ],
+          "details": "Move the two private static final fields All (String) and AllTag (TagName) from Safelist to SafelistConfig. Preserve their modifiers (private static final) in SafelistConfig if possible; if SafelistConfig needs to access them from package-private code, adjust visibility to package-private. Update references in Safelist to access the moved fields via SafelistConfig (e.g. SafelistConfig.All / SafelistConfig.AllTag) or via package-private access if visibility changed.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.jsoup.safety.Safelist#shouldAbsUrl(TagName, AttributeKey)"
+          ],
+          "outputs": [
+            "org.jsoup.safety.SafelistConfig#shouldAbsUrl(TagName, AttributeKey)"
+          ],
+          "details": "Move the private helper method shouldAbsUrl(TagName, AttributeKey) from Safelist into SafelistConfig. Keep the method signature and implementation intact. If the method uses fields now moved (All/AllTag), update those accesses to refer to SafelistConfig's copies. Adjust visibility to package-private or private in SafelistConfig as appropriate.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/SafelistConfig.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/SafelistConfig.java"
+          ],
+          "details": "Add or update imports in SafelistConfig.java if the moved method or fields reference types not currently imported (e.g., TagName, AttributeKey). Ensure SafelistConfig compiles after the moved elements are added.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "details": "Update all references in Safelist to the moved fields/method to reference the new location in SafelistConfig. Example changes: replace direct field usages with SafelistConfig.All or SafelistConfig.AllTag or package-access as adjusted; replace any internal calls to shouldAbsUrl(TagName, AttributeKey) with calls to the moved method in SafelistConfig (e.g., config.shouldAbsUrl(...) or SafelistConfig.shouldAbsUrl(...) depending on chosen visibility). Ensure Safelist compiles after updates.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+            "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+            "src/test/java/org/jsoup/safety/CleanerTest.java",
+            "src/test/java/org/jsoup/safety/SafelistTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Remove thin static factory wrappers from Safelist by relocating the static factory methods to the existing SafelistPresets class, reducing the number of public methods on Safelist.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistPresets.java",
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.jsoup.safety.Safelist#none()",
+            "org.jsoup.safety.Safelist#simpleText()",
+            "org.jsoup.safety.Safelist#basic()",
+            "org.jsoup.safety.Safelist#basicWithImages()",
+            "org.jsoup.safety.Safelist#relaxed()"
+          ],
+          "outputs": [
+            "org.jsoup.safety.SafelistPresets#none()",
+            "org.jsoup.safety.SafelistPresets#simpleText()",
+            "org.jsoup.safety.SafelistPresets#basic()",
+            "org.jsoup.safety.SafelistPresets#basicWithImages()",
+            "org.jsoup.safety.SafelistPresets#relaxed()"
+          ],
+          "details": "Move the five public static factory methods (none, simpleText, basic, basicWithImages, relaxed) out of Safelist into the existing SafelistPresets class. Preserve semantics. If SafelistPresets already contains equivalent implementations, prefer consolidating to a single canonical implementation in SafelistPresets and remove the wrappers from Safelist. Keep Safelist minimal; after this move, Safelist will no longer expose these static factories directly.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "project-wide: all references to Safelist.none(), Safelist.simpleText(), Safelist.basic(), Safelist.basicWithImages(), Safelist.relaxed()"
+          ],
+          "outputs": [
+            "project-wide: all references updated to SafelistPresets.none(), SafelistPresets.simpleText(), SafelistPresets.basic(), SafelistPresets.basicWithImages(), SafelistPresets.relaxed()"
+          ],
+          "details": "Replace external references that previously called Safelist.X() to call SafelistPresets.X() after the methods are moved. Update imports where necessary. If preserving compatibility is required, an alternative is to leave one-line delegating static methods in Safelist that forward to SafelistPresets; choose either full relocation with call-site updates or add-one-line delegators in Safelist. This plan prefers full relocation and call-site updates to reduce Safelist's public API surface.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/* (files that reference the moved factories)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/* (updated imports)"
+          ],
+          "details": "Update imports in files that previously referenced Safelist static factory methods to import or reference SafelistPresets as needed.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+            "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+            "src/test/java/org/jsoup/safety/CleanerTest.java",
+            "src/test/java/org/jsoup/safety/SafelistTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": 2,
+  "goal": "Extract the InSelect state (and its closely related InSelectInTable helper 'anythingElse') into a dedicated select handler to reduce the enum's size and isolate select-specific complexity.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandler.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandler.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Create org.jsoup.parser.HtmlTreeBuilderStateSelectHandler with static methods: processInSelect(Token t, HtmlTreeBuilder tb) and a private anythingElse(Token t, HtmlTreeBuilder tb). Move the entire body of the InSelect enum state's process implementation into processInSelect, and move the helper anythingElse used by InSelect and InSelectInTable. Keep behavior identical. Place the new class in the same package and import required types.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandler.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Change the InSelect enum element to delegate to HtmlTreeBuilderStateSelectHandler.processInSelect(Token, HtmlTreeBuilder). Update InSelectInTable to call the new handler's anythingElse method (or continue delegating to processInSelect when appropriate).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": 2,
+  "goal": "Group the large cohesive set of public method-invocation APIs currently in MethodUtils into a dedicated class to reduce MethodUtils public surface area and improve cohesion.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java",
+    "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+      ],
+      "details": "Extract the cohesive group of public (and related package/private) methods that implement method lookup, matching and invocation into a new utility class MethodInvocationUtils (package org.apache.commons.lang3.reflect). Move the following public static methods (and any small private helpers they require that are not already moved to MethodUtilsCore) from MethodUtils to MethodInvocationUtils: getAccessibleMethod(Class, Method), getAccessibleMethod(Class, String, Class<?>...), getAccessibleMethod(Method), getMatchingAccessibleMethod(Class, String, Class<?>...), getMatchingMethod(Class, String, Class<?>...), getMethodObject(Class, String, Class<?>...), getMethodsListWithAnnotation(Class, Class<? extends Annotation> , boolean, boolean) and its overload, getMethodsWithAnnotation(Class, Class<? extends Annotation>, boolean, boolean) and its overload, getAnnotation(Method, Class<A>, boolean, boolean), invokeExactMethod (all overloads), invokeExactStaticMethod (overloads), invokeMethod (all overloads), invokeStaticMethod (overloads), invokeMethod variants that delegate to MethodInvoker, and any small helpers used exclusively by these methods. In MethodUtils.java replace the moved method bodies with simple delegating calls to MethodInvocationUtils (keeping the original signatures) to preserve the public API. Ensure moved methods reference MethodUtilsCore for helper operations where appropriate. Update or add imports as needed. This groups all invocation-related APIs and greatly reduces the number of public methods in MethodUtils, improving modularization.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvocationUtils.java"
+      ],
+      "details": "Replace internal direct calls within the moved code and remaining MethodUtils to refer to the new class boundaries: calls that used the extracted helper methods should call MethodUtilsCore.*, and MethodUtils public methods should delegate to MethodInvocationUtils.*. Ensure any external callers (within the same module) that previously referenced MethodUtils methods continue to work because MethodUtils retains delegating methods with original signatures.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ]
+}

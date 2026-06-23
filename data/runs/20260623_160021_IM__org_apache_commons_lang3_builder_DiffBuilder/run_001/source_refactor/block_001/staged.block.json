@@ -1,0 +1,41 @@
+{
+  "id": 1,
+  "goal": "Extract core diff-building state and all append overloads into a new helper class to reduce the size and complexity of DiffBuilder.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+    "src/main/java/org/apache/commons/lang3/builder/DiffBuilderCore.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilderCore.java"
+      ],
+      "details": "Create a new top-level class org.apache.commons.lang3.builder.DiffBuilderCore<T> in the same package. Move the following from DiffBuilder into DiffBuilderCore: the fields 'private final List<Diff<?>> diffs', 'private final boolean equals', 'private final T left', 'private final T right', 'private final ToStringStyle style', 'private final String toStringFormat'; the private add(...) method; all public append(...) overloads (primitive, array, Object, DiffResult); the build() implementation that returns new DiffResult<>(...); the package-private getLeft() and getRight() accessors; the private static SDiff<T> class and the private SerializableSupplier<T> interface (they become nested types of DiffBuilderCore). Include the TO_STRING_FORMAT constant in DiffBuilderCore if needed for moved constructors. Implement constructors in DiffBuilderCore corresponding to the moved constructors (including the deprecated ones) with the same parameter semantics. The moved methods should operate over the core's fields and nested types. Do not change external visible behaviour: signatures and semantics remain identical but are implemented in DiffBuilderCore.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+  ]
+}

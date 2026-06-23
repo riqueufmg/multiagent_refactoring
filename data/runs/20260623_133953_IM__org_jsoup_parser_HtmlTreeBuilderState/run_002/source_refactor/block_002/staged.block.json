@@ -1,0 +1,48 @@
+{
+  "id": 2,
+  "goal": "Move the table-related processing method bodies from enum constants into the new HtmlTreeBuilderStateTableHandlers, and update enum constants to delegate to these helper methods.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+      ],
+      "details": "For enum constants InTable, InTableText, InCaption, InColumnGroup, InTableBody, InRow, InCell: move their process(Token t, HtmlTreeBuilder tb) method bodies into the corresponding static methods in HtmlTreeBuilderStateTableHandlers (processInTable, processInTableText, etc.). For helper-only routines used by these states (e.g., closeCell logic), move them as private static methods into the new helper class. Keep method signatures taking (Token, HtmlTreeBuilder).",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Replace the moved bodies in the enum constants with a single-line delegation to the helper e.g. return HtmlTreeBuilderStateTableHandlers.processInTable(t, tb); ensuring the enum compiles against the new static helper methods.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

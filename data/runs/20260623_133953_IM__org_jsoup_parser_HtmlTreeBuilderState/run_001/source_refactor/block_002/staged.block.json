@@ -1,0 +1,60 @@
+{
+  "id": 2,
+  "goal": "Move utility routines (mergeAttributes, isWhitespace, HandleTextState and the nullString constant) out of HtmlTreeBuilderState into a focused helper class to reduce the enum's implementation complexity and group cohesive helper behavior.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::mergeAttributes",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::isWhitespace",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HandleTextState",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::nullString"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java"
+      ],
+      "details": "Create a new helper class org.jsoup.parser.HtmlTreeBuilderStateHelper with public static methods: mergeAttributes(Token.StartTag source, Element dest), boolean isWhitespace(Token t), void HandleTextState(Token.StartTag startTag, HtmlTreeBuilder tb, @Nullable TokeniserState state) and a public static final String nullString equal to the previous nullString value. The helper methods will have identical implementations and signatures (adjusted for being static utility methods). Do not change semantics. Keep the helper class in the same package (org.jsoup.parser).",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Update HtmlTreeBuilderState to call the newly extracted helper methods: replace calls to mergeAttributes(...) with HtmlTreeBuilderStateHelper.mergeAttributes(...), calls to isWhitespace(...) with HtmlTreeBuilderStateHelper.isWhitespace(...), calls to HandleTextState(...) with HtmlTreeBuilderStateHelper.HandleTextState(...), and references to nullString with HtmlTreeBuilderStateHelper.nullString. Add any required imports or fully qualify calls as simple static calls to the helper class. Ensure the enum remains compilable by referencing the new helper class.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Add an import for org.jsoup.parser.HtmlTreeBuilderStateHelper if desired, or use fully qualified calls. No external package changes; keep everything in org.jsoup.parser.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

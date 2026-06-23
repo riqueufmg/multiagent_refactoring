@@ -1,0 +1,79 @@
+{
+  "id": 1,
+  "goal": "Move low-level constants and the private URL helper out of Safelist into SafelistConfig to reduce Safelist internal state and private implementation surface.",
+  "files": [
+    "src/main/java/org/jsoup/safety/Safelist.java",
+    "src/main/java/org/jsoup/safety/SafelistConfig.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "org.jsoup.safety.Safelist#All",
+        "org.jsoup.safety.Safelist#AllTag"
+      ],
+      "outputs": [
+        "org.jsoup.safety.SafelistConfig#All",
+        "org.jsoup.safety.SafelistConfig#AllTag"
+      ],
+      "details": "Move the two private static final fields All (String) and AllTag (TagName) from Safelist to SafelistConfig. Preserve their modifiers (private static final) in SafelistConfig if possible; if SafelistConfig needs to access them from package-private code, adjust visibility to package-private. Update references in Safelist to access the moved fields via SafelistConfig (e.g. SafelistConfig.All / SafelistConfig.AllTag) or via package-private access if visibility changed.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.jsoup.safety.Safelist#shouldAbsUrl(TagName, AttributeKey)"
+      ],
+      "outputs": [
+        "org.jsoup.safety.SafelistConfig#shouldAbsUrl(TagName, AttributeKey)"
+      ],
+      "details": "Move the private helper method shouldAbsUrl(TagName, AttributeKey) from Safelist into SafelistConfig. Keep the method signature and implementation intact. If the method uses fields now moved (All/AllTag), update those accesses to refer to SafelistConfig's copies. Adjust visibility to package-private or private in SafelistConfig as appropriate.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/SafelistConfig.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/SafelistConfig.java"
+      ],
+      "details": "Add or update imports in SafelistConfig.java if the moved method or fields reference types not currently imported (e.g., TagName, AttributeKey). Ensure SafelistConfig compiles after the moved elements are added.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "details": "Update all references in Safelist to the moved fields/method to reference the new location in SafelistConfig. Example changes: replace direct field usages with SafelistConfig.All or SafelistConfig.AllTag or package-access as adjusted; replace any internal calls to shouldAbsUrl(TagName, AttributeKey) with calls to the moved method in SafelistConfig (e.g., config.shouldAbsUrl(...) or SafelistConfig.shouldAbsUrl(...) depending on chosen visibility). Ensure Safelist compiles after updates.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ]
+}

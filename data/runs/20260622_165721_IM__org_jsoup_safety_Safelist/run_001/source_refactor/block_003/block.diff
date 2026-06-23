@@ -1,0 +1,98 @@
+commit 447b29bed61d57d1cce847c907d59c6c1948777f
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Jun 22 17:04:07 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/jsoup/safety/Safelist.java b/src/main/java/org/jsoup/safety/Safelist.java
+index 7ee80da5..c8c5e06d 100644
+--- a/src/main/java/org/jsoup/safety/Safelist.java
++++ b/src/main/java/org/jsoup/safety/Safelist.java
+@@ -333,7 +333,7 @@ public class Safelist {
+ 
+     /**
+      Add allowed URL protocols for an element's URL attribute. This restricts the possible values of the attribute to
+-     URLs with the defined protocol.
++     * URLs with the defined protocol.
+      <p>
+      E.g.: <code>addProtocols("a", "href", "ftp", "http", "https")</code>
+      </p>
+@@ -387,27 +387,7 @@ public class Safelist {
+      * @return true if allowed
+      */
+     public boolean isSafeAttribute(String tagName, Element el, Attribute attr) {
+-        TagName tag = TagName.valueOf(tagName);
+-        AttributeKey key = AttributeKey.valueOf(attr.getKey());
+-
+-        Set<AttributeKey> okSet = config.attributes.get(tag);
+-        if (okSet != null && okSet.contains(key)) {
+-            if (config.protocols.containsKey(tag)) {
+-                Map<AttributeKey, Set<Protocol>> attrProts = config.protocols.get(tag);
+-                // ok if not defined protocol; otherwise test
+-                return !attrProts.containsKey(key) || config.isSafeProtocol(config.getProtocolValue(el, attr), attrProts.get(key));
+-            } else { // attribute found, no protocols defined, so OK
+-                return true;
+-            }
+-        }
+-        Map<AttributeKey, AttributeValue> enforcedSet = config.enforcedAttributes.get(tag);
+-        if (enforcedSet != null && enforcedSet.containsKey(key)) {
+-            // enforced attr key was LCed via AttributeKey.valueOf(attr.getKey()),
+-            // if the input already has that exact value, treat it as safe
+-            return enforcedSet.get(key).equals(AttributeValue.valueOf(attr.getValue()));
+-        }
+-        // no attributes defined for tag, try :all tag
+-        return !tagName.equals(All) && isSafeAttribute(All, el, attr);
++        return config.isSafeAttribute(tagName, el, attr);
+     }
+ 
+     /**
+@@ -428,8 +408,4 @@ public class Safelist {
+         return config.shouldAbsUrl(tag, key);
+     }
+ 
+-    private static boolean isValidAnchor(String value) {
+-        return value.startsWith("#") && !value.matches(".*\\s.*");
+-    }
+-
+ }
+diff --git a/src/main/java/org/jsoup/safety/SafelistConfig.java b/src/main/java/org/jsoup/safety/SafelistConfig.java
+index 606975f9..d8872354 100644
+--- a/src/main/java/org/jsoup/safety/SafelistConfig.java
++++ b/src/main/java/org/jsoup/safety/SafelistConfig.java
+@@ -379,4 +379,36 @@ public class SafelistConfig {
+ 
+         return !tag.equals(AllTag) && shouldAbsUrl(AllTag, key);
+     }
++
++    /**
++     * Test if the supplied attribute is allowed by this safelist config for this tag.
++     * <p>This method does not modify the input element or attribute.</p>
++     * @param tagName tag to consider allowing the attribute in
++     * @param el element under test, to confirm protocol
++     * @param attr attribute under test
++     * @return true if allowed
++     */
++    public boolean isSafeAttribute(String tagName, Element el, Attribute attr) {
++        TagName tag = TagName.valueOf(tagName);
++        AttributeKey key = AttributeKey.valueOf(attr.getKey());
++
++        Set<AttributeKey> okSet = attributes.get(tag);
++        if (okSet != null && okSet.contains(key)) {
++            if (protocols.containsKey(tag)) {
++                Map<AttributeKey, Set<Protocol>> attrProts = protocols.get(tag);
++                // ok if not defined protocol; otherwise test
++                return !attrProts.containsKey(key) || isSafeProtocol(getProtocolValue(el, attr), attrProts.get(key));
++            } else { // attribute found, no protocols defined, so OK
++                return true;
++            }
++        }
++        Map<AttributeKey, AttributeValue> enforcedSet = enforcedAttributes.get(tag);
++        if (enforcedSet != null && enforcedSet.containsKey(key)) {
++            // enforced attr key was LCed via AttributeKey.valueOf(attr.getKey()),
++            // if the input already has that exact value, treat it as safe
++            return enforcedSet.get(key).equals(AttributeValue.valueOf(attr.getValue()));
++        }
++        // no attributes defined for tag, try :all tag
++        return !tagName.equals(All) && isSafeAttribute(All, el, attr);
++    }
+ }

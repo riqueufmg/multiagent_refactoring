@@ -1,0 +1,58 @@
+{
+  "id": 1,
+  "goal": "Extract low-level private helper methods from MethodUtils into a new small utility class to reduce the size and complexity of MethodUtils and to group cohesive reflection helpers.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+    "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java",
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "details": "Move the following private static helper methods from MethodUtils into a new package-private class MethodUtilsCore in the same package (org.apache.commons.lang3.reflect). Make the moved methods public static in MethodUtilsCore so callers in the original file can reference them: distance(Class<?>[], Class<?>[]), getAccessibleMethodFromInterfaceNest(Class<?>, String, Class<?>...), getAccessibleMethodFromSuperclass(Class<?>, String, Class<?>...), getAllSuperclassesAndInterfaces(Class<?>), requireNonNull(Method, Class<?>, String, Class<?>[]), toVarArgs(Executable, Object[]), toVarArgs(Object[], Class<?>[]), getInvokeMethod(boolean, String, Class<?>[], Class<?>). Update MethodUtils.java to replace direct definitions with calls to MethodUtilsCore (e.g., MethodUtilsCore.distance(...)). Update imports in both files as necessary (retain existing imports). Keep both classes in org.apache.commons.lang3.reflect package. This reduces size and groups low-level reflection helpers separately.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtilsCore.java"
+      ],
+      "details": "Adjust imports so MethodUtilsCore compiles independently: include java.lang.reflect.* and java.util.* imports used by the moved methods, plus references to org.apache.commons.lang3.* utilities already used by MethodUtils. Ensure MethodUtils imports MethodUtilsCore if needed (same package so no import needed).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ]
+}

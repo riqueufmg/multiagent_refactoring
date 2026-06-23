@@ -1,0 +1,67 @@
+mvp:
+  name: source_refactor
+  run_id: auto
+
+input:
+  planner_contract: /data/henrique/multiagent_refactoring/data/runs/20260619_132701_64e44498/planner/contract.json
+
+models:
+  executor: gpt-5-mini
+  repair: gpt-5-mini
+
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/system.md
+  execute_plan: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/execute_plan.md
+  repair_compile: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/repair_compile.md
+
+executor:
+  temperature: 0.0
+  timeout: 600
+  max_retries: 5
+  max_block_attempts: 5
+
+repair:
+  enabled: true
+  max_attempts: 1
+
+compile:
+  timeout: 600
+  command:
+    - mvn
+    - -q
+    - -Djapicmp.skip=true
+    - -Drat.skip=true
+    - -Dcheckstyle.skip=true
+    - -Dspotbugs.skip=true
+    - -Dpmd.skip=true
+    - -DskipITs
+    - clean
+    - test
+
+mechanical_tools:
+  openrewrite_enabled: true
+  openrewrite_timeout: 600
+  openrewrite_command:
+    - mvn
+    - -U
+    - -Dmaven.test.skip=true
+    - -DskipTests
+    - -DskipITs
+    - -Djapicmp.skip=true
+    - -Drat.skip=true
+    - -Dcheckstyle.skip=true
+    - -Dspotbugs.skip=true
+    - -Dpmd.skip=true
+    - -Danimal.sniffer.skip=true
+    - -Dforbiddenapis.skip=true
+    - -Denforcer.skip=true
+    - -Dlicense.skip=true
+    - -Dskip.npm=true
+    - -Dskip.yarn=true
+    - org.openrewrite.maven:rewrite-maven-plugin:runNoFork
+
+tests:
+  update_tests: true
+
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs

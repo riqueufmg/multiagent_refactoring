@@ -1,0 +1,48 @@
+{
+  "id": 4,
+  "goal": "Move head-related state logic into HtmlTreeBuilderStateHeadHandlers and delegate enum constants to the helper methods.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+      ],
+      "details": "Move the process bodies for Initial, BeforeHtml, BeforeHead, InHead, InHeadNoscript, AfterHead from the enum into corresponding static methods in HtmlTreeBuilderStateHeadHandlers (processInitial, processBeforeHtml, etc.). Adjust moved code to reference passed-in Token and HtmlTreeBuilder parameters. Preserve existing calls to HtmlTreeBuilderStateHelper and other helpers by importing them in the new class.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Replace the moved bodies in the enum constants with delegating calls to HtmlTreeBuilderStateHeadHandlers, e.g. return HtmlTreeBuilderStateHeadHandlers.processInHead(t, tb); Ensures enum constants remain thin delegators.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

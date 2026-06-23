@@ -1,0 +1,40 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Document",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the size and complexity of org.jsoup.nodes.Document by extracting the cohesive OutputSettings inner class into a top-level class in the same package.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Document.java",
+        "src/main/java/org/jsoup/nodes/OutputSettings.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Document.java:OutputSettings (static inner class)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/OutputSettings.java",
+            "src/main/java/org/jsoup/nodes/Document.java (updated - inner class removed, references unchanged)"
+          ],
+          "details": "Move the static inner class Document.OutputSettings (including nested enum Syntax and its methods) into a new top-level class OutputSettings in package org.jsoup.nodes. Preserve method bodies, visibility, and semantics. Keep the class in the same package so existing unqualified references (in Document and other package classes) continue to resolve. Remove the inner class definition from Document and add the new file OutputSettings.java containing the extracted code. Ensure the new file includes required imports: java.nio.charset.Charset; org.jsoup.helper.DataUtil; org.jsoup.helper.Validate. Retain references to Entities (assumed in the same package) without additional import. The Document field 'private OutputSettings outputSettings = new OutputSettings();' and all existing uses remain unchanged because the moved class keeps the same simple name and package.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/OutputSettings.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/OutputSettings.java (with imports)"
+          ],
+          "details": "Add necessary imports at the top of the new OutputSettings.java file: java.nio.charset.Charset; org.jsoup.helper.DataUtil; org.jsoup.helper.Validate. No changes to Document.java imports are required because both classes are in the same package and existing Document references remain valid.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

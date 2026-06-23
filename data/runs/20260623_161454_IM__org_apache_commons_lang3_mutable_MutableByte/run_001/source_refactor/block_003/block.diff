@@ -1,0 +1,370 @@
+commit 70aa2376f223533860942bb06b56bdfdf765bdf1
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 16:30:33 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java b/src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java
+new file mode 100644
+index 000000000..ac8027b80
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java
+@@ -0,0 +1,35 @@
++package org.apache.commons.lang3.mutable;
++
++/**
++ * Interface describing arithmetic operations for byte mutables.
++ */
++public interface ByteArithmetic {
++
++    byte add(byte current, byte operand);
++
++    byte add(byte current, Number operand);
++
++    byte subtract(byte current, byte operand);
++
++    byte subtract(byte current, Number operand);
++
++    byte increment(byte current);
++
++    byte decrement(byte current);
++
++    byte addAndGet(byte current, byte operand);
++
++    byte addAndGet(byte current, Number operand);
++
++    byte getAndAdd(byte current, byte operand);
++
++    byte getAndAdd(byte current, Number operand);
++
++    byte incrementAndGet(byte current);
++
++    byte getAndIncrement(byte current);
++
++    byte decrementAndGet(byte current);
++
++    byte getAndDecrement(byte current);
++}
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+index fc5a3b62b..7422f9fa3 100644
+--- a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+@@ -40,6 +40,8 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
+      */
+     private static final long serialVersionUID = -1585823265L;
+ 
++    private static final ByteArithmetic ARITH = new MutableByteArithmetic();
++
+     /** The mutable value. */
+     private byte value;
+ 
+@@ -86,7 +88,7 @@ public MutableByte(final String value) {
+      * @since 2.2
+      */
+     public void add(final byte operand) {
+-        this.value = MutableByteArithmetic.add(this.value, operand);
++        this.value = ARITH.add(this.value, operand);
+     }
+ 
+     /**
+@@ -97,7 +99,7 @@ public void add(final byte operand) {
+      * @since 2.2
+      */
+     public void add(final Number operand) {
+-        this.value = MutableByteArithmetic.add(this.value, operand);
++        this.value = ARITH.add(this.value, operand);
+     }
+ 
+     /**
+@@ -109,7 +111,7 @@ public void add(final Number operand) {
+      * @since 3.5
+      */
+     public byte addAndGet(final byte operand) {
+-        final byte newVal = MutableByteArithmetic.addAndGet(this.value, operand);
++        final byte newVal = ARITH.addAndGet(this.value, operand);
+         this.value = newVal;
+         return newVal;
+     }
+@@ -124,7 +126,7 @@ public byte addAndGet(final byte operand) {
+      * @since 3.5
+      */
+     public byte addAndGet(final Number operand) {
+-        final byte newVal = MutableByteArithmetic.addAndGet(this.value, operand);
++        final byte newVal = ARITH.addAndGet(this.value, operand);
+         this.value = newVal;
+         return newVal;
+     }
+@@ -157,7 +159,7 @@ public int compareTo(final MutableByte other) {
+      * @since 2.2
+      */
+     public void decrement() {
+-        this.value = MutableByteArithmetic.decrement(this.value);
++        this.value = ARITH.decrement(this.value);
+     }
+ 
+     /**
+@@ -168,7 +170,7 @@ public void decrement() {
+      * @since 3.5
+      */
+     public byte decrementAndGet() {
+-        final byte newVal = MutableByteArithmetic.decrementAndGet(this.value);
++        final byte newVal = ARITH.decrementAndGet(this.value);
+         this.value = newVal;
+         return newVal;
+     }
+@@ -218,8 +220,8 @@ public float floatValue() {
+      * @since 3.5
+      */
+     public byte getAndAdd(final byte operand) {
+-        final byte last = MutableByteArithmetic.getAndAdd(this.value, operand);
+-        this.value = MutableByteArithmetic.add(this.value, operand);
++        final byte last = ARITH.getAndAdd(this.value, operand);
++        this.value = ARITH.add(this.value, operand);
+         return last;
+     }
+ 
+@@ -233,8 +235,8 @@ public byte getAndAdd(final byte operand) {
+      * @since 3.5
+      */
+     public byte getAndAdd(final Number operand) {
+-        final byte last = MutableByteArithmetic.getAndAdd(this.value, operand);
+-        this.value = MutableByteArithmetic.add(this.value, operand);
++        final byte last = ARITH.getAndAdd(this.value, operand);
++        this.value = ARITH.add(this.value, operand);
+         return last;
+     }
+ 
+@@ -246,8 +248,8 @@ public byte getAndAdd(final Number operand) {
+      * @since 3.5
+      */
+     public byte getAndDecrement() {
+-        final byte last = MutableByteArithmetic.getAndDecrement(this.value);
+-        this.value = MutableByteArithmetic.decrement(this.value);
++        final byte last = ARITH.getAndDecrement(this.value);
++        this.value = ARITH.decrement(this.value);
+         return last;
+     }
+ 
+@@ -259,8 +261,8 @@ public byte getAndDecrement() {
+      * @since 3.5
+      */
+     public byte getAndIncrement() {
+-        final byte last = MutableByteArithmetic.getAndIncrement(this.value);
+-        this.value = MutableByteArithmetic.increment(this.value);
++        final byte last = ARITH.getAndIncrement(this.value);
++        this.value = ARITH.increment(this.value);
+         return last;
+     }
+ 
+@@ -292,7 +294,7 @@ public int hashCode() {
+      * @since 2.2
+      */
+     public void increment() {
+-        this.value = MutableByteArithmetic.increment(this.value);
++        this.value = ARITH.increment(this.value);
+     }
+ 
+     /**
+@@ -303,7 +305,7 @@ public void increment() {
+      * @since 3.5
+      */
+     public byte incrementAndGet() {
+-        final byte newVal = MutableByteArithmetic.incrementAndGet(this.value);
++        final byte newVal = ARITH.incrementAndGet(this.value);
+         this.value = newVal;
+         return newVal;
+     }
+@@ -355,7 +357,7 @@ public void setValue(final Number value) {
+      * @since 2.2
+      */
+     public void subtract(final byte operand) {
+-        this.value = MutableByteArithmetic.subtract(this.value, operand);
++        this.value = ARITH.subtract(this.value, operand);
+     }
+ 
+     /**
+@@ -366,7 +368,7 @@ public void subtract(final byte operand) {
+      * @since 2.2
+      */
+     public void subtract(final Number operand) {
+-        this.value = MutableByteArithmetic.subtract(this.value, operand);
++        this.value = ARITH.subtract(this.value, operand);
+     }
+ 
+     /**
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java
+index 7fee54290..741b1b33e 100644
+--- a/src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java
+@@ -3,71 +3,141 @@
+ /**
+  * Helper class that implements byte arithmetic operations used by {@link MutableByte}.
+  *
+- * <p>All methods are static and operate on primitive values (or {@link Number}) so
+- * the helper is independent of MutableByte's internal state. Methods returning the
+- * "getAnd..." variants return the value before the operation; the caller is
+- * expected to apply the corresponding "add"/"subtract"/"...AndGet" result to
+- * update its state.</p>
++ * <p>All methods are available as static helpers for backwards compatibility and as
++ * instance methods via {@link ByteArithmetic} for dependency inversion.</p>
+  */
+-public final class MutableByteArithmetic {
++public class MutableByteArithmetic implements ByteArithmetic {
+ 
+-    private MutableByteArithmetic() {
+-        // utility class
++    public MutableByteArithmetic() {
++        // allow instantiation for interface-based usage
+     }
+ 
+-    public static byte add(byte current, byte operand) {
++    /* Static helper methods (renamed to avoid duplicate signatures with instance methods) */
++    public static byte doAdd(byte current, byte operand) {
+         return (byte) (current + operand);
+     }
+ 
+-    public static byte add(byte current, Number operand) {
+-        return add(current, operand.byteValue());
++    public static byte doAdd(byte current, Number operand) {
++        return doAdd(current, operand.byteValue());
+     }
+ 
+-    public static byte subtract(byte current, byte operand) {
++    public static byte doSubtract(byte current, byte operand) {
+         return (byte) (current - operand);
+     }
+ 
+-    public static byte subtract(byte current, Number operand) {
+-        return subtract(current, operand.byteValue());
++    public static byte doSubtract(byte current, Number operand) {
++        return doSubtract(current, operand.byteValue());
+     }
+ 
+-    public static byte increment(byte current) {
+-        return add(current, (byte) 1);
++    public static byte doIncrement(byte current) {
++        return doAdd(current, (byte) 1);
+     }
+ 
+-    public static byte decrement(byte current) {
+-        return subtract(current, (byte) 1);
++    public static byte doDecrement(byte current) {
++        return doSubtract(current, (byte) 1);
+     }
+ 
+-    public static byte addAndGet(byte current, byte operand) {
+-        return add(current, operand);
++    public static byte doAddAndGet(byte current, byte operand) {
++        return doAdd(current, operand);
+     }
+ 
+-    public static byte addAndGet(byte current, Number operand) {
+-        return add(current, operand);
++    public static byte doAddAndGet(byte current, Number operand) {
++        return doAdd(current, operand);
+     }
+ 
+-    public static byte getAndAdd(byte current, byte operand) {
++    public static byte doGetAndAdd(byte current, byte operand) {
+         return current;
+     }
+ 
+-    public static byte getAndAdd(byte current, Number operand) {
++    public static byte doGetAndAdd(byte current, Number operand) {
+         return current;
+     }
+ 
+-    public static byte incrementAndGet(byte current) {
+-        return increment(current);
++    public static byte doIncrementAndGet(byte current) {
++        return doIncrement(current);
+     }
+ 
+-    public static byte getAndIncrement(byte current) {
++    public static byte doGetAndIncrement(byte current) {
+         return current;
+     }
+ 
+-    public static byte decrementAndGet(byte current) {
+-        return decrement(current);
++    public static byte doDecrementAndGet(byte current) {
++        return doDecrement(current);
+     }
+ 
+-    public static byte getAndDecrement(byte current) {
++    public static byte doGetAndDecrement(byte current) {
+         return current;
+     }
++
++    /* Instance implementations delegating to static helpers */
++
++    @Override
++    public byte add(byte current, byte operand) {
++        return MutableByteArithmetic.doAdd(current, operand);
++    }
++
++    @Override
++    public byte add(byte current, Number operand) {
++        return MutableByteArithmetic.doAdd(current, operand);
++    }
++
++    @Override
++    public byte subtract(byte current, byte operand) {
++        return MutableByteArithmetic.doSubtract(current, operand);
++    }
++
++    @Override
++    public byte subtract(byte current, Number operand) {
++        return MutableByteArithmetic.doSubtract(current, operand);
++    }
++
++    @Override
++    public byte increment(byte current) {
++        return MutableByteArithmetic.doIncrement(current);
++    }
++
++    @Override
++    public byte decrement(byte current) {
++        return MutableByteArithmetic.doDecrement(current);
++    }
++
++    @Override
++    public byte addAndGet(byte current, byte operand) {
++        return MutableByteArithmetic.doAddAndGet(current, operand);
++    }
++
++    @Override
++    public byte addAndGet(byte current, Number operand) {
++        return MutableByteArithmetic.doAddAndGet(current, operand);
++    }
++
++    @Override
++    public byte getAndAdd(byte current, byte operand) {
++        return MutableByteArithmetic.doGetAndAdd(current, operand);
++    }
++
++    @Override
++    public byte getAndAdd(byte current, Number operand) {
++        return MutableByteArithmetic.doGetAndAdd(current, operand);
++    }
++
++    @Override
++    public byte incrementAndGet(byte current) {
++        return MutableByteArithmetic.doIncrementAndGet(current);
++    }
++
++    @Override
++    public byte getAndIncrement(byte current) {
++        return MutableByteArithmetic.doGetAndIncrement(current);
++    }
++
++    @Override
++    public byte decrementAndGet(byte current) {
++        return MutableByteArithmetic.doDecrementAndGet(current);
++    }
++
++    @Override
++    public byte getAndDecrement(byte current) {
++        return MutableByteArithmetic.doGetAndDecrement(current);
++    }
+ }

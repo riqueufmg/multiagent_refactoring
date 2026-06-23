@@ -1,0 +1,46 @@
+{
+  "id": 5,
+  "goal": "Create a dedicated helper class for body-related state processing (initial preparation) to reduce enum size and group cohesive methods.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+      ],
+      "details": "Create a new class org.jsoup.parser.HtmlTreeBuilderStateBodyHandlers containing static method signatures for InBody, Text, AfterBody, AfterAfterBody, AfterAfterFrameset, InFrameset and other body/adjoining states as appropriate (processInBody, processText, etc.). This file is created so that large bodies of logic can be moved in the next step.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateBodyHandlers.java"
+      ],
+      "details": "Add imports needed by body-related logic (org.jsoup.nodes.Element, ArrayList, TokeniserState references, HtmlTreeBuilderStateHelper, etc.) so the helper compiles standalone.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

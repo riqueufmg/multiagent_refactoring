@@ -1,0 +1,286 @@
+commit f3759c55e4e9e79cd5f32f22acac08771c4004d9
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 16:41:13 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+index 613cf7b01..a4936e65a 100644
+--- a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+@@ -40,11 +40,11 @@ public class MutableByte extends Number implements Comparable<MutableByte>, Muta
+      */
+     private static final long serialVersionUID = -1585823265L;
+ 
+-    private static final ByteArithmetic ARITH = new MutableByteArithmetic();
+-
+     /** The mutable value. */
+     private byte value;
+ 
++    private final MutableByteAtomicOperations ops = new MutableByteAtomicOperations(this);
++
+     /**
+      * Constructs a new MutableByte with the default value of zero.
+      */
+@@ -88,7 +88,7 @@ public MutableByte(final String value) {
+      * @since 2.2
+      */
+     public void add(final byte operand) {
+-        this.value = ARITH.add(this.value, operand);
++        ops.add(operand);
+     }
+ 
+     /**
+@@ -99,7 +99,7 @@ public void add(final byte operand) {
+      * @since 2.2
+      */
+     public void add(final Number operand) {
+-        this.value = ARITH.add(this.value, operand);
++        ops.add(operand);
+     }
+ 
+     /**
+@@ -111,9 +111,7 @@ public void add(final Number operand) {
+      * @since 3.5
+      */
+     public byte addAndGet(final byte operand) {
+-        final byte newVal = ARITH.addAndGet(this.value, operand);
+-        this.value = newVal;
+-        return newVal;
++        return ops.addAndGet(operand);
+     }
+ 
+     /**
+@@ -126,9 +124,7 @@ public byte addAndGet(final byte operand) {
+      * @since 3.5
+      */
+     public byte addAndGet(final Number operand) {
+-        final byte newVal = ARITH.addAndGet(this.value, operand);
+-        this.value = newVal;
+-        return newVal;
++        return ops.addAndGet(operand);
+     }
+ 
+     // shortValue relies on Number implementation
+@@ -159,7 +155,7 @@ public int compareTo(final MutableByte other) {
+      * @since 2.2
+      */
+     public void decrement() {
+-        this.value = ARITH.decrement(this.value);
++        ops.decrement();
+     }
+ 
+     /**
+@@ -170,9 +166,7 @@ public void decrement() {
+      * @since 3.5
+      */
+     public byte decrementAndGet() {
+-        final byte newVal = ARITH.decrementAndGet(this.value);
+-        this.value = newVal;
+-        return newVal;
++        return ops.decrementAndGet();
+     }
+ 
+     /**
+@@ -220,9 +214,7 @@ public float floatValue() {
+      * @since 3.5
+      */
+     public byte getAndAdd(final byte operand) {
+-        final byte last = ARITH.getAndAdd(this.value, operand);
+-        this.value = ARITH.add(this.value, operand);
+-        return last;
++        return ops.getAndAdd(operand);
+     }
+ 
+     /**
+@@ -235,9 +227,7 @@ public byte getAndAdd(final byte operand) {
+      * @since 3.5
+      */
+     public byte getAndAdd(final Number operand) {
+-        final byte last = ARITH.getAndAdd(this.value, operand);
+-        this.value = ARITH.add(this.value, operand);
+-        return last;
++        return ops.getAndAdd(operand);
+     }
+ 
+     /**
+@@ -248,9 +238,7 @@ public byte getAndAdd(final Number operand) {
+      * @since 3.5
+      */
+     public byte getAndDecrement() {
+-        final byte last = ARITH.getAndDecrement(this.value);
+-        this.value = ARITH.decrement(this.value);
+-        return last;
++        return ops.getAndDecrement();
+     }
+ 
+     /**
+@@ -261,9 +249,7 @@ public byte getAndDecrement() {
+      * @since 3.5
+      */
+     public byte getAndIncrement() {
+-        final byte last = ARITH.getAndIncrement(this.value);
+-        this.value = ARITH.increment(this.value);
+-        return last;
++        return ops.getAndIncrement();
+     }
+ 
+     /**
+@@ -294,7 +280,7 @@ public int hashCode() {
+      * @since 2.2
+      */
+     public void increment() {
+-        this.value = ARITH.increment(this.value);
++        ops.increment();
+     }
+ 
+     /**
+@@ -305,9 +291,7 @@ public void increment() {
+      * @since 3.5
+      */
+     public byte incrementAndGet() {
+-        final byte newVal = ARITH.incrementAndGet(this.value);
+-        this.value = newVal;
+-        return newVal;
++        return ops.incrementAndGet();
+     }
+ 
+     /**
+@@ -357,7 +341,7 @@ public void setValue(final Number value) {
+      * @since 2.2
+      */
+     public void subtract(final byte operand) {
+-        this.value = ARITH.subtract(this.value, operand);
++        ops.subtract(operand);
+     }
+ 
+     /**
+@@ -368,7 +352,7 @@ public void subtract(final byte operand) {
+      * @since 2.2
+      */
+     public void subtract(final Number operand) {
+-        this.value = ARITH.subtract(this.value, operand);
++        ops.subtract(operand);
+     }
+ 
+     /**
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByteAtomicOperations.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByteAtomicOperations.java
+new file mode 100644
+index 000000000..81719d090
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByteAtomicOperations.java
+@@ -0,0 +1,114 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.lang3.mutable;
++
++/**
++ * Helper class that encapsulates mutation and atomic-style operations for MutableByte.
++ * Operates via a MutableByteAccessor to avoid direct dependency on the MutableByte internals.
++ *
++ * This class owns the ARITH field that provides byte arithmetic operations.
++ */
++public class MutableByteAtomicOperations {
++
++    private final MutableByteAccessor accessor;
++
++    private static final ByteArithmetic ARITH = new MutableByteArithmetic();
++
++    public MutableByteAtomicOperations(final MutableByteAccessor accessor) {
++        this.accessor = accessor;
++    }
++
++    public void add(final byte operand) {
++        accessor.setRaw(ARITH.add(accessor.getRaw(), operand));
++    }
++
++    public void add(final Number operand) {
++        accessor.setRaw(ARITH.add(accessor.getRaw(), operand));
++    }
++
++    public byte addAndGet(final byte operand) {
++        final byte newVal = ARITH.addAndGet(accessor.getRaw(), operand);
++        accessor.setRaw(newVal);
++        return newVal;
++    }
++
++    public byte addAndGet(final Number operand) {
++        final byte newVal = ARITH.addAndGet(accessor.getRaw(), operand);
++        accessor.setRaw(newVal);
++        return newVal;
++    }
++
++    public byte getAndAdd(final byte operand) {
++        final byte current = accessor.getRaw();
++        final byte last = ARITH.getAndAdd(current, operand);
++        final byte newVal = ARITH.add(current, operand);
++        accessor.setRaw(newVal);
++        return last;
++    }
++
++    public byte getAndAdd(final Number operand) {
++        final byte current = accessor.getRaw();
++        final byte last = ARITH.getAndAdd(current, operand);
++        final byte newVal = ARITH.add(current, operand);
++        accessor.setRaw(newVal);
++        return last;
++    }
++
++    public void increment() {
++        accessor.setRaw(ARITH.increment(accessor.getRaw()));
++    }
++
++    public byte incrementAndGet() {
++        final byte newVal = ARITH.incrementAndGet(accessor.getRaw());
++        accessor.setRaw(newVal);
++        return newVal;
++    }
++
++    public byte getAndIncrement() {
++        final byte current = accessor.getRaw();
++        final byte last = ARITH.getAndIncrement(current);
++        final byte newVal = ARITH.increment(current);
++        accessor.setRaw(newVal);
++        return last;
++    }
++
++    public void decrement() {
++        accessor.setRaw(ARITH.decrement(accessor.getRaw()));
++    }
++
++    public byte decrementAndGet() {
++        final byte newVal = ARITH.decrementAndGet(accessor.getRaw());
++        accessor.setRaw(newVal);
++        return newVal;
++    }
++
++    public byte getAndDecrement() {
++        final byte current = accessor.getRaw();
++        final byte last = ARITH.getAndDecrement(current);
++        final byte newVal = ARITH.decrement(current);
++        accessor.setRaw(newVal);
++        return last;
++    }
++
++    public void subtract(final byte operand) {
++        accessor.setRaw(ARITH.subtract(accessor.getRaw(), operand));
++    }
++
++    public void subtract(final Number operand) {
++        accessor.setRaw(ARITH.subtract(accessor.getRaw(), operand));
++    }
++}

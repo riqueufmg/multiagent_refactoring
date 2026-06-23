@@ -1,0 +1,46 @@
+{
+  "id": 1,
+  "goal": "Introduce a new helper class to host TokeniserState's large private static methods and related constants so the enum's body is smaller and more focused on state variants.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateHelper.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "Create a new class org.jsoup.parser.TokeniserStateHelper in the same package. Copy the implementations of the private static methods from TokeniserState: handleDataEndTag, readRawData, readCharRef, readEndTag, handleDataDoubleEscapeTag, readDoctypeInternalSubset. Also copy the private static final arrays/fields used by those helpers (attributeNameCharsSorted, attributeValueUnquoted) into the helper as package-private or public static final as appropriate so the helper is self-contained. The helper methods should accept the same parameters (Tokeniser t, CharacterReader r, TokeniserState ... as in originals) and be declared static. Do not remove the originals yet; this step only creates the helper class with the same logic, so the codebase remains compilable.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "Add imports required by the moved code into TokeniserStateHelper (org.jsoup.internal.StringUtil and org.jsoup.nodes.DocumentType) and any other types referenced by the copied methods (Token, TokenData, etc.). Ensure package declaration matches org.jsoup.parser.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ]
+}

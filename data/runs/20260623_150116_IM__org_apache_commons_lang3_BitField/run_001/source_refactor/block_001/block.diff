@@ -1,0 +1,468 @@
+commit f159c11b3799f1542ef350957cdaab93acdb38e8
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 15:08:37 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/BitField.java b/src/main/java/org/apache/commons/lang3/BitField.java
+index 247460c06..24359224f 100644
+--- a/src/main/java/org/apache/commons/lang3/BitField.java
++++ b/src/main/java/org/apache/commons/lang3/BitField.java
+@@ -118,26 +118,6 @@ public long clear(final long holder) {
+         return holder & ~mask;
+     }
+ 
+-    /**
+-     * Clears the bits.
+-     *
+-     * @param holder the byte data containing the bits we're interested in.
+-     * @return the value of holder with the specified bits cleared (set to {@code 0}).
+-     */
+-    public byte clearByte(final byte holder) {
+-        return (byte) clear(holder);
+-    }
+-
+-    /**
+-     * Clears the bits.
+-     *
+-     * @param holder the short data containing the bits we're interested in.
+-     * @return the value of holder with the specified bits cleared (set to {@code 0}).
+-     */
+-    public short clearShort(final short holder) {
+-        return (short) clear(holder);
+-    }
+-
+     /**
+      * Gets the value for the specified BitField, unshifted.
+      *
+@@ -159,31 +139,6 @@ public long getRawValue(final long holder) {
+         return holder & mask;
+     }
+ 
+-    /**
+-     * Obtains the value for the specified BitField, unshifted.
+-     *
+-     * @param holder the short data containing the bits we're interested in.
+-     * @return the selected bits.
+-     */
+-    public short getShortRawValue(final short holder) {
+-        return (short) getRawValue(holder);
+-    }
+-
+-    /**
+-     * Gets the value for the specified BitField, appropriately shifted right, as a short.
+-     * <p>
+-     * Many users of a BitField will want to treat the specified bits as an int value, and will not want to be aware that the value is stored as a BitField (and
+-     * so shifted left so many bits).
+-     * </p>
+-     *
+-     * @param holder the short data containing the bits we're interested in.
+-     * @return the selected bits, shifted right appropriately.
+-     * @see #setShortValue(short,short)
+-     */
+-    public short getShortValue(final short holder) {
+-        return (short) getValue(holder);
+-    }
+-
+     /**
+      * Gets the value for the specified BitField, appropriately shifted right.
+      * <p>
+@@ -315,60 +270,6 @@ public long setBoolean(final long holder, final boolean flag) {
+         return flag ? set(holder) : clear(holder);
+     }
+ 
+-    /**
+-     * Sets the bits.
+-     *
+-     * @param holder the byte data containing the bits we're interested in
+-     * @return the value of holder with the specified bits set to {@code 1}
+-     */
+-    public byte setByte(final byte holder) {
+-        return (byte) set(holder);
+-    }
+-
+-    /**
+-     * Sets a boolean BitField.
+-     *
+-     * @param holder the byte data containing the bits we're interested in.
+-     * @param flag   indicating whether to set or clear the bits.
+-     * @return the value of holder with the specified bits set or cleared.
+-     */
+-    public byte setByteBoolean(final byte holder, final boolean flag) {
+-        return flag ? setByte(holder) : clearByte(holder);
+-    }
+-
+-    /**
+-     * Sets the bits.
+-     *
+-     * @param holder the short data containing the bits we're interested in.
+-     * @return the value of holder with the specified bits set to {@code 1}.
+-     */
+-    public short setShort(final short holder) {
+-        return (short) set(holder);
+-    }
+-
+-    /**
+-     * Sets a boolean BitField.
+-     *
+-     * @param holder the short data containing the bits we're interested in.
+-     * @param flag   indicating whether to set or clear the bits.
+-     * @return the value of holder with the specified bits set or cleared.
+-     */
+-    public short setShortBoolean(final short holder, final boolean flag) {
+-        return flag ? setShort(holder) : clearShort(holder);
+-    }
+-
+-    /**
+-     * Sets the bits with new values.
+-     *
+-     * @param holder the short data containing the bits we're interested in
+-     * @param value  the new value for the specified bits
+-     * @return the value of holder with the bits from the value parameter replacing the old bits
+-     * @see #getShortValue(short)
+-     */
+-    public short setShortValue(final short holder, final short value) {
+-        return (short) setValue(holder, value);
+-    }
+-
+     /**
+      * Sets the bits with new values.
+      *
+diff --git a/src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java b/src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java
+new file mode 100644
+index 000000000..afd920e1d
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java
+@@ -0,0 +1,66 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.apache.commons.lang3;
++
++/**
++ * Helper class to host byte/short convenience operations for a BitField delegate.
++ */
++public class BitFieldPrimitives {
++
++    private final BitField delegate;
++
++    public BitFieldPrimitives(final BitField delegate) {
++        this.delegate = delegate;
++    }
++
++    public byte clearByte(final byte holder) {
++        return (byte) delegate.clear(holder);
++    }
++
++    public short clearShort(final short holder) {
++        return (short) delegate.clear(holder);
++    }
++
++    public short getShortRawValue(final short holder) {
++        return (short) delegate.getRawValue(holder);
++    }
++
++    public short getShortValue(final short holder) {
++        return (short) delegate.getValue(holder);
++    }
++
++    public byte setByte(final byte holder) {
++        return (byte) delegate.set(holder);
++    }
++
++    public byte setByteBoolean(final byte holder, final boolean flag) {
++        return flag ? setByte(holder) : clearByte(holder);
++    }
++
++    public short setShort(final short holder) {
++        return (short) delegate.set(holder);
++    }
++
++    public short setShortBoolean(final short holder, final boolean flag) {
++        return flag ? setShort(holder) : clearShort(holder);
++    }
++
++    public short setShortValue(final short holder, final short value) {
++        return (short) delegate.setValue(holder, value);
++    }
++}
+diff --git a/src/test/java/org/apache/commons/lang3/BitFieldLongTest.java b/src/test/java/org/apache/commons/lang3/BitFieldLongTest.java
+index ad2c19a24..b9ed380d3 100644
+--- a/src/test/java/org/apache/commons/lang3/BitFieldLongTest.java
++++ b/src/test/java/org/apache/commons/lang3/BitFieldLongTest.java
+@@ -37,26 +37,26 @@ class BitFieldLongTest extends AbstractLangTest {
+ 
+     @Test
+     void testByteBoolean() {
+-        assertEquals(0, new BitField(0L).setByteBoolean((byte) 0, true));
+-        assertEquals(1, new BitField(1L).setByteBoolean((byte) 0, true));
+-        assertEquals(2, new BitField(2L).setByteBoolean((byte) 0, true));
+-        assertEquals(4, new BitField(4L).setByteBoolean((byte) 0, true));
+-        assertEquals(8, new BitField(8L).setByteBoolean((byte) 0, true));
+-        assertEquals(16, new BitField(16L).setByteBoolean((byte) 0, true));
+-        assertEquals(32, new BitField(32L).setByteBoolean((byte) 0, true));
+-        assertEquals(64, new BitField(64L).setByteBoolean((byte) 0, true));
+-        assertEquals(-128, new BitField(128L).setByteBoolean((byte) 0, true));
+-        assertEquals(1, new BitField(0L).setByteBoolean((byte) 1, false));
+-        assertEquals(0, new BitField(1L).setByteBoolean((byte) 1, false));
+-        assertEquals(0, new BitField(2L).setByteBoolean((byte) 2, false));
+-        assertEquals(0, new BitField(4L).setByteBoolean((byte) 4, false));
+-        assertEquals(0, new BitField(8L).setByteBoolean((byte) 8, false));
+-        assertEquals(0, new BitField(16L).setByteBoolean((byte) 16, false));
+-        assertEquals(0, new BitField(32L).setByteBoolean((byte) 32, false));
+-        assertEquals(0, new BitField(64L).setByteBoolean((byte) 64, false));
+-        assertEquals(0, new BitField(128L).setByteBoolean((byte) 128, false));
+-        assertEquals(-2, new BitField(1L).setByteBoolean((byte) 255, false));
+-        final byte clearedBit = new BitField(0x40L).setByteBoolean((byte) - 63, false);
++        assertEquals(0, new BitFieldPrimitives(new BitField(0L)).setByteBoolean((byte) 0, true));
++        assertEquals(1, new BitFieldPrimitives(new BitField(1L)).setByteBoolean((byte) 0, true));
++        assertEquals(2, new BitFieldPrimitives(new BitField(2L)).setByteBoolean((byte) 0, true));
++        assertEquals(4, new BitFieldPrimitives(new BitField(4L)).setByteBoolean((byte) 0, true));
++        assertEquals(8, new BitFieldPrimitives(new BitField(8L)).setByteBoolean((byte) 0, true));
++        assertEquals(16, new BitFieldPrimitives(new BitField(16L)).setByteBoolean((byte) 0, true));
++        assertEquals(32, new BitFieldPrimitives(new BitField(32L)).setByteBoolean((byte) 0, true));
++        assertEquals(64, new BitFieldPrimitives(new BitField(64L)).setByteBoolean((byte) 0, true));
++        assertEquals(-128, new BitFieldPrimitives(new BitField(128L)).setByteBoolean((byte) 0, true));
++        assertEquals(1, new BitFieldPrimitives(new BitField(0L)).setByteBoolean((byte) 1, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(1L)).setByteBoolean((byte) 1, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(2L)).setByteBoolean((byte) 2, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(4L)).setByteBoolean((byte) 4, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(8L)).setByteBoolean((byte) 8, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(16L)).setByteBoolean((byte) 16, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(32L)).setByteBoolean((byte) 32, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(64L)).setByteBoolean((byte) 64, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(128L)).setByteBoolean((byte) 128, false));
++        assertEquals(-2, new BitFieldPrimitives(new BitField(1L)).setByteBoolean((byte) 255, false));
++        final byte clearedBit = new BitFieldPrimitives(new BitField(0x40L)).setByteBoolean((byte) - 63, false);
+         assertFalse(new BitField(0x40).isSet(clearedBit));
+     }
+ 
+@@ -91,12 +91,12 @@ void testClearLong() {
+      */
+     @Test
+     void testClearShort() {
+-        assertEquals(BF_MULTI.clearShort((short) - 1), (short) 0xC07F);
+-        assertEquals(BF_SINGLE.clearShort((short) - 1), (short) 0xBFFF);
+-        assertEquals(BF_ZERO.clearShort((short) -1), (short) 0xFFFF);
+-        assertEquals(BF_MULTI_L.clearShort((short) - 1), (short) 0xFFFF);
+-        assertEquals(BF_SINGLE_L.clearShort((short) - 1), (short) 0xFFFF);
+-        assertEquals(BF_ZERO_L.clearShort((short) -1), (short) 0xFFFF);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).clearShort((short) - 1), (short) 0xC07F);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).clearShort((short) - 1), (short) 0xBFFF);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).clearShort((short) -1), (short) 0xFFFF);
++        assertEquals(new BitFieldPrimitives(BF_MULTI_L).clearShort((short) - 1), (short) 0xFFFF);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE_L).clearShort((short) - 1), (short) 0xFFFF);
++        assertEquals(new BitFieldPrimitives(BF_ZERO_L).clearShort((short) -1), (short) 0xFFFF);
+     }
+ 
+     @Test
+@@ -143,19 +143,19 @@ void testGetRawValue() {
+     @Test
+     void testGetShortRawValue() {
+         // mask < max int and short input
+-        assertEquals(BF_MULTI.getShortRawValue((short) - 1), (short) 0x3F80);
+-        assertEquals(BF_MULTI.getShortRawValue((short) 0), (short) 0);
+-        assertEquals(BF_SINGLE.getShortRawValue((short) - 1), (short) 0x4000);
+-        assertEquals(BF_SINGLE.getShortRawValue((short) 0), (short) 0);
+-        assertEquals(BF_ZERO.getShortRawValue((short) -1), (short) 0);
+-        assertEquals(BF_ZERO.getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).getShortRawValue((short) - 1), (short) 0x3F80);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortRawValue((short) - 1), (short) 0x4000);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).getShortRawValue((short) -1), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).getShortRawValue((short) 0), (short) 0);
+         // mask > max int and short input
+-        assertEquals(BF_MULTI_L.getShortRawValue((short) - 1), (short) 0);
+-        assertEquals(BF_MULTI_L.getShortRawValue((short) 0), (short) 0);
+-        assertEquals(BF_SINGLE_L.getShortRawValue((short) - 1), (short) 0);
+-        assertEquals(BF_SINGLE_L.getShortRawValue((short) 0), (short) 0);
+-        assertEquals(BF_ZERO_L.getShortRawValue((short) -1), (short) 0);
+-        assertEquals(BF_ZERO_L.getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI_L).getShortRawValue((short) - 1), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI_L).getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE_L).getShortRawValue((short) - 1), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE_L).getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO_L).getShortRawValue((short) -1), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO_L).getShortRawValue((short) 0), (short) 0);
+     }
+ 
+     /**
+diff --git a/src/test/java/org/apache/commons/lang3/BitFieldTest.java b/src/test/java/org/apache/commons/lang3/BitFieldTest.java
+index c91f92530..bc049c79d 100644
+--- a/src/test/java/org/apache/commons/lang3/BitFieldTest.java
++++ b/src/test/java/org/apache/commons/lang3/BitFieldTest.java
+@@ -36,26 +36,26 @@ class BitFieldTest extends AbstractLangTest {
+ 
+     @Test
+     void testByteBoolean() {
+-        assertEquals(0, new BitField(0).setByteBoolean((byte) 0, true));
+-        assertEquals(1, new BitField(1).setByteBoolean((byte) 0, true));
+-        assertEquals(2, new BitField(2).setByteBoolean((byte) 0, true));
+-        assertEquals(4, new BitField(4).setByteBoolean((byte) 0, true));
+-        assertEquals(8, new BitField(8).setByteBoolean((byte) 0, true));
+-        assertEquals(16, new BitField(16).setByteBoolean((byte) 0, true));
+-        assertEquals(32, new BitField(32).setByteBoolean((byte) 0, true));
+-        assertEquals(64, new BitField(64).setByteBoolean((byte) 0, true));
+-        assertEquals(-128, new BitField(128).setByteBoolean((byte) 0, true));
+-        assertEquals(1, new BitField(0).setByteBoolean((byte) 1, false));
+-        assertEquals(0, new BitField(1).setByteBoolean((byte) 1, false));
+-        assertEquals(0, new BitField(2).setByteBoolean((byte) 2, false));
+-        assertEquals(0, new BitField(4).setByteBoolean((byte) 4, false));
+-        assertEquals(0, new BitField(8).setByteBoolean((byte) 8, false));
+-        assertEquals(0, new BitField(16).setByteBoolean((byte) 16, false));
+-        assertEquals(0, new BitField(32).setByteBoolean((byte) 32, false));
+-        assertEquals(0, new BitField(64).setByteBoolean((byte) 64, false));
+-        assertEquals(0, new BitField(128).setByteBoolean((byte) 128, false));
+-        assertEquals(-2, new BitField(1).setByteBoolean((byte) 255, false));
+-        final byte clearedBit = new BitField(0x40).setByteBoolean((byte) -63, false);
++        assertEquals(0, new BitFieldPrimitives(new BitField(0)).setByteBoolean((byte) 0, true));
++        assertEquals(1, new BitFieldPrimitives(new BitField(1)).setByteBoolean((byte) 0, true));
++        assertEquals(2, new BitFieldPrimitives(new BitField(2)).setByteBoolean((byte) 0, true));
++        assertEquals(4, new BitFieldPrimitives(new BitField(4)).setByteBoolean((byte) 0, true));
++        assertEquals(8, new BitFieldPrimitives(new BitField(8)).setByteBoolean((byte) 0, true));
++        assertEquals(16, new BitFieldPrimitives(new BitField(16)).setByteBoolean((byte) 0, true));
++        assertEquals(32, new BitFieldPrimitives(new BitField(32)).setByteBoolean((byte) 0, true));
++        assertEquals(64, new BitFieldPrimitives(new BitField(64)).setByteBoolean((byte) 0, true));
++        assertEquals(-128, new BitFieldPrimitives(new BitField(128)).setByteBoolean((byte) 0, true));
++        assertEquals(1, new BitFieldPrimitives(new BitField(0)).setByteBoolean((byte) 1, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(1)).setByteBoolean((byte) 1, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(2)).setByteBoolean((byte) 2, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(4)).setByteBoolean((byte) 4, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(8)).setByteBoolean((byte) 8, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(16)).setByteBoolean((byte) 16, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(32)).setByteBoolean((byte) 32, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(64)).setByteBoolean((byte) 64, false));
++        assertEquals(0, new BitFieldPrimitives(new BitField(128)).setByteBoolean((byte) 128, false));
++        assertEquals(-2, new BitFieldPrimitives(new BitField(1)).setByteBoolean((byte) 255, false));
++        final byte clearedBit = new BitFieldPrimitives(new BitField(0x40)).setByteBoolean((byte) -63, false);
+         assertFalse(new BitField(0x40).isSet(clearedBit));
+     }
+ 
+@@ -84,9 +84,9 @@ void testClearLong() {
+      */
+     @Test
+     void testClearShort() {
+-        assertEquals(BF_MULTI.clearShort((short) -1), (short) 0xC07F);
+-        assertEquals(BF_SINGLE.clearShort((short) -1), (short) 0xBFFF);
+-        assertEquals(BF_ZERO.clearShort((short) -1), (short) 0xFFFF);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).clearShort((short) -1), (short) 0xC07F);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).clearShort((short) -1), (short) 0xBFFF);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).clearShort((short) -1), (short) 0xFFFF);
+     }
+ 
+     /**
+@@ -107,12 +107,12 @@ void testGetRawValue() {
+      */
+     @Test
+     void testGetShortRawValue() {
+-        assertEquals(BF_MULTI.getShortRawValue((short) -1), (short) 0x3F80);
+-        assertEquals(BF_MULTI.getShortRawValue((short) 0), (short) 0);
+-        assertEquals(BF_SINGLE.getShortRawValue((short) -1), (short) 0x4000);
+-        assertEquals(BF_SINGLE.getShortRawValue((short) 0), (short) 0);
+-        assertEquals(BF_ZERO.getShortRawValue((short) -1), (short) 0);
+-        assertEquals(BF_ZERO.getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).getShortRawValue((short) -1), (short) 0x3F80);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortRawValue((short) -1), (short) 0x4000);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortRawValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).getShortRawValue((short) -1), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).getShortRawValue((short) 0), (short) 0);
+     }
+ 
+     /**
+@@ -120,12 +120,12 @@ void testGetShortRawValue() {
+      */
+     @Test
+     void testGetShortValue() {
+-        assertEquals(BF_MULTI.getShortValue((short) -1), (short) 127);
+-        assertEquals(BF_MULTI.getShortValue((short) 0), (short) 0);
+-        assertEquals(BF_SINGLE.getShortValue((short) -1), (short) 1);
+-        assertEquals(BF_SINGLE.getShortValue((short) 0), (short) 0);
+-        assertEquals(BF_ZERO.getShortValue((short) -1), (short) 0);
+-        assertEquals(BF_ZERO.getShortValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).getShortValue((short) -1), (short) 127);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).getShortValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortValue((short) -1), (short) 1);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortValue((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).getShortValue((short) -1), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).getShortValue((short) 0), (short) 0);
+     }
+ 
+     /**
+@@ -218,9 +218,9 @@ void testSetBoolean() {
+      */
+     @Test
+     void testSetShort() {
+-        assertEquals(BF_MULTI.setShort((short) 0), (short) 0x3F80);
+-        assertEquals(BF_SINGLE.setShort((short) 0), (short) 0x4000);
+-        assertEquals(BF_ZERO.setShort((short) 0), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).setShort((short) 0), (short) 0x3F80);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).setShort((short) 0), (short) 0x4000);
++        assertEquals(new BitFieldPrimitives(BF_ZERO).setShort((short) 0), (short) 0);
+     }
+ 
+     /**
+@@ -228,12 +228,12 @@ void testSetShort() {
+      */
+     @Test
+     void testSetShortBoolean() {
+-        assertEquals(BF_MULTI.setShort((short) 0), BF_MULTI.setShortBoolean((short) 0, true));
+-        assertEquals(BF_SINGLE.setShort((short) 0), BF_SINGLE.setShortBoolean((short) 0, true));
+-        assertEquals(BF_ZERO.setShort((short) 0), BF_ZERO.setShortBoolean((short) 0, true));
+-        assertEquals(BF_MULTI.clearShort((short) -1), BF_MULTI.setShortBoolean((short) -1, false));
+-        assertEquals(BF_SINGLE.clearShort((short) -1), BF_SINGLE.setShortBoolean((short) -1, false));
+-        assertEquals(BF_ZERO.clearShort((short) -1), BF_ZERO.setShortBoolean((short) -1, false));
++        assertEquals(new BitFieldPrimitives(BF_MULTI).setShort((short) 0), new BitFieldPrimitives(BF_MULTI).setShortBoolean((short) 0, true));
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).setShort((short) 0), new BitFieldPrimitives(BF_SINGLE).setShortBoolean((short) 0, true));
++        assertEquals(new BitFieldPrimitives(BF_ZERO).setShort((short) 0), new BitFieldPrimitives(BF_ZERO).setShortBoolean((short) 0, true));
++        assertEquals(new BitFieldPrimitives(BF_MULTI).clearShort((short) -1), new BitFieldPrimitives(BF_MULTI).setShortBoolean((short) -1, false));
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).clearShort((short) -1), new BitFieldPrimitives(BF_SINGLE).setShortBoolean((short) -1, false));
++        assertEquals(new BitFieldPrimitives(BF_ZERO).clearShort((short) -1), new BitFieldPrimitives(BF_ZERO).setShortBoolean((short) -1, false));
+     }
+ 
+     /**
+@@ -243,21 +243,21 @@ void testSetShortBoolean() {
+     void testSetShortValue() {
+         final int limit = 128;
+         for (int j = 0; j < limit; j++) {
+-            assertEquals(BF_MULTI.getShortValue(BF_MULTI.setShortValue((short) 0, (short) j)), (short) j);
+-            assertEquals(BF_MULTI.setShortValue((short) 0, (short) j), (short) (j << 7));
++            assertEquals(new BitFieldPrimitives(BF_MULTI).getShortValue(new BitFieldPrimitives(BF_MULTI).setShortValue((short) 0, (short) j)), (short) j);
++            assertEquals(new BitFieldPrimitives(BF_MULTI).setShortValue((short) 0, (short) j), (short) (j << 7));
+         }
+         for (int j = 0; j < limit; j++) {
+-            assertEquals(BF_ZERO.getShortValue(BF_ZERO.setShortValue((short) 0, (short) j)), (short) 0);
+-            assertEquals(BF_ZERO.setShortValue((short) 0, (short) j), (short) 0);
++            assertEquals(new BitFieldPrimitives(BF_ZERO).getShortValue(new BitFieldPrimitives(BF_ZERO).setShortValue((short) 0, (short) j)), (short) 0);
++            assertEquals(new BitFieldPrimitives(BF_ZERO).setShortValue((short) 0, (short) j), (short) 0);
+         }
+         // verify that excess bits are stripped off
+-        assertEquals(BF_MULTI.setShortValue((short) 0x3f80, (short) 128), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_MULTI).setShortValue((short) 0x3f80, (short) 128), (short) 0);
+         for (int j = 0; j < 2; j++) {
+-            assertEquals(BF_SINGLE.getShortValue(BF_SINGLE.setShortValue((short) 0, (short) j)), (short) j);
+-            assertEquals(BF_SINGLE.setShortValue((short) 0, (short) j), (short) (j << 14));
++            assertEquals(new BitFieldPrimitives(BF_SINGLE).getShortValue(new BitFieldPrimitives(BF_SINGLE).setShortValue((short) 0, (short) j)), (short) j);
++            assertEquals(new BitFieldPrimitives(BF_SINGLE).setShortValue((short) 0, (short) j), (short) (j << 14));
+         }
+         // verify that excess bits are stripped off
+-        assertEquals(BF_SINGLE.setShortValue((short) 0x4000, (short) 2), (short) 0);
++        assertEquals(new BitFieldPrimitives(BF_SINGLE).setShortValue((short) 0x4000, (short) 2), (short) 0);
+     }
+ 
+     /**

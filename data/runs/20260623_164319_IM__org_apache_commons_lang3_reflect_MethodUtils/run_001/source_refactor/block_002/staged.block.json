@@ -1,0 +1,74 @@
+{
+  "id": 2,
+  "goal": "Extract method-finding and matching logic into a dedicated class to separate discovery responsibilities from invocation and annotation utilities.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/MethodFinder.java",
+    "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "MethodUtils.getMatchingAccessibleMethod(Class<?>,String,Class<?>...)",
+        "MethodUtils.getMatchingMethod(Class<?>,String,Class<?>...)",
+        "MethodUtils.getMethodObject(Class<?>,String,Class<?>...)",
+        "MethodUtils.distance(Class<?>[],Class<?>[])"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.reflect.MethodFinder (new class)",
+        "MethodFinder.getMatchingAccessibleMethod(Class<?>,String,Class<?>...)",
+        "MethodFinder.getMatchingMethod(Class<?>,String,Class<?>...)",
+        "MethodFinder.getMethodObject(Class<?>,String,Class<?>...)",
+        "MethodFinder.distance(Class<?>[],Class<?>[])"
+      ],
+      "details": "Create MethodFinder in the same package and move the method discovery logic there. Methods remain static. MethodFinder will call back to MethodUtils.getAccessibleMethod(...) when it needs access checks, preserving existing accessibility logic until that is refactored. Maintain deterministic sorting and candidate selection logic as-is.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodFinder.java"
+      ],
+      "outputs": [
+        "MethodFinder imports for java.lang.reflect.Method, java.util.*, java.util.stream.*, org.apache.commons.lang3.* as needed"
+      ],
+      "details": "Add required imports to MethodFinder so it compiles standalone (Comparator, ArrayUtils, ClassUtils, MemberUtils, Streams, LangCollectors).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java"
+      ],
+      "outputs": [
+        "Sites that previously called getMatchingAccessibleMethod/getMatchingMethod/getMethodObject/distance now call MethodFinder equivalents"
+      ],
+      "details": "Replace internal direct calls in MethodUtils and MethodInvoker to the moved methods with calls to MethodFinder to preserve behavior.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": 1,
+  "goal": "Reduce size and complexity of the InBody state by extracting its processing logic and helper methods into a dedicated handler class.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateInBodyHandler.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateInBodyHandler.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Create org.jsoup.parser.HtmlTreeBuilderStateInBodyHandler with static methods: processInBody(Token t, HtmlTreeBuilder tb), inBodyStartTag(Token t, HtmlTreeBuilder tb), inBodyEndTag(Token t, HtmlTreeBuilder tb), anyOtherEndTag(Token t, HtmlTreeBuilder tb), inBodyEndTagAdoption(Token t, HtmlTreeBuilder tb), and the private constant MaxStackScan. Move the InBody enum's full processing implementation and its private helpers into this class. Keep signatures using Token and HtmlTreeBuilder and reuse Element/Tag/TokeniserState/etc. Preserve behavior: the new class uses the same package org.jsoup.parser and imports as needed. The original enum's InBody override is replaced with a single call: return HtmlTreeBuilderStateInBodyHandler.processInBody(t, tb);",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateInBodyHandler.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Update the InBody enum element in HtmlTreeBuilderState to delegate to HtmlTreeBuilderStateInBodyHandler.processInBody(Token, HtmlTreeBuilder). Ensure references to moved private helpers are updated to call the static methods on the new handler class.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

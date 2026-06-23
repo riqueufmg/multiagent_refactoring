@@ -1,0 +1,116 @@
+{
+  "id": 2,
+  "goal": "Move rendering and validation responsibilities out of Attribute into AttributeUtil and update Attribute to delegate, reducing the Attribute class size and improving cohesion.",
+  "files": [
+    "src/main/java/org/jsoup/nodes/Attribute.java",
+    "src/main/java/org/jsoup/nodes/AttributeUtil.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/integration/netty/TestRequest.java",
+    "src/test/java/org/jsoup/nodes/AttributeTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/ParserSettingsTest.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java:booleanAttributes",
+        "src/main/java/org/jsoup/nodes/Attribute.java:xmlKeyReplace",
+        "src/main/java/org/jsoup/nodes/Attribute.java:htmlKeyReplace"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/AttributeUtil.java"
+      ],
+      "details": "Move the three private static fields booleanAttributes, xmlKeyReplace, and htmlKeyReplace from Attribute into AttributeUtil. They are stateless data used by validation and boolean checks.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java:getValidKey(java.lang.String,org.jsoup.nodes.Document.OutputSettings.Syntax)",
+        "src/main/java/org/jsoup/nodes/Attribute.java:isValidXmlKey(java.lang.String)",
+        "src/main/java/org/jsoup/nodes/Attribute.java:isValidHtmlKey(java.lang.String)",
+        "src/main/java/org/jsoup/nodes/Attribute.java:html(java.lang.String,@org.jspecify.annotations.Nullable java.lang.String,org.jsoup.internal.QuietAppendable,org.jsoup.nodes.Document.OutputSettings)",
+        "src/main/java/org/jsoup/nodes/Attribute.java:htmlNoValidate(java.lang.String,@org.jspecify.annotations.Nullable java.lang.String,org.jsoup.internal.QuietAppendable,org.jsoup.nodes.Document.OutputSettings)",
+        "src/main/java/org/jsoup/nodes/Attribute.java:isBooleanAttribute(java.lang.String)"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/AttributeUtil.java"
+      ],
+      "details": "Move the listed static methods from Attribute into AttributeUtil (as static methods). Ensure moved methods reference the moved fields in AttributeUtil and preserve access modifiers (public/static/private as appropriate).",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java"
+      ],
+      "details": "Update Attribute to delegate to AttributeUtil for moved functionality: - Replace internal calls to getValidKey(...) with AttributeUtil.getValidKey(...) - Replace calls to html(...) and htmlNoValidate(...) with AttributeUtil.html(...) and AttributeUtil.htmlNoValidate(...). Update shouldCollapseAttribute and other methods that call isBooleanAttribute(...) to call AttributeUtil.isBooleanAttribute(...). Remove the moved fields and methods from Attribute.java source. Add or update imports in Attribute.java to reference AttributeUtil if necessary. Keep behavior identical by delegating to AttributeUtil where previously logic existed in this class.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java",
+        "src/main/java/org/jsoup/nodes/AttributeUtil.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java",
+        "src/main/java/org/jsoup/nodes/AttributeUtil.java"
+      ],
+      "details": "Add required imports to AttributeUtil.java (copied from Attribute where necessary). In Attribute.java, add import for org.jsoup.nodes.AttributeUtil if not in same package (it is in same package, so explicit import is optional) and ensure imports remain consistent for referenced types. Remove any now-unused imports in Attribute.java relating only to the moved code (e.g., Pattern if no longer used in Attribute).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/integration/netty/TestRequest.java",
+        "src/test/java/org/jsoup/nodes/AttributeTest.java",
+        "src/test/java/org/jsoup/nodes/AttributesTest.java",
+        "src/test/java/org/jsoup/nodes/ElementTest.java",
+        "src/test/java/org/jsoup/nodes/NodeTest.java",
+        "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/parser/ParserSettingsTest.java",
+        "src/test/java/org/jsoup/parser/PositionTest.java",
+        "src/test/java/org/jsoup/parser/TokeniserTest.java",
+        "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java",
+        "src/test/java/org/jsoup/select/EvaluatorTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/integration/netty/TestRequest.java",
+    "src/test/java/org/jsoup/nodes/AttributeTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/ParserSettingsTest.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java"
+  ]
+}

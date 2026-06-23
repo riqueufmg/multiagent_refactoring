@@ -1,0 +1,51 @@
+{
+  "id": 2,
+  "goal": "Refactor the original DiffBuilder into a small facade that delegates diff construction to DiffBuilderCore, reducing public API surface and improving modularization.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+  ],
+  "ops": [
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "details": "Add or update imports if required by the delegation to DiffBuilderCore (no new external library imports). Ensure the file still imports classes already used (List, Arrays, Objects, ToStringStyle, DiffResult, Diff, ArrayUtils, ObjectUtils).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "details": "Replace the moved implementations in DiffBuilder with delegation to a private final DiffBuilderCore<T> core field. Keep the public API of DiffBuilder unchanged. Changes include: add a private final DiffBuilderCore<T> core; change existing constructors to initialize 'core' (for backward-compatible constructors preserve parameter lists and call new DiffBuilderCore<>(...)); delegate all append(...) overloads, build(), getLeft(), getRight() to corresponding methods on 'core'. Keep the nested public static Builder<T> unchanged in API but ensure its build() returns a DiffBuilder that constructs/initializes the internal DiffBuilderCore accordingly (i.e., Builder.build() should call new DiffBuilderCore<>(left, right, style, testObjectsEquals, toStringFormat) and then new DiffBuilder<>(thatCore) or a suitable DiffBuilder constructor that accepts DiffBuilderCore). Maintain deprecated constructors as delegating wrappers. Ensure no behavioral changes to callers: method signatures and return types remain identical.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+  ]
+}

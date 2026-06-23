@@ -1,0 +1,192 @@
+commit 5c27b149852f3150b0b21c20fe75ab2e9da4f509
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:43:33 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserState.java b/src/main/java/org/jsoup/parser/TokeniserState.java
+index 8dbdfce2..832a8cb5 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserState.java
++++ b/src/main/java/org/jsoup/parser/TokeniserState.java
+@@ -12,66 +12,29 @@ enum TokeniserState {
+     Data {
+         // in data state, gather characters until a character reference or tag is found
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            switch (r.current()) {
+-                case '&':
+-                    t.advanceTransition(CharacterReferenceInData);
+-                    break;
+-                case '<':
+-                    t.advanceTransition(TagOpen);
+-                    break;
+-                case nullChar:
+-                    t.error(this); // NOT replacement character (oddly?)
+-                    t.emit(r.consume());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.emit(new Token.EOF());
+-                    break;
+-                default:
+-                    String data = r.consumeData();
+-                    t.emit(data);
+-                    break;
+-            }
++            TokeniserStateDataFacade.readData(t, r);
+         }
+     },
+     CharacterReferenceInData {
+         // from & in data
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            TokeniserStateHelper.readCharRef(t, Data);
++            TokeniserStateDataFacade.readCharRefInData(t, r);
+         }
+     },
+     Rcdata { // Rcdata has text with character references
+         /// handles data in title, textarea etc
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            switch (r.current()) {
+-                case '&':
+-                    t.advanceTransition(CharacterReferenceInRcdata);
+-                    break;
+-                case '<':
+-                    t.advanceTransition(RcdataLessthanSign);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    r.advance();
+-                    t.emit(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.emit(new Token.EOF());
+-                    break;
+-                default:
+-                    String data = r.consumeData();
+-                    t.emit(data);
+-                    break;
+-            }
++            TokeniserStateDataFacade.readRcdata(t, r);
+         }
+     },
+     CharacterReferenceInRcdata {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            TokeniserStateHelper.readCharRef(t, Rcdata);
++            TokeniserStateDataFacade.readCharRefInRcdata(t, r);
+         }
+     },
+     Rawtext {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            TokeniserStateHelper.readRawData(t, r, this, RawtextLessthanSign);
++            TokeniserStateDataFacade.readRawtext(t, r);
+         }
+     },
+     ScriptData {
+@@ -81,20 +44,7 @@ enum TokeniserState {
+     },
+     PLAINTEXT {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            switch (r.current()) {
+-                case nullChar:
+-                    t.error(this);
+-                    r.advance();
+-                    t.emit(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.emit(new Token.EOF());
+-                    break;
+-                default:
+-                    String data = r.consumeTo(nullChar);
+-                    t.emit(data);
+-                    break;
+-            }
++            TokeniserStateDataFacade.readPlaintext(t, r);
+         }
+     },
+     TagOpen {
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateDataFacade.java b/src/main/java/org/jsoup/parser/TokeniserStateDataFacade.java
+new file mode 100644
+index 00000000..127abbd6
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/TokeniserStateDataFacade.java
+@@ -0,0 +1,82 @@
++package org.jsoup.parser;
++
++/**
++ * Facade to hold data-related Tokeniser state logic extracted from TokeniserState enum.
++ */
++final class TokeniserStateDataFacade {
++    private TokeniserStateDataFacade() {}
++
++    static void readData(Tokeniser t, CharacterReader r) {
++        switch (r.current()) {
++            case '&':
++                t.advanceTransition(TokeniserState.CharacterReferenceInData);
++                break;
++            case '<':
++                t.advanceTransition(TokeniserState.TagOpen);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.Data); // NOT replacement character (oddly?)
++                t.emit(r.consume());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.emit(new Token.EOF());
++                break;
++            default:
++                String data = r.consumeData();
++                t.emit(data);
++                break;
++        }
++    }
++
++    static void readCharRefInData(Tokeniser t, CharacterReader r) {
++        TokeniserStateHelper.readCharRef(t, TokeniserState.Data);
++    }
++
++    static void readRcdata(Tokeniser t, CharacterReader r) {
++        switch (r.current()) {
++            case '&':
++                t.advanceTransition(TokeniserState.CharacterReferenceInRcdata);
++                break;
++            case '<':
++                t.advanceTransition(TokeniserState.RcdataLessthanSign);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.Rcdata);
++                r.advance();
++                t.emit(TokeniserStateHelper.replacementChar());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.emit(new Token.EOF());
++                break;
++            default:
++                String data = r.consumeData();
++                t.emit(data);
++                break;
++        }
++    }
++
++    static void readCharRefInRcdata(Tokeniser t, CharacterReader r) {
++        TokeniserStateHelper.readCharRef(t, TokeniserState.Rcdata);
++    }
++
++    static void readRawtext(Tokeniser t, CharacterReader r) {
++        TokeniserStateHelper.readRawData(t, r, TokeniserState.Rawtext, TokeniserState.RawtextLessthanSign);
++    }
++
++    static void readPlaintext(Tokeniser t, CharacterReader r) {
++        switch (r.current()) {
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.PLAINTEXT);
++                r.advance();
++                t.emit(TokeniserStateHelper.replacementChar());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.emit(new Token.EOF());
++                break;
++            default:
++                String data = r.consumeTo(TokeniserState.nullChar);
++                t.emit(data);
++                break;
++        }
++    }
++}

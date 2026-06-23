@@ -1,0 +1,156 @@
+commit 60ef1a57defcd31a68c4ab6668ea69e34138e0f6
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 16:25:12 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+index 9e5da5fff..fc5a3b62b 100644
+--- a/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
++++ b/src/main/java/org/apache/commons/lang3/mutable/MutableByte.java
+@@ -86,7 +86,7 @@ public MutableByte(final String value) {
+      * @since 2.2
+      */
+     public void add(final byte operand) {
+-        this.value += operand;
++        this.value = MutableByteArithmetic.add(this.value, operand);
+     }
+ 
+     /**
+@@ -97,7 +97,7 @@ public void add(final byte operand) {
+      * @since 2.2
+      */
+     public void add(final Number operand) {
+-        this.value += operand.byteValue();
++        this.value = MutableByteArithmetic.add(this.value, operand);
+     }
+ 
+     /**
+@@ -109,8 +109,9 @@ public void add(final Number operand) {
+      * @since 3.5
+      */
+     public byte addAndGet(final byte operand) {
+-        this.value += operand;
+-        return value;
++        final byte newVal = MutableByteArithmetic.addAndGet(this.value, operand);
++        this.value = newVal;
++        return newVal;
+     }
+ 
+     /**
+@@ -123,8 +124,9 @@ public byte addAndGet(final byte operand) {
+      * @since 3.5
+      */
+     public byte addAndGet(final Number operand) {
+-        this.value += operand.byteValue();
+-        return value;
++        final byte newVal = MutableByteArithmetic.addAndGet(this.value, operand);
++        this.value = newVal;
++        return newVal;
+     }
+ 
+     // shortValue relies on Number implementation
+@@ -155,7 +157,7 @@ public int compareTo(final MutableByte other) {
+      * @since 2.2
+      */
+     public void decrement() {
+-        value--;
++        this.value = MutableByteArithmetic.decrement(this.value);
+     }
+ 
+     /**
+@@ -166,8 +168,9 @@ public void decrement() {
+      * @since 3.5
+      */
+     public byte decrementAndGet() {
+-        value--;
+-        return value;
++        final byte newVal = MutableByteArithmetic.decrementAndGet(this.value);
++        this.value = newVal;
++        return newVal;
+     }
+ 
+     /**
+@@ -215,8 +218,8 @@ public float floatValue() {
+      * @since 3.5
+      */
+     public byte getAndAdd(final byte operand) {
+-        final byte last = value;
+-        this.value += operand;
++        final byte last = MutableByteArithmetic.getAndAdd(this.value, operand);
++        this.value = MutableByteArithmetic.add(this.value, operand);
+         return last;
+     }
+ 
+@@ -230,8 +233,8 @@ public byte getAndAdd(final byte operand) {
+      * @since 3.5
+      */
+     public byte getAndAdd(final Number operand) {
+-        final byte last = value;
+-        this.value += operand.byteValue();
++        final byte last = MutableByteArithmetic.getAndAdd(this.value, operand);
++        this.value = MutableByteArithmetic.add(this.value, operand);
+         return last;
+     }
+ 
+@@ -243,8 +246,8 @@ public byte getAndAdd(final Number operand) {
+      * @since 3.5
+      */
+     public byte getAndDecrement() {
+-        final byte last = value;
+-        value--;
++        final byte last = MutableByteArithmetic.getAndDecrement(this.value);
++        this.value = MutableByteArithmetic.decrement(this.value);
+         return last;
+     }
+ 
+@@ -256,8 +259,8 @@ public byte getAndDecrement() {
+      * @since 3.5
+      */
+     public byte getAndIncrement() {
+-        final byte last = value;
+-        value++;
++        final byte last = MutableByteArithmetic.getAndIncrement(this.value);
++        this.value = MutableByteArithmetic.increment(this.value);
+         return last;
+     }
+ 
+@@ -289,7 +292,7 @@ public int hashCode() {
+      * @since 2.2
+      */
+     public void increment() {
+-        value++;
++        this.value = MutableByteArithmetic.increment(this.value);
+     }
+ 
+     /**
+@@ -300,8 +303,9 @@ public void increment() {
+      * @since 3.5
+      */
+     public byte incrementAndGet() {
+-        value++;
+-        return value;
++        final byte newVal = MutableByteArithmetic.incrementAndGet(this.value);
++        this.value = newVal;
++        return newVal;
+     }
+ 
+     /**
+@@ -351,7 +355,7 @@ public void setValue(final Number value) {
+      * @since 2.2
+      */
+     public void subtract(final byte operand) {
+-        this.value -= operand;
++        this.value = MutableByteArithmetic.subtract(this.value, operand);
+     }
+ 
+     /**
+@@ -362,7 +366,7 @@ public void subtract(final byte operand) {
+      * @since 2.2
+      */
+     public void subtract(final Number operand) {
+-        this.value -= operand.byteValue();
++        this.value = MutableByteArithmetic.subtract(this.value, operand);
+     }
+ 
+     /**

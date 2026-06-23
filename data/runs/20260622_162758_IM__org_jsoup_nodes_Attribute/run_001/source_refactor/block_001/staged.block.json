@@ -1,0 +1,74 @@
+{
+  "id": 1,
+  "goal": "Introduce a dedicated utility class to contain attribute-related rendering and validation helpers so Attribute can delegate non-state behavior.",
+  "files": [
+    "src/main/java/org/jsoup/nodes/Attribute.java",
+    "src/main/java/org/jsoup/nodes/AttributeUtil.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/integration/netty/TestRequest.java",
+    "src/test/java/org/jsoup/nodes/AttributeTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/ParserSettingsTest.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Attribute.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/AttributeUtil.java"
+      ],
+      "details": "Create a new utility class org.jsoup.nodes.AttributeUtil in the same package. Copy static helper implementations (rendering and key validation) from Attribute into AttributeUtil as static members so callers can use them via AttributeUtil. The new class should include required imports: org.jsoup.internal.StringUtil, org.jsoup.internal.QuietAppendable, org.jsoup.nodes.Document.OutputSettings, org.jsoup.internal.Normalizer, org.jsoup.internal.SharedConstants, org.jspecify.annotations.Nullable, java.util.regex.Pattern, java.util.Arrays, and any other types referenced by the moved code (Entities, Attributes). Implement the following static members in AttributeUtil (copied implementations): - private static final String[] booleanAttributes (copy contents) - private static final Pattern xmlKeyReplace - private static final Pattern htmlKeyReplace - public static String getValidKey(String key, Document.OutputSettings.Syntax syntax) - private static boolean isValidXmlKey(String key) - private static boolean isValidHtmlKey(String key) - static void html(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) - static void htmlNoValidate(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) - public static boolean isBooleanAttribute(final String key)\n\nDo not modify Attribute.java in this step; only add the new file so the project can compile with both classes present.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/integration/netty/TestRequest.java",
+        "src/test/java/org/jsoup/nodes/AttributeTest.java",
+        "src/test/java/org/jsoup/nodes/AttributesTest.java",
+        "src/test/java/org/jsoup/nodes/ElementTest.java",
+        "src/test/java/org/jsoup/nodes/NodeTest.java",
+        "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/parser/ParserSettingsTest.java",
+        "src/test/java/org/jsoup/parser/PositionTest.java",
+        "src/test/java/org/jsoup/parser/TokeniserTest.java",
+        "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java",
+        "src/test/java/org/jsoup/select/EvaluatorTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/integration/netty/TestRequest.java",
+    "src/test/java/org/jsoup/nodes/AttributeTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/ParserSettingsTest.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java"
+  ]
+}

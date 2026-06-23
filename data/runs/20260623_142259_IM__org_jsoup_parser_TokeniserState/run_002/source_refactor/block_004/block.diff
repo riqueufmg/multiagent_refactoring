@@ -1,0 +1,447 @@
+commit 5b6faf82171e5980bf17417ae3a1a613f46bb437
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:53:41 2026 -0300
+
+    source_refactor: apply block 4
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserState.java b/src/main/java/org/jsoup/parser/TokeniserState.java
+index 1f77d4c2..a4524dd3 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserState.java
++++ b/src/main/java/org/jsoup/parser/TokeniserState.java
+@@ -492,212 +492,47 @@ enum TokeniserState {
+     },
+     BogusComment {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            // todo: handle bogus comment starting from eof. when does that trigger?
+-            t.commentPending.append(r.consumeTo('>'));
+-            // todo: replace nullChar with replaceChar
+-            char next = r.current();
+-            if (next == '>' || next == TokeniserStateHelper.EOF) {
+-                r.consume();
+-                t.emitCommentPending();
+-                t.transition(Data);
+-            }
++            TokeniserStateCommentFacade.readBogusComment(t, r);
+         }
+     },
+     MarkupDeclarationOpen { // from <!
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            if (r.matchConsume("--")) {
+-                t.createCommentPending();
+-                t.transition(CommentStart);
+-            } else if (r.matchConsumeIgnoreCase("DOCTYPE")) {
+-                t.transition(Doctype);
+-            } else if (r.matchConsume("[CDATA[")) {
+-                // todo: should actually check current namespace, and only non-html allows cdata. until namespace
+-                // is implemented properly, keep handling as cdata
+-                //} else if (!t.currentNodeInHtmlNS() && r.matchConsume("[CDATA[")) {
+-                t.createTempBuffer();
+-                t.transition(CdataSection);
+-            } else {
+-                if (t.syntax == xml && r.matchesAsciiAlpha()) {
+-                    t.createXmlDeclPending(true);
+-                    t.transition(TagName); // treat <!ENTITY as XML Declaration, with tag-like handling
+-                } else {
+-                    t.error(this);
+-                    t.createBogusCommentPending();
+-                    t.transition(BogusComment);
+-                }
+-            }
++            TokeniserStateCommentFacade.readMarkupDeclarationOpen(t, r);
+         }
+     },
+     MarkupProcessingOpen { // From <? in syntax XML
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            if (r.matchesAsciiAlpha()) {
+-                t.createXmlDeclPending(false);
+-                t.transition(TagName); // treat <?xml... as XML Declaration (processing instruction), with tag-like handling
+-            } else {
+-                t.error(this);
+-                t.createBogusCommentPending();
+-                t.commentPending.append('?'); // push the ? to the start of the comment
+-                t.transition(BogusComment);
+-            }
++            TokeniserStateCommentFacade.readMarkupProcessingOpen(t, r);
+         }
+     },
+     CommentStart {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '-':
+-                    t.transition(CommentStartDash);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.commentPending.append(TokeniserStateHelper.replacementChar());
+-                    t.transition(Comment);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    r.unconsume();
+-                    t.transition(Comment);
+-            }
++            TokeniserStateCommentFacade.readCommentStart(t, r);
+         }
+     },
+     CommentStartDash {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '-':
+-                    t.transition(CommentEnd);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.commentPending.append(TokeniserStateHelper.replacementChar());
+-                    t.transition(Comment);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.commentPending.append(c);
+-                    t.transition(Comment);
+-            }
++            TokeniserStateCommentFacade.readCommentStartDash(t, r);
+         }
+     },
+     Comment {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.current();
+-            switch (c) {
+-                case '-':
+-                    t.advanceTransition(CommentEndDash);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    r.advance();
+-                    t.commentPending.append(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.commentPending.append(r.consumeToAny('-', nullChar));
+-            }
++            TokeniserStateCommentFacade.readComment(t, r);
+         }
+     },
+     CommentEndDash {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '-':
+-                    t.transition(CommentEnd);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.commentPending.append('-').append(TokeniserStateHelper.replacementChar());
+-                    t.transition(Comment);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.commentPending.append('-').append(c);
+-                    t.transition(Comment);
+-            }
++            TokeniserStateCommentFacade.readCommentEndDash(t, r);
+         }
+     },
+     CommentEnd {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '>':
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.commentPending.append("--").append(TokeniserStateHelper.replacementChar());
+-                    t.transition(Comment);
+-                    break;
+-                case '!':
+-                    t.transition(CommentEndBang);
+-                    break;
+-                case '-':
+-                    t.commentPending.append('-');
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.commentPending.append("--").append(c);
+-                    t.transition(Comment);
+-            }
++            TokeniserStateCommentFacade.readCommentEnd(t, r);
+         }
+     },
+     CommentEndBang {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '-':
+-                    t.commentPending.append("--!");
+-                    t.transition(CommentEndDash);
+-                    break;
+-                case '>':
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.commentPending.append("--!").append(TokeniserStateHelper.replacementChar());
+-                    t.transition(Comment);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitCommentPending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.commentPending.append("--!").append(c);
+-                    t.transition(Comment);
+-            }
++            TokeniserStateCommentFacade.readCommentEndBang(t, r);
+         }
+     },
+     Doctype {
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java b/src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java
+new file mode 100644
+index 00000000..cec27eff
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java
+@@ -0,0 +1,209 @@
++package org.jsoup.parser;
++
++import org.jsoup.nodes.DocumentType;
++
++import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
++
++final class TokeniserStateCommentFacade {
++
++    static void readBogusComment(Tokeniser t, CharacterReader r) {
++        // todo: handle bogus comment starting from eof. when does that trigger?
++        t.commentPending.append(r.consumeTo('>'));
++        // todo: replace nullChar with replaceChar
++        char next = r.current();
++        if (next == '>' || next == TokeniserStateHelper.EOF) {
++            r.consume();
++            t.emitCommentPending();
++            t.transition(TokeniserState.Data);
++        }
++    }
++
++    static void readMarkupDeclarationOpen(Tokeniser t, CharacterReader r) {
++        if (r.matchConsume("--")) {
++            t.createCommentPending();
++            t.transition(TokeniserState.CommentStart);
++        } else if (r.matchConsumeIgnoreCase("DOCTYPE")) {
++            t.transition(TokeniserState.Doctype);
++        } else if (r.matchConsume("[CDATA[")) {
++            // todo: should actually check current namespace, and only non-html allows cdata. until namespace
++            // is implemented properly, keep handling as cdata
++            //} else if (!t.currentNodeInHtmlNS() && r.matchConsume("[CDATA[")) {
++            t.createTempBuffer();
++            t.transition(TokeniserState.CdataSection);
++        } else {
++            if (t.syntax == xml && r.matchesAsciiAlpha()) {
++                t.createXmlDeclPending(true);
++                t.transition(TokeniserState.TagName); // treat <!ENTITY as XML Declaration, with tag-like handling
++            } else {
++                t.error(TokeniserState.MarkupDeclarationOpen);
++                t.createBogusCommentPending();
++                t.transition(TokeniserState.BogusComment);
++            }
++        }
++    }
++
++    static void readMarkupProcessingOpen(Tokeniser t, CharacterReader r) {
++        if (r.matchesAsciiAlpha()) {
++            t.createXmlDeclPending(false);
++            t.transition(TokeniserState.TagName); // treat <?xml... as XML Declaration (processing instruction), with tag-like handling
++        } else {
++            t.error(TokeniserState.MarkupProcessingOpen);
++            t.createBogusCommentPending();
++            t.commentPending.append('?'); // push the ? to the start of the comment
++            t.transition(TokeniserState.BogusComment);
++        }
++    }
++
++    static void readCommentStart(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '-':
++                t.transition(TokeniserState.CommentStartDash);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.CommentStart);
++                t.commentPending.append(TokeniserStateHelper.replacementChar());
++                t.transition(TokeniserState.Comment);
++                break;
++            case '>':
++                t.error(TokeniserState.CommentStart);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.CommentStart);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                r.unconsume();
++                t.transition(TokeniserState.Comment);
++        }
++    }
++
++    static void readCommentStartDash(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '-':
++                t.transition(TokeniserState.CommentEnd);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.CommentStartDash);
++                t.commentPending.append(TokeniserStateHelper.replacementChar());
++                t.transition(TokeniserState.Comment);
++                break;
++            case '>':
++                t.error(TokeniserState.CommentStartDash);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.CommentStartDash);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.commentPending.append(c);
++                t.transition(TokeniserState.Comment);
++        }
++    }
++
++    static void readComment(Tokeniser t, CharacterReader r) {
++        char c = r.current();
++        switch (c) {
++            case '-':
++                t.advanceTransition(TokeniserState.CommentEndDash);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.Comment);
++                r.advance();
++                t.commentPending.append(TokeniserStateHelper.replacementChar());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.Comment);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.commentPending.append(r.consumeToAny('-', TokeniserState.nullChar));
++        }
++    }
++
++    static void readCommentEndDash(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '-':
++                t.transition(TokeniserState.CommentEnd);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.CommentEndDash);
++                t.commentPending.append('-').append(TokeniserStateHelper.replacementChar());
++                t.transition(TokeniserState.Comment);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.CommentEndDash);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.commentPending.append('-').append(c);
++                t.transition(TokeniserState.Comment);
++        }
++    }
++
++    static void readCommentEnd(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '>':
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.CommentEnd);
++                t.commentPending.append("--").append(TokeniserStateHelper.replacementChar());
++                t.transition(TokeniserState.Comment);
++                break;
++            case '!':
++                t.transition(TokeniserState.CommentEndBang);
++                break;
++            case '-':
++                t.commentPending.append('-');
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.CommentEnd);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.commentPending.append("--").append(c);
++                t.transition(TokeniserState.Comment);
++        }
++    }
++
++    static void readCommentEndBang(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '-':
++                t.commentPending.append("--!");
++                t.transition(TokeniserState.CommentEndDash);
++                break;
++            case '>':
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.CommentEndBang);
++                t.commentPending.append("--!").append(TokeniserStateHelper.replacementChar());
++                t.transition(TokeniserState.Comment);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.CommentEndBang);
++                t.emitCommentPending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.commentPending.append("--!").append(c);
++                t.transition(TokeniserState.Comment);
++        }
++    }
++}

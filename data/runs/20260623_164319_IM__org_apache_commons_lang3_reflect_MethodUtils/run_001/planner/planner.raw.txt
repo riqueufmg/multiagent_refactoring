@@ -1,0 +1,285 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.reflect.MethodUtils",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract invocation and varargs-handling responsibilities into a new helper class to reduce MethodUtils size and group cohesive invocation logic.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "MethodUtils.invokeExactMethod(Object,String)",
+            "MethodUtils.invokeExactMethod(Object,String,Object...)",
+            "MethodUtils.invokeExactMethod(Object,String,Object[],Class<?>[])",
+            "MethodUtils.invokeExactStaticMethod(Class<?>,String,Object...)",
+            "MethodUtils.invokeExactStaticMethod(Class<?>,String,Object[],Class<?>[])",
+            "MethodUtils.invokeMethod(Object,boolean,String)",
+            "MethodUtils.invokeMethod(Object,boolean,String,Object...)",
+            "MethodUtils.invokeMethod(Object,boolean,String,Object[],Class<?>[])",
+            "MethodUtils.invokeMethod(Object,String)",
+            "MethodUtils.invokeMethod(Object,String,Object...)",
+            "MethodUtils.invokeMethod(Object,String,Object[],Class<?>[])",
+            "MethodUtils.invokeStaticMethod(Class<?>,String,Object...)",
+            "MethodUtils.invokeStaticMethod(Class<?>,String,Object[],Class<?>[])",
+            "MethodUtils.getInvokeMethod(boolean,String,Class<?>[],Class<?>)",
+            "MethodUtils.toVarArgs(Executable,Object[])",
+            "MethodUtils.toVarArgs(Object[],Class<?>[])",
+            "MethodUtils.requireNonNull(Method,Class<?>,String,Class<?>[])"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.reflect.MethodInvoker (new class)",
+            "MethodInvoker.invokeExactMethod(Object,String)",
+            "MethodInvoker.invokeExactMethod(Object,String,Object...)",
+            "MethodInvoker.invokeExactMethod(Object,String,Object[],Class<?>[])",
+            "MethodInvoker.invokeExactStaticMethod(Class<?>,String,Object...)",
+            "MethodInvoker.invokeExactStaticMethod(Class<?>,String,Object[],Class<?>[])",
+            "MethodInvoker.invokeMethod(Object,boolean,String)",
+            "MethodInvoker.invokeMethod(Object,boolean,String,Object...)",
+            "MethodInvoker.invokeMethod(Object,boolean,String,Object[],Class<?>[])",
+            "MethodInvoker.invokeMethod(Object,String)",
+            "MethodInvoker.invokeMethod(Object,String,Object...)",
+            "MethodInvoker.invokeMethod(Object,String,Object[],Class<?>[])",
+            "MethodInvoker.invokeStaticMethod(Class<?>,String,Object...)",
+            "MethodInvoker.invokeStaticMethod(Class<?>,String,Object[],Class<?>[])",
+            "MethodInvoker.getInvokeMethod(boolean,String,Class<?>[],Class<?>)",
+            "MethodInvoker.toVarArgs(Executable,Object[])",
+            "MethodInvoker.toVarArgs(Object[],Class<?>[])",
+            "MethodInvoker.requireNonNull(Method,Class<?>,String,Class<?>[])"
+          ],
+          "details": "Create a new class MethodInvoker in package org.apache.commons.lang3.reflect containing all invocation entry points and varargs transformation helpers. Methods retain original signatures but are made public static so callers (including MethodUtils) can delegate. Implementation reuses existing utilities (ClassUtils, MemberUtils, ArrayUtils) by importing them. This reduces MethodUtils size by grouping invocation concerns.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java"
+          ],
+          "outputs": [
+            "MethodInvoker imports for java.lang.reflect.Executable, java.lang.reflect.InvocationTargetException, java.lang.reflect.Method, java.lang.reflect.Array, java.lang.reflect.TypeVariable, java.lang.annotation.Annotation, java.util.*, java.util.stream.* and org.apache.commons.lang3.* as needed"
+          ],
+          "details": "Ensure MethodInvoker has all imports required for compilation (ArrayUtils, ClassUtils, MemberUtils, Streams, LangCollectors, Validate, TypeUtils where used).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "outputs": [
+            "MethodUtils delegates invocation-related calls to MethodInvoker (e.g., replace internal calls to invokeMethod/invokeStaticMethod/... with MethodInvoker.invokeMethod/...)"
+          ],
+          "details": "Update the original MethodUtils source to delegate invocation calls to MethodInvoker. Keep MethodUtils as a façade for backward compatibility by forwarding public API to MethodInvoker.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract method-finding and matching logic into a dedicated class to separate discovery responsibilities from invocation and annotation utilities.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodFinder.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "MethodUtils.getMatchingAccessibleMethod(Class<?>,String,Class<?>...)",
+            "MethodUtils.getMatchingMethod(Class<?>,String,Class<?>...)",
+            "MethodUtils.getMethodObject(Class<?>,String,Class<?>...)",
+            "MethodUtils.distance(Class<?>[],Class<?>[])"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.reflect.MethodFinder (new class)",
+            "MethodFinder.getMatchingAccessibleMethod(Class<?>,String,Class<?>...)",
+            "MethodFinder.getMatchingMethod(Class<?>,String,Class<?>...)",
+            "MethodFinder.getMethodObject(Class<?>,String,Class<?>...)",
+            "MethodFinder.distance(Class<?>[],Class<?>[])"
+          ],
+          "details": "Create MethodFinder in the same package and move the method discovery logic there. Methods remain static. MethodFinder will call back to MethodUtils.getAccessibleMethod(...) when it needs access checks, preserving existing accessibility logic until that is refactored. Maintain deterministic sorting and candidate selection logic as-is.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodFinder.java"
+          ],
+          "outputs": [
+            "MethodFinder imports for java.lang.reflect.Method, java.util.*, java.util.stream.*, org.apache.commons.lang3.* as needed"
+          ],
+          "details": "Add required imports to MethodFinder so it compiles standalone (Comparator, ArrayUtils, ClassUtils, MemberUtils, Streams, LangCollectors).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java"
+          ],
+          "outputs": [
+            "Sites that previously called getMatchingAccessibleMethod/getMatchingMethod/getMethodObject/distance now call MethodFinder equivalents"
+          ],
+          "details": "Replace internal direct calls in MethodUtils and MethodInvoker to the moved methods with calls to MethodFinder to preserve behavior.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract annotation-related utilities into a dedicated class grouping annotation lookup and method annotation listing logic.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodAnnotationUtils.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "MethodUtils.getAnnotation(Method,Class<A>,boolean,boolean)",
+            "MethodUtils.getMethodsListWithAnnotation(Class<?>,Class<? extends Annotation>)",
+            "MethodUtils.getMethodsListWithAnnotation(Class<?>,Class<? extends Annotation>,boolean,boolean)",
+            "MethodUtils.getMethodsWithAnnotation(Class<?>,Class<? extends Annotation>)",
+            "MethodUtils.getMethodsWithAnnotation(Class<?>,Class<? extends Annotation>,boolean,boolean)"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.reflect.MethodAnnotationUtils (new class)",
+            "MethodAnnotationUtils.getAnnotation(Method,Class<A>,boolean,boolean)",
+            "MethodAnnotationUtils.getMethodsListWithAnnotation(Class<?>,Class<? extends Annotation>)",
+            "MethodAnnotationUtils.getMethodsListWithAnnotation(Class<?>,Class<? extends Annotation>,boolean,boolean)",
+            "MethodAnnotationUtils.getMethodsWithAnnotation(Class<?>,Class<? extends Annotation>)",
+            "MethodAnnotationUtils.getMethodsWithAnnotation(Class<?>,Class<? extends Annotation>,boolean,boolean)"
+          ],
+          "details": "Create MethodAnnotationUtils and move annotation lookup and listing methods. Keep method contracts identical. If these methods depend on getAllSuperclassesAndInterfaces, they will reference MethodUtils.getAllSuperclassesAndInterfaces until that helper is refactored in a separate block.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodAnnotationUtils.java"
+          ],
+          "outputs": [
+            "MethodAnnotationUtils imports for java.lang.annotation.Annotation, java.lang.reflect.Method, java.util.*, java.util.stream.* and org.apache.commons.lang3.*"
+          ],
+          "details": "Add imports required by annotation utilities (ArrayUtils, ClassUtils, Validate, Streams, LangCollectors).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "outputs": [
+            "MethodUtils delegates getAnnotation and getMethodsWithAnnotation(...) calls to MethodAnnotationUtils"
+          ],
+          "details": "Update MethodUtils to delegate public annotation-related API to MethodAnnotationUtils to preserve backward compatibility.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Extract accessibility-related utilities (accessible-method resolution and interface/superclass scanning) into a focused class to separate accessibility concerns.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/MethodAccessibility.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "MethodUtils.getAccessibleMethod(Class<?>,Method)",
+            "MethodUtils.getAccessibleMethod(Class<?>,String,Class<?>...)",
+            "MethodUtils.getAccessibleMethod(Method)",
+            "MethodUtils.getAccessibleMethodFromInterfaceNest(Class<?>,String,Class<?>...)",
+            "MethodUtils.getAccessibleMethodFromSuperclass(Class<?>,String,Class<?>...)"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.reflect.MethodAccessibility (new class)",
+            "MethodAccessibility.getAccessibleMethod(Class<?>,Method)",
+            "MethodAccessibility.getAccessibleMethod(Class<?>,String,Class<?>...)",
+            "MethodAccessibility.getAccessibleMethod(Method)",
+            "MethodAccessibility.getAccessibleMethodFromInterfaceNest(Class<?>,String,Class<?>...)",
+            "MethodAccessibility.getAccessibleMethodFromSuperclass(Class<?>,String,Class<?>...)"
+          ],
+          "details": "Create MethodAccessibility and move accessibility-resolution logic. The new class will expose public static methods matching previous MethodUtils signatures so callers can delegate. It preserves interface-nest and superclass scanning semantics and uses ClassUtils and MemberUtils as before.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodAccessibility.java"
+          ],
+          "outputs": [
+            "MethodAccessibility imports for java.lang.reflect.Method, java.util.*, org.apache.commons.lang3.* and others as needed"
+          ],
+          "details": "Add required imports so MethodAccessibility compiles standalone.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodFinder.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java",
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "outputs": [
+            "All internal usages of getAccessibleMethod and related helper calls updated to call MethodAccessibility equivalents"
+          ],
+          "details": "Replace internal references (in MethodFinder, MethodInvoker and remaining MethodUtils code) to accessibility methods with calls to MethodAccessibility to maintain behavior.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "goal": "Introduce a light façade in MethodUtils that composes the new extracted classes and preserves the original public API while delegating responsibilities.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "MethodInvoker (new class)",
+            "MethodFinder (new class)",
+            "MethodAnnotationUtils (new class)",
+            "MethodAccessibility (new class)"
+          ],
+          "outputs": [
+            "MethodUtils updated to forward public API calls to the corresponding helper classes while retaining deprecated constructor and original public signatures"
+          ],
+          "details": "Keep MethodUtils as the public façade expected by callers. Replace internal implementations with simple delegates: invocation methods forward to MethodInvoker, discovery methods to MethodFinder, annotation methods to MethodAnnotationUtils, accessibility checks to MethodAccessibility. This reduces class size and groups cohesive logic into focused classes while maintaining backward-compatible API.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+          ],
+          "outputs": [
+            "MethodUtils imports updated to reference the new helper classes in the same package"
+          ],
+          "details": "Adjust imports in MethodUtils as necessary to reference MethodInvoker, MethodFinder, MethodAnnotationUtils, and MethodAccessibility.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "project-wide references to org.apache.commons.lang3.reflect.MethodUtils"
+          ],
+          "outputs": [
+            "No external call-site changes required because MethodUtils continues to expose the same public API; internal delegates are updated."
+          ],
+          "details": "Since MethodUtils continues to expose the same public signatures, external call sites need no changes. Internal code was updated in prior blocks to refer to extracted classes.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

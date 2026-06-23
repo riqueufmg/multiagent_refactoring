@@ -1,0 +1,305 @@
+commit 21e110b624299801d10df0f8b43213b8e2a3f163
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 13:50:37 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index 8fa75a44..d2391a76 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -24,7 +24,7 @@ import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;
+ enum HtmlTreeBuilderState {
+     Initial {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 return true; // ignore whitespace until we get the first content
+             } else if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+@@ -56,7 +56,7 @@ enum HtmlTreeBuilderState {
+                 return false;
+             } else if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+-            } else if (isWhitespace(t)) {
++            } else if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter()); // out of spec - include whitespace
+             } else if (t.isStartTag() && t.asStartTag().normalName().equals("html")) {
+                 tb.insertElementFor(t.asStartTag());
+@@ -80,7 +80,7 @@ enum HtmlTreeBuilderState {
+     },
+     BeforeHead {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter()); // out of spec - include whitespace
+             } else if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+@@ -108,7 +108,7 @@ enum HtmlTreeBuilderState {
+     },
+     InHead {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter()); // out of spec - include whitespace
+                 return true;
+             }
+@@ -133,9 +133,9 @@ enum HtmlTreeBuilderState {
+                     } else if (name.equals("meta")) {
+                         tb.insertEmptyElementFor(start);
+                     } else if (name.equals("title")) {
+-                        HandleTextState(start, tb, tb.tagFor(start).textState());
++                        HtmlTreeBuilderStateHelper.HandleTextState(start, tb, tb.tagFor(start).textState());
+                     } else if (inSorted(name, InHeadRaw)) {
+-                        HandleTextState(start, tb, tb.tagFor(start).textState());
++                        HtmlTreeBuilderStateHelper.HandleTextState(start, tb, tb.tagFor(start).textState());
+                     } else if (name.equals("noscript")) {
+                         // else if noscript && scripting flag = true: rawtext (jsoup doesn't run script, to handle as noscript)
+                         tb.insertElementFor(start);
+@@ -204,7 +204,7 @@ enum HtmlTreeBuilderState {
+             } else if (t.isEndTag() && t.asEndTag().normalName().equals("noscript")) {
+                 tb.pop();
+                 tb.transition(InHead);
+-            } else if (isWhitespace(t) || t.isComment() || (t.isStartTag() && inSorted(t.asStartTag().normalName(),
++            } else if (HtmlTreeBuilderStateHelper.isWhitespace(t) || t.isComment() || (t.isStartTag() && inSorted(t.asStartTag().normalName(),
+                     InHeadNoScriptHead))) {
+                 return tb.process(t, InHead);
+             } else if (t.isEndTag() && t.asEndTag().normalName().equals("br")) {
+@@ -229,7 +229,7 @@ enum HtmlTreeBuilderState {
+     },
+     AfterHead {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter());
+             } else if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+@@ -287,7 +287,7 @@ enum HtmlTreeBuilderState {
+             switch (t.type) {
+                 case Character: {
+                     Token.Character c = t.asCharacter();
+-                    if (tb.framesetOk() && isWhitespace(c)) { // don't check if whitespace if frames already closed
++                    if (tb.framesetOk() && HtmlTreeBuilderStateHelper.isWhitespace(c)) { // don't check if whitespace if frames already closed
+                         tb.reconstructFormattingElements();
+                         tb.insertCharacterNode(c);
+                     } else {
+@@ -374,7 +374,7 @@ enum HtmlTreeBuilderState {
+                     stack = tb.getStack();
+                     if (stack.size() > 0) {
+                         Element html = tb.getStack().get(0);
+-                        mergeAttributes(startTag, html);
++                        HtmlTreeBuilderStateHelper.mergeAttributes(startTag, html);
+                     }
+                     break;
+                 case "body":
+@@ -387,7 +387,7 @@ enum HtmlTreeBuilderState {
+                         tb.framesetOk(false);
+                         // will be on stack if this is a nested body. won't be if closed (which is a variance from spec, which leaves it on)
+                         Element body = tb.getFromStack("body");
+-                        if (body != null) mergeAttributes(startTag, body);
++                        if (body != null) HtmlTreeBuilderStateHelper.mergeAttributes(startTag, body);
+                     }
+                     break;
+                 case "frameset":
+@@ -477,7 +477,7 @@ enum HtmlTreeBuilderState {
+                     break;
+                 case "textarea":
+                     tb.framesetOk(false);
+-                    HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                    HtmlTreeBuilderStateHelper.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+                     break;
+                 case "xmp":
+                     if (tb.inButtonScope("p")) {
+@@ -485,15 +485,15 @@ enum HtmlTreeBuilderState {
+                     }
+                     tb.reconstructFormattingElements();
+                     tb.framesetOk(false);
+-                    HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                    HtmlTreeBuilderStateHelper.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+                     break;
+                 case "iframe":
+                     tb.framesetOk(false);
+-                    HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                    HtmlTreeBuilderStateHelper.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+                     break;
+                 case "noembed":
+                     // also handle noscript if script enabled
+-                    HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                    HtmlTreeBuilderStateHelper.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+                     break;
+                 case "select":
+                     tb.reconstructFormattingElements();
+@@ -623,7 +623,7 @@ enum HtmlTreeBuilderState {
+                     Tag tag = tb.tagFor(startTag);
+                     TokeniserState textState = tag.textState();
+                     if (textState != null) { // custom rcdata or rawtext (if we were in head, will have auto-transitioned here)
+-                        HandleTextState(startTag, tb, textState);
++                        HtmlTreeBuilderStateHelper.HandleTextState(startTag, tb, textState);
+                     } else if (!tag.isKnownTag()) { // no other special rules for custom tags
+                         tb.insertElementFor(startTag);
+                     } else if (inSorted(name, InBodyStartPClosers)) {
+@@ -1120,7 +1120,7 @@ enum HtmlTreeBuilderState {
+                     final Token og = tb.currentToken; // update current token, so we can track cursor pos correctly
+                     for (Token.Character c : tb.getPendingTableCharacters()) {
+                         tb.currentToken = c;
+-                        if (!isWhitespace(c)) {
++                        if (!HtmlTreeBuilderStateHelper.isWhitespace(c)) {
+                             // InTable anything else section:
+                             tb.error(this);
+                             if (inSorted(tb.currentElement().normalName(), InTableFoster)) {
+@@ -1181,7 +1181,7 @@ enum HtmlTreeBuilderState {
+     },
+     InColumnGroup {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter());
+                 return true;
+             }
+@@ -1630,7 +1630,7 @@ enum HtmlTreeBuilderState {
+     AfterBody {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+             Element html = tb.getFromStack("html");
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 // spec deviation - currently body is still on stack, but we want this to go to the html node
+                 if (html != null)
+                     tb.insertCharacterToElement(t.asCharacter(), html);
+@@ -1663,7 +1663,7 @@ enum HtmlTreeBuilderState {
+     },
+     InFrameset {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter());
+             } else if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+@@ -1711,7 +1711,7 @@ enum HtmlTreeBuilderState {
+     },
+     AfterFrameset {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            if (isWhitespace(t)) {
++            if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 tb.insertCharacterNode(t.asCharacter());
+             } else if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+@@ -1739,7 +1739,7 @@ enum HtmlTreeBuilderState {
+                 tb.insertCommentNode(t.asComment());
+             } else if (t.isDoctype() || (t.isStartTag() && t.asStartTag().normalName().equals("html"))) {
+                 return tb.process(t, InBody);
+-            } else if (isWhitespace(t)) {
++            } else if (HtmlTreeBuilderStateHelper.isWhitespace(t)) {
+                 // spec deviation - body and html still on stack, but want this space to go after </html>
+                 Element doc = tb.getDocument();
+                 tb.insertCharacterToElement(t.asCharacter(), doc);
+@@ -1757,7 +1757,7 @@ enum HtmlTreeBuilderState {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+             if (t.isComment()) {
+                 tb.insertCommentNode(t.asComment());
+-            } else if (t.isDoctype() || isWhitespace(t) || (t.isStartTag() && t.asStartTag().normalName().equals("html"))) {
++            } else if (t.isDoctype() || HtmlTreeBuilderStateHelper.isWhitespace(t) || (t.isStartTag() && t.asStartTag().normalName().equals("html"))) {
+                 return tb.process(t, InBody);
+             } else if (t.isEOF()) {
+                 // nice work chuck
+@@ -1776,7 +1776,7 @@ enum HtmlTreeBuilderState {
+             switch (t.type) {
+                 case Character:
+                     Token.Character c = t.asCharacter();
+-                    if (HtmlTreeBuilderState.isWhitespace(c))
++                    if (HtmlTreeBuilderStateHelper.isWhitespace(c))
+                         tb.insertCharacterNode(c);
+                     else {
+                         tb.insertCharacterNode(c, true); // replace nulls
+@@ -1862,36 +1862,6 @@ enum HtmlTreeBuilderState {
+         }
+     };
+ 
+-    private static void mergeAttributes(Token.StartTag source, Element dest) {
+-        if (!source.hasAttributes()) return;
+-        source.finaliseAttributeRanges(source.treeBuilder.settings);
+-        for (Attribute attr : source.attributes) { // only iterates public attributes
+-            Attributes destAttrs = dest.attributes();
+-            if (!destAttrs.hasKey(attr.getKey())) {
+-                Range.AttributeRange range = attr.sourceRange(); // grab before its parent changes
+-                destAttrs.put(attr);
+-                NodeInternals.attributeRange(destAttrs, attr.getKey(), range);
+-            }
+-        }
+-    }
+-
+-    private static final String nullString = String.valueOf('\u0000');
+-
+     abstract boolean process(Token t, HtmlTreeBuilder tb);
+ 
+-    private static boolean isWhitespace(Token t) {
+-        if (t.isCharacter()) {
+-            String data = t.asCharacter().getData();
+-            return StringUtil.isBlank(data);
+-        }
+-        return false;
+-    }
+-
+-    private static void HandleTextState(Token.StartTag startTag, HtmlTreeBuilder tb, @Nullable TokeniserState state) {
+-        if (state != null)
+-            tb.tokeniser.transition(state);
+-        tb.markInsertionMode();
+-        tb.transition(Text);
+-        tb.insertElementFor(startTag);
+-    }
+ }
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java
+new file mode 100644
+index 00000000..c55a8091
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHelper.java
+@@ -0,0 +1,50 @@
++package org.jsoup.parser;
++
++import org.jsoup.internal.StringUtil;
++import org.jsoup.nodes.Attribute;
++import org.jsoup.nodes.Attributes;
++import org.jsoup.nodes.Element;
++import org.jsoup.nodes.NodeInternals;
++import org.jsoup.nodes.Range;
++import org.jspecify.annotations.Nullable;
++
++/**
++ * Helper utilities extracted from HtmlTreeBuilderState to reduce enum complexity.
++ */
++public final class HtmlTreeBuilderStateHelper {
++
++    private HtmlTreeBuilderStateHelper() {
++        // no instantiation
++    }
++
++    public static void mergeAttributes(Token.StartTag source, Element dest) {
++        if (!source.hasAttributes()) return;
++        source.finaliseAttributeRanges(source.treeBuilder.settings);
++        for (Attribute attr : source.attributes) { // only iterates public attributes
++            Attributes destAttrs = dest.attributes();
++            if (!destAttrs.hasKey(attr.getKey())) {
++                Range.AttributeRange range = attr.sourceRange(); // grab before its parent changes
++                destAttrs.put(attr);
++                NodeInternals.attributeRange(destAttrs, attr.getKey(), range);
++            }
++        }
++    }
++
++    public static final String nullString = String.valueOf('\u0000');
++
++    public static boolean isWhitespace(Token t) {
++        if (t.isCharacter()) {
++            String data = t.asCharacter().getData();
++            return StringUtil.isBlank(data);
++        }
++        return false;
++    }
++
++    public static void HandleTextState(Token.StartTag startTag, HtmlTreeBuilder tb, @Nullable TokeniserState state) {
++        if (state != null)
++            tb.tokeniser.transition(state);
++        tb.markInsertionMode();
++        tb.transition(HtmlTreeBuilderState.Text);
++        tb.insertElementFor(startTag);
++    }
++}

@@ -1,0 +1,48 @@
+{
+  "id": 3,
+  "goal": "Move the ForeignContent state's processing (including processAsHtml helper) into a dedicated handler class to isolate foreign-content parsing logic.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignContentHandler.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignContentHandler.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Create org.jsoup.parser.HtmlTreeBuilderStateForeignContentHandler with static methods: processForeignContent(Token t, HtmlTreeBuilder tb) and processAsHtml(Token t, HtmlTreeBuilder tb). Move the ForeignContent enum state's process implementation and its processAsHtml helper to these static methods. Maintain the same namespace and imports.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignContentHandler.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Update the ForeignContent enum constant to delegate to HtmlTreeBuilderStateForeignContentHandler.processForeignContent(Token, HtmlTreeBuilder). Ensure calls that previously used the internal processAsHtml now call the handler's static processAsHtml method.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

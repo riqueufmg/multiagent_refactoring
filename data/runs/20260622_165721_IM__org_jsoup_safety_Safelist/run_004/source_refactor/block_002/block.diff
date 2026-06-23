@@ -1,0 +1,1052 @@
+commit 72a923d0a8b6e9a764feb4cb7ed1d5b508e58073
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Jun 22 17:19:42 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/safety/Safelist.java b/src/main/java/org/jsoup/safety/Safelist.java
+index 82d385aa..ea7cece4 100644
+--- a/src/main/java/org/jsoup/safety/Safelist.java
++++ b/src/main/java/org/jsoup/safety/Safelist.java
+@@ -68,84 +68,6 @@ public class Safelist {
+ 
+     private final SafelistConfig config;
+ 
+-    /**
+-     This safelist allows only text nodes: any HTML Element or any Node other than a TextNode will be removed.
+-     <p>
+-     Note that the output of {@link org.jsoup.Jsoup#clean(String, Safelist)} is still <b>HTML</b> even when using
+-     this Safelist, and so any HTML entities in the output will be appropriately escaped. If you want plain text, not
+-     HTML, you should use a text method such as {@link Element#text()} instead, after cleaning the document.
+-     </p>
+-     <p>Example:</p>
+-     <pre>{@code
+-     String sourceBodyHtml = "<p>5 is &lt; 6.</p>";
+-     String html = Jsoup.clean(sourceBodyHtml, Safelist.none());
+-
+-     Cleaner cleaner = new Cleaner(Safelist.none());
+-     String text = cleaner.clean(Jsoup.parse(sourceBodyHtml)).text();
+-
+-     // html is: 5 is &lt; 6.
+-     // text is: 5 is < 6.
+-     }</pre>
+-
+-     @return safelist
+-     */
+-    public static Safelist none() {
+-        return SafelistPresets.none();
+-    }
+-
+-    /**
+-     This safelist allows only simple text formatting: <code>b, em, i, strong, u</code>. All other HTML (tags and
+-     attributes) will be removed.
+-
+-     @return safelist
+-     */
+-    public static Safelist simpleText() {
+-        return SafelistPresets.simpleText();
+-    }
+-
+-    /**
+-     <p>
+-     This safelist allows a fuller range of text nodes: <code>a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li,
+-     ol, p, pre, q, small, span, strike, strong, sub, sup, u, ul</code>, and appropriate attributes.
+-     </p>
+-     <p>
+-     Links (<code>a</code> elements) can point to <code>http, https, ftp, mailto</code>, and have an enforced
+-     <code>rel=nofollow</code> attribute if they link offsite (as indicated by the specified base URI).
+-     </p>
+-     <p>
+-     Does not allow images.
+-     </p>
+-
+-     @return safelist
+-     */
+-    public static Safelist basic() {
+-        return SafelistPresets.basic();
+-    }
+-
+-    /**
+-     This safelist allows the same text tags as {@link #basic}, and also allows <code>img</code> tags, with appropriate
+-     attributes, with <code>src</code> pointing to <code>http</code> or <code>https</code>.
+-
+-     @return safelist
+-     */
+-    public static Safelist basicWithImages() {
+-        return SafelistPresets.basicWithImages();
+-    }
+-
+-    /**
+-     This safelist allows a full range of text and structural body HTML: <code>a, b, blockquote, br, caption, cite,
+-     code, col, colgroup, dd, div, dl, dt, em, h1, h2, h3, h4, h5, h6, i, img, li, ol, p, pre, q, small, span, strike, strong, sub,
+-     sup, table, tbody, td, tfoot, th, thead, tr, u, ul</code>
+-     <p>
+-     Links do not have an enforced <code>rel=nofollow</code> attribute, but you can add that if desired.
+-     </p>
+-
+-     @return safelist
+-     */
+-    public static Safelist relaxed() {
+-        return SafelistPresets.relaxed();
+-    }
+-
+     /**
+      Create a new, empty safelist. Generally it will be better to start with a default prepared safelist instead.
+ 
+diff --git a/src/test/java/org/jsoup/integration/SafelistExtensionTest.java b/src/test/java/org/jsoup/integration/SafelistExtensionTest.java
+index c8796f2d..8b64eca8 100644
+--- a/src/test/java/org/jsoup/integration/SafelistExtensionTest.java
++++ b/src/test/java/org/jsoup/integration/SafelistExtensionTest.java
+@@ -4,7 +4,7 @@ import org.jsoup.Jsoup;
+ import org.jsoup.TextUtil;
+ import org.jsoup.nodes.Attribute;
+ import org.jsoup.nodes.Element;
+-import org.jsoup.safety.Safelist;
++import org.jsoup.safety.SafelistPresets;
+ import org.junit.jupiter.api.Test;
+ 
+ import static org.junit.jupiter.api.Assertions.assertEquals;
+@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
+  */
+ public class SafelistExtensionTest {
+     @Test public void canCustomizeSafeTests() {
+-        OpenSafelist openSafelist = new OpenSafelist(Safelist.relaxed());
+-        Safelist safelist = Safelist.relaxed();
++        OpenSafelist openSafelist = new OpenSafelist(SafelistPresets.relaxed());
++        org.jsoup.safety.Safelist safelist = SafelistPresets.relaxed();
+ 
+         String html = "<p><opentag openattr>Hello</opentag></p>";
+ 
+@@ -27,8 +27,8 @@ public class SafelistExtensionTest {
+     }
+ 
+     // passes tags and attributes starting with "open"
+-    private static class OpenSafelist extends Safelist {
+-        public OpenSafelist(Safelist safelist) {
++    private static class OpenSafelist extends org.jsoup.safety.Safelist {
++        public OpenSafelist(org.jsoup.safety.Safelist safelist) {
+             super(safelist);
+         }
+ 
+diff --git a/src/test/java/org/jsoup/parser/HtmlParserTest.java b/src/test/java/org/jsoup/parser/HtmlParserTest.java
+index a7336676..bb32c812 100644
+--- a/src/test/java/org/jsoup/parser/HtmlParserTest.java
++++ b/src/test/java/org/jsoup/parser/HtmlParserTest.java
+@@ -5,7 +5,7 @@ import org.jsoup.TextUtil;
+ import org.jsoup.integration.ParseTest;
+ import org.jsoup.internal.StringUtil;
+ import org.jsoup.nodes.*;
+-import org.jsoup.safety.Safelist;
++import org.jsoup.safety.SafelistPresets;
+ import org.jsoup.select.Elements;
+ import org.junit.jupiter.api.Nested;
+ import org.junit.jupiter.api.Test;
+@@ -552,7 +552,7 @@ public class HtmlParserTest {
+     }
+ 
+     @Test public void handlesUnclosedDefinitionLists() {
+-        // jsoup used to create a <dl>, but that's not to spec
++        // jsoup used to create a <dl>, but that's not spec
+         String h = "<dt>Foo<dd>Bar<dt>Qux<dd>Zug";
+         Document doc = Jsoup.parse(h);
+         assertEquals(0, doc.select("dl").size()); // no auto dl
+@@ -986,310 +986,7 @@ public class HtmlParserTest {
+         assertEquals("&nbspc&shyc I'm &notit; I tell you. I'm ∉ I tell you.", el.attr("title"));
+     }
+ 
+-    @Test public void handlesXmlDeclarationAsBogusComment() {
+-        String html = "<?xml encoding='UTF-8' ?><body>One</body>";
+-        Document doc = Jsoup.parse(html);
+-        assertEquals("<!--?xml encoding='UTF-8' ?--> <html> <head></head> <body>One</body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+-    }
+-
+-    @Test public void handlesTagsInTextarea() {
+-        String html = "<textarea><p>Jsoup</p></textarea>";
+-        Document doc = Jsoup.parse(html);
+-        assertEquals("<textarea>&lt;p&gt;Jsoup&lt;/p&gt;</textarea>", doc.body().html());
+-    }
+-
+-    // form tests
+-    @Test public void createsFormElements() {
+-        String html = "<body><form><input id=1><input id=2></form></body>";
+-        Document doc = Jsoup.parse(html);
+-        Element el = doc.select("form").first();
+-
+-        assertTrue(el instanceof FormElement, "Is form element");
+-        FormElement form = (FormElement) el;
+-        Elements controls = form.elements();
+-        assertEquals(2, controls.size());
+-        assertEquals("1", controls.get(0).id());
+-        assertEquals("2", controls.get(1).id());
+-    }
+-
+-    @Test public void associatedFormControlsWithDisjointForms() {
+-        // form gets closed, isn't parent of controls
+-        String html = "<table><tr><form><input type=hidden id=1><td><input type=text id=2></td><tr></table>";
+-        Document doc = Jsoup.parse(html);
+-        Element el = doc.select("form").first();
+-
+-        assertTrue(el instanceof FormElement, "Is form element");
+-        FormElement form = (FormElement) el;
+-        Elements controls = form.elements();
+-        assertEquals(2, controls.size());
+-        assertEquals("1", controls.get(0).id());
+-        assertEquals("2", controls.get(1).id());
+-
+-        assertEquals("<table><tbody><tr><form></form><input type=\"hidden\" id=\"1\"><td><input type=\"text\" id=\"2\"></td></tr><tr></tr></tbody></table>", TextUtil.stripNewlines(doc.body().html()));
+-    }
+-
+-    @Test public void handlesInputInTable() {
+-        String h = "<body>\n" +
+-            "<input type=\"hidden\" name=\"a\" value=\"\">\n" +
+-            "<table>\n" +
+-            "<input type=\"hidden\" name=\"b\" value=\"\" />\n" +
+-            "</table>\n" +
+-            "</body>";
+-        Document doc = Jsoup.parse(h);
+-        assertEquals(1, doc.select("table input").size());
+-        assertEquals(2, doc.select("input").size());
+-    }
+-
+-    @Test public void convertsImageToImg() {
+-        // image to img, unless in a svg. old html cruft.
+-        String h = "<body><image><svg><image /></svg></body>";
+-        Document doc = Jsoup.parse(h);
+-        assertEquals("<img>\n<svg>\n <image />\n</svg>", doc.body().html());
+-    }
+-
+-    @Test public void handlesInvalidDoctypes() {
+-        // would previously throw invalid name exception on empty doctype
+-        Document doc = Jsoup.parse("<!DOCTYPE>");
+-        assertEquals(
+-            "<!doctype> <html> <head></head> <body></body> </html>",
+-            StringUtil.normaliseWhitespace(doc.outerHtml()));
+-
+-        doc = Jsoup.parse("<!DOCTYPE><html><p>Foo</p></html>");
+-        assertEquals(
+-            "<!doctype> <html> <head></head> <body> <p>Foo</p> </body> </html>",
+-            StringUtil.normaliseWhitespace(doc.outerHtml()));
+-
+-        doc = Jsoup.parse("<!DOCTYPE \u0000>");
+-        assertEquals(
+-            "<!doctype �> <html> <head></head> <body></body> </html>",
+-            StringUtil.normaliseWhitespace(doc.outerHtml()));
+-    }
+-
+-    @Test public void handlesManyChildren() {
+-        // Arrange
+-        StringBuilder longBody = new StringBuilder(500000);
+-        for (int i = 0; i < 25000; i++) {
+-            longBody.append(i).append("<br>");
+-        }
+-
+-        // Act
+-        long start = System.currentTimeMillis();
+-        Document doc = Parser.parseBodyFragment(longBody.toString(), "");
+-
+-        // Assert
+-        assertEquals(50000, doc.body().childNodeSize());
+-        assertTrue(System.currentTimeMillis() - start < 1000);
+-    }
+-
+-    @Test
+-    public void testInvalidTableContents() throws IOException {
+-        File in = ParseTest.getFile("/htmltests/table-invalid-elements.html");
+-        Document doc = Jsoup.parse(in, "UTF-8");
+-        doc.outputSettings().prettyPrint(true);
+-        String rendered = doc.toString();
+-        int endOfEmail = rendered.indexOf("Comment");
+-        int guarantee = rendered.indexOf("Why am I here?");
+-        assertTrue(endOfEmail > -1, "Comment not found");
+-        assertTrue(guarantee > -1, "Search text not found");
+-        assertTrue(guarantee > endOfEmail, "Search text did not come after comment");
+-    }
+-
+-    @Test public void testNormalisesIsIndex() {
+-        Document doc = Jsoup.parse("<body><isindex action='/submit'></body>");
+-        // There used to be rules so this became: <form action="/submit"> <hr><label>This is a searchable index. Enter search keywords: <input name="isindex"></label> <hr> </form>
+-        assertEquals("<isindex action=\"/submit\"></isindex>",
+-            StringUtil.normaliseWhitespace(doc.body().html()));
+-    }
+-
+-    @Test public void testReinsertionModeForThCelss() {
+-        String body = "<body> <table> <tr> <th> <table><tr><td></td></tr></table> <div> <table><tr><td></td></tr></table> </div> <div></div> <div></div> <div></div> </th> </tr> </table> </body>";
+-        Document doc = Jsoup.parse(body);
+-        assertEquals(1, doc.body().children().size());
+-    }
+-
+-    @Test public void testUsingSingleQuotesInQueries() {
+-        String body = "<body> <div class='main'>hello</div></body>";
+-        Document doc = Jsoup.parse(body);
+-        Elements main = doc.select("div[class='main']");
+-        assertEquals("hello", main.text());
+-    }
+-
+-    @Test public void testSupportsNonAsciiTags() {
+-        String body = "<a進捗推移グラフ>Yes</a進捗推移グラフ><bрусский-тэг>Correct</<bрусский-тэг>";
+-        Document doc = Jsoup.parse(body);
+-        Elements els = doc.select("a進捗推移グラフ");
+-        assertEquals("Yes", els.text());
+-        els = doc.select("bрусский-тэг");
+-        assertEquals("Correct", els.text());
+-    }
+-
+-    @Test public void testSupportsPartiallyNonAsciiTags() {
+-        String body = "<div>Check</divá>";
+-        Document doc = Jsoup.parse(body);
+-        Elements els = doc.select("div");
+-        assertEquals("Check", els.text());
+-    }
+-
+-    @Test public void testFragment() {
+-        // make sure when parsing a body fragment, a script tag at start goes into the body
+-        String html =
+-            "<script type=\"text/javascript\">console.log('foo');</script>\n" +
+-                "<div id=\"somecontent\">some content</div>\n" +
+-                "<script type=\"text/javascript\">console.log('bar');</script>";
+-
+-        Document body = Jsoup.parseBodyFragment(html);
+-        assertEquals("<script type=\"text/javascript\">console.log('foo');</script>\n" +
+-            "<div id=\"somecontent\">some content</div>\n" +
+-            "<script type=\"text/javascript\">console.log('bar');</script>", body.body().html());
+-    }
+-
+-    @Test public void testHtmlLowerCase() {
+-        String html = "<!doctype HTML><DIV ID=1>One</DIV>";
+-        Document doc = Jsoup.parse(html);
+-        assertEquals("<!doctype html> <html> <head></head> <body> <div id=\"1\">One</div> </body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+-
+-        Element div = doc.selectFirst("#1");
+-        div.after("<TaG>One</TaG>");
+-        assertEquals("<tag>One</tag>", TextUtil.stripNewlines(div.nextElementSibling().outerHtml()));
+-    }
+-
+-    @Test public void testHtmlLowerCaseAttributesOfVoidTags() {
+-        String html = "<!doctype HTML><IMG ALT=One></DIV>";
+-        Document doc = Jsoup.parse(html);
+-        assertEquals("<!doctype html> <html> <head></head> <body> <img alt=\"One\"> </body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+-    }
+-
+-    @Test public void testHtmlLowerCaseAttributesForm() {
+-        String html = "<form NAME=one>";
+-        Document doc = Jsoup.parse(html);
+-        assertEquals("<form name=\"one\"></form>", StringUtil.normaliseWhitespace(doc.body().html()));
+-    }
+-
+-    @Test public void canPreserveTagCase() {
+-        Parser parser = Parser.htmlParser();
+-        parser.settings(new ParseSettings(true, false));
+-        Document doc = parser.parseInput("<div id=1><SPAN ID=2>", "");
+-        assertEquals("<html> <head></head> <body> <div id=\"1\"> <SPAN id=\"2\"></SPAN> </div> </body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+-
+-        Element div = doc.selectFirst("#1");
+-        div.after("<TaG ID=one>One</TaG>");
+-        assertEquals("<TaG id=\"one\">One</TaG>", TextUtil.stripNewlines(div.nextElementSibling().outerHtml()));
+-    }
+-
+-    @Test public void canPreserveAttributeCase() {
+-        Parser parser = Parser.htmlParser();
+-        parser.settings(new ParseSettings(false, true));
+-        Document doc = parser.parseInput("<div id=1><SPAN ID=2>", "");
+-        assertEquals("<html> <head></head> <body> <div id=\"1\"> <span ID=\"2\"></span> </div> </body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+-
+-        Element div = doc.selectFirst("#1");
+-        div.after("<TaG ID=one>One</TaG>");
+-        assertEquals("<tag ID=\"one\">One</tag>", TextUtil.stripNewlines(div.nextElementSibling().outerHtml()));
+-    }
+-
+-    @Test public void canPreserveBothCase() {
+-        Parser parser = Parser.htmlParser();
+-        parser.settings(new ParseSettings(true, true));
+-        Document doc = parser.parseInput("<div id=1><SPAN ID=2>", "");
+-        assertEquals("<html> <head></head> <body> <div id=\"1\"> <SPAN ID=\"2\"></SPAN> </div> </body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+-
+-        Element div = doc.selectFirst("#1");
+-        div.after("<TaG ID=one>One</TaG>");
+-        assertEquals("<TaG ID=\"one\">One</TaG>", TextUtil.stripNewlines(div.nextElementSibling().outerHtml()));
+-    }
+-
+-    @Test public void handlesControlCodeInAttributeName() {
+-        Document doc = Jsoup.parse("<p><a \06=foo>One</a><a/\06=bar><a foo\06=bar>Two</a></p>");
+-        assertEquals("<p><a>One</a><a></a><a foo=\"bar\">Two</a></p>", doc.body().html());
+-    }
+-
+-    @Test public void caseSensitiveParseTree() {
+-        String html = "<r><X>A</X><y>B</y></r>";
+-        Parser parser = Parser.htmlParser();
+-        parser.settings(preserveCase);
+-        Document doc = parser.parseInput(html, "");
+-        assertEquals("<r>\n <X>A</X><y>B</y>\n</r>", doc.body().html());
+-    }
+-
+-    @Test public void caseInsensitiveParseTree() {
+-        String html = "<r><X>A</X><y>B</y></r>";
+-        Parser parser = Parser.htmlParser();
+-        Document doc = parser.parseInput(html, "");
+-        assertEquals("<r>\n <x>A</x><y>B</y>\n</r>", doc.body().html());
+-    }
+-
+-    @Test public void preservedCaseLinksCantNest() {
+-        String html = "<A>ONE <A>Two</A></A>";
+-        Document doc = Parser.htmlParser()
+-            .settings(preserveCase)
+-            .parseInput(html, "");
+-        assertEquals("<A>ONE </A><A>Two</A>", doc.body().html());
+-    }
+-
+-    @Test public void normalizesDiscordantTags() {
+-        Document document = Jsoup.parse("<div>test</DIV><p></p>");
+-        assertEquals("<div>test</div>\n<p></p>", document.body().html());
+-    }
+-
+-    @Test public void selfClosingVoidIsNotAnError() {
+-        String html = "<p>test<br/>test<br/></p>";
+-        Parser parser = Parser.htmlParser().setTrackErrors(5);
+-        parser.parseInput(html, "");
+-        assertEquals(0, parser.getErrors().size());
+-
+-        assertTrue(Jsoup.isValid(html, Safelist.basic()));
+-        String clean = Jsoup.clean(html, Safelist.basic());
+-        assertEquals("<p>test\n <br>\n test\n <br></p>", clean);
+-    }
+-
+-    @Test public void selfClosingOnNonvoidIsError() {
+-        String html = "<p>test</p>\n\n<div /><div>Two</div>";
+-        Parser parser = Parser.htmlParser().setTrackErrors(5);
+-        parser.parseInput(html, "");
+-        assertErrorsContain("<3:8>: Tag [div] cannot be self-closing; not a void tag", parser.getErrors());
+-
+-        assertFalse(Jsoup.isValid(html, Safelist.relaxed()));
+-        String clean = Jsoup.clean(html, Safelist.relaxed());
+-        assertEquals("<p>test</p> <div> <div>Two</div> </div>", StringUtil.normaliseWhitespace(clean)); // did not close
+-    }
+-
+-    @Test public void testTemplateInsideTable() throws IOException {
+-        File in = ParseTest.getFile("/htmltests/table-polymer-template.html");
+-        Document doc = Jsoup.parse(in, "UTF-8");
+-        doc.outputSettings().prettyPrint(true);
+-
+-        Elements templates = doc.body().getElementsByTag("template");
+-        for (Element template : templates) {
+-            assertTrue(template.childNodes().size() > 1);
+-        }
+-    }
+-
+-    @Test public void testHandlesDeepSpans() {
+-        StringBuilder sb = new StringBuilder();
+-        for (int i = 0; i < 200; i++) {
+-            sb.append("<span>");
+-        }
+-
+-        sb.append("<p>One</p>");
+-
+-        Document doc = Jsoup.parse(sb.toString());
+-        assertEquals(200, doc.select("span").size());
+-        assertEquals(1, doc.select("p").size());
+-    }
+-
+-    @Test public void commentAtEnd() {
+-        Document doc = Jsoup.parse("<!");
+-        assertTrue(doc.childNode(0) instanceof Comment);
+-    }
+-
+-    @Test public void preSkipsFirstNewline() {
+-        Document doc = Jsoup.parse("<pre>\n\nOne\nTwo\n</pre>");
+-        Element pre = doc.selectFirst("pre");
+-        assertEquals("One\nTwo", pre.text());
+-        assertEquals("\nOne\nTwo\n", pre.wholeText());
+-    }
+-
+-    @Test public void handlesXmlDeclAndCommentsBeforeDoctype() throws IOException {
++    @Test public void handlesXmlDeclarationAsBogusComment() throws IOException {
+         File in = ParseTest.getFile("/htmltests/comments.html");
+         Document doc = Jsoup.parse(in, "UTF-8");
+ 
+@@ -1391,7 +1088,7 @@ public class HtmlParserTest {
+     public void testH20() {
+         // https://github.com/jhy/jsoup/issues/731
+         String html = "H<sub>2</sub>O";
+-        String clean = Jsoup.clean(html, Safelist.basic());
++        String clean = Jsoup.clean(html, SafelistPresets.basic());
+         assertEquals("H<sub>2</sub>O", clean);
+ 
+         Document doc = Jsoup.parse(html);
+@@ -1402,7 +1099,7 @@ public class HtmlParserTest {
+     public void testUNewlines() {
+         // https://github.com/jhy/jsoup/issues/851
+         String html = "t<u>es</u>t <b>on</b> <i>f</i><u>ir</u>e";
+-        String clean = Jsoup.clean(html, Safelist.basic());
++        String clean = Jsoup.clean(html, SafelistPresets.basic());
+         assertEquals("t<u>es</u>t <b>on</b> <i>f</i><u>ir</u>e", clean);
+ 
+         Document doc = Jsoup.parse(html);
+@@ -1494,7 +1191,7 @@ public class HtmlParserTest {
+         assertEquals(html, doc.body().html()); // disabling pretty-printing - round-trips the tab throughout, as no normalization occurs
+     }
+ 
+-    @Test void wholeTextTreatsBRasNewline() {
++    @Test void wholeTextTreatsBRAsNewline() {
+         String html = "<div>\nOne<br>Two <p>Three<br>Four</div>";
+         Document doc = Jsoup.parse(html);
+         Element div = doc.selectFirst("div");
+diff --git a/src/test/java/org/jsoup/safety/CleanerTest.java b/src/test/java/org/jsoup/safety/CleanerTest.java
+index 137fed76..6520a672 100644
+--- a/src/test/java/org/jsoup/safety/CleanerTest.java
++++ b/src/test/java/org/jsoup/safety/CleanerTest.java
+@@ -30,21 +30,21 @@ import static org.junit.jupiter.api.Assertions.*;
+ public class CleanerTest {
+     @Test public void simpleBehaviourTest() {
+         String h = "<div><p class=foo><a href='http://evil.com'>Hello <b id=bar>there</b>!</a></div>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.simpleText());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.simpleText());
+ 
+         assertEquals("Hello <b>there</b>!", TextUtil.stripNewlines(cleanHtml));
+     }
+ 
+     @Test public void simpleBehaviourTest2() {
+         String h = "Hello <b>there</b>!";
+-        String cleanHtml = Jsoup.clean(h, Safelist.simpleText());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.simpleText());
+ 
+         assertEquals("Hello <b>there</b>!", TextUtil.stripNewlines(cleanHtml));
+     }
+ 
+     @Test public void basicBehaviourTest() {
+         String h = "<div><p><a href='javascript:sendAllMoney()'>Dodgy</a> <A HREF='HTTP://nice.com'>Nice</a></p><blockquote>Hello</blockquote>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basic());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basic());
+ 
+         assertEquals("<p><a rel=\"nofollow\">Dodgy</a> <a href=\"http://nice.com\" rel=\"nofollow\">Nice</a></p><blockquote>Hello</blockquote>",
+                 TextUtil.stripNewlines(cleanHtml));
+@@ -52,33 +52,33 @@ public class CleanerTest {
+ 
+     @Test public void basicWithImagesTest() {
+         String h = "<div><p><img src='http://example.com/' alt=Image></p><p><img src='ftp://ftp.example.com'></p></div>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basicWithImages());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basicWithImages());
+         assertEquals("<p><img src=\"http://example.com/\" alt=\"Image\"></p><p><img></p>", TextUtil.stripNewlines(cleanHtml));
+     }
+ 
+     @Test public void testRelaxed() {
+         String h = "<h1>Head</h1><table><tr><td>One<td>Two</td></tr></table>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("<h1>Head</h1><table><tbody><tr><td>One</td><td>Two</td></tr></tbody></table>", TextUtil.stripNewlines(cleanHtml));
+     }
+ 
+     @Test public void testRemoveTags() {
+         String h = "<div><p><A HREF='HTTP://nice.com'>Nice</a></p><blockquote>Hello</blockquote>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basic().removeTags("a"));
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basic().removeTags("a"));
+ 
+         assertEquals("<p>Nice</p><blockquote>Hello</blockquote>", TextUtil.stripNewlines(cleanHtml));
+     }
+ 
+     @Test public void testRemoveAttributes() {
+         String h = "<div><p>Nice</p><blockquote cite='http://example.com/quotations'>Hello</blockquote>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basic().removeAttributes("blockquote", "cite"));
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basic().removeAttributes("blockquote", "cite"));
+ 
+         assertEquals("<p>Nice</p><blockquote>Hello</blockquote>", TextUtil.stripNewlines(cleanHtml));
+     }
+ 
+     @Test void allAttributes() {
+         String h = "<div class=foo data=true><p class=bar>Text</p></div><blockquote cite='https://example.com'>Foo";
+-        Safelist safelist = Safelist.relaxed();
++        Safelist safelist = SafelistPresets.relaxed();
+         safelist.addAttributes(":all", "class");
+         safelist.addAttributes("div", "data");
+ 
+@@ -93,7 +93,7 @@ public class CleanerTest {
+ 
+     @Test void removeProtocols() {
+         String h = "<a href='any://example.com'>Link</a>";
+-        Safelist safelist = Safelist.relaxed();
++        Safelist safelist = SafelistPresets.relaxed();
+         String clean1 = Jsoup.clean(h, safelist);
+         assertEquals("<a>Link</a>", clean1);
+ 
+@@ -104,7 +104,7 @@ public class CleanerTest {
+ 
+     @Test public void testRemoveEnforcedAttributes() {
+         String h = "<div><p><A HREF='HTTP://nice.com'>Nice</a></p><blockquote>Hello</blockquote>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basic().removeEnforcedAttribute("a", "rel"));
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basic().removeEnforcedAttribute("a", "rel"));
+ 
+         assertEquals("<p><a href=\"http://nice.com\">Nice</a></p><blockquote>Hello</blockquote>",
+                 TextUtil.stripNewlines(cleanHtml));
+@@ -112,7 +112,7 @@ public class CleanerTest {
+ 
+     @Test public void testRemoveProtocols() {
+         String h = "<p>Contact me <a href='mailto:info@example.com'>here</a></p>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basic().removeProtocols("a", "href", "ftp", "mailto"));
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basic().removeProtocols("a", "href", "ftp", "mailto"));
+ 
+         assertEquals("<p>Contact me <a rel=\"nofollow\">here</a></p>",
+                 TextUtil.stripNewlines(cleanHtml));
+@@ -122,7 +122,7 @@ public class CleanerTest {
+     public void safeListedProtocolShouldBeRetained(Locale locale) {
+         Locale.setDefault(locale);
+ 
+-        Safelist safelist = Safelist.none()
++        Safelist safelist = SafelistPresets.none()
+                 .addTags("a")
+                 .addAttributes("a", "href")
+                 .addProtocols("a", "href", "something");
+@@ -134,31 +134,31 @@ public class CleanerTest {
+ 
+     @Test public void testDropComments() {
+         String h = "<p>Hello<!-- no --></p>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("<p>Hello</p>", cleanHtml);
+     }
+ 
+     @Test public void testDropXmlProc() {
+         String h = "<?import namespace=\"xss\"><p>Hello</p>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("<p>Hello</p>", cleanHtml);
+     }
+ 
+     @Test public void testDropScript() {
+         String h = "<SCRIPT SRC=//ha.ckers.org/.j><SCRIPT>alert(/XSS/.source)</SCRIPT>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("", cleanHtml);
+     }
+ 
+     @Test public void testDropImageScript() {
+         String h = "<IMG SRC=\"javascript:alert('XSS')\">";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("<img>", cleanHtml);
+     }
+ 
+     @Test public void testCleanJavascriptHref() {
+         String h = "<A HREF=\"javascript:document.location='http://www.google.com/'\">XSS</A>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("<a>XSS</a>", cleanHtml);
+     }
+ 
+@@ -167,14 +167,14 @@ public class CleanerTest {
+         String invalidAnchor = "<a href=\"#anchor with spaces\">Invalid anchor</a>";
+ 
+         // A Safelist that does not allow anchors will strip them out.
+-        String cleanHtml = Jsoup.clean(validAnchor, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(validAnchor, SafelistPresets.relaxed());
+         assertEquals("<a>Valid anchor</a>", cleanHtml);
+ 
+-        cleanHtml = Jsoup.clean(invalidAnchor, Safelist.relaxed());
++        cleanHtml = Jsoup.clean(invalidAnchor, SafelistPresets.relaxed());
+         assertEquals("<a>Invalid anchor</a>", cleanHtml);
+ 
+         // A Safelist that allows them will keep them.
+-        Safelist relaxedWithAnchor = Safelist.relaxed().addProtocols("a", "href", "#");
++        Safelist relaxedWithAnchor = SafelistPresets.relaxed().addProtocols("a", "href", "#");
+ 
+         cleanHtml = Jsoup.clean(validAnchor, relaxedWithAnchor);
+         assertEquals(validAnchor, cleanHtml);
+@@ -186,13 +186,13 @@ public class CleanerTest {
+ 
+     @Test public void testDropsUnknownTags() {
+         String h = "<p><custom foo=true>Test</custom></p>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.relaxed());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.relaxed());
+         assertEquals("<p>Test</p>", cleanHtml);
+     }
+ 
+     @Test public void testHandlesEmptyAttributes() {
+         String h = "<img alt=\"\" src= unknown=''>";
+-        String cleanHtml = Jsoup.clean(h, Safelist.basicWithImages());
++        String cleanHtml = Jsoup.clean(h, SafelistPresets.basicWithImages());
+         assertEquals("<img alt=\"\">", cleanHtml);
+     }
+ 
+@@ -206,28 +206,28 @@ public class CleanerTest {
+         String nok5 = "<p>Test <b><a href='http://example.com/' rel='nofollowme'>OK</a></b></p>";
+         String nok6 = "<p>Test <b><a href='http://example.com/'>OK</b></p>"; // missing close tag
+         String nok7 = "</div>What";
+-        assertTrue(Jsoup.isValid(ok, Safelist.basic()));
+-        assertTrue(Jsoup.isValid(ok1, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(nok1, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(nok2, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(nok3, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(nok4, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(nok5, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(nok6, Safelist.basic()));
+-        assertFalse(Jsoup.isValid(ok, Safelist.none()));
+-        assertFalse(Jsoup.isValid(nok7, Safelist.basic()));
++        assertTrue(Jsoup.isValid(ok, SafelistPresets.basic()));
++        assertTrue(Jsoup.isValid(ok1, SafelistPresets.basic()));
++        assertFalse(Jsoup.isValid(nok1, SafelistPresets.basic()));
++        assertFalse(Jsoup.isValid(nok2, SafelistPresets.basic()));
++        assertFalse(Jsoup.isValid(nok3, SafelistPresets.basic()));
++        assertFalse(Jsoup.isValid(nok4, SafelistPresets.none()));
++        assertFalse(Jsoup.isValid(nok5, SafelistPresets.basic()));
++        assertFalse(Jsoup.isValid(nok6, SafelistPresets.basic()));
++        assertFalse(Jsoup.isValid(ok, SafelistPresets.none()));
++        assertFalse(Jsoup.isValid(nok7, SafelistPresets.basic()));
+     }
+ 
+     @Test public void testIsValidDocument() {
+         String ok = "<html><head></head><body><p>Hello</p></body><html>";
+         String nok = "<html><head><script>woops</script><title>Hello</title></head><body><p>Hello</p></body><html>";
+ 
+-        Safelist relaxed = Safelist.relaxed();
++        Safelist relaxed = SafelistPresets.relaxed();
+         Cleaner cleaner = new Cleaner(relaxed);
+         Document okDoc = Jsoup.parse(ok);
+         assertTrue(cleaner.isValid(okDoc));
+         assertFalse(cleaner.isValid(Jsoup.parse(nok)));
+-        assertFalse(new Cleaner(Safelist.none()).isValid(okDoc));
++        assertFalse(new Cleaner(SafelistPresets.none()).isValid(okDoc));
+     }
+ 
+     @Test void configuredCleanerMayBeSharedAcrossThreads() throws InterruptedException {
+@@ -235,7 +235,7 @@ public class CleanerTest {
+         String html = "<a href='/foo'>Link</a><img src='/bar' alt='Q'>";
+         String baseUri = "https://example.com/";
+         String expected = "<a href=\"https://example.com/foo\">Link</a><img src=\"https://example.com/bar\" alt=\"Q\">";
+-        Cleaner cleaner = new Cleaner(Safelist.basicWithImages());
++        Cleaner cleaner = new Cleaner(SafelistPresets.basicWithImages());
+ 
+         int numThreads = 10;
+         int numLoops = 20;
+@@ -279,13 +279,13 @@ public class CleanerTest {
+ 
+     @Test public void resolvesRelativeLinks() {
+         String html = "<a href='/foo'>Link</a><img src='/bar'>";
+-        String clean = Jsoup.clean(html, "http://example.com/", Safelist.basicWithImages());
++        String clean = Jsoup.clean(html, "http://example.com/", SafelistPresets.basicWithImages());
+         assertEquals("<a href=\"http://example.com/foo\">Link</a><img src=\"http://example.com/bar\">", clean);
+     }
+ 
+     @Test void cleanDoesNotModifyInputDocumentWhenResolvingRelativeLinks() {
+         String html = "<a href='/foo'>Link</a>";
+-        Cleaner cleaner = new Cleaner(Safelist.basic());
++        Cleaner cleaner = new Cleaner(SafelistPresets.basic());
+         Document dirty = Jsoup.parseBodyFragment(html, "http://example.com/");
+         Document clean = cleaner.clean(dirty);
+ 
+@@ -295,7 +295,7 @@ public class CleanerTest {
+ 
+     @Test void isValidDoesNotModifyInputDocumentWhenResolvingRelativeLinks() {
+         String html = "<a href='/foo'>Link</a>";
+-        Cleaner cleaner = new Cleaner(Safelist.basic());
++        Cleaner cleaner = new Cleaner(SafelistPresets.basic());
+         Document dirty = Jsoup.parseBodyFragment(html, "http://example.com/");
+ 
+         assertTrue(cleaner.isValid(dirty));
+@@ -327,25 +327,25 @@ public class CleanerTest {
+ 
+     @Test public void preservesRelativeLinksIfConfigured() {
+         String html = "<a href='/foo'>Link</a><img src='/bar'> <img src='javascript:alert()'>";
+-        String clean = Jsoup.clean(html, "http://example.com/", Safelist.basicWithImages().preserveRelativeLinks(true));
++        String clean = Jsoup.clean(html, "http://example.com/", SafelistPresets.basicWithImages().preserveRelativeLinks(true));
+         assertEquals("<a href=\"/foo\">Link</a><img src=\"/bar\"> <img>", clean);
+     }
+ 
+     @Test public void dropsUnresolvableRelativeLinks() { // when not preserving
+         String html = "<a href='/foo'>Link</a>";
+-        String clean = Jsoup.clean(html, Safelist.basic());
++        String clean = Jsoup.clean(html, SafelistPresets.basic());
+         assertEquals("<a rel=\"nofollow\">Link</a>", clean);
+     }
+ 
+     @Test void dropsJavascriptWhenRelativeLinks() {
+         String html ="<a href='javascript:alert()'>One</a>";
+-        Safelist safelist = Safelist.basic().preserveRelativeLinks(true);
++        Safelist safelist = SafelistPresets.basic().preserveRelativeLinks(true);
+         assertEquals("<a rel=\"nofollow\">One</a>", Jsoup.clean(html, safelist));
+         assertFalse(Jsoup.isValid(html, safelist));
+     }
+ 
+     @Test void dropsConcealedJavascriptProtocolWhenRelativesLinksEnabled() {
+-        Safelist safelist = Safelist.basic().preserveRelativeLinks(true);
++        Safelist safelist = SafelistPresets.basic().preserveRelativeLinks(true);
+         String html = "<a href=\"&#0013;ja&Tab;va&Tab;script&#0010;:alert(1)\">Link</a>";
+         String clean = Jsoup.clean(html, "https://", safelist);
+         assertEquals("<a rel=\"nofollow\">Link</a>", clean);
+@@ -358,7 +358,7 @@ public class CleanerTest {
+     }
+ 
+     @Test void dropsConcealedJavascriptProtocolWhenRelativesLinksDisabled() {
+-        Safelist safelist = Safelist.basic().preserveRelativeLinks(false);
++        Safelist safelist = SafelistPresets.basic().preserveRelativeLinks(false);
+         String html = "<a href=\"ja&Tab;vas&#0013;cript:alert(1)\">Link</a>";
+         String clean = Jsoup.clean(html, "https://", safelist);
+         assertEquals("<a rel=\"nofollow\">Link</a>", clean);
+@@ -367,10 +367,10 @@ public class CleanerTest {
+ 
+     @Test public void handlesCustomProtocols() {
+         String html = "<img src='cid:12345' /> <img src='data:gzzt' />";
+-        String dropped = Jsoup.clean(html, Safelist.basicWithImages());
++        String dropped = Jsoup.clean(html, SafelistPresets.basicWithImages());
+         assertEquals("<img> <img>", dropped);
+ 
+-        String preserved = Jsoup.clean(html, Safelist.basicWithImages().addProtocols("img", "src", "cid", "data"));
++        String preserved = Jsoup.clean(html, SafelistPresets.basicWithImages().addProtocols("img", "src", "cid", "data"));
+         assertEquals("<img src=\"cid:12345\"> <img src=\"data:gzzt\">", preserved);
+     }
+ 
+@@ -402,8 +402,8 @@ public class CleanerTest {
+         os.charset("ascii");
+ 
+         String html = "<div><p>&bernou;</p></div>";
+-        String customOut = Jsoup.clean(html, "http://foo.com/", Safelist.relaxed(), os);
+-        String defaultOut = Jsoup.clean(html, "http://foo.com/", Safelist.relaxed());
++        String customOut = Jsoup.clean(html, "http://foo.com/", SafelistPresets.relaxed(), os);
++        String defaultOut = Jsoup.clean(html, "http://foo.com/", SafelistPresets.relaxed());
+         assertNotSame(defaultOut, customOut);
+ 
+         assertEquals("<div><p>&Bscr;</p></div>", customOut); // entities now prefers shorted names if aliased
+@@ -413,28 +413,28 @@ public class CleanerTest {
+ 
+         os.charset("ASCII");
+         os.escapeMode(Entities.EscapeMode.base);
+-        String customOut2 = Jsoup.clean(html, "http://foo.com/", Safelist.relaxed(), os);
++        String customOut2 = Jsoup.clean(html, "http://foo.com/", SafelistPresets.relaxed(), os);
+         assertEquals("<div><p>&#x212c;</p></div>", customOut2);
+     }
+ 
+     @Test public void handlesFramesets() {
+         String dirty = "<html><head><script></script><noscript></noscript></head><frameset><frame src=\"foo\" /><frame src=\"foo\" /></frameset></html>";
+-        String clean = Jsoup.clean(dirty, Safelist.basic());
++        String clean = Jsoup.clean(dirty, SafelistPresets.basic());
+         assertEquals("", clean); // nothing good can come out of that
+ 
+         Document dirtyDoc = Jsoup.parse(dirty);
+-        Document cleanDoc = new Cleaner(Safelist.basic()).clean(dirtyDoc);
++        Document cleanDoc = new Cleaner(SafelistPresets.basic()).clean(dirtyDoc);
+         assertNotNull(cleanDoc);
+         assertEquals(0, cleanDoc.body().childNodeSize());
+     }
+ 
+     @Test public void cleansInternationalText() {
+-        assertEquals("привет", Jsoup.clean("привет", Safelist.none()));
++        assertEquals("привет", Jsoup.clean("привет", SafelistPresets.none()));
+     }
+ 
+     @Test
+     public void testScriptTagInSafeList() {
+-        Safelist safelist = Safelist.relaxed();
++        Safelist safelist = SafelistPresets.relaxed();
+         safelist.addTags( "script" );
+         assertTrue( Jsoup.isValid("Hello<script>alert('Doh')</script>World !", safelist) );
+     }
+@@ -443,7 +443,7 @@ public class CleanerTest {
+     public void bailsIfRemovingProtocolThatsNotSet() {
+         assertThrows(IllegalArgumentException.class, () -> {
+             // a case that came up on the email list
+-            Safelist w = Safelist.none();
++            Safelist w = SafelistPresets.none();
+ 
+             // note no add tag, and removing protocol without adding first
+             w.addAttributes("a", "href");
+@@ -453,20 +453,20 @@ public class CleanerTest {
+ 
+     @Test public void handlesControlCharactersAfterTagName() {
+         String html = "<a/\06>";
+-        String clean = Jsoup.clean(html, Safelist.basic());
++        String clean = Jsoup.clean(html, SafelistPresets.basic());
+         assertEquals("<a rel=\"nofollow\"></a>", clean);
+     }
+ 
+     @Test public void handlesAttributesWithNoValue() {
+         // https://github.com/jhy/jsoup/issues/973
+-        String clean = Jsoup.clean("<a href>Clean</a>", Safelist.basic());
++        String clean = Jsoup.clean("<a href>Clean</a>", SafelistPresets.basic());
+ 
+         assertEquals("<a rel=\"nofollow\">Clean</a>", clean);
+     }
+ 
+     @Test public void handlesNoHrefAttribute() {
+         String dirty = "<a>One</a> <a href>Two</a>";
+-        Safelist relaxedWithAnchor = Safelist.relaxed().addProtocols("a", "href", "#");
++        Safelist relaxedWithAnchor = SafelistPresets.relaxed().addProtocols("a", "href", "#");
+         String clean = Jsoup.clean(dirty, relaxedWithAnchor);
+         assertEquals("<a>One</a> <a>Two</a>", clean);
+     }
+@@ -474,7 +474,7 @@ public class CleanerTest {
+     @Test void cleanerPreservesCaseVariantOfMatchingEnforcedAttribute() {
+         Document dirty = Jsoup.parse("<a href='http://example.com/' REL='nofollow'>Link</a>", "",
+             Parser.htmlParser().settings(ParseSettings.preserveCase));
+-        Cleaner cleaner = new Cleaner(Safelist.basic());
++        Cleaner cleaner = new Cleaner(SafelistPresets.basic());
+ 
+         Document clean = cleaner.clean(dirty);
+         Element link = clean.expectFirst("a");
+@@ -486,7 +486,7 @@ public class CleanerTest {
+     @Test public void handlesNestedQuotesInAttribute() {
+         // https://github.com/jhy/jsoup/issues/1243 - no repro
+         String orig = "<div style=\"font-family: 'Calibri'\">Will (not) fail</div>";
+-        Safelist allow = Safelist.relaxed()
++        Safelist allow = SafelistPresets.relaxed()
+             .addAttributes("div", "style");
+ 
+         String clean = Jsoup.clean(orig, allow);
+@@ -500,7 +500,7 @@ public class CleanerTest {
+         Document orig = Jsoup.parse("<p>test<br></p>");
+         orig.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+         orig.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
+-        Safelist safelist = Safelist.none().addTags("p", "br");
++        Safelist safelist = SafelistPresets.none().addTags("p", "br");
+ 
+         Document result = new Cleaner(safelist).clean(orig);
+         assertEquals(Document.OutputSettings.Syntax.xml, result.outputSettings().syntax());
+@@ -518,7 +518,7 @@ public class CleanerTest {
+         Range.AttributeRange attributeRange = p.attributes().sourceRange("id");
+         assertEquals("2,5:25-2,7:27=2,8:28-2,9:29", attributeRange.toString());
+ 
+-        Document clean = new Cleaner(Safelist.relaxed().addAttributes("p", "id")).clean(orig);
++        Document clean = new Cleaner(SafelistPresets.relaxed().addAttributes("p", "id")).clean(orig);
+         Element cleanP = clean.expectFirst("p");
+         assertEquals("1", cleanP.id());
+         Range cleanRange = cleanP.sourceRange();
+@@ -539,7 +539,7 @@ public class CleanerTest {
+             attrs = Arrays.stream(attrs).map(String::toLowerCase).toArray(String[]::new);
+         }
+ 
+-        Safelist safelist = Safelist.none().addTags(tags).addAttributes(":all", attrs);
++        Safelist safelist = SafelistPresets.none().addTags(tags).addAttributes(":all", attrs);
+         String clean = Jsoup.clean(html, safelist);
+         String expected = "<svg>\n" +
+             " <feMerge baseFrequency=\"2\">\n" +
+@@ -557,7 +557,7 @@ public class CleanerTest {
+         // We want to add nofollow to external links, but not to for relative links or those on the same site
+         String html = "<a href='http://external.com/'>One</a> <a href='/relative/'>Two</a> <a href='../other/'>Three</a> <a href='http://example.com/bar'>Four</a>";
+ 
+-        Safelist basic = Safelist.basic().preserveRelativeLinks(true);
++        Safelist basic = SafelistPresets.basic().preserveRelativeLinks(true);
+         String clean = Jsoup.clean(html, "http://example.com/", basic);
+         assertEquals("<a href=\"http://external.com/\" rel=\"nofollow\">One</a> <a href=\"/relative/\">Two</a> <a href=\"../other/\">Three</a> <a href=\"http://example.com/bar\">Four</a>", clean);
+ 
+@@ -570,7 +570,7 @@ public class CleanerTest {
+         assertTrue(Jsoup.isValid(html, basic));
+ 
+         // test that it works in safelist.relaxed as well, which doesn't by default have rel=nofollow
+-        Safelist relaxed = Safelist.relaxed().preserveRelativeLinks(true).addEnforcedAttribute("a", "rel", "nofollow");
++        Safelist relaxed = SafelistPresets.relaxed().preserveRelativeLinks(true).addEnforcedAttribute("a", "rel", "nofollow");
+         String clean3 = Jsoup.clean(html, "http://example.com/", relaxed);
+         assertEquals("<a href=\"http://external.com/\" rel=\"nofollow\">One</a> <a href=\"/relative/\">Two</a> <a href=\"../other/\">Three</a> <a href=\"http://example.com/bar\">Four</a>", clean3);
+         assertTrue(Jsoup.isValid(html, relaxed));
+@@ -582,7 +582,7 @@ public class CleanerTest {
+     @Test void canonicalizesEnforcedAttributes() {
+         Document customDirty = Jsoup.parse("<a REL='external'>One</a>", "",
+             Parser.htmlParser().settings(ParseSettings.preserveCase));
+-        Cleaner customCleaner = new Cleaner(Safelist.none()
++        Cleaner customCleaner = new Cleaner(SafelistPresets.none()
+             .addTags("a")
+             .addEnforcedAttribute("a", "rel", "external"));
+         assertEquals("<a rel=\"external\">One</a>", customCleaner.clean(customDirty).body().html());
+@@ -591,20 +591,20 @@ public class CleanerTest {
+     @Test void canonicalizesNofollowEnforcedAttribute() {
+         Document dirty = Jsoup.parse("<a href='http://external.com/' REL='nofollow'>One</a>", "",
+             Parser.htmlParser().settings(ParseSettings.preserveCase));
+-        Cleaner cleaner = new Cleaner(Safelist.basic());
++        Cleaner cleaner = new Cleaner(SafelistPresets.basic());
+         assertEquals("<a href=\"http://external.com/\" rel=\"nofollow\">One</a>", cleaner.clean(dirty).body().html());
+     }
+ 
+     @Test void preservesMatchingSourceNofollowWhenEnforcementSuppressed() {
+         Document dirty = Jsoup.parse("<a href='http://example.com/foo' REL='nofollow'>One</a>", "http://example.com/",
+             Parser.htmlParser().settings(ParseSettings.preserveCase));
+-        Cleaner cleaner = new Cleaner(Safelist.basic());
++        Cleaner cleaner = new Cleaner(SafelistPresets.basic());
+         assertEquals("<a href=\"http://example.com/foo\" REL=\"nofollow\">One</a>", cleaner.clean(dirty).body().html());
+     }
+ 
+     @Test void discardsSvgScriptData() {
+         // https://github.com/jhy/jsoup/issues/2320
+-        Safelist svgOk = Safelist.none().addTags("svg");
++        Safelist svgOk = SafelistPresets.none().addTags("svg");
+         String cleaned = Jsoup.clean("<svg><script> a < b </script></svg>", svgOk);
+         assertEquals("<svg></svg>", cleaned);
+     }
+@@ -614,7 +614,7 @@ public class CleanerTest {
+ 
+         // by default, iframe is data
+         String input = "<iframe>content is <data></iframe>";
+-        Safelist safelist = Safelist.relaxed().addTags("iframe");
++        Safelist safelist = SafelistPresets.relaxed().addTags("iframe");
+         String clean = Jsoup.clean(input, safelist);
+         assertEquals("<iframe>content is <data></iframe>", clean);
+ 
+@@ -633,7 +633,7 @@ public class CleanerTest {
+         assertEquals("<iframe>content is &lt;data&gt;</iframe>", doc2.body().html());
+ 
+         // can use cleaner with updated tagset
+-        Cleaner cleaner = new Cleaner(Safelist.relaxed());
++        Cleaner cleaner = new Cleaner(SafelistPresets.relaxed());
+         String clean2 = cleaner.clean(doc2).body().html();
+         assertEquals("content is &lt;data&gt;", clean2);
+     }
+diff --git a/src/test/java/org/jsoup/safety/SafelistTest.java b/src/test/java/org/jsoup/safety/SafelistTest.java
+index 90b4fd61..635c28b1 100644
+--- a/src/test/java/org/jsoup/safety/SafelistTest.java
++++ b/src/test/java/org/jsoup/safety/SafelistTest.java
+@@ -17,7 +17,7 @@ public class SafelistTest {
+ 
+     @Test
+     public void testCopyConstructor_noSideEffectOnTags() {
+-        Safelist safelist1 = Safelist.none().addTags(TEST_TAG);
++        Safelist safelist1 = SafelistPresets.none().addTags(TEST_TAG);
+         Safelist safelist2 = new Safelist(safelist1);
+         safelist1.addTags("invalidTag");
+ 
+@@ -26,7 +26,7 @@ public class SafelistTest {
+ 
+     @Test
+     public void testCopyConstructor_noSideEffectOnAttributes() {
+-        Safelist safelist1 = Safelist.none().addAttributes(TEST_TAG, TEST_ATTRIBUTE);
++        Safelist safelist1 = SafelistPresets.none().addAttributes(TEST_TAG, TEST_ATTRIBUTE);
+         Safelist safelist2 = new Safelist(safelist1);
+         safelist1.addAttributes(TEST_TAG, "invalidAttribute");
+ 
+@@ -35,7 +35,7 @@ public class SafelistTest {
+ 
+     @Test
+     public void testCopyConstructor_noSideEffectOnEnforcedAttributes() {
+-        Safelist safelist1 = Safelist.none().addEnforcedAttribute(TEST_TAG, TEST_ATTRIBUTE, TEST_VALUE);
++        Safelist safelist1 = SafelistPresets.none().addEnforcedAttribute(TEST_TAG, TEST_ATTRIBUTE, TEST_VALUE);
+         Safelist safelist2 = new Safelist(safelist1);
+         safelist1.addEnforcedAttribute(TEST_TAG, TEST_ATTRIBUTE, "invalidValue");
+ 
+@@ -47,7 +47,7 @@ public class SafelistTest {
+     @Test
+     public void testCopyConstructor_noSideEffectOnProtocols() {
+         final String invalidScheme = "invalid-scheme";
+-        Safelist safelist1 = Safelist.none()
++        Safelist safelist1 = SafelistPresets.none()
+                 .addAttributes(TEST_TAG, TEST_ATTRIBUTE)
+                 .addProtocols(TEST_TAG, TEST_ATTRIBUTE, TEST_SCHEME);
+         Safelist safelist2 = new Safelist(safelist1);
+@@ -68,7 +68,7 @@ public class SafelistTest {
+         Attribute href = link.attributes().attribute("href");
+         assertNotNull(href);
+ 
+-        assertTrue(Safelist.basic().isSafeAttribute("a", link, href));
++        assertTrue(SafelistPresets.basic().isSafeAttribute("a", link, href));
+         assertEquals("/foo", href.getValue());
+         assertEquals("/foo", link.attr("href"));
+     }
+@@ -79,7 +79,7 @@ public class SafelistTest {
+         Attributes attributes = new Attributes().put(rel);
+         Element link = new Element(Tag.valueOf("a"), "", attributes);
+ 
+-        assertTrue(Safelist.basic().isSafeAttribute("a", link, rel));
++        assertTrue(SafelistPresets.basic().isSafeAttribute("a", link, rel));
+     }
+ 
+     @Test
+@@ -87,7 +87,7 @@ public class SafelistTest {
+         boolean threw = false;
+         Safelist safelist = null;
+         try {
+-            safelist = Safelist.none().addTags("NOSCRIPT");
++            safelist = SafelistPresets.none().addTags("NOSCRIPT");
+         } catch (ValidationException validationException) {
+             threw = true;
+             assertTrue(validationException.getMessage().contains("unsupported"));

@@ -1,0 +1,215 @@
+commit e44115e79f2d8d4e9c87b4b801c3241ff0de3f46
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:24:45 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateHelper.java b/src/main/java/org/jsoup/parser/TokeniserStateHelper.java
+new file mode 100644
+index 00000000..01a44f20
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/TokeniserStateHelper.java
+@@ -0,0 +1,203 @@
++package org.jsoup.parser;
++
++import org.jsoup.internal.StringUtil;
++import org.jsoup.nodes.DocumentType;
++
++/**
++ * Helper for TokeniserState large private static methods and related constants.
++ */
++final class TokeniserStateHelper {
++
++    static final char nullChar = '\u0000';
++    static final char[] attributeNameCharsSorted = new char[]{'\t', '\n', '\f', '\r', ' ', '"', '\'', '/', '<', '=', '>', '?'};
++    static final char[] attributeValueUnquoted = new char[]{nullChar, '\t', '\n', '\f', '\r', ' ', '"', '&', '\'', '<', '=', '>', '`'};
++
++    private static final char replacementChar = Tokeniser.replacementChar;
++    private static final String replacementStr = String.valueOf(Tokeniser.replacementChar);
++    private static final char eof = CharacterReader.EOF;
++
++    static void handleDataEndTag(Tokeniser t, CharacterReader r, TokeniserState elseTransition) {
++        if (r.matchesAsciiAlpha()) {
++            String name = r.consumeTagName();
++            t.tagPending.appendTagName(name);
++            t.dataBuffer.append(name);
++            return;
++        }
++
++        boolean needsExitTransition = false;
++        if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
++            char c = r.consume();
++            switch (c) {
++                case '\t':
++                case '\n':
++                case '\r':
++                case '\f':
++                case ' ':
++                    t.transition(TokeniserState.BeforeAttributeName);
++                    break;
++                case '/':
++                    t.transition(TokeniserState.SelfClosingStartTag);
++                    break;
++                case '>':
++                    t.emitTagPending();
++                    t.transition(TokeniserState.Data);
++                    break;
++                default:
++                    t.dataBuffer.append(c);
++                    needsExitTransition = true;
++            }
++        } else {
++            needsExitTransition = true;
++        }
++
++        if (needsExitTransition) {
++            t.emit("</");
++            t.emit(t.dataBuffer.value());
++            t.transition(elseTransition);
++        }
++    }
++
++    static void readRawData(Tokeniser t, CharacterReader r, TokeniserState current, TokeniserState advance) {
++        switch (r.current()) {
++            case '<':
++                t.advanceTransition(advance);
++                break;
++            case nullChar:
++                t.error(current);
++                r.advance();
++                t.emit(replacementChar);
++                break;
++            case eof:
++                t.emit(new Token.EOF());
++                break;
++            default:
++                String data = r.consumeRawData();
++                t.emit(data);
++                break;
++        }
++    }
++
++    static void readCharRef(Tokeniser t, TokeniserState advance) {
++        int[] c = t.consumeCharacterReference(null, false);
++        if (c == null)
++            t.emit('&');
++        else
++            t.emit(c);
++        t.transition(advance);
++    }
++
++    static void readEndTag(Tokeniser t, CharacterReader r, TokeniserState a, TokeniserState b) {
++        if (r.matchesAsciiAlpha()) {
++            t.createTagPending(false);
++            t.transition(a);
++        } else {
++            t.emit("</");
++            t.transition(b);
++        }
++    }
++
++    static void handleDataDoubleEscapeTag(Tokeniser t, CharacterReader r, TokeniserState primary, TokeniserState fallback) {
++        if (r.matchesAsciiAlpha()) {
++            String name = r.consumeLetterSequence();
++            t.dataBuffer.append(name);
++            t.emit(name);
++            return;
++        }
++
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++            case '/':
++            case '>':
++                if (t.dataBuffer.value().equals("script"))
++                    t.transition(primary);
++                else
++                    t.transition(fallback);
++                t.emit(c);
++                break;
++            default:
++                r.unconsume();
++                t.transition(fallback);
++        }
++    }
++
++    static void readDoctypeInternalSubset(Tokeniser t, CharacterReader r, TokeniserState current) {
++        final byte None = 0, SingleQuote = 1, DoubleQuote = 2, Comment = 3, ProcessingInstruction = 4;
++        byte context = None;
++        TokenData subset = t.doctypePending.internalSubset;
++
++        while (true) {
++            char c = r.consume();
++            switch (c) {
++                case '\'':
++                    subset.append(c);
++                    if  (context == None) context = SingleQuote;
++                    else if (context == SingleQuote) context = None;
++                    break;
++                case '"':
++                    subset.append(c);
++                    if (context == None) context = DoubleQuote;
++                    else if (context == DoubleQuote) context = None;
++                    break;
++                case '<':
++                    subset.append(c);
++                    if (context == None) {
++                        if (r.matchConsume("!--")) {
++                            subset.append("!--");
++                            context = Comment;
++                        } else if (r.matchConsume("?")) {
++                            subset.append('?');
++                            context = ProcessingInstruction;
++                        }
++                    }
++                    break;
++                case '-':
++                    subset.append(c);
++                    if (context == Comment && r.matchConsume("->")) {
++                        subset.append("->");
++                        context = None;
++                    }
++                    break;
++                case '?':
++                    subset.append(c);
++                    if (context == ProcessingInstruction && r.matches('>')) {
++                        r.advance();
++                        subset.append('>');
++                        context = None;
++                    }
++                    break;
++                case ']':
++                    if (context == None) {
++                        String ws = r.consumeMatching(StringUtil::isWhitespace);
++                        if (r.matches('>')) {
++                            r.advance();
++                            t.emitDoctypePending();
++                            t.transition(TokeniserState.Data);
++                            return;
++                        }
++                        subset.append(c);
++                        subset.append(ws);
++                        break;
++                    }
++                    subset.append(c);
++                    break;
++                case nullChar:
++                    t.error(current);
++                    subset.append(replacementChar);
++                    break;
++                case eof:
++                    t.eofError(current);
++                    t.emitDoctypePending();
++                    t.transition(TokeniserState.Data);
++                    return;
++                default:
++                    subset.append(c);
++                    break;
++            }
++        }
++    }
++}

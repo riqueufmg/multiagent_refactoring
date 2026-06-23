@@ -1,0 +1,70 @@
+commit 43477eb87d72b4fc0a5287fc9ac696a7dd7a5f64
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 13:53:02 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java
+new file mode 100644
+index 00000000..5cf89a63
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java
+@@ -0,0 +1,58 @@
++package org.jsoup.parser;
++
++import org.jsoup.nodes.Element;
++import org.jsoup.nodes.Node;
++import org.jsoup.nodes.Document;
++import java.util.ArrayList;
++
++/**
++ * Helper holder for table-related handlers extracted from HtmlTreeBuilderState.
++ *
++ * This class provides static method signatures so subsequent refactor blocks can
++ * move logic out of the large enum into here. For this block, these methods
++ * delegate to the corresponding enum-state implementations so behavior is
++ * preserved and the project compiles.
++ */
++public final class HtmlTreeBuilderStateTableHandlers {
++
++    private HtmlTreeBuilderStateTableHandlers() {}
++
++    public static boolean processInTable(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InTable.process(t, tb);
++    }
++
++    public static boolean processInTableText(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InTableText.process(t, tb);
++    }
++
++    public static boolean processInCaption(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InCaption.process(t, tb);
++    }
++
++    public static boolean processInColumnGroup(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InColumnGroup.process(t, tb);
++    }
++
++    public static boolean processInTableBody(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InTableBody.process(t, tb);
++    }
++
++    public static boolean processInRow(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InRow.process(t, tb);
++    }
++
++    public static boolean processInCell(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderState.InCell.process(t, tb);
++    }
++
++    /**
++     * Close a table cell. Token parameter is present to match expected helper
++     * signature for potential future needs; current implementation ignores it.
++     */
++    public static void closeCell(Token t, HtmlTreeBuilder tb) {
++        if (tb.inTableScope("td"))
++            tb.processEndTag("td");
++        else
++            tb.processEndTag("th");
++    }
++}

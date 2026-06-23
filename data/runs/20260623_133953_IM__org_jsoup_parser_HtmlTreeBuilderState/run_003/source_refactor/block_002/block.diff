@@ -1,0 +1,218 @@
+commit 5e0d1b64f177c1dbaa511ea81394acfe00366ccb
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:15:39 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index 1a94e6c9..647278bb 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -141,99 +141,9 @@ enum HtmlTreeBuilderState {
+     },
+     InSelect {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            final String name;
+-
+-            switch (t.type) {
+-                case Character:
+-                    tb.insertCharacterNode(t.asCharacter());
+-                    break;
+-                case Comment:
+-                    tb.insertCommentNode(t.asComment());
+-                    break;
+-                case Doctype:
+-                    tb.error(this);
+-                    return false;
+-                case StartTag:
+-                    Token.StartTag start = t.asStartTag();
+-                    name = start.normalName();
+-                    if (name.equals("html"))
+-                        return tb.process(start, InBody);
+-                    else if (name.equals("option")) {
+-                        if (tb.currentElementIs("option"))
+-                            tb.processEndTag("option");
+-                        tb.insertElementFor(start);
+-                    } else if (name.equals("optgroup")) {
+-                        if (tb.currentElementIs("option"))
+-                            tb.processEndTag("option"); // pop option and flow to pop optgroup
+-                        if (tb.currentElementIs("optgroup"))
+-                            tb.processEndTag("optgroup");
+-                        tb.insertElementFor(start);
+-                    } else if (name.equals("select")) {
+-                        tb.error(this);
+-                        return tb.processEndTag("select");
+-                    } else if (inSorted(name, InSelectEnd)) {
+-                        tb.error(this);
+-                        if (!tb.inSelectScope("select"))
+-                            return false; // frag
+-                        // spec says close select then reprocess; leads to recursion. iter directly:
+-                        do {
+-                            tb.popStackToClose("select");
+-                            tb.resetInsertionMode();
+-                        } while (tb.inSelectScope("select")); // collapse invalid nested selects
+-                        return tb.process(start);
+-                    } else if (name.equals("script") || name.equals("template")) {
+-                        return tb.process(t, InHead);
+-                    } else {
+-                        return anythingElse(t, tb);
+-                    }
+-                    break;
+-                case EndTag:
+-                    Token.EndTag end = t.asEndTag();
+-                    name = end.normalName();
+-                    switch (name) {
+-                        case "optgroup":
+-                            if (tb.currentElementIs("option") && tb.aboveOnStack(tb.currentElement()) != null && tb.aboveOnStack(tb.currentElement()).nameIs("optgroup"))
+-                                tb.processEndTag("option");
+-                            if (tb.currentElementIs("optgroup"))
+-                                tb.pop();
+-                            else
+-                                tb.error(this);
+-                            break;
+-                        case "option":
+-                            if (tb.currentElementIs("option"))
+-                                tb.pop();
+-                            else
+-                                tb.error(this);
+-                            break;
+-                        case "select":
+-                            if (!tb.inSelectScope(name)) {
+-                                tb.error(this);
+-                                return false;
+-                            } else {
+-                                tb.popStackToClose(name);
+-                                tb.resetInsertionMode();
+-                            }
+-                            break;
+-                        case "template":
+-                            return tb.process(t, InHead);
+-                        default:
+-                            return anythingElse(t, tb);
+-                    }
+-                    break;
+-                case EOF:
+-                    if (!tb.currentElementIs("html"))
+-                        tb.error(this);
+-                    break;
+-                default:
+-                    return anythingElse(t, tb);
+-            }
+-            return true;
++            return HtmlTreeBuilderStateSelectHandler.processInSelect(t, tb);
+         }
+ 
+-        private boolean anythingElse(Token t, HtmlTreeBuilder tb) {
+-            tb.error(this);
+-            return false;
+-        }
+     },
+     InSelectInTable {
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandler.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandler.java
+new file mode 100644
+index 00000000..3c389b7d
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateSelectHandler.java
+@@ -0,0 +1,101 @@
++package org.jsoup.parser;
++
++import static org.jsoup.internal.StringUtil.inSorted;
++import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;
++
++class HtmlTreeBuilderStateSelectHandler {
++    static boolean processInSelect(Token t, HtmlTreeBuilder tb) {
++        final String name;
++
++        switch (t.type) {
++            case Character:
++                tb.insertCharacterNode(t.asCharacter());
++                break;
++            case Comment:
++                tb.insertCommentNode(t.asComment());
++                break;
++            case Doctype:
++                tb.error(HtmlTreeBuilderState.InSelect);
++                return false;
++            case StartTag:
++                Token.StartTag start = t.asStartTag();
++                name = start.normalName();
++                if (name.equals("html"))
++                    return tb.process(start, HtmlTreeBuilderState.InBody);
++                else if (name.equals("option")) {
++                    if (tb.currentElementIs("option"))
++                        tb.processEndTag("option");
++                    tb.insertElementFor(start);
++                } else if (name.equals("optgroup")) {
++                    if (tb.currentElementIs("option"))
++                        tb.processEndTag("option"); // pop option and flow to pop optgroup
++                    if (tb.currentElementIs("optgroup"))
++                        tb.processEndTag("optgroup");
++                    tb.insertElementFor(start);
++                } else if (name.equals("select")) {
++                    tb.error(HtmlTreeBuilderState.InSelect);
++                    return tb.processEndTag("select");
++                } else if (inSorted(name, InSelectEnd)) {
++                    tb.error(HtmlTreeBuilderState.InSelect);
++                    if (!tb.inSelectScope("select"))
++                        return false; // frag
++                    // spec says close select then reprocess; leads to recursion. iter directly:
++                    do {
++                        tb.popStackToClose("select");
++                        tb.resetInsertionMode();
++                    } while (tb.inSelectScope("select")); // collapse invalid nested selects
++                    return tb.process(start);
++                } else if (name.equals("script") || name.equals("template")) {
++                    return tb.process(t, HtmlTreeBuilderState.InHead);
++                } else {
++                    return anythingElse(t, tb);
++                }
++                break;
++            case EndTag:
++                Token.EndTag end = t.asEndTag();
++                name = end.normalName();
++                switch (name) {
++                    case "optgroup":
++                        if (tb.currentElementIs("option") && tb.aboveOnStack(tb.currentElement()) != null && tb.aboveOnStack(tb.currentElement()).nameIs("optgroup"))
++                            tb.processEndTag("option");
++                        if (tb.currentElementIs("optgroup"))
++                            tb.pop();
++                        else
++                            tb.error(HtmlTreeBuilderState.InSelect);
++                        break;
++                    case "option":
++                        if (tb.currentElementIs("option"))
++                            tb.pop();
++                        else
++                            tb.error(HtmlTreeBuilderState.InSelect);
++                        break;
++                    case "select":
++                        if (!tb.inSelectScope(name)) {
++                            tb.error(HtmlTreeBuilderState.InSelect);
++                            return false;
++                        } else {
++                            tb.popStackToClose(name);
++                            tb.resetInsertionMode();
++                        }
++                        break;
++                    case "template":
++                        return tb.process(t, HtmlTreeBuilderState.InHead);
++                    default:
++                        return anythingElse(t, tb);
++                }
++                break;
++            case EOF:
++                if (!tb.currentElementIs("html"))
++                    tb.error(HtmlTreeBuilderState.InSelect);
++                break;
++            default:
++                return anythingElse(t, tb);
++        }
++        return true;
++    }
++
++    private static boolean anythingElse(Token t, HtmlTreeBuilder tb) {
++        tb.error(HtmlTreeBuilderState.InSelect);
++        return false;
++    }
++}

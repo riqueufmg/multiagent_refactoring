@@ -1,0 +1,59 @@
+{
+  "id": 1,
+  "goal": "Reduce type clutter inside Safelist by extracting the small typed helper nested classes (TypedValue and its concrete subclasses) into a dedicated top-level source to improve modularity and readability.",
+  "files": [
+    "src/main/java/org/jsoup/safety/Safelist.java",
+    "src/main/java/org/jsoup/safety/SafelistTypes.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java:TypedValue",
+        "src/main/java/org/jsoup/safety/Safelist.java:TagName",
+        "src/main/java/org/jsoup/safety/Safelist.java:AttributeKey",
+        "src/main/java/org/jsoup/safety/Safelist.java:AttributeValue",
+        "src/main/java/org/jsoup/safety/Safelist.java:Protocol"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/SafelistTypes.java"
+      ],
+      "details": "Move the nested static classes TypedValue, TagName, AttributeKey, AttributeValue, and Protocol into a new top-level source file SafelistTypes.java in package org.jsoup.safety. The new file will declare the abstract class TypedValue and the four concrete subclasses as package-private (or public if necessary) so existing code in Safelist can continue to reference them. Preserve existing constructors and implementations (e.g. TypedValue constructor validation, equals/hashCode/toString; TagName.valueOf using Normalizer.lowerCase).",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "details": "Update Safelist.java imports to reference the extracted top-level types (TagName, AttributeKey, AttributeValue, Protocol, TypedValue) from the same package instead of using nested type references. Remove the nested type declarations from Safelist.java after extraction.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ]
+}

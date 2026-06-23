@@ -1,0 +1,79 @@
+{
+  "id": 3,
+  "goal": "Make Safelist a thin façade that preserves its public fluent API while delegating configuration responsibilities to SafelistConfig and using the extracted typed helper classes; update imports and internal call sites accordingly.",
+  "files": [
+    "src/main/java/org/jsoup/safety/Safelist.java",
+    "src/main/java/org/jsoup/safety/SafelistConfig.java",
+    "src/main/java/org/jsoup/safety/SafelistTypes.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ],
+  "ops": [
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "details": "Add imports for org.jsoup.safety.SafelistConfig and (if needed) for types from SafelistTypes. Remove any imports that referenced nested types (no longer present) and adjust references to the moved methods/fields so that Safelist delegates to a private final SafelistConfig config field.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java:<implicit internal state now replaced>"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java:config"
+      ],
+      "details": "Introduce a new private final field 'config' of type SafelistConfig in Safelist. Initialize it in constructors: Safelist() -> new SafelistConfig(); Safelist(Safelist copy) -> new SafelistConfig(copy.config). Remove direct usages of the old fields in Safelist and replace with delegation to config.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/cleaner/Cleaner.java"
+      ],
+      "details": "Update internal call sites inside Safelist to delegate to SafelistConfig (e.g., methods left on Safelist should call config.addTags(...), config.isSafeAttribute(...), config.shouldAbsUrl(...)). Also update any other project call sites that referenced moved internal helpers directly (search for direct access to tagNames/attributes/enforcedAttributes/protocols or moved private helpers and replace with calls to Safelist's public delegating methods or to SafelistConfig if package-local access is used). This preserves the public Safelist API while removing the implementation from the long class body.",
+      "risk": "medium"
+    },
+    {
+      "op": "REPLACE_DEPENDENCY",
+      "inputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/safety/Safelist.java"
+      ],
+      "details": "Where necessary, replace references that previously relied on nested helper classes with references to the extracted top-level classes (TagName, AttributeKey, AttributeValue, Protocol) and references to configuration now provided by SafelistConfig. Ensure the fluent chaining of the public API (methods return Safelist) still works by having Safelist delegating methods return 'this' after invoking config.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ]
+}

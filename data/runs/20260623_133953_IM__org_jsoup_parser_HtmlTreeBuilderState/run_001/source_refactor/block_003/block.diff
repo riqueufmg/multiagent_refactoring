@@ -1,0 +1,37 @@
+commit 8bd5c496a7473a94f38f332e60bcf9f55482d082
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 13:51:07 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java
+new file mode 100644
+index 00000000..62b9e963
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java
+@@ -0,0 +1,25 @@
++package org.jsoup.parser;
++
++/**
++ * Thin facade to centralize external calls into HtmlTreeBuilderState. Provides a single
++ * stable entry point for handling tokens against a given state. Delegates to the
++ * enum's package-private process(...) method.
++ */
++public final class HtmlTreeBuilderStateFacade {
++
++    private HtmlTreeBuilderStateFacade() {
++        // no instantiation
++    }
++
++    /**
++     * Handle a token using the provided state by delegating to HtmlTreeBuilderState.process.
++     *
++     * @param t the token to process
++     * @param tb the tree builder
++     * @param state the current state
++     * @return true if processing should continue, false otherwise
++     */
++    public static boolean handle(Token t, HtmlTreeBuilder tb, HtmlTreeBuilderState state) {
++        return state.process(t, tb);
++    }
++}

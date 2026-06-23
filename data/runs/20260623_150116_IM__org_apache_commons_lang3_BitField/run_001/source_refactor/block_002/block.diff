@@ -1,0 +1,88 @@
+commit 68c68d77231ef68f4c7d53d37d6f55094b3ddbdc
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 15:13:28 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/lang3/BitField.java b/src/main/java/org/apache/commons/lang3/BitField.java
+index 24359224f..6ca8f3732 100644
+--- a/src/main/java/org/apache/commons/lang3/BitField.java
++++ b/src/main/java/org/apache/commons/lang3/BitField.java
+@@ -76,6 +76,9 @@ public class BitField {
+ 
+     private final int shiftCount;
+ 
++    /* Helper handling primitive-size convenience methods. Delegates moved implementations to keep BitField small. */
++    private final BitFieldPrimitives primitives;
++
+     /**
+      * Creates a BitField instance.
+      *
+@@ -84,6 +87,7 @@ public class BitField {
+     public BitField(final int mask) {
+         this.mask = Integer.toUnsignedLong(mask);
+         this.shiftCount = this.mask == 0 ? 0 : Long.numberOfTrailingZeros(this.mask);
++        this.primitives = new BitFieldPrimitives(this);
+     }
+ 
+     /**
+@@ -95,6 +99,7 @@ public BitField(final int mask) {
+     public BitField(final long mask) {
+         this.mask = mask;
+         this.shiftCount = mask == 0 ? 0 : Long.numberOfTrailingZeros(mask);
++        this.primitives = new BitFieldPrimitives(this);
+     }
+ 
+     /**
+@@ -294,4 +299,51 @@ public int setValue(final int holder, final int value) {
+     public long setValue(final long holder, final long value) {
+         return holder & ~mask | value << shiftCount & mask;
+     }
++
++    /* Delegate primitive convenience methods to BitFieldPrimitives to keep this class small but preserve API. */
++
++    /** Clears bits in a byte holder. */
++    public byte clearByte(final byte holder) {
++        return primitives.clearByte(holder);
++    }
++
++    /** Clears bits in a short holder. */
++    public short clearShort(final short holder) {
++        return primitives.clearShort(holder);
++    }
++
++    /** Gets the raw short value (unshifted) from a short holder. */
++    public short getShortRawValue(final short holder) {
++        return primitives.getShortRawValue(holder);
++    }
++
++    /** Gets the short value (shifted) from a short holder. */
++    public short getShortValue(final short holder) {
++        return primitives.getShortValue(holder);
++    }
++
++    /** Sets bits in a byte holder. */
++    public byte setByte(final byte holder) {
++        return primitives.setByte(holder);
++    }
++
++    /** Sets a boolean bit in a byte holder. */
++    public byte setByteBoolean(final byte holder, final boolean flag) {
++        return primitives.setByteBoolean(holder, flag);
++    }
++
++    /** Sets bits in a short holder. */
++    public short setShort(final short holder) {
++        return primitives.setShort(holder);
++    }
++
++    /** Sets or clears bits in a short holder based on a boolean flag. */
++    public short setShortBoolean(final short holder, final boolean flag) {
++        return primitives.setShortBoolean(holder, flag);
++    }
++
++    /** Sets the bits in a short holder to the supplied short value. */
++    public short setShortValue(final short holder, final short value) {
++        return primitives.setShortValue(holder, value);
++    }
+ }

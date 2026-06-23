@@ -1,0 +1,226 @@
+commit 81ac36d40b9f7ebcdf73a6dd16b810f9c05d924d
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Jun 22 16:32:59 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/nodes/Attribute.java b/src/main/java/org/jsoup/nodes/Attribute.java
+index 3ca0057e..45f6ac6c 100644
+--- a/src/main/java/org/jsoup/nodes/Attribute.java
++++ b/src/main/java/org/jsoup/nodes/Attribute.java
+@@ -9,22 +9,13 @@ import org.jsoup.nodes.Document.OutputSettings.Syntax;
+ import org.jspecify.annotations.Nullable;
+ 
+ import java.io.IOException;
+-import java.util.Arrays;
+ import java.util.Map;
+ import java.util.Objects;
+-import java.util.regex.Pattern;
+ 
+ /**
+  A single key + value attribute. (Only used for presentation.)
+  */
+ public class Attribute implements Map.Entry<String, String>, Cloneable  {
+-    private static final String[] booleanAttributes = {
+-            "allowfullscreen", "async", "autofocus", "checked", "compact", "declare", "default", "defer", "disabled",
+-            "formnovalidate", "hidden", "inert", "ismap", "itemscope", "multiple", "muted", "nohref", "noresize",
+-            "noshade", "novalidate", "nowrap", "open", "readonly", "required", "reversed", "seamless", "selected",
+-            "sortable", "truespeed", "typemustmatch"
+-    };
+-
+     private String key;
+     @Nullable private String val;
+     @Nullable Attributes parent; // used to update the holding Attributes when the key / value is changed via this interface
+@@ -186,25 +177,22 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
+     }
+ 
+     void html(QuietAppendable accum, Document.OutputSettings out) {
+-        html(key, val, accum, out);
+-    }
+-
+-    static void html(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) {
+-        key = getValidKey(key, out.syntax());
+-        if (key == null) return; // can't write it :(
+-        htmlNoValidate(key, val, accum, out);
++        AttributeUtil.html(key, val, accum, out);
+     }
+ 
+-    /** @deprecated internal method; use {@link #html(String, String, QuietAppendable, Document.OutputSettings)} with {@link org.jsoup.internal.QuietAppendable#wrap(Appendable)} instead. Will be removed in jsoup 1.24.1. */
+     @Deprecated
+     protected void html(Appendable accum, Document.OutputSettings out) throws IOException {
+-        html(key, val, accum, out);
++        AttributeUtil.html(key, val, QuietAppendable.wrap(accum), out);
+     }
+ 
+-    /** @deprecated internal method; use {@link #html(String, String, QuietAppendable, Document.OutputSettings)} with {@link org.jsoup.internal.QuietAppendable#wrap(Appendable)} instead. Will be removed in jsoup 1.24.1. */
+     @Deprecated
+     protected static void html(String key, @Nullable String val, Appendable accum, Document.OutputSettings out) throws IOException {
+-        html(key, val, QuietAppendable.wrap(accum), out);
++        AttributeUtil.html(key, val, QuietAppendable.wrap(accum), out);
++    }
++
++    @Nullable
++    public static String getValidKey(String key, Document.OutputSettings.Syntax syntax) {
++        return AttributeUtil.getValidKey(key, syntax);
+     }
+ 
+     static void htmlNoValidate(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) {
+@@ -217,83 +205,6 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
+         }
+     }
+ 
+-    private static final Pattern xmlKeyReplace = Pattern.compile("[^-a-zA-Z0-9_:.]+");
+-    private static final Pattern htmlKeyReplace = Pattern.compile("[\\x00-\\x1f\\x7f-\\x9f \"'/=]+");
+-    /**
+-     * Get a valid attribute key for the given syntax. If the key is not valid, it will be coerced into a valid key.
+-     * @param key the original attribute key
+-     * @param syntax HTML or XML
+-     * @return the original key if it's valid; a key with invalid characters replaced with "_" otherwise; or null if a valid key could not be created.
+-     */
+-    @Nullable public static String getValidKey(String key, Syntax syntax) {
+-        if (syntax == Syntax.xml && !isValidXmlKey(key)) {
+-            key = xmlKeyReplace.matcher(key).replaceAll("_");
+-            return isValidXmlKey(key) ? key : null; // null if could not be coerced
+-        }
+-        else if (syntax == Syntax.html && !isValidHtmlKey(key)) {
+-            key = htmlKeyReplace.matcher(key).replaceAll("_");
+-            return isValidHtmlKey(key) ? key : null; // null if could not be coerced
+-        }
+-        return key;
+-    }
+-
+-    // perf critical in html() so using manual scan vs regex:
+-    // note that we aren't using anything in supplemental space, so OK to iter charAt
+-    private static boolean isValidXmlKey(String key) {
+-        // =~ [a-zA-Z_:][-a-zA-Z0-9_:.]*
+-        final int length = key.length();
+-        if (length == 0) return false;
+-        char c = key.charAt(0);
+-        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == ':'))
+-            return false;
+-        for (int i = 1; i < length; i++) {
+-            c = key.charAt(i);
+-            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == ':' || c == '.'))
+-                return false;
+-        }
+-        return true;
+-    }
+-
+-    private static boolean isValidHtmlKey(String key) {
+-        // =~ [\x00-\x1f\x7f-\x9f "'/=]+
+-        final int length = key.length();
+-        if (length == 0) return false;
+-        for (int i = 0; i < length; i++) {
+-            char c = key.charAt(i);
+-            if ((c <= 0x1f) || (c >= 0x7f && c <= 0x9f) || c == ' ' || c == '"' || c == '\'' || c == '/' || c == '=')
+-                return false;
+-        }
+-        return true;
+-    }
+-
+-    /**
+-     Get the string representation of this attribute, implemented as {@link #html()}.
+-     @return string
+-     */
+-    @Override
+-    public String toString() {
+-        return html();
+-    }
+-
+-    /**
+-     * Create a new Attribute from an unencoded key and a HTML attribute encoded value.
+-     * @param unencodedKey assumes the key is not encoded, as can be only run of simple \w chars.
+-     * @param encodedValue HTML attribute encoded value
+-     * @return attribute
+-     */
+-    public static Attribute createFromEncoded(String unencodedKey, String encodedValue) {
+-        String value = Entities.unescape(encodedValue, true);
+-        return new Attribute(unencodedKey, value, null); // parent will get set when Put
+-    }
+-
+-    protected boolean isDataAttribute() {
+-        return isDataAttribute(key);
+-    }
+-
+-    protected static boolean isDataAttribute(String key) {
+-        return key.startsWith(Attributes.dataPrefix) && key.length() > Attributes.dataPrefix.length();
+-    }
+-
+     /**
+      * Collapsible if it's a boolean attribute and value is empty or same as name
+      * 
+@@ -309,14 +220,7 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
+     // collapse unknown foo=null, known checked=null, checked="", checked=checked; write out others
+     protected static boolean shouldCollapseAttribute(final String key, @Nullable final String val, final Document.OutputSettings out) {
+         return (out.syntax() == Syntax.html &&
+-                (val == null || (val.isEmpty() || val.equalsIgnoreCase(key)) && Attribute.isBooleanAttribute(key)));
+-    }
+-
+-    /**
+-     * Checks if this attribute name is defined as a boolean attribute in HTML5
+-     */
+-    public static boolean isBooleanAttribute(final String key) {
+-        return Arrays.binarySearch(booleanAttributes, Normalizer.lowerCase(key)) >= 0;
++                (val == null || (val.isEmpty() || val.equalsIgnoreCase(key)) && AttributeUtil.isBooleanAttribute(key)));
+     }
+ 
+     @Override
+@@ -340,4 +244,30 @@ public class Attribute implements Map.Entry<String, String>, Cloneable  {
+             throw new RuntimeException(e);
+         }
+     }
++
++    /**
++     * Returns the HTML representation for debugging and string conversion.
++     * Historically Attribute.toString() returned the html() value.
++     */
++    @Override
++    public String toString() {
++        return html();
++    }
++
++    /**
++     * Instance helper to check if this attribute is a data-* attribute.
++     * Some code (Attributes.Dataset) calls this on the Attribute instance.
++     */
++    public boolean isDataAttribute() {
++        return isDataAttribute(this.key);
++    }
++
++    /**
++     * Static helper to test a key for data-* form.
++     */
++    public static boolean isDataAttribute(String key) {
++        if (key == null) return false;
++        // data- must be followed by at least one character
++        return key.length() > 5 && key.startsWith("data-");
++    }
+ }
+diff --git a/src/test/java/org/jsoup/nodes/AttributeTest.java b/src/test/java/org/jsoup/nodes/AttributeTest.java
+index 4cff3205..1ec4e959 100644
+--- a/src/test/java/org/jsoup/nodes/AttributeTest.java
++++ b/src/test/java/org/jsoup/nodes/AttributeTest.java
+@@ -49,7 +49,7 @@ public class AttributeTest {
+         assertEquals("hidden", first.getKey());
+         assertEquals("", first.getValue());
+         assertFalse(first.hasDeclaredValue());
+-        assertTrue(Attribute.isBooleanAttribute(first.getKey()));
++        assertTrue(AttributeUtil.isBooleanAttribute(first.getKey()));
+     }
+ 
+     @Test public void settersOnOrphanAttribute() {
+@@ -99,10 +99,10 @@ public class AttributeTest {
+ 
+     @Test void booleanAttributesAreNotCaseSensitive() {
+         // https://github.com/jhy/jsoup/issues/1656
+-        assertTrue(Attribute.isBooleanAttribute("required"));
+-        assertTrue(Attribute.isBooleanAttribute("REQUIRED"));
+-        assertTrue(Attribute.isBooleanAttribute("rEQUIREd"));
+-        assertFalse(Attribute.isBooleanAttribute("random string"));
++        assertTrue(AttributeUtil.isBooleanAttribute("required"));
++        assertTrue(AttributeUtil.isBooleanAttribute("REQUIRED"));
++        assertTrue(AttributeUtil.isBooleanAttribute("rEQUIREd"));
++        assertFalse(AttributeUtil.isBooleanAttribute("random string"));
+ 
+         String html = "<a href=autofocus REQUIRED>One</a>";
+         Document doc = Jsoup.parse(html);

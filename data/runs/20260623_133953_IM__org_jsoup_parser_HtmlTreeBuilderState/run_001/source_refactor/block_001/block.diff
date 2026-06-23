@@ -1,0 +1,314 @@
+commit 93321a8b409f30d2fbc8fe768bd8acf1f833cc74
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 13:47:02 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilder.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilder.java
+index f31f6f19..3c9e8746 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilder.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilder.java
+@@ -19,8 +19,8 @@ import java.util.ArrayList;
+ import java.util.List;
+ 
+ import static org.jsoup.internal.StringUtil.inSorted;
+-import static org.jsoup.parser.HtmlTreeBuilderState.Constants.Headings;
+-import static org.jsoup.parser.HtmlTreeBuilderState.Constants.InTableFoster;
++import static org.jsoup.parser.HtmlTreeBuilderStateConstants.Headings;
++import static org.jsoup.parser.HtmlTreeBuilderStateConstants.InTableFoster;
+ import static org.jsoup.parser.HtmlTreeBuilderState.ForeignContent;
+ import static org.jsoup.parser.Parser.*;
+ 
+@@ -410,7 +410,8 @@ public class HtmlTreeBuilder extends TreeBuilder {
+         insertCharacterToElement(characterToken, el);
+     }
+ 
+-    /** Inserts the provided character token into the provided element. */
++    /**
++     Inserts the provided character token into the provided element. */
+     void insertCharacterToElement(Token.Character characterToken, Element el) {
+         final Node node;
+         final String data = characterToken.getData();
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index eef814bc..8fa75a44 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -16,7 +16,7 @@ import java.util.ArrayList;
+ 
+ import static org.jsoup.internal.StringUtil.inSorted;
+ import static org.jsoup.parser.HtmlTreeBuilder.isSpecial;
+-import static org.jsoup.parser.HtmlTreeBuilderState.Constants.*;
++import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;
+ 
+ /**
+  * The Tree Builder's current state. Each state embodies the processing for the state, and transitions to other states.
+@@ -165,7 +165,7 @@ enum HtmlTreeBuilderState {
+                     if (name.equals("head")) {
+                         tb.pop();
+                         tb.transition(AfterHead);
+-                    } else if (inSorted(name, Constants.InHeadEnd)) {
++                    } else if (inSorted(name, InHeadEnd)) {
+                         return anythingElse(t, tb);
+                     } else if (name.equals("template")) {
+                         if (!tb.onStack(name)) {
+@@ -359,7 +359,7 @@ enum HtmlTreeBuilderState {
+                             tb.processEndTag("li");
+                             break;
+                         }
+-                        if (isSpecial(el) && !inSorted(el.normalName(), Constants.InBodyStartLiBreakers))
++                        if (isSpecial(el) && !inSorted(el.normalName(), InBodyStartLiBreakers))
+                             break;
+                     }
+                     if (tb.inButtonScope("p")) {
+@@ -525,7 +525,7 @@ enum HtmlTreeBuilderState {
+                     if (tb.inButtonScope("p")) {
+                         tb.processEndTag("p");
+                     }
+-                    if (inSorted(tb.currentElement().normalName(), Constants.Headings)) {
++                    if (inSorted(tb.currentElement().normalName(), Headings)) {
+                         tb.error(this);
+                         tb.pop();
+                     }
+@@ -550,11 +550,11 @@ enum HtmlTreeBuilderState {
+                     final int upper = bottom >= MaxStackScan ? bottom - MaxStackScan : 0;
+                     for (int i = bottom; i >= upper; i--) {
+                         el = stack.get(i);
+-                        if (inSorted(el.normalName(), Constants.DdDt)) {
++                        if (inSorted(el.normalName(), DdDt)) {
+                             tb.processEndTag(el.normalName());
+                             break;
+                         }
+-                        if (isSpecial(el) && !inSorted(el.normalName(), Constants.InBodyStartLiBreakers))
++                        if (isSpecial(el) && !inSorted(el.normalName(), InBodyStartLiBreakers))
+                             break;
+                     }
+                     if (tb.inButtonScope("p")) {
+@@ -626,19 +626,19 @@ enum HtmlTreeBuilderState {
+                         HandleTextState(startTag, tb, textState);
+                     } else if (!tag.isKnownTag()) { // no other special rules for custom tags
+                         tb.insertElementFor(startTag);
+-                    } else if (inSorted(name, Constants.InBodyStartPClosers)) {
++                    } else if (inSorted(name, InBodyStartPClosers)) {
+                         if (tb.inButtonScope("p")) tb.processEndTag("p");
+                         tb.insertElementFor(startTag);
+-                    } else if (inSorted(name, Constants.InBodyStartToHead)) {
++                    } else if (inSorted(name, InBodyStartToHead)) {
+                         return tb.process(t, InHead);
+-                    } else if (inSorted(name, Constants.InBodyStartApplets)) {
++                    } else if (inSorted(name, InBodyStartApplets)) {
+                         tb.reconstructFormattingElements();
+                         tb.insertElementFor(startTag);
+                         tb.insertMarkerToFormattingElements();
+                         tb.framesetOk(false);
+-                    } else if (inSorted(name, Constants.InBodyStartMedia)) {
++                    } else if (inSorted(name, InBodyStartMedia)) {
+                         tb.insertEmptyElementFor(startTag);
+-                    } else if (inSorted(name, Constants.InBodyStartDrop)) {
++                    } else if (inSorted(name, InBodyStartDrop)) {
+                         tb.error(this);
+                         return false;
+                     } else {
+@@ -755,7 +755,7 @@ enum HtmlTreeBuilderState {
+                         tb.generateImpliedEndTags(name);
+                         if (!tb.currentElementIs(name))
+                             tb.error(this);
+-                        tb.popStackToClose(Constants.Headings);
++                        tb.popStackToClose(Headings);
+                     }
+                     break;
+                 case "br":
+@@ -764,9 +764,9 @@ enum HtmlTreeBuilderState {
+                     return false;
+                 default:
+                     // todo - move rest to switch if desired
+-                    if (inSorted(name, Constants.InBodyEndAdoptionFormatters)) {
++                    if (inSorted(name, InBodyEndAdoptionFormatters)) {
+                         return inBodyEndTagAdoption(t, tb);
+-                    } else if (inSorted(name, Constants.InBodyEndClosers)) {
++                    } else if (inSorted(name, InBodyEndClosers)) {
+                         if (!tb.inScope(name)) {
+                             // nothing to close
+                             tb.error(this);
+@@ -777,7 +777,7 @@ enum HtmlTreeBuilderState {
+                                 tb.error(this);
+                             tb.popStackToClose(name);
+                         }
+-                    } else if (inSorted(name, Constants.InBodyStartApplets)) {
++                    } else if (inSorted(name, InBodyStartApplets)) {
+                         if (!tb.inScope("name")) {
+                             if (!tb.inScope(name)) {
+                                 tb.error(this);
+@@ -1390,7 +1390,7 @@ enum HtmlTreeBuilderState {
+                 Token.EndTag endTag = t.asEndTag();
+                 String name = endTag.normalName();
+ 
+-                if (inSorted(name, Constants.InCellNames)) { // td, th
++                if (inSorted(name, InCellNames)) { // td, th
+                     if (!tb.inTableScope(name)) {
+                         tb.error(this);
+                         tb.transition(InRow); // might not be in scope if empty: <td /> and processing fake end tag
+@@ -1402,10 +1402,10 @@ enum HtmlTreeBuilderState {
+                     tb.popStackToClose(name);
+                     tb.clearFormattingElementsToLastMarker();
+                     tb.transition(InRow);
+-                } else if (inSorted(name, Constants.InCellBody)) {
++                } else if (inSorted(name, InCellBody)) {
+                     tb.error(this);
+                     return false;
+-                } else if (inSorted(name, Constants.InCellTable)) {
++                } else if (inSorted(name, InCellTable)) {
+                     if (!tb.inTableScope(name)) {
+                         tb.error(this);
+                         return false;
+@@ -1416,7 +1416,7 @@ enum HtmlTreeBuilderState {
+                     return anythingElse(t, tb);
+                 }
+             } else if (t.isStartTag() &&
+-                    inSorted(t.asStartTag().normalName(), Constants.InCellCol)) {
++                    inSorted(t.asStartTag().normalName(), InCellCol)) {
+                 if (!(tb.inTableScope("td") || tb.inTableScope("th"))) {
+                     tb.error(this);
+                     return false;
+@@ -1894,51 +1894,4 @@ enum HtmlTreeBuilderState {
+         tb.transition(Text);
+         tb.insertElementFor(startTag);
+     }
+-
+-    // lists of tags to search through
+-    static final class Constants {
+-        static final String[] InHeadEmpty = new String[]{"base", "basefont", "bgsound", "command", "link"};
+-        static final String[] InHeadRaw = new String[]{"noframes", "style"};
+-        static final String[] InHeadEnd = new String[]{"body", "br", "html"};
+-        static final String[] AfterHeadBody = new String[]{"body", "br", "html"};
+-        static final String[] BeforeHtmlToHead = new String[]{"body", "br", "head", "html", };
+-        static final String[] InHeadNoScriptHead = new String[]{"basefont", "bgsound", "link", "meta", "noframes", "style"};
+-        static final String[] InBodyStartToHead = new String[]{"base", "basefont", "bgsound", "command", "link", "meta", "noframes", "script", "style", "template", "title"};
+-        static final String[] InBodyStartPClosers = new String[]{"address", "article", "aside", "blockquote", "center", "details", "dir", "div", "dl",
+-            "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "menu", "nav", "ol",
+-            "p", "section", "summary", "ul"};
+-        static final String[] Headings = new String[]{"h1", "h2", "h3", "h4", "h5", "h6"};
+-        static final String[] InBodyStartLiBreakers = new String[]{"address", "div", "p"};
+-        static final String[] DdDt = new String[]{"dd", "dt"};
+-        static final String[] InBodyStartApplets = new String[]{"applet", "marquee", "object"};
+-        static final String[] InBodyStartMedia = new String[]{"param", "source", "track"};
+-        static final String[] InBodyStartInputAttribs = new String[]{"action", "name", "prompt"};
+-        static final String[] InBodyStartDrop = new String[]{"caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr"};
+-        static final String[] InBodyEndClosers = new String[]{"address", "article", "aside", "blockquote", "button", "center", "details", "dir", "div",
+-            "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "listing", "menu",
+-            "nav", "ol", "pre", "section", "summary", "ul"};
+-        static final String[] InBodyEndOtherErrors = new String[] {"body", "dd", "dt", "html", "li", "optgroup", "option", "p", "rb", "rp", "rt", "rtc", "tbody", "td", "tfoot", "th", "thead", "tr"};
+-        static final String[] InBodyEndAdoptionFormatters = new String[]{"a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u"};
+-        static final String[] InTableToBody = new String[]{"tbody", "tfoot", "thead"};
+-        static final String[] InTableAddBody = new String[]{"td", "th", "tr"};
+-        static final String[] InTableToHead = new String[]{"script", "style", "template"};
+-        static final String[] InCellNames = new String[]{"td", "th"};
+-        static final String[] InCellBody = new String[]{"body", "caption", "col", "colgroup", "html"};
+-        static final String[] InCellTable = new String[]{ "table", "tbody", "tfoot", "thead", "tr"};
+-        static final String[] InCellCol = new String[]{"caption", "col", "colgroup", "tbody", "td", "tfoot", "th", "thead", "tr"};
+-        static final String[] InTableEndErr = new String[]{"body", "caption", "col", "colgroup", "html", "tbody", "td", "tfoot", "th", "thead", "tr"};
+-        static final String[] InTableFoster = new String[]{"table", "tbody", "tfoot", "thead", "tr"};
+-        static final String[] InTableBodyExit = new String[]{"caption", "col", "colgroup", "tbody", "tfoot", "thead"};
+-        static final String[] InTableBodyEndIgnore = new String[]{"body", "caption", "col", "colgroup", "html", "td", "th", "tr"};
+-        static final String[] InRowMissing = new String[]{"caption", "col", "colgroup", "tbody", "tfoot", "thead", "tr"};
+-        static final String[] InRowIgnore = new String[]{"body", "caption", "col", "colgroup", "html", "td", "th"};
+-        static final String[] InSelectEnd = new String[]{"input", "keygen", "textarea"};
+-        static final String[] InSelectTableEnd = new String[]{"caption", "table", "tbody", "td", "tfoot", "th", "thead", "tr"};
+-        static final String[] InTableEndIgnore = new String[]{"tbody", "tfoot", "thead"};
+-        static final String[] InHeadNoscriptIgnore = new String[]{"head", "noscript"};
+-        static final String[] InCaptionIgnore = new String[]{"body", "col", "colgroup", "html", "tbody", "td", "tfoot", "th", "thead", "tr"};
+-        static final String[] InTemplateToHead = new String[] {"base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "template", "title"};
+-        static final String[] InTemplateToTable = new String[] {"caption", "colgroup", "tbody", "tfoot", "thead"};
+-        static final String[] InForeignToHtml = new String[] {"b", "big", "blockquote", "body", "br", "center", "code", "dd", "div", "dl", "dt", "em", "embed", "h1", "h2", "h3", "h4", "h5", "h6", "head", "hr", "i", "img", "li", "listing", "menu", "meta", "nobr", "ol", "p", "pre", "ruby", "s", "small", "span", "strike", "strong", "sub", "sup", "table", "tt", "u", "ul", "var"};
+-    }
+ }
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java
+new file mode 100644
+index 00000000..f9fd60f1
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java
+@@ -0,0 +1,47 @@
++package org.jsoup.parser;
++
++final class HtmlTreeBuilderStateConstants {
++    static final String[] InHeadEmpty = new String[]{"base", "basefont", "bgsound", "command", "link"};
++    static final String[] InHeadRaw = new String[]{"noframes", "style"};
++    static final String[] InHeadEnd = new String[]{"body", "br", "html"};
++    static final String[] AfterHeadBody = new String[]{"body", "br", "html"};
++    static final String[] BeforeHtmlToHead = new String[]{"body", "br", "head", "html", };
++    static final String[] InHeadNoScriptHead = new String[]{"basefont", "bgsound", "link", "meta", "noframes", "style"};
++    static final String[] InBodyStartToHead = new String[]{"base", "basefont", "bgsound", "command", "link", "meta", "noframes", "script", "style", "template", "title"};
++    static final String[] InBodyStartPClosers = new String[]{"address", "article", "aside", "blockquote", "center", "details", "dir", "div", "dl",
++        "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "menu", "nav", "ol",
++        "p", "section", "summary", "ul"};
++    static final String[] Headings = new String[]{"h1", "h2", "h3", "h4", "h5", "h6"};
++    static final String[] InBodyStartLiBreakers = new String[]{"address", "div", "p"};
++    static final String[] DdDt = new String[]{"dd", "dt"};
++    static final String[] InBodyStartApplets = new String[]{"applet", "marquee", "object"};
++    static final String[] InBodyStartMedia = new String[]{"param", "source", "track"};
++    static final String[] InBodyStartInputAttribs = new String[]{"action", "name", "prompt"};
++    static final String[] InBodyStartDrop = new String[]{"caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr"};
++    static final String[] InBodyEndClosers = new String[]{"address", "article", "aside", "blockquote", "button", "center", "details", "dir", "div",
++        "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "listing", "menu",
++        "nav", "ol", "pre", "section", "summary", "ul"};
++    static final String[] InBodyEndOtherErrors = new String[] {"body", "dd", "dt", "html", "li", "optgroup", "option", "p", "rb", "rp", "rt", "rtc", "tbody", "td", "tfoot", "th", "thead", "tr"};
++    static final String[] InBodyEndAdoptionFormatters = new String[]{"a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u"};
++    static final String[] InTableToBody = new String[]{"tbody", "tfoot", "thead"};
++    static final String[] InTableAddBody = new String[]{"td", "th", "tr"};
++    static final String[] InTableToHead = new String[]{"script", "style", "template"};
++    static final String[] InCellNames = new String[]{"td", "th"};
++    static final String[] InCellBody = new String[]{"body", "caption", "col", "colgroup", "html"};
++    static final String[] InCellTable = new String[]{ "table", "tbody", "tfoot", "thead", "tr"};
++    static final String[] InCellCol = new String[]{"caption", "col", "colgroup", "tbody", "td", "tfoot", "th", "thead", "tr"};
++    static final String[] InTableEndErr = new String[]{"body", "caption", "col", "colgroup", "html", "tbody", "td", "tfoot", "th", "thead", "tr"};
++    static final String[] InTableFoster = new String[]{"table", "tbody", "tfoot", "thead", "tr"};
++    static final String[] InTableBodyExit = new String[]{"caption", "col", "colgroup", "tbody", "tfoot", "thead"};
++    static final String[] InTableBodyEndIgnore = new String[]{"body", "caption", "col", "colgroup", "html", "td", "th", "tr"};
++    static final String[] InRowMissing = new String[]{"caption", "col", "colgroup", "tbody", "tfoot", "thead", "tr"};
++    static final String[] InRowIgnore = new String[]{"body", "caption", "col", "colgroup", "html", "td", "th"};
++    static final String[] InSelectEnd = new String[]{"input", "keygen", "textarea"};
++    static final String[] InSelectTableEnd = new String[]{"caption", "table", "tbody", "td", "tfoot", "th", "thead", "tr"};
++    static final String[] InTableEndIgnore = new String[]{"tbody", "tfoot", "thead"};
++    static final String[] InHeadNoscriptIgnore = new String[]{"head", "noscript"};
++    static final String[] InCaptionIgnore = new String[]{"body", "col", "colgroup", "html", "tbody", "td", "tfoot", "th", "thead", "tr"};
++    static final String[] InTemplateToHead = new String[] {"base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "template", "title"};
++    static final String[] InTemplateToTable = new String[] {"caption", "colgroup", "tbody", "tfoot", "thead"};
++    static final String[] InForeignToHtml = new String[] {"b", "big", "blockquote", "body", "br", "center", "code", "dd", "div", "dl", "dt", "em", "embed", "h1", "h2", "h3", "h4", "h5", "h6", "head", "hr", "i", "img", "li", "listing", "menu", "meta", "nobr", "ol", "p", "pre", "ruby", "s", "small", "span", "strike", "strong", "sub", "sup", "table", "tt", "u", "ul", "var"};
++}
+diff --git a/src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java b/src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java
+index b9c573b2..7660f329 100644
+--- a/src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java
++++ b/src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java
+@@ -2,7 +2,7 @@ package org.jsoup.parser;
+ 
+ import org.jsoup.Jsoup;
+ import org.jsoup.internal.StringUtil;
+-import org.jsoup.parser.HtmlTreeBuilderState.Constants;
++import org.jsoup.parser.HtmlTreeBuilderStateConstants;
+ import org.junit.jupiter.api.Test;
+ 
+ import java.lang.reflect.Field;
+@@ -11,7 +11,7 @@ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.List;
+ 
+-import static org.jsoup.parser.HtmlTreeBuilderState.Constants.InBodyStartInputAttribs;
++import static org.jsoup.parser.HtmlTreeBuilderStateConstants.InBodyStartInputAttribs;
+ import static org.junit.jupiter.api.Assertions.*;
+ 
+ public class HtmlTreeBuilderStateTest {
+@@ -43,13 +43,13 @@ public class HtmlTreeBuilderStateTest {
+ 
+     @Test
+     public void ensureArraysAreSorted() {
+-        List<Object[]> constants = findConstantArrays(Constants.class);
++        List<Object[]> constants = findConstantArrays(HtmlTreeBuilderStateConstants.class);
+         ensureSorted(constants);
+         assertEquals(39, constants.size());
+     }
+ 
+     @Test public void ensureTagSearchesAreKnownTags() {
+-        List<Object[]> constants = findConstantArrays(Constants.class);
++        List<Object[]> constants = findConstantArrays(HtmlTreeBuilderStateConstants.class);
+         for (Object[] constant : constants) {
+             String[] tagNames = (String[]) constant;
+             for (String tagName : tagNames) {

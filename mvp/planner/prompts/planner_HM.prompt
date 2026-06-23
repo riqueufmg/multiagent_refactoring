@@ -1,0 +1,79 @@
+# GOAL
+
+Remove the architecture smell: **Hub-like Modularization** from the TARGET CLASS by reducing coupling.
+
+Target outcome: fan-out must become ≤ 20 (preferably ≤ 15) while keeping behavior and public API unchanged.
+
+The plan will be executed by another agent (code + compile/tests).
+
+Be **precise, executable, and conservative**.
+
+After the change, it will be checked by the command mvn clean install, then be carefull to not break the tests.
+
+# RUN SCOPE (HARD)
+- This run focuses ONLY on reducing outgoing dependencies (fan-out). Do NOT attempt to reduce fan-in.
+- Block 1 MUST only modify the TARGET FILE (no other files). If you cannot do that safely, output NO_OP.
+- Any new type introduced must be in the SAME package as the target class.
+- Do NOT introduce new external dependencies/imports. Allowed new imports are ONLY: java.* / javax.* or classes in the target package.
+- Block 1 allowed ops are ONLY: EXTRACT_CLASS, MOVE_METHOD, MOVE_FIELD, ADD_OR_UPDATE_IMPORTS, NO_OP.
+  (No CREATE_PACKAGE, MOVE_CLASS, UPDATE_CALL_SITES, DEPENDENCY_INVERSION, REPLACE_DEPENDENCY, INTRODUCE_FACADE in Block 1.)
+
+# ALLOWED OPS (ONLY these):
+EXTRACT_CLASS, EXTRACT_INTERFACE, MOVE_METHOD, MOVE_FIELD, INTRODUCE_FACADE,
+DEPENDENCY_INVERSION, REPLACE_DEPENDENCY, CREATE_PACKAGE, MOVE_CLASS,
+ADD_OR_UPDATE_IMPORTS, UPDATE_CALL_SITES, NO_OP.
+
+# CONSTRAINTS:
+1) No invention of existing identifiers:
+   - Reference ONLY packages/classes/methods/fields present in Input.
+   - Methods must be referenced exactly as:
+     ClassFQN#<method.signature> (as in Input).
+2) Each block must be safe and independently compilable:
+   - Prefer delegation/wrappers.
+   - Do not remove or rename public APIs in early blocks.
+3) Creating new types/packages (controlled):
+   - New classes/interfaces only via EXTRACT_CLASS, EXTRACT_INTERFACE or INTRODUCE_FACADE.
+   - New packages only via CREATE_PACKAGE.
+4) CREATE_PACKAGE may only create a subpackage of an existing package in Input.
+7) If a safe plan cannot be produced (missing identifiers, deps, etc.), use NO_OP.
+8) Keep blocks small (3–8 ops per block).
+9) Any external type moved to a helper must no longer be referenced directly by the target class after the block (no residual imports/usages).
+10) Do not introduce new external dependencies in the target class; net new external types in target must be 0.
+11) Do not increase fan-in: extracted types must be private nested or package-private and must not be referenced by other packages/modules.
+
+# REASONING:
+- Use types_used to cluster responsibilities.
+- - Reduce fan-out by extracting internal wrapper/helper classes (same package) that encapsulate multiple external types, so the target class drops direct imports/usages.
+- Use cc and loc to prioritize complex/large methods.
+- Prefer moving cohesive method groups together.
+
+# OUTPUT:
+Return ONLY valid JSON (no markdown, no comments, no explanations).
+
+{
+  "smell_type": "<copied from input>",
+  "target_level": "package|class",
+  "target": "<package FQN or class FQN from input>",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "...",
+      "files": ["..."],
+      "ops": [
+        {
+          "op": "<allowed op>",
+          "inputs": ["<element paths from input>"],
+          "outputs": ["<new names or target container>"],
+          "details": "<short, implementable instructions>",
+          "risk": "low|medium|high"
+        }
+      ],
+      "verification": ["compile", "tests"]
+    }
+  ]
+}
+
+# INPUT
+```json
+{input}
+```

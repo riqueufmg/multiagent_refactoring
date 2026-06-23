@@ -1,0 +1,29 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.safety.Safelist",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the size and complexity of Safelist by extracting the static factory/preset methods (none, simpleText, basic, basicWithImages, relaxed) into a dedicated helper class so Safelist focuses on instance behavior and delegation to SafelistConfig.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistPresets.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/SafelistPresets.java",
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "details": "Create a new class org.jsoup.safety.SafelistPresets in the same package. Move the full implementations of the five public static factory methods: none(), simpleText(), basic(), basicWithImages(), relaxed() from Safelist into SafelistPresets as public static methods that return Safelist. In Safelist, replace the moved method bodies with small delegating implementations that call the corresponding SafelistPresets method (e.g. public static Safelist none() { return SafelistPresets.none(); }). Preserve existing Javadoc on the methods by copying it to SafelistPresets and retaining javadoc references in Safelist delegators. Keep all other members of Safelist unchanged. Ensure imports and package declarations are correct; both classes are in package org.jsoup.safety. This groups the cohesive preset construction logic into a separate class and keeps Safelist focused on its instance API and delegation to SafelistConfig.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

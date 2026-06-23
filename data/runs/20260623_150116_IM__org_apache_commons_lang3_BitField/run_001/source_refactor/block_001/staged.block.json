@@ -1,0 +1,57 @@
+{
+  "id": 1,
+  "goal": "Extract primitive-specific convenience operations (byte/short variants) from BitField into a new helper class to reduce class size and group cohesive functionality.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/BitField.java",
+    "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java:clearByte(byte)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:clearShort(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getShortRawValue(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getShortValue(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setByte(byte)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setByteBoolean(byte,boolean)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setShort(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setShortBoolean(short,boolean)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setShortValue(short,short)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+      ],
+      "details": "Create a new class org.apache.commons.lang3.BitFieldPrimitives in the same package. The new class holds a private final BitField delegate passed via constructor. Move implementations of the listed byte/short convenience methods into BitFieldPrimitives, adapting them to call the BitField delegate's public methods (getRawValue, getValue, setValue, clear, set). The moved methods keep the same signatures and semantics but are now implemented as instance methods on BitFieldPrimitives that delegate to the BitField instance to preserve behavior.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+      ],
+      "details": "Ensure BitFieldPrimitives is in package org.apache.commons.lang3 and imports nothing extra (uses the BitField type from same package).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+        "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+  ]
+}

@@ -1,0 +1,784 @@
+commit 4ad5318c53abd469a42363e1981d51ada456972c
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Jun 22 17:02:16 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/safety/Safelist.java b/src/main/java/org/jsoup/safety/Safelist.java
+index 6212fdd7..7ee80da5 100644
+--- a/src/main/java/org/jsoup/safety/Safelist.java
++++ b/src/main/java/org/jsoup/safety/Safelist.java
+@@ -11,12 +11,7 @@ import org.jsoup.nodes.Attribute;
+ import org.jsoup.nodes.Attributes;
+ import org.jsoup.nodes.Element;
+ 
+-import java.util.HashMap;
+-import java.util.HashSet;
+-import java.util.Iterator;
+-import java.util.Map;
+-import java.util.Objects;
+-import java.util.Set;
++import java.util.*;
+ 
+ import static org.jsoup.internal.Normalizer.lowerCase;
+ 
+@@ -72,11 +67,8 @@ import static org.jsoup.internal.Normalizer.lowerCase;
+ public class Safelist {
+     private static final String All = ":all";
+     private static final TagName AllTag = TagName.valueOf(All);
+-    private final Set<TagName> tagNames; // tags allowed, lower case. e.g. [p, br, span]
+-    private final Map<TagName, Set<AttributeKey>> attributes; // tag -> attribute[]. allowed attributes [href] for a tag.
+-    private final Map<TagName, Map<AttributeKey, AttributeValue>> enforcedAttributes; // always set these attribute values
+-    private final Map<TagName, Map<AttributeKey, Set<Protocol>>> protocols; // allowed URL protocols for attributes
+-    private boolean preserveRelativeLinks; // option to preserve relative links
++
++    private final SafelistConfig config;
+ 
+     /**
+      This safelist allows only text nodes: any HTML Element or any Node other than a TextNode will be removed.
+@@ -214,11 +206,7 @@ public class Safelist {
+      @see #relaxed()
+      */
+     public Safelist() {
+-        tagNames = new HashSet<>();
+-        attributes = new HashMap<>();
+-        enforcedAttributes = new HashMap<>();
+-        protocols = new HashMap<>();
+-        preserveRelativeLinks = false;
++        config = new SafelistConfig();
+     }
+ 
+     /**
+@@ -226,22 +214,7 @@ public class Safelist {
+      @param copy the Safelist to copy
+      */
+     public Safelist(Safelist copy) {
+-        this();
+-        tagNames.addAll(copy.tagNames);
+-        for (Map.Entry<TagName, Set<AttributeKey>> copyTagAttributes : copy.attributes.entrySet()) {
+-            attributes.put(copyTagAttributes.getKey(), new HashSet<>(copyTagAttributes.getValue()));
+-        }
+-        for (Map.Entry<TagName, Map<AttributeKey, AttributeValue>> enforcedEntry : copy.enforcedAttributes.entrySet()) {
+-            enforcedAttributes.put(enforcedEntry.getKey(), new HashMap<>(enforcedEntry.getValue()));
+-        }
+-        for (Map.Entry<TagName, Map<AttributeKey, Set<Protocol>>> protocolsEntry : copy.protocols.entrySet()) {
+-            Map<AttributeKey, Set<Protocol>> attributeProtocolsCopy = new HashMap<>();
+-            for (Map.Entry<AttributeKey, Set<Protocol>> attributeProtocols : protocolsEntry.getValue().entrySet()) {
+-                attributeProtocolsCopy.put(attributeProtocols.getKey(), new HashSet<>(attributeProtocols.getValue()));
+-            }
+-            protocols.put(protocolsEntry.getKey(), attributeProtocolsCopy);
+-        }
+-        preserveRelativeLinks = copy.preserveRelativeLinks;
++        this.config = new SafelistConfig(copy.config);
+     }
+ 
+     /**
+@@ -251,14 +224,7 @@ public class Safelist {
+      @return this (for chaining)
+      */
+     public Safelist addTags(String... tags) {
+-        Validate.notNull(tags);
+-
+-        for (String tagName : tags) {
+-            Validate.notEmpty(tagName);
+-            Validate.isFalse(tagName.equalsIgnoreCase("noscript"),
+-                "noscript is unsupported in Safelists, due to incompatibilities between parsers with and without script-mode enabled");
+-            tagNames.add(TagName.valueOf(tagName));
+-        }
++        config.addTags(tags);
+         return this;
+     }
+ 
+@@ -269,18 +235,7 @@ public class Safelist {
+      @return this (for chaining)
+      */
+     public Safelist removeTags(String... tags) {
+-        Validate.notNull(tags);
+-
+-        for(String tag: tags) {
+-            Validate.notEmpty(tag);
+-            TagName tagName = TagName.valueOf(tag);
+-
+-            if(tagNames.remove(tagName)) { // Only look in sub-maps if tag was allowed
+-                attributes.remove(tagName);
+-                enforcedAttributes.remove(tagName);
+-                protocols.remove(tagName);
+-            }
+-        }
++        config.removeTags(tags);
+         return this;
+     }
+ 
+@@ -300,19 +255,7 @@ public class Safelist {
+      @return this (for chaining)
+      */
+     public Safelist addAttributes(String tag, String... attributes) {
+-        Validate.notEmpty(tag);
+-        Validate.notNull(attributes);
+-        Validate.isTrue(attributes.length > 0, "No attribute names supplied.");
+-
+-        addTags(tag);
+-        TagName tagName = TagName.valueOf(tag);
+-        Set<AttributeKey> attributeSet = new HashSet<>();
+-        for (String key : attributes) {
+-            Validate.notEmpty(key);
+-            attributeSet.add(AttributeKey.valueOf(key));
+-        }
+-        Set<AttributeKey> currentSet = this.attributes.computeIfAbsent(tagName, k -> new HashSet<>());
+-        currentSet.addAll(attributeSet);
++        config.addAttributes(tag, attributes);
+         return this;
+     }
+ 
+@@ -332,33 +275,7 @@ public class Safelist {
+      @return this (for chaining)
+      */
+     public Safelist removeAttributes(String tag, String... attributes) {
+-        Validate.notEmpty(tag);
+-        Validate.notNull(attributes);
+-        Validate.isTrue(attributes.length > 0, "No attribute names supplied.");
+-
+-        TagName tagName = TagName.valueOf(tag);
+-        Set<AttributeKey> attributeSet = new HashSet<>();
+-        for (String key : attributes) {
+-            Validate.notEmpty(key);
+-            attributeSet.add(AttributeKey.valueOf(key));
+-        }
+-        if(tagNames.contains(tagName) && this.attributes.containsKey(tagName)) { // Only look in sub-maps if tag was allowed
+-            Set<AttributeKey> currentSet = this.attributes.get(tagName);
+-            currentSet.removeAll(attributeSet);
+-
+-            if(currentSet.isEmpty()) // Remove tag from attribute map if no attributes are allowed for tag
+-                this.attributes.remove(tagName);
+-        }
+-        if(tag.equals(All)) { // Attribute needs to be removed from all individually set tags
+-            Iterator<Map.Entry<TagName, Set<AttributeKey>>> it = this.attributes.entrySet().iterator();
+-            while (it.hasNext()) {
+-                Map.Entry<TagName, Set<AttributeKey>> entry = it.next();
+-                Set<AttributeKey> currentSet = entry.getValue();
+-                currentSet.removeAll(attributeSet);
+-                if(currentSet.isEmpty()) // Remove tag from attribute map if no attributes are allowed for tag
+-                    it.remove();
+-            }
+-        }
++        config.removeAttributes(tag, attributes);
+         return this;
+     }
+ 
+@@ -376,17 +293,7 @@ public class Safelist {
+      @return this (for chaining)
+      */
+     public Safelist addEnforcedAttribute(String tag, String attribute, String value) {
+-        Validate.notEmpty(tag);
+-        Validate.notEmpty(attribute);
+-        Validate.notEmpty(value);
+-
+-        TagName tagName = TagName.valueOf(tag);
+-        tagNames.add(tagName);
+-        AttributeKey attrKey = AttributeKey.valueOf(attribute);
+-        AttributeValue attrVal = AttributeValue.valueOf(value);
+-
+-        Map<AttributeKey, AttributeValue> attrMap = enforcedAttributes.computeIfAbsent(tagName, k -> new HashMap<>());
+-        attrMap.put(attrKey, attrVal);
++        config.addEnforcedAttribute(tag, attribute, value);
+         return this;
+     }
+ 
+@@ -398,18 +305,7 @@ public class Safelist {
+      @return this (for chaining)
+      */
+     public Safelist removeEnforcedAttribute(String tag, String attribute) {
+-        Validate.notEmpty(tag);
+-        Validate.notEmpty(attribute);
+-
+-        TagName tagName = TagName.valueOf(tag);
+-        if(tagNames.contains(tagName) && enforcedAttributes.containsKey(tagName)) {
+-            AttributeKey attrKey = AttributeKey.valueOf(attribute);
+-            Map<AttributeKey, AttributeValue> attrMap = enforcedAttributes.get(tagName);
+-            attrMap.remove(attrKey);
+-
+-            if(attrMap.isEmpty()) // Remove tag from enforced attribute map if no enforced attributes are present
+-                enforcedAttributes.remove(tagName);
+-        }
++        config.removeEnforcedAttribute(tag, attribute);
+         return this;
+     }
+ 
+@@ -423,7 +319,7 @@ public class Safelist {
+      * @see #addProtocols
+      */
+     public Safelist preserveRelativeLinks(boolean preserve) {
+-        preserveRelativeLinks = preserve;
++        config.preserveRelativeLinks(preserve);
+         return this;
+     }
+ 
+@@ -432,7 +328,7 @@ public class Safelist {
+      * @return {@code true} if relative links are preserved, {@code false} if they are converted to absolute.
+      */
+     public boolean preserveRelativeLinks() {
+-        return preserveRelativeLinks;
++        return config.preserveRelativeLinks();
+     }
+ 
+     /**
+@@ -452,20 +348,7 @@ public class Safelist {
+      @return this, for chaining
+      */
+     public Safelist addProtocols(String tag, String attribute, String... protocols) {
+-        Validate.notEmpty(tag);
+-        Validate.notEmpty(attribute);
+-        Validate.notNull(protocols);
+-
+-        TagName tagName = TagName.valueOf(tag);
+-        AttributeKey attrKey = AttributeKey.valueOf(attribute);
+-        Map<AttributeKey, Set<Protocol>> attrMap = this.protocols.computeIfAbsent(tagName, k -> new HashMap<>());
+-        Set<Protocol> protSet = attrMap.computeIfAbsent(attrKey, k -> new HashSet<>());
+-
+-        for (String protocol : protocols) {
+-            Validate.notEmpty(protocol);
+-            Protocol prot = Protocol.valueOf(protocol);
+-            protSet.add(prot);
+-        }
++        config.addProtocols(tag, attribute, protocols);
+         return this;
+     }
+ 
+@@ -482,30 +365,7 @@ public class Safelist {
+      @return this, for chaining
+      */
+     public Safelist removeProtocols(String tag, String attribute, String... removeProtocols) {
+-        Validate.notEmpty(tag);
+-        Validate.notEmpty(attribute);
+-        Validate.notNull(removeProtocols);
+-
+-        TagName tagName = TagName.valueOf(tag);
+-        AttributeKey attr = AttributeKey.valueOf(attribute);
+-
+-        // make sure that what we're removing actually exists; otherwise can open the tag to any data and that can
+-        // be surprising
+-        Validate.isTrue(protocols.containsKey(tagName), "Cannot remove a protocol that is not set.");
+-        Map<AttributeKey, Set<Protocol>> tagProtocols = protocols.get(tagName);
+-        Validate.isTrue(tagProtocols.containsKey(attr), "Cannot remove a protocol that is not set.");
+-
+-        Set<Protocol> attrProtocols = tagProtocols.get(attr);
+-        for (String protocol : removeProtocols) {
+-            Validate.notEmpty(protocol);
+-            attrProtocols.remove(Protocol.valueOf(protocol));
+-        }
+-
+-        if (attrProtocols.isEmpty()) { // Remove protocol set if empty
+-            tagProtocols.remove(attr);
+-            if (tagProtocols.isEmpty()) // Remove entry for tag if empty
+-                protocols.remove(tagName);
+-        }
++        config.removeProtocols(tag, attribute, removeProtocols);
+         return this;
+     }
+ 
+@@ -515,7 +375,7 @@ public class Safelist {
+      * @return true if allowed
+      */
+     public boolean isSafeTag(String tag) {
+-        return tagNames.contains(TagName.valueOf(tag));
++        return config.isSafeTag(tag);
+     }
+ 
+     /**
+@@ -530,17 +390,17 @@ public class Safelist {
+         TagName tag = TagName.valueOf(tagName);
+         AttributeKey key = AttributeKey.valueOf(attr.getKey());
+ 
+-        Set<AttributeKey> okSet = attributes.get(tag);
++        Set<AttributeKey> okSet = config.attributes.get(tag);
+         if (okSet != null && okSet.contains(key)) {
+-            if (protocols.containsKey(tag)) {
+-                Map<AttributeKey, Set<Protocol>> attrProts = protocols.get(tag);
++            if (config.protocols.containsKey(tag)) {
++                Map<AttributeKey, Set<Protocol>> attrProts = config.protocols.get(tag);
+                 // ok if not defined protocol; otherwise test
+-                return !attrProts.containsKey(key) || isSafeProtocol(getProtocolValue(el, attr), attrProts.get(key));
++                return !attrProts.containsKey(key) || config.isSafeProtocol(config.getProtocolValue(el, attr), attrProts.get(key));
+             } else { // attribute found, no protocols defined, so OK
+                 return true;
+             }
+         }
+-        Map<AttributeKey, AttributeValue> enforcedSet = enforcedAttributes.get(tag);
++        Map<AttributeKey, AttributeValue> enforcedSet = config.enforcedAttributes.get(tag);
+         if (enforcedSet != null && enforcedSet.containsKey(key)) {
+             // enforced attr key was LCed via AttributeKey.valueOf(attr.getKey()),
+             // if the input already has that exact value, treat it as safe
+@@ -550,75 +410,26 @@ public class Safelist {
+         return !tagName.equals(All) && isSafeAttribute(All, el, attr);
+     }
+ 
+-    private String getProtocolValue(Element el, Attribute attr) {
+-        String value = el.absUrl(attr.getKey());
+-        if (value.isEmpty())
+-            value = attr.getValue(); // if it could not be made abs, run as-is to allow custom unknown protocols
+-        return value;
+-    }
+-
+-    private boolean isSafeProtocol(String value, Set<Protocol> protocols) {
+-        for (Protocol protocol : protocols) {
+-            String prot = protocol.toString();
+-
+-            if (prot.equals("#")) { // allows anchor links
+-                if (isValidAnchor(value)) {
+-                    return true;
+-                } else {
+-                    continue;
+-                }
+-            }
+-
+-            prot += ":";
+-
+-            if (lowerCase(value).startsWith(prot)) {
+-                return true;
+-            }
+-        }
+-        return false;
+-    }
+-
+     /**
+-     Check if a URL attribute should be normalized to an absolute URL in the cleaned output. Uses the configured
+-     protocols for that tag+attribute pair, falling back to {@code :all} only if the tag does not define the
+-     attribute.
++     Gets the Attributes that should be enforced for a given tag
++     * @param tagName the tag
++     * @return the attributes that will be enforced; empty if none are set for the given tag
+      */
++    public Attributes getEnforcedAttributes(String tagName) {
++        return config.getEnforcedAttributes(tagName);
++    }
++
++    // preserve old helper visibility by delegating to config, since other package classes (Cleaner) expect to call
+     boolean shouldAbsUrl(String tagName, String attrKey) {
+-        if (preserveRelativeLinks) return false;
+-        return shouldAbsUrl(TagName.valueOf(tagName), AttributeKey.valueOf(attrKey));
++        return config.shouldAbsUrl(tagName, attrKey);
+     }
+ 
+     private boolean shouldAbsUrl(TagName tag, AttributeKey key) {
+-        Set<AttributeKey> allowedAttrs = attributes.get(tag);
+-        if (allowedAttrs != null && allowedAttrs.contains(key)) {
+-            Map<AttributeKey, Set<Protocol>> protocolsByAttr = protocols.get(tag);
+-            return protocolsByAttr != null && protocolsByAttr.containsKey(key);
+-        }
+-
+-        Map<AttributeKey, AttributeValue> enforcedAttrs = enforcedAttributes.get(tag);
+-        if (enforcedAttrs != null && enforcedAttrs.containsKey(key)) return false;
+-
+-        return !tag.equals(AllTag) && shouldAbsUrl(AllTag, key);
++        return config.shouldAbsUrl(tag, key);
+     }
+ 
+     private static boolean isValidAnchor(String value) {
+         return value.startsWith("#") && !value.matches(".*\\s.*");
+     }
+ 
+-    /**
+-     Gets the Attributes that should be enforced for a given tag
+-     * @param tagName the tag
+-     * @return the attributes that will be enforced; empty if none are set for the given tag
+-     */
+-    public Attributes getEnforcedAttributes(String tagName) {
+-        Attributes attrs = new Attributes();
+-        TagName tag = TagName.valueOf(tagName);
+-        if (enforcedAttributes.containsKey(tag)) {
+-            Map<AttributeKey, AttributeValue> keyVals = enforcedAttributes.get(tag);
+-            for (Map.Entry<AttributeKey, AttributeValue> entry : keyVals.entrySet()) {
+-                attrs.put(entry.getKey().toString(), entry.getValue().toString());
+-            }
+-        }
+-        return attrs;
+-    }
+ }
+diff --git a/src/main/java/org/jsoup/safety/SafelistConfig.java b/src/main/java/org/jsoup/safety/SafelistConfig.java
+new file mode 100644
+index 00000000..606975f9
+--- /dev/null
++++ b/src/main/java/org/jsoup/safety/SafelistConfig.java
+@@ -0,0 +1,382 @@
++package org.jsoup.safety;
++
++import org.jsoup.helper.Validate;
++import org.jsoup.internal.Normalizer;
++import org.jsoup.nodes.Attribute;
++import org.jsoup.nodes.Attributes;
++import org.jsoup.nodes.Element;
++
++import java.util.HashMap;
++import java.util.HashSet;
++import java.util.Iterator;
++import java.util.Map;
++import java.util.Set;
++
++import static org.jsoup.internal.Normalizer.lowerCase;
++
++/**
++ * Encapsulates Safelist configuration state and related helper methods.
++ * Extracted from Safelist to improve modularization.
++ */
++public class SafelistConfig {
++    // pseudo-tag for attributes that apply to all tags
++    private static final String All = ":all";
++    private static final TagName AllTag = TagName.valueOf(All);
++
++    // configuration state
++    final Set<TagName> tagNames; // tags allowed, lower case. e.g. [p, br, span]
++    final Map<TagName, Set<AttributeKey>> attributes; // tag -> attribute[]. allowed attributes [href] for a tag.
++    final Map<TagName, Map<AttributeKey, AttributeValue>> enforcedAttributes; // always set these attribute values
++    final Map<TagName, Map<AttributeKey, Set<Protocol>>> protocols; // allowed URL protocols for attributes
++    boolean preserveRelativeLinks; // option to preserve relative links
++
++    /**
++     * Create a new, empty safelist configuration.
++     */
++    public SafelistConfig() {
++        tagNames = new HashSet<>();
++        attributes = new HashMap<>();
++        enforcedAttributes = new HashMap<>();
++        protocols = new HashMap<>();
++        preserveRelativeLinks = false;
++    }
++
++    /**
++     * Copy constructor for SafelistConfig
++     * @param copy the SafelistConfig to copy
++     */
++    public SafelistConfig(SafelistConfig copy) {
++        this();
++        tagNames.addAll(copy.tagNames);
++        for (Map.Entry<TagName, Set<AttributeKey>> copyTagAttributes : copy.attributes.entrySet()) {
++            attributes.put(copyTagAttributes.getKey(), new HashSet<>(copyTagAttributes.getValue()));
++        }
++        for (Map.Entry<TagName, Map<AttributeKey, AttributeValue>> enforcedEntry : copy.enforcedAttributes.entrySet()) {
++            enforcedAttributes.put(enforcedEntry.getKey(), new HashMap<>(enforcedEntry.getValue()));
++        }
++        for (Map.Entry<TagName, Map<AttributeKey, Set<Protocol>>> protocolsEntry : copy.protocols.entrySet()) {
++            Map<AttributeKey, Set<Protocol>> attributeProtocolsCopy = new HashMap<>();
++            for (Map.Entry<AttributeKey, Set<Protocol>> attributeProtocols : protocolsEntry.getValue().entrySet()) {
++                attributeProtocolsCopy.put(attributeProtocols.getKey(), new HashSet<>(attributeProtocols.getValue()));
++            }
++            protocols.put(protocolsEntry.getKey(), attributeProtocolsCopy);
++        }
++        preserveRelativeLinks = copy.preserveRelativeLinks;
++    }
++
++    /**
++     * Add a list of allowed elements to a safelist config. (If a tag is not allowed, it will be removed from the HTML.)
++     *
++     * @param tags tag names to allow
++     * @return this (for chaining)
++     */
++    public SafelistConfig addTags(String... tags) {
++        Validate.notNull(tags);
++
++        for (String tagName : tags) {
++            Validate.notEmpty(tagName);
++            Validate.isFalse(tagName.equalsIgnoreCase("noscript"),
++                "noscript is unsupported in Safelists, due to incompatibilities between parsers with and without script-mode enabled");
++            tagNames.add(TagName.valueOf(tagName));
++        }
++        return this;
++    }
++
++    /**
++     * Remove a list of allowed elements from a safelist configuration.
++     *
++     * @param tags tag names to disallow
++     * @return this (for chaining)
++     */
++    public SafelistConfig removeTags(String... tags) {
++        Validate.notNull(tags);
++
++        for(String tag: tags) {
++            Validate.notEmpty(tag);
++            TagName tagName = TagName.valueOf(tag);
++
++            if(tagNames.remove(tagName)) { // Only look in sub-maps if tag was allowed
++                attributes.remove(tagName);
++                enforcedAttributes.remove(tagName);
++                protocols.remove(tagName);
++            }
++        }
++        return this;
++    }
++
++    /**
++     * Add a list of allowed attributes to a tag. (If an attribute is not allowed on an element, it will be removed.)
++     *
++     * @param tag  The tag the attributes are for. The tag will be added to the allowed tag list if necessary.
++     * @param attributes List of valid attributes for the tag
++     * @return this (for chaining)
++     */
++    public SafelistConfig addAttributes(String tag, String... attributes) {
++        Validate.notEmpty(tag);
++        Validate.notNull(attributes);
++        Validate.isTrue(attributes.length > 0, "No attribute names supplied.");
++
++        addTags(tag);
++        TagName tagName = TagName.valueOf(tag);
++        Set<AttributeKey> attributeSet = new HashSet<>();
++        for (String key : attributes) {
++            Validate.notEmpty(key);
++            attributeSet.add(AttributeKey.valueOf(key));
++        }
++        Set<AttributeKey> currentSet = this.attributes.computeIfAbsent(tagName, k -> new HashSet<>());
++        currentSet.addAll(attributeSet);
++        return this;
++    }
++
++    /**
++     * Remove a list of allowed attributes from a tag.
++     *
++     * @param tag  The tag the attributes are for.
++     * @param attributes List of invalid attributes for the tag
++     * @return this (for chaining)
++     */
++    public SafelistConfig removeAttributes(String tag, String... attributes) {
++        Validate.notEmpty(tag);
++        Validate.notNull(attributes);
++        Validate.isTrue(attributes.length > 0, "No attribute names supplied.");
++
++        TagName tagName = TagName.valueOf(tag);
++        Set<AttributeKey> attributeSet = new HashSet<>();
++        for (String key : attributes) {
++            Validate.notEmpty(key);
++            attributeSet.add(AttributeKey.valueOf(key));
++        }
++        if(tagNames.contains(tagName) && this.attributes.containsKey(tagName)) { // Only look in sub-maps if tag was allowed
++            Set<AttributeKey> currentSet = this.attributes.get(tagName);
++            currentSet.removeAll(attributeSet);
++
++            if(currentSet.isEmpty()) // Remove tag from attribute map if no attributes are allowed for tag
++                this.attributes.remove(tagName);
++        }
++        if(tag.equals(All)) { // Attribute needs to be removed from all individually set tags
++            Iterator<Map.Entry<TagName, Set<AttributeKey>>> it = this.attributes.entrySet().iterator();
++            while (it.hasNext()) {
++                Map.Entry<TagName, Set<AttributeKey>> entry = it.next();
++                Set<AttributeKey> currentSet = entry.getValue();
++                currentSet.removeAll(attributeSet);
++                if(currentSet.isEmpty()) // Remove tag from attribute map if no attributes are allowed for tag
++                    it.remove();
++            }
++        }
++        return this;
++    }
++
++    /**
++     * Add an enforced attribute to a tag. An enforced attribute will always be added to the element. If the element
++     * already has the attribute set, it will be overridden with this value.
++     *
++     * @param tag   The tag the enforced attribute is for. The tag will be added to the allowed tag list if necessary.
++     * @param attribute   The attribute name
++     * @param value The enforced attribute value
++     * @return this (for chaining)
++     */
++    public SafelistConfig addEnforcedAttribute(String tag, String attribute, String value) {
++        Validate.notEmpty(tag);
++        Validate.notEmpty(attribute);
++        Validate.notEmpty(value);
++
++        TagName tagName = TagName.valueOf(tag);
++        tagNames.add(tagName);
++        AttributeKey attrKey = AttributeKey.valueOf(attribute);
++        AttributeValue attrVal = AttributeValue.valueOf(value);
++
++        Map<AttributeKey, AttributeValue> attrMap = enforcedAttributes.computeIfAbsent(tagName, k -> new HashMap<>());
++        attrMap.put(attrKey, attrVal);
++        return this;
++    }
++
++    /**
++     * Remove a previously configured enforced attribute from a tag.
++     *
++     * @param tag   The tag the enforced attribute is for.
++     * @param attribute   The attribute name
++     * @return this (for chaining)
++     */
++    public SafelistConfig removeEnforcedAttribute(String tag, String attribute) {
++        Validate.notEmpty(tag);
++        Validate.notEmpty(attribute);
++
++        TagName tagName = TagName.valueOf(tag);
++        if(tagNames.contains(tagName) && enforcedAttributes.containsKey(tagName)) {
++            AttributeKey attrKey = AttributeKey.valueOf(attribute);
++            Map<AttributeKey, AttributeValue> attrMap = enforcedAttributes.get(tagName);
++            attrMap.remove(attrKey);
++
++            if(attrMap.isEmpty()) // Remove tag from enforced attribute map if no enforced attributes are present
++                enforcedAttributes.remove(tagName);
++        }
++        return this;
++    }
++
++    /**
++     * Configure this to preserve relative links in an element's URL attribute, or convert them to absolute
++     * links. By default, this is <b>false</b>: URLs will be made absolute (e.g. start with an allowed protocol, like
++     * e.g. {@code http://}.
++     *
++     * @param preserve {@code true} to allow relative links, {@code false} (default) to deny
++     * @return this, for chaining.
++     * @see #addProtocols
++     */
++    public SafelistConfig preserveRelativeLinks(boolean preserve) {
++        preserveRelativeLinks = preserve;
++        return this;
++    }
++
++    /**
++     * Get the current setting for preserving relative links.
++     * @return {@code true} if relative links are preserved, {@code false} if they are converted to absolute.
++     */
++    public boolean preserveRelativeLinks() {
++        return preserveRelativeLinks;
++    }
++
++    /**
++     * Add allowed URL protocols for an element's URL attribute. This restricts the possible values of the attribute to
++     * URLs with the defined protocol.
++     *
++     * @param tag       Tag the URL protocol is for
++     * @param attribute       Attribute name
++     * @param protocols List of valid protocols
++     * @return this, for chaining
++     */
++    public SafelistConfig addProtocols(String tag, String attribute, String... protocols) {
++        Validate.notEmpty(tag);
++        Validate.notEmpty(attribute);
++        Validate.notNull(protocols);
++
++        TagName tagName = TagName.valueOf(tag);
++        AttributeKey attrKey = AttributeKey.valueOf(attribute);
++        Map<AttributeKey, Set<Protocol>> attrMap = this.protocols.computeIfAbsent(tagName, k -> new HashMap<>());
++        Set<Protocol> protSet = attrMap.computeIfAbsent(attrKey, k -> new HashSet<>());
++
++        for (String protocol : protocols) {
++            Validate.notEmpty(protocol);
++            Protocol prot = Protocol.valueOf(protocol);
++            protSet.add(prot);
++        }
++        return this;
++    }
++
++    /**
++     * Remove allowed URL protocols for an element's URL attribute.
++     *
++     * @param tag Tag the URL protocol is for
++     * @param attribute Attribute name
++     * @param removeProtocols List of invalid protocols
++     * @return this, for chaining
++     */
++    public SafelistConfig removeProtocols(String tag, String attribute, String... removeProtocols) {
++        Validate.notEmpty(tag);
++        Validate.notEmpty(attribute);
++        Validate.notNull(removeProtocols);
++
++        TagName tagName = TagName.valueOf(tag);
++        AttributeKey attr = AttributeKey.valueOf(attribute);
++
++        // make sure that what we're removing actually exists; otherwise can open the tag to any data and that can
++        // be surprising
++        Validate.isTrue(protocols.containsKey(tagName), "Cannot remove a protocol that is not set.");
++        Map<AttributeKey, Set<Protocol>> tagProtocols = protocols.get(tagName);
++        Validate.isTrue(tagProtocols.containsKey(attr), "Cannot remove a protocol that is not set.");
++
++        Set<Protocol> attrProtocols = tagProtocols.get(attr);
++        for (String protocol : removeProtocols) {
++            Validate.notEmpty(protocol);
++            attrProtocols.remove(Protocol.valueOf(protocol));
++        }
++
++        if (attrProtocols.isEmpty()) { // Remove protocol set if empty
++            tagProtocols.remove(attr);
++            if (tagProtocols.isEmpty()) // Remove entry for tag if empty
++                protocols.remove(tagName);
++        }
++        return this;
++    }
++
++    /**
++     * Test if the supplied tag is allowed by this safelist config.
++     * @param tag test tag
++     * @return true if allowed
++     */
++    public boolean isSafeTag(String tag) {
++        return tagNames.contains(TagName.valueOf(tag));
++    }
++
++    /**
++     * Gets the Attributes that should be enforced for a given tag
++     * @param tagName the tag
++     * @return the attributes that will be enforced; empty if none are set for the given tag
++     */
++    public Attributes getEnforcedAttributes(String tagName) {
++        Attributes attrs = new Attributes();
++        TagName tag = TagName.valueOf(tagName);
++        if (enforcedAttributes.containsKey(tag)) {
++            Map<AttributeKey, AttributeValue> keyVals = enforcedAttributes.get(tag);
++            for (Map.Entry<AttributeKey, AttributeValue> entry : keyVals.entrySet()) {
++                attrs.put(entry.getKey().toString(), entry.getValue().toString());
++            }
++        }
++        return attrs;
++    }
++
++    // helper methods used by cleaning logic
++    String getProtocolValue(Element el, Attribute attr) {
++        String value = el.absUrl(attr.getKey());
++        if (value.isEmpty())
++            value = attr.getValue(); // if it could not be made abs, run as-is to allow custom unknown protocols
++        return value;
++    }
++
++    boolean isSafeProtocol(String value, Set<Protocol> protocols) {
++        for (Protocol protocol : protocols) {
++            String prot = protocol.toString();
++
++            if (prot.equals("#")) { // allows anchor links
++                if (isValidAnchor(value)) {
++                    return true;
++                } else {
++                    continue;
++                }
++            }
++
++            prot += ":";
++
++            if (lowerCase(value).startsWith(prot)) {
++                return true;
++            }
++        }
++        return false;
++    }
++
++    private static boolean isValidAnchor(String value) {
++        return value.startsWith("#") && !value.matches(".*\\s.*");
++    }
++
++    /**
++     * Check if a URL attribute should be normalized to an absolute URL in the cleaned output. Uses the configured
++     * protocols for that tag+attribute pair, falling back to {@code :all} only if the tag does not define the
++     * attribute.
++     */
++    boolean shouldAbsUrl(String tagName, String attrKey) {
++        if (preserveRelativeLinks) return false;
++        return shouldAbsUrl(TagName.valueOf(tagName), AttributeKey.valueOf(attrKey));
++    }
++
++    boolean shouldAbsUrl(TagName tag, AttributeKey key) {
++        Set<AttributeKey> allowedAttrs = attributes.get(tag);
++        if (allowedAttrs != null && allowedAttrs.contains(key)) {
++            Map<AttributeKey, Set<Protocol>> protocolsByAttr = protocols.get(tag);
++            return protocolsByAttr != null && protocolsByAttr.containsKey(key);
++        }
++
++        Map<AttributeKey, AttributeValue> enforcedAttrs = enforcedAttributes.get(tag);
++        if (enforcedAttrs != null && enforcedAttrs.containsKey(key)) return false;
++
++        return !tag.equals(AllTag) && shouldAbsUrl(AllTag, key);
++    }
++}

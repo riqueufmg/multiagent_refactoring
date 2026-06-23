@@ -1,0 +1,78 @@
+## CONTEXT
+
+Insufficient Modularization is a design smell that occurs when a class exists that has not been completely decomposed, and a further decomposition could reduce its size, implementation complexity, or both.
+
+The factors that characterize Insufficient Modularization are considered in the following priority order:
+- Too many public methods (poorly cohesive API).
+- Too many general methods.
+- Overly complex methods.
+
+## TASK
+
+Evaluate the input elements and create a plan in JSON format with the goal of removing (or reducing) Insufficient Modularization.
+
+Strategy:
+- Reduce the size and complexity of the class by grouping cohesive attributes and methods.
+- MOVE and CREATE refactorings are only allowed at the same level as the entry or at a sub-level.
+- When the smell is caused by too many public methods, prefer plans that move a cohesive group of public and private methods out of the target class.
+- Test refactoring does not need to be included, as this will be done later.
+
+## ALLOWED REFACTORINGS
+A list of refactorings allowed in the refactoring plan is presented as following:
+- ADD_OR_UPDATE_IMPORTS
+- CREATE_PACKAGE
+- DEPENDENCY_INVERSION
+- EXTRACT_CLASS
+- EXTRACT_INTERFACE
+- INTRODUCE_FACADE
+- MOVE_CLASS
+- MOVE_FIELD
+- MOVE_METHOD
+- REPLACE_DEPENDENCY
+- UPDATE_CALL_SITES
+
+## INPUT
+{
+  "smell": "Insufficient Modularization",
+  "target_type": "class",
+  "target_name": "org.apache.commons.lang3.BitField",
+  "designite": {
+    "dir": "/data/henrique/langchain_prototype/new/data/runs/20260623_150116_IM__org_apache_commons_lang3_BitField/run_002/planner/designite",
+    "smells_csv": "DesignSmells.csv",
+    "target_has_smell": true
+  },
+  "target_file": "src/main/java/org/apache/commons/lang3/BitField.java",
+  "target_source_root": "src/main/java",
+  "target_code": "/*\n * Licensed to the Apache Software Foundation (ASF) under one or more\n * contributor license agreements.  See the NOTICE file distributed with\n * this work for additional information regarding copyright ownership.\n * The ASF licenses this file to You under the Apache License, Version 2.0\n * (the \"License\"); you may not use this file except in compliance with\n * the License.  You may obtain a copy of the License at\n *\n *      https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\npackage org.apache.commons.lang3;\n\n/**\n * Supports operations on bit-mapped fields. Instances of this class can be used to store a flag or data within an {@code int}, {@code short} or {@code byte}.\n * <p>\n * Each {@link BitField} is constructed with a mask value, which indicates the bits that will be used to store and retrieve the data for that field. For\n * instance, the mask {@code 0xFF} indicates the least-significant byte should be used to store the data.\n * </p>\n * <p>\n * As an example, consider a car painting machine that accepts paint instructions as integers. Bit fields can be used to encode this:\n * </p>\n *\n * <pre>\n *\n * // blue, green and red are 1 byte values (0-255) stored in the three least\n * // significant bytes\n * BitField blue = new BitField(0xFF);\n *\n * BitField green = new BitField(0xFF00);\n *\n * BitField red = new BitField(0xFF0000);\n *\n * // anyColor is a flag triggered if any color is used\n * BitField anyColor = new BitField(0xFFFFFF);\n *\n * // isMetallic is a single bit flag\n * BitField isMetallic = new BitField(0x1000000);\n * </pre>\n * <p>\n * Using these {@link BitField} instances, a paint instruction can be encoded into an integer:\n * </p>\n *\n * <pre>\n * int paintInstruction = 0;\n * paintInstruction = red.setValue(paintInstruction, 35);\n * paintInstruction = green.setValue(paintInstruction, 100);\n * paintInstruction = blue.setValue(paintInstruction, 255);\n * </pre>\n * <p>\n * Flags and data can be retrieved from the integer:\n * </p>\n *\n * <pre>\n * // Prints true if red, green or blue is non-zero\n * System.out.println(anyColor.isSet(paintInstruction)); // prints true\n * // Prints value of red, green and blue\n * System.out.println(red.getValue(paintInstruction)); // prints 35\n * System.out.println(green.getValue(paintInstruction)); // prints 100\n * System.out.println(blue.getValue(paintInstruction)); // prints 255\n * // Prints true if isMetallic was set\n * System.out.println(isMetallic.isSet(paintInstruction)); // prints false\n * </pre>\n *\n * @since 2.0\n */\npublic class BitField {\n\n    private final long mask;\n\n    private final int shiftCount;\n\n    /* Helper handling primitive-size convenience methods. Delegates moved implementations to keep BitField small. */\n    private final BitFieldPrimitives primitives;\n\n    /* Core extracted masking logic for int/long operations. */\n    private final BitFieldCore core;\n\n    /**\n     * Creates a BitField instance.\n     *\n     * @param mask the mask specifying which bits apply to this BitField. Bits that are set in this mask are the bits that this BitField operates on.\n     */\n    public BitField(final int mask) {\n        this.mask = Integer.toUnsignedLong(mask);\n        this.shiftCount = this.mask == 0 ? 0 : Long.numberOfTrailingZeros(this.mask);\n        this.primitives = new BitFieldPrimitives(this);\n        this.core = new BitFieldCore(this.mask, this.shiftCount);\n    }\n\n    /**\n     * Creates a BitField instance.\n     *\n     * @param mask the mask specifying which bits apply to this BitField. Bits that are set in this mask are the bits that this BitField operates on.\n     * @since 3.21.0\n     */\n    public BitField(final long mask) {\n        this.mask = mask;\n        this.shiftCount = mask == 0 ? 0 : Long.numberOfTrailingZeros(mask);\n        this.primitives = new BitFieldPrimitives(this);\n        this.core = new BitFieldCore(this.mask, this.shiftCount);\n    }\n\n    /**\n     * Clears the bits.\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @return the value of holder with the specified bits cleared (set to {@code 0}).\n     */\n    public int clear(final int holder) {\n        return core.clear(holder);\n    }\n\n    /**\n     * Clears the bits.\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @return the value of holder with the specified bits cleared (set to {@code 0}).\n     * @since 3.21.0\n     */\n    public long clear(final long holder) {\n        return core.clear(holder);\n    }\n\n    /**\n     * Gets the value for the specified BitField, unshifted.\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @return the selected bits.\n     */\n    public int getRawValue(final int holder) {\n        return core.getRawValue(holder);\n    }\n\n    /**\n     * Gets the value for the specified BitField, unshifted.\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @return the selected bits.\n     * @since 3.21.0\n     */\n    public long getRawValue(final long holder) {\n        return core.getRawValue(holder);\n    }\n\n    /**\n     * Gets the value for the specified BitField, appropriately shifted right.\n     * <p>\n     * Many users of a BitField will want to treat the specified bits as an int value, and will not want to be aware that the value is stored as a BitField (and\n     * so shifted left so many bits).\n     * </p>\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @return the selected bits, shifted right appropriately.\n     * @see #setValue(int,int)\n     */\n    public int getValue(final int holder) {\n        return core.getValue(holder);\n    }\n\n    /**\n     * Gets the value for the specified BitField, appropriately shifted right.\n     * <p>\n     * Many users of a BitField will want to treat the specified bits as an long value, and will not want to be aware that the value is stored as a BitField (and\n     * so shifted left so many bits).\n     * </p>\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @return the selected bits, shifted right appropriately.\n     * @see #setValue(long,long)\n     * @since 3.21.0\n     */\n    public long getValue(final long holder) {\n        return core.getValue(holder);\n    }\n\n    /**\n     * Tests whether all of the bits are set or not.\n     * <p>\n     * This is a stricter test than {@link #isSet(int)}, in that all of the bits in a multi-bit set must be set for this method to return {@code true}.\n     * </p>\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @return {@code true} if all of the bits are set, else {@code false}.\n     */\n    public boolean isAllSet(final int holder) {\n        return (holder & mask) == mask;\n    }\n\n    /**\n     * Tests whether all of the bits are set or not.\n     * <p>\n     * This is a stricter test than {@link #isSet(long)}, in that all of the bits in a multi-bit set must be set for this method to return {@code true}.\n     * </p>\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @return {@code true} if all of the bits are set, else {@code false}.\n     * @since 3.21.0\n     */\n    public boolean isAllSet(final long holder) {\n        return (holder & mask) == mask;\n    }\n\n    /**\n     * Tests whether the field is set or not.\n     * <p>\n     * This is most commonly used for a single-bit field, which is often used to represent a boolean value; the results of using it for a multi-bit field is to\n     * determine whether <em>any</em> of its bits are set.\n     * </p>\n     *\n     * @param holder the int data containing the bits we're interested in\n     * @return {@code true} if any of the bits are set, else {@code false}\n     */\n    public boolean isSet(final int holder) {\n        return (holder & mask) != 0;\n    }\n\n    /**\n     * Tests whether the field is set or not.\n     * <p>\n     * This is most commonly used for a single-bit field, which is often used to represent a boolean value; the results of using it for a multi-bit field is to\n     * determine whether <em>any</em> of its bits are set.\n     * </p>\n     *\n     * @param holder the long data containing the bits we're interested in\n     * @return {@code true} if any of the bits are set, else {@code false}\n     * @since 3.21.0\n     */\n    public boolean isSet(final long holder) {\n        return (holder & mask) != 0;\n    }\n\n    /**\n     * Sets the bits.\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @return the value of holder with the specified bits set to {@code 1}.\n     */\n    public int set(final int holder) {\n        return (int) (holder | mask);\n    }\n\n    /**\n     * Sets the bits.\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @return the value of holder with the specified bits set to {@code 1}.\n     * @since 3.21.0\n     */\n    public long set(final long holder) {\n        return holder | mask;\n    }\n\n    /**\n     * Sets a boolean BitField.\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @param flag   indicating whether to set or clear the bits.\n     * @return the value of holder with the specified bits set or cleared.\n     */\n    public int setBoolean(final int holder, final boolean flag) {\n        return flag ? set(holder) : clear(holder);\n    }\n\n    /**\n     * Sets a boolean BitField.\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @param flag   indicating whether to set or clear the bits.\n     * @return the value of holder with the specified bits set or cleared.\n     * @since 3.21.0\n     */\n    public long setBoolean(final long holder, final boolean flag) {\n        return flag ? set(holder) : clear(holder);\n    }\n\n    /**\n     * Sets the bits with new values.\n     *\n     * @param holder the int data containing the bits we're interested in.\n     * @param value  the new value for the specified bits.\n     * @return the value of holder with the bits from the value parameter replacing the old bits.\n     * @see #getValue(int)\n     */\n    public int setValue(final int holder, final int value) {\n        return core.setValue(holder, value);\n    }\n\n    /**\n     * Sets the bits with new values.\n     *\n     * @param holder the long data containing the bits we're interested in.\n     * @param value  the new value for the specified bits.\n     * @return the value of holder with the bits from the value parameter replacing the old bits.\n     * @see #getValue(long)\n     * @since 3.21.0\n     */\n    public long setValue(final long holder, final long value) {\n        return core.setValue(holder, value);\n    }\n\n    /* Delegate primitive convenience methods to BitFieldPrimitives to keep this class small but preserve API. */\n\n    /** Clears bits in a byte holder. */\n    public byte clearByte(final byte holder) {\n        return primitives.clearByte(holder);\n    }\n\n    /** Clears bits in a short holder. */\n    public short clearShort(final short holder) {\n        return primitives.clearShort(holder);\n    }\n\n    /** Gets the raw short value (unshifted) from a short holder. */\n    public short getShortRawValue(final short holder) {\n        return primitives.getShortRawValue(holder);\n    }\n\n    /** Gets the short value (shifted) from a short holder. */\n    public short getShortValue(final short holder) {\n        return primitives.getShortValue(holder);\n    }\n\n    /** Sets bits in a byte holder. */\n    public byte setByte(final byte holder) {\n        return primitives.setByte(holder);\n    }\n\n    /** Sets a boolean bit in a byte holder. */\n    public byte setByteBoolean(final byte holder, final boolean flag) {\n        return primitives.setByteBoolean(holder, flag);\n    }\n\n    /** Sets bits in a short holder. */\n    public short setShort(final short holder) {\n        return primitives.setShort(holder);\n    }\n\n    /** Sets or clears bits in a short holder based on a boolean flag. */\n    public short setShortBoolean(final short holder, final boolean flag) {\n        return primitives.setShortBoolean(holder, flag);\n    }\n\n    /** Sets the bits in a short holder to the supplied short value. */\n    public short setShortValue(final short holder, final short value) {\n        return primitives.setShortValue(holder, value);\n    }\n}\n"
+}
+
+## OUTPUT
+
+The expected output format and contraints for that output are presented below.
+
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "<class FQN from input>",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "...",
+      "files": ["..."],
+      "ops": [
+        {
+          "op": "<allowed op>",
+          "inputs": ["..."],
+          "outputs": ["..."],
+          "details": "...",
+          "risk": "low|medium|high"
+        }
+      ]
+    }
+  ]
+}
+
+Contraints:
+- Reference only packages, classes, methods, and fields present in the input.
+- Each block must be small and independently compilable.
+- New classes must be placed in the same package as the target class unless the input clearly justifies otherwise.

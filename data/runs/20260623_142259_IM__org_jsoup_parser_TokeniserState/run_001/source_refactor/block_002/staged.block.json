@@ -1,0 +1,68 @@
+{
+  "id": 2,
+  "goal": "Move the original private static helper methods and related fields out of TokeniserState to the new TokeniserStateHelper and update internal call sites to delegate to the helper, reducing the size and complexity of the enum.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateHelper.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java:handleDataEndTag(Tokeniser, CharacterReader, TokeniserState)",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:readRawData(Tokeniser, CharacterReader, TokeniserState, TokeniserState)",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:readCharRef(Tokeniser, TokeniserState)",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:readEndTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState)",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:handleDataDoubleEscapeTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState)",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:readDoctypeInternalSubset(Tokeniser, CharacterReader, TokeniserState)"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "Remove the private static method bodies from TokeniserState and move their implementations into TokeniserStateHelper as public static (or package-private static) methods with identical signatures. Keep TokeniserState compilation-safe by delegating calls (see UPDATE_CALL_SITES).",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java:attributeNameCharsSorted",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:attributeValueUnquoted",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:replacementStr",
+        "src/main/java/org/jsoup/parser/TokeniserState.java:eof"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "Move the static arrays and constants used only by the moved helper methods from TokeniserState to TokeniserStateHelper. For replacementChar (which references Tokeniser.replacementChar), keep usage in helper but do not change the original Tokeniser.replacementChar. After move, ensure the fields are declared with the same values and appropriate visibility in the helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "Replace internal references in TokeniserState that called the original private static methods/fields with calls to the corresponding TokeniserStateHelper.staticMethod(...) and references to TokeniserStateHelper.staticField. For example, occurrences of handleDataEndTag(t, r, Rawtext) become TokeniserStateHelper.handleDataEndTag(t, r, Rawtext). After updates, remove the original private static method and field declarations from TokeniserState so enum contains only state definitions and small delegating calls where needed. Ensure no external behavior change.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ]
+}

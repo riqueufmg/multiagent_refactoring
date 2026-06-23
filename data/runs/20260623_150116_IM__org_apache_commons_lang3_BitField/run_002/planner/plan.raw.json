@@ -1,0 +1,42 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.BitField",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce size and complexity of org.apache.commons.lang3.BitField by extracting a cohesive group of boolean/bit-flag operations into a new helper class and delegating from BitField to the helper. This groups related public methods and moves implementation details out of the main class while preserving the existing BitField API (delegation), reducing BitField's implementation size and complexity.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/BitField.java",
+        "src/main/java/org/apache/commons/lang3/BitFieldBooleanOps.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitFieldBooleanOps.java",
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "details": "Create a new class BitFieldBooleanOps in package org.apache.commons.lang3. The new class encapsulates boolean/flag operations that operate on the BitField mask and provides instance methods: boolean isAllSet(int holder), boolean isAllSet(long holder), boolean isSet(int holder), boolean isSet(long holder), int set(int holder), long set(long holder), int setBoolean(int holder, boolean flag), long setBoolean(long holder, boolean flag). Add a constructor BitFieldBooleanOps(long mask) that stores the mask in a private final field. This class is created alongside the existing BitField and does not change external callers.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java",
+            "src/main/java/org/apache/commons/lang3/BitFieldBooleanOps.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java",
+            "src/main/java/org/apache/commons/lang3/BitFieldBooleanOps.java"
+          ],
+          "details": "Move the implementations of the following BitField methods into BitFieldBooleanOps as instance methods that use the BitFieldBooleanOps.mask:\n- isAllSet(int holder)\n- isAllSet(long holder)\n- isSet(int holder)\n- isSet(long holder)\n- set(int holder)\n- set(long holder)\n- setBoolean(int holder, boolean flag)\n- setBoolean(long holder, boolean flag)\n\nIn BitField.java, add a private final field: private final BitFieldBooleanOps booleanOps; Initialize it in both constructors (int and long) after mask is set: this.booleanOps = new BitFieldBooleanOps(this.mask);\n\nReplace each moved method body in BitField with a small delegating call to booleanOps (for example, public boolean isSet(final int holder) { return booleanOps.isSet(holder); }). This keeps the public API of BitField unchanged while relocating implementation to the extracted class.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

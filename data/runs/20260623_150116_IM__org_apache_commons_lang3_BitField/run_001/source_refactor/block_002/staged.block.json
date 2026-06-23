@@ -1,0 +1,67 @@
+{
+  "id": 2,
+  "goal": "Replace the moved primitive convenience implementations in BitField with small delegating methods to the new helper, and add a helper field to BitField to preserve the public API while reducing internal complexity.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/BitField.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java:clearByte(byte)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:clearShort(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getShortRawValue(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getShortValue(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setByte(byte)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setByteBoolean(byte,boolean)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setShort(short)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setShortBoolean(short,boolean)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setShortValue(short,short)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "details": "Replace the original implementations in BitField with delegating methods that forward to an instance of BitFieldPrimitives. Add a private final field 'primitives' of type BitFieldPrimitives, initialized in each BitField constructor (e.g. this.primitives = new BitFieldPrimitives(this)). Keep the same public method signatures in BitField so external callers are unaffected; the methods now delegate to primitives.[method](...). This reduces BitField size while preserving API and behavior.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "details": "No external imports needed; ensure the new field type BitFieldPrimitives (same package) is referenced without import or with correct package declaration.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "details": "Update any internal calls inside BitField that previously invoked the moved implementations directly (if any) to use the delegating methods. Because the public signatures are unchanged, external call sites do not need modification. Internal usages should call the delegating methods so behavior remains identical.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+        "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+  ]
+}

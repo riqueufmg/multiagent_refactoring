@@ -1,0 +1,124 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.BitField",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract primitive-specific convenience operations (byte/short variants) from BitField into a new helper class to reduce class size and group cohesive functionality.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/BitField.java",
+        "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java:clearByte(byte)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:clearShort(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getShortRawValue(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getShortValue(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setByte(byte)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setByteBoolean(byte,boolean)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setShort(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setShortBoolean(short,boolean)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setShortValue(short,short)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+          ],
+          "details": "Create a new class org.apache.commons.lang3.BitFieldPrimitives in the same package. The new class holds a private final BitField delegate passed via constructor. Move implementations of the listed byte/short convenience methods into BitFieldPrimitives, adapting them to call the BitField delegate's public methods (getRawValue, getValue, setValue, clear, set). The moved methods keep the same signatures and semantics but are now implemented as instance methods on BitFieldPrimitives that delegate to the BitField instance to preserve behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitFieldPrimitives.java"
+          ],
+          "details": "Ensure BitFieldPrimitives is in package org.apache.commons.lang3 and imports nothing extra (uses the BitField type from same package).",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Replace the moved primitive convenience implementations in BitField with small delegating methods to the new helper, and add a helper field to BitField to preserve the public API while reducing internal complexity.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java:clearByte(byte)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:clearShort(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getShortRawValue(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getShortValue(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setByte(byte)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setByteBoolean(byte,boolean)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setShort(short)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setShortBoolean(short,boolean)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setShortValue(short,short)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "details": "Replace the original implementations in BitField with delegating methods that forward to an instance of BitFieldPrimitives. Add a private final field 'primitives' of type BitFieldPrimitives, initialized in each BitField constructor (e.g. this.primitives = new BitFieldPrimitives(this)). Keep the same public method signatures in BitField so external callers are unaffected; the methods now delegate to primitives.[method](...). This reduces BitField size while preserving API and behavior.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "details": "No external imports needed; ensure the new field type BitFieldPrimitives (same package) is referenced without import or with correct package declaration.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java"
+          ],
+          "details": "Update any internal calls inside BitField that previously invoked the moved implementations directly (if any) to use the delegating methods. Because the public signatures are unchanged, external call sites do not need modification. Internal usages should call the delegating methods so behavior remains identical.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "(Optional) Evaluate opportunities to further modularize long/int related operations if additional size reduction is desired.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/BitField.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/BitField.java:getRawValue(int)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getRawValue(long)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getValue(int)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:getValue(long)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setValue(int,int)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:setValue(long,long)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:clear(int)",
+            "src/main/java/org/apache/commons/lang3/BitField.java:clear(long)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/BitFieldCore.java"
+          ],
+          "details": "If further decomposition is required, extract the core masking logic that operates on int/long into a new class BitFieldCore (same package) or an interface + implementation. This is optional and should be considered only after verifying that the primitives extraction reduced complexity sufficiently. Keep public API on BitField by delegating to the new core implementation.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

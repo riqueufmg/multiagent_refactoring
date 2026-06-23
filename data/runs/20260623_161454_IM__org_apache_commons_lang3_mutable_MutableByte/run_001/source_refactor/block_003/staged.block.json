@@ -1,0 +1,54 @@
+{
+  "id": 3,
+  "goal": "Finalize API surface: keep non-arithmetic responsibilities in MutableByte (Number conversions, equals, hashCode, toString, constructors) and ensure the class size and public method count are reduced and cohesive. Optionally define an interface for arithmetic operations if needed by other mutables.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+    "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java",
+    "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+    "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::add(byte,byte)",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::subtract(byte,byte)",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::increment(byte)",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::decrement(byte)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java"
+      ],
+      "details": "Optionally extract an interface (ByteArithmetic) describing the arithmetic operations implemented by MutableByteArithmetic. This is useful if other mutable numeric classes in the package should depend on the abstraction. Placing the interface in the same package keeps visibility simple. Implement MutableByteArithmetic to implement the new interface.",
+      "risk": "low"
+    },
+    {
+      "op": "REPLACE_DEPENDENCY",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java",
+        "src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+      ],
+      "details": "If the interface ByteArithmetic is extracted, update MutableByte (and any other classes) to depend on the interface rather than the concrete MutableByteArithmetic class. Use dependency inversion to reduce coupling and make future testing/mocking easier.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+        "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+    "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java",
+      "content": "package org.jsoup.parser;\n\n/**\n * Thin facade to centralize external calls into HtmlTreeBuilderState. Provides a single\n * stable entry point for handling tokens against a given state. Delegates to the\n * enum's package-private process(...) method.\n */\npublic final class HtmlTreeBuilderStateFacade {\n\n    private HtmlTreeBuilderStateFacade() {\n        // no instantiation\n    }\n\n    /**\n     * Handle a token using the provided state by delegating to HtmlTreeBuilderState.process.\n     *\n     * @param t the token to process\n     * @param tb the tree builder\n     * @param state the current state\n     * @return true if processing should continue, false otherwise\n     */\n    public static boolean handle(Token t, HtmlTreeBuilder tb, HtmlTreeBuilderState state) {\n        return state.process(t, tb);\n    }\n}\n"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "Added HtmlTreeBuilderStateFacade with a single static handle(...) method delegating to HtmlTreeBuilderState.process to provide a stable external entry point. No tests required changes."
+}

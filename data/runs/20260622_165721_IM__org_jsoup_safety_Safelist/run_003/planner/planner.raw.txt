@@ -1,0 +1,119 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.safety.Safelist",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Group all configuration and policy-related behaviors out of Safelist into the existing SafelistConfig class so Safelist becomes a thin façade and the implementation is concentrated in one place (reduce number of public methods and move cohesive logic).",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistConfig.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "public Safelist addTags(String... tags) { config.addTags(tags); return this; }",
+            "public Safelist removeTags(String... tags) { config.removeTags(tags); return this; }",
+            "public Safelist addAttributes(String tag, String... attributes) { config.addAttributes(tag, attributes); return this; }",
+            "public Safelist removeAttributes(String tag, String... attributes) { config.removeAttributes(tag, attributes); return this; }",
+            "public Safelist addEnforcedAttribute(String tag, String attribute, String value) { config.addEnforcedAttribute(tag, attribute, value); return this; }",
+            "public Safelist removeEnforcedAttribute(String tag, String attribute) { config.removeEnforcedAttribute(tag, attribute); return this; }",
+            "public Safelist preserveRelativeLinks(boolean preserve) { config.preserveRelativeLinks(preserve); return this; }",
+            "public boolean preserveRelativeLinks() { return config.preserveRelativeLinks(); }",
+            "public Safelist addProtocols(String tag, String attribute, String... protocols) { config.addProtocols(tag, attribute, protocols); return this; }",
+            "public Safelist removeProtocols(String tag, String attribute, String... removeProtocols) { config.removeProtocols(tag, attribute, removeProtocols); return this; }",
+            "public boolean isSafeTag(String tag) { return config.isSafeTag(tag); }",
+            "public boolean isSafeAttribute(String tagName, Element el, Attribute attr) { return config.isSafeAttribute(tagName, el, attr); }",
+            "public Attributes getEnforcedAttributes(String tagName) { return config.getEnforcedAttributes(tagName); }",
+            "boolean shouldAbsUrl(String tagName, String attrKey) { return config.shouldAbsUrl(tagName, attrKey); }",
+            "private boolean shouldAbsUrl(TagName tag, AttributeKey key) { return config.shouldAbsUrl(tag, key); }"
+          ],
+          "outputs": [
+            "Add equivalent method implementations to SafelistConfig with the same signatures but implemented to operate on the SafelistConfig instance state (move bodies into SafelistConfig).",
+            "Ensure SafelistConfig exposes the same public/ package-private methods so it encapsulates the configuration/policy logic."
+          ],
+          "details": "Move the concrete implementations for the listed configuration and policy methods from Safelist into SafelistConfig. After movement, the implementation logic and any state reads/writes live in SafelistConfig. Keep the original method signatures (see Block 2) on Safelist as thin delegating stubs to preserve the public API surface if desired; alternatively, callers can call Safelist.config.* where applicable after update. All moved methods must preserve behavior, exceptions, and access modifiers when moved to SafelistConfig (public methods remain public on SafelistConfig; package-private helpers remain package-private).",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Preserve binary/source compatibility for callers while reducing Safelist implementation content: replace moved implementations in Safelist with minimal delegating stubs that forward to SafelistConfig, update imports if needed, and update any internal call sites to use SafelistConfig if they should call the implementation class directly.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistConfig.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "Safelist.java",
+            "SafelistConfig.java"
+          ],
+          "outputs": [
+            "Ensure Safelist and SafelistConfig have the required imports for Element, Attribute, Attributes, TagName, AttributeKey, and any other types used by the moved methods."
+          ],
+          "details": "Add or update imports in both classes so that moved methods compile in their new location. No new external packages are introduced; imports already used in Safelist should be sufficient but must be present in SafelistConfig.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "All internal references within org.jsoup.safety to methods moved into SafelistConfig (e.g., places that previously called the internal Safelist implementations)."
+          ],
+          "outputs": [
+            "Update internal call sites in the same package to call the moved implementations on SafelistConfig (either via the existing 'config' field on Safelist instances, or via direct SafelistConfig usage where appropriate)."
+          ],
+          "details": "Replace direct internal calls that previously relied on Safelist's internal implementation with calls to SafelistConfig methods when the logic is implementation-specific. External public callers are preserved via stubs in Safelist (see next op).",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "The original methods in Safelist (same signatures as moved in Block 1) but implemented as delegating stubs."
+          ],
+          "outputs": [
+            "In Safelist.java, add minimal delegating method bodies that call the corresponding SafelistConfig methods (e.g., public Safelist addTags(String... tags) { config.addTags(tags); return this; }). These stubs keep the Safelist public API while the implementation lives in SafelistConfig."
+          ],
+          "details": "After Block 1 moved the implementation, ensure Safelist still declares the same methods but with single-line delegations to config. This preserves source compatibility for code that uses Safelist directly and makes Safelist a small façade.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Optionally introduce an explicit façade/adapter interface to separate API from implementation (improves modularization and allows alternative implementations of the configuration behavior).",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistConfig.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "Select the public configuration method signatures now implemented in SafelistConfig (e.g., addTags, removeTags, addAttributes, removeAttributes, addEnforcedAttribute, removeEnforcedAttribute, preserveRelativeLinks, preserveRelativeLinks getter, addProtocols, removeProtocols, isSafeTag, isSafeAttribute, getEnforcedAttributes)."
+          ],
+          "outputs": [
+            "Create a new interface in org.jsoup.safety (e.g., an interface type declared in SafelistConfig.java or a new file) that declares the configuration API methods. Make SafelistConfig implement that interface and have Safelist hold the config field typed to that interface rather than the concrete type."
+          ],
+          "details": "Introduce an interface that captures the policy/configuration API surface, implemented by SafelistConfig. Update Safelist to depend on the interface (configuration abstraction) rather than the concrete SafelistConfig. This enables dependency inversion and clearer module boundaries. Keep the interface in the same package (org.jsoup.safety).",
+          "risk": "medium"
+        },
+        {
+          "op": "DEPENDENCY_INVERSION",
+          "inputs": [
+            "Safelist.java (field 'private final SafelistConfig config;')"
+          ],
+          "outputs": [
+            "Change the type of Safelist.config to the newly extracted interface and update constructors to instantiate SafelistConfig (the concrete) while storing it via the interface type."
+          ],
+          "details": "Make Safelist depend on the small interface rather than the concrete class to decouple the façade from implementation and allow future alternative implementations for testing or different policies.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

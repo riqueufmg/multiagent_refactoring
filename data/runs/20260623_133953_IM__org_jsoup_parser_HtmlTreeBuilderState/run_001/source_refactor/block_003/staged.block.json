@@ -1,0 +1,35 @@
+{
+  "id": 3,
+  "goal": "Reduce public surface and clarify responsibilities by creating a minimal facade for external use if future splits are needed (prepares for further extraction of state implementations).",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::process"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateFacade.java"
+      ],
+      "details": "Introduce a thin facade class org.jsoup.parser.HtmlTreeBuilderStateFacade that offers a single public entry method (e.g. boolean handle(Token t, HtmlTreeBuilder tb, HtmlTreeBuilderState state)) that delegates to state.process(t, tb). The facade centralizes external calls and prepares for future refactorings where some state-processing responsibilities could be moved out of the enum while keeping a stable external API to HtmlTreeBuilder. Update callers (if any within the same repository, e.g., HtmlTreeBuilder) to use the facade where appropriate in a later step. This step only creates the facade and leaves existing enum behavior intact (the facade delegates to the enum's process), so compilation is preserved.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

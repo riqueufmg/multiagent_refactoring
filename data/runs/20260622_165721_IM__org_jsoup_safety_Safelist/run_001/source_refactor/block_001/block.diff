@@ -1,0 +1,167 @@
+commit 9387b7e177fc01c3dc75a59a0f58007bbafb63f9
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Jun 22 17:00:07 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/safety/Safelist.java b/src/main/java/org/jsoup/safety/Safelist.java
+index 05e5f700..6212fdd7 100644
+--- a/src/main/java/org/jsoup/safety/Safelist.java
++++ b/src/main/java/org/jsoup/safety/Safelist.java
+@@ -621,73 +621,4 @@ public class Safelist {
+         }
+         return attrs;
+     }
+-    
+-    // named types for config. All just hold strings, but here for my sanity.
+-
+-    static class TagName extends TypedValue {
+-        TagName(String value) {
+-            super(value);
+-        }
+-
+-        static TagName valueOf(String value) {
+-            return new TagName(Normalizer.lowerCase(value));
+-        }
+-    }
+-
+-    static class AttributeKey extends TypedValue {
+-        AttributeKey(String value) {
+-            super(value);
+-        }
+-
+-        static AttributeKey valueOf(String value) {
+-            return new AttributeKey(Normalizer.lowerCase(value));
+-        }
+-    }
+-
+-    static class AttributeValue extends TypedValue {
+-        AttributeValue(String value) {
+-            super(value);
+-        }
+-
+-        static AttributeValue valueOf(String value) {
+-            return new AttributeValue(value);
+-        }
+-    }
+-
+-    static class Protocol extends TypedValue {
+-        Protocol(String value) {
+-            super(value);
+-        }
+-
+-        static Protocol valueOf(String value) {
+-            return new Protocol(value);
+-        }
+-    }
+-
+-    abstract static class TypedValue {
+-        private final String value;
+-
+-        TypedValue(String value) {
+-            Validate.notNull(value);
+-            this.value = value;
+-        }
+-
+-        @Override
+-        public int hashCode() {
+-            return value.hashCode();
+-        }
+-
+-        @Override
+-        public boolean equals(Object obj) {
+-            if (this == obj) return true;
+-            if (obj == null || getClass() != obj.getClass()) return false;
+-            TypedValue other = (TypedValue) obj;
+-            return Objects.equals(value, other.value);
+-        }
+-
+-        @Override
+-        public String toString() {
+-            return value;
+-        }
+-    }
+ }
+diff --git a/src/main/java/org/jsoup/safety/SafelistTypes.java b/src/main/java/org/jsoup/safety/SafelistTypes.java
+new file mode 100644
+index 00000000..f1fbb940
+--- /dev/null
++++ b/src/main/java/org/jsoup/safety/SafelistTypes.java
+@@ -0,0 +1,77 @@
++package org.jsoup.safety;
++
++import org.jsoup.helper.Validate;
++import org.jsoup.internal.Normalizer;
++
++import java.util.Objects;
++
++/**
++ * Extracted small typed helper classes used by Safelist: TypedValue and concrete subtypes.
++ * Package-private so Safelist in same package can access them.
++ */
++abstract class TypedValue {
++    private final String value;
++
++    TypedValue(String value) {
++        Validate.notNull(value);
++        this.value = value;
++    }
++
++    @Override
++    public int hashCode() {
++        return value.hashCode();
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        if (this == obj) return true;
++        if (obj == null || getClass() != obj.getClass()) return false;
++        TypedValue other = (TypedValue) obj;
++        return Objects.equals(value, other.value);
++    }
++
++    @Override
++    public String toString() {
++        return value;
++    }
++}
++
++class TagName extends TypedValue {
++    TagName(String value) {
++        super(value);
++    }
++
++    static TagName valueOf(String value) {
++        return new TagName(Normalizer.lowerCase(value));
++    }
++}
++
++class AttributeKey extends TypedValue {
++    AttributeKey(String value) {
++        super(value);
++    }
++
++    static AttributeKey valueOf(String value) {
++        return new AttributeKey(Normalizer.lowerCase(value));
++    }
++}
++
++class AttributeValue extends TypedValue {
++    AttributeValue(String value) {
++        super(value);
++    }
++
++    static AttributeValue valueOf(String value) {
++        return new AttributeValue(value);
++    }
++}
++
++class Protocol extends TypedValue {
++    Protocol(String value) {
++        super(value);
++    }
++
++    static Protocol valueOf(String value) {
++        return new Protocol(value);
++    }
++}

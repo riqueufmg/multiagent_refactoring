@@ -1,0 +1,60 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Document",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce size and complexity of org.jsoup.nodes.Document by extracting the large nested static OutputSettings class into its own top-level class in the same package.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Document.java",
+        "src/main/java/org/jsoup/nodes/OutputSettings.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Document.java::nested static class OutputSettings"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/OutputSettings.java::public class OutputSettings"
+          ],
+          "details": "Extract the nested static class Document.OutputSettings to a new top-level class org.jsoup.nodes.OutputSettings. Preserve the class contents (enum Syntax, fields, methods, and clone behavior) without changing logic. Keep package declaration 'package org.jsoup.nodes;'. Ensure references within the moved class to Entities, Charset, Validate and other types remain unchanged (they are referenced in the original class). Remove the nested OutputSettings class definition from Document and leave the Document.outputSettings field of type OutputSettings (same simple name) so Document compiles against the new top-level class in the same package.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Update references and call sites that previously used the nested type Document.OutputSettings so they use the new top-level OutputSettings type, and ensure imports or package references are correct.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Document.java",
+        "src/main/java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "All source files under src/main/java that reference Document.OutputSettings or the nested type (e.g. code using Document.OutputSettings or Document.OutputSettings.Syntax)"
+          ],
+          "outputs": [
+            "Updated source files to reference org.jsoup.nodes.OutputSettings and OutputSettings.Syntax where appropriate"
+          ],
+          "details": "Replace references to the nested type Document.OutputSettings (qualified or unqualified usages) with the new top-level OutputSettings type. For example, change any 'Document.OutputSettings' occurrences to 'OutputSettings' for files in the same package, or add 'import org.jsoup.nodes.OutputSettings;' where necessary. Ensure method signatures in Document that expose OutputSettings (outputSettings(), outputSettings(OutputSettings)) remain using the same simple type name and compile correctly against the new top-level class.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "Files updated in this block that now reference OutputSettings as a top-level class from other packages"
+          ],
+          "outputs": [
+            "Updated imports in the changed files (add 'import org.jsoup.nodes.OutputSettings;' where needed)"
+          ],
+          "details": "For any files outside org.jsoup.nodes that previously used the nested name Document.OutputSettings, add a top-level import for org.jsoup.nodes.OutputSettings or fully qualify usages. Do not change semantics; keep visibility and package the same.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

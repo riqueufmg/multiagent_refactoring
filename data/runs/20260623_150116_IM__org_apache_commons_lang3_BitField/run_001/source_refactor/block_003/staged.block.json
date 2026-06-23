@@ -1,0 +1,44 @@
+{
+  "id": 3,
+  "goal": "(Optional) Evaluate opportunities to further modularize long/int related operations if additional size reduction is desired.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/BitField.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/BitField.java:getRawValue(int)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getRawValue(long)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getValue(int)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:getValue(long)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setValue(int,int)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:setValue(long,long)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:clear(int)",
+        "src/main/java/org/apache/commons/lang3/BitField.java:clear(long)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/BitFieldCore.java"
+      ],
+      "details": "If further decomposition is required, extract the core masking logic that operates on int/long into a new class BitFieldCore (same package) or an interface + implementation. This is optional and should be considered only after verifying that the primitives extraction reduced complexity sufficiently. Keep public API on BitField by delegating to the new core implementation.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+        "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/BitFieldLongTest.java",
+    "src/test/java/org/apache/commons/lang3/BitFieldTest.java"
+  ]
+}

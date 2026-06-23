@@ -1,0 +1,209 @@
+commit a5fe6f1f0d109484abeacf7589dfa7f2d125aebe
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:17:40 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index 647278bb..9b7a54f5 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -382,92 +382,7 @@ enum HtmlTreeBuilderState {
+     ForeignContent {
+         // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inforeign
+         @Override boolean process(Token t, HtmlTreeBuilder tb) {
+-            switch (t.type) {
+-                case Character:
+-                    Token.Character c = t.asCharacter();
+-                    if (HtmlTreeBuilderStateHelper.isWhitespace(c))
+-                        tb.insertCharacterNode(c);
+-                    else {
+-                        tb.insertCharacterNode(c, true); // replace nulls
+-                        tb.framesetOk(false);
+-                    }
+-                    break;
+-                case Comment:
+-                    tb.insertCommentNode(t.asComment());
+-                    break;
+-                case Doctype:
+-                    tb.error(this);
+-                    break;
+-                case StartTag:
+-                    Token.StartTag start = t.asStartTag();
+-                    if (StringUtil.in(start.normalName, InForeignToHtml))
+-                        return processAsHtml(t, tb);
+-                    if (start.normalName.equals("font") && (
+-                        start.hasAttributeIgnoreCase("color")
+-                            || start.hasAttributeIgnoreCase("face")
+-                            || start.hasAttributeIgnoreCase("size")))
+-                        return processAsHtml(t, tb);
+-
+-                    // Any other start:
+-                    // (whatwg says to fix up tag name and attribute case per a table - we will preserve original case instead)
+-                    String namespace = tb.currentElement().tag().namespace();
+-                    tb.insertForeignElementFor(start, namespace);
+-                    // (self-closing handled in insert)
+-                    // if self-closing svg script -- level and execution elided
+-
+-                    // seemingly not in spec, but as browser behavior, get into ScriptData state for svg script; and allow custom data tags
+-                    TokeniserState textState = tb.tagFor(start.tagName.value(), start.normalName, namespace, tb.settings).textState();
+-                    if (textState != null) {
+-                        if (start.normalName.equals("script"))
+-                            tb.tokeniser.transition(TokeniserState.ScriptData);
+-                        else
+-                            tb.tokeniser.transition(textState);
+-                    }
+-
+-                    break;
+-
+-                case EndTag:
+-                    Token.EndTag end = t.asEndTag();
+-                    if (end.normalName.equals("br") || end.normalName.equals("p"))
+-                        return processAsHtml(t, tb);
+-                    if (end.normalName.equals("script") && tb.currentElementIs("script", Parser.NamespaceSvg)) {
+-                        // script level and execution elided.
+-                        tb.pop();
+-                        return true;
+-                    }
+-
+-                    // Any other end tag
+-                    ArrayList<Element> stack = tb.getStack();
+-                    if (stack.isEmpty())
+-                        Validate.wtf("Stack unexpectedly empty");
+-                    int i = stack.size() - 1;
+-                    Element el = stack.get(i);
+-                    if (!el.nameIs(end.normalName))
+-                        tb.error(this);
+-                    while (i != 0) {
+-                        if (el.nameIs(end.normalName)) {
+-                            tb.popStackToCloseAnyNamespace(el.normalName());
+-                            return true;
+-                        }
+-                        i--;
+-                        el = stack.get(i);
+-                        if (el.tag().namespace().equals(Parser.NamespaceHtml)) {
+-                            return processAsHtml(t, tb);
+-                        }
+-                    }
+-                    break;
+-
+-                case EOF:
+-                    // won't come through here, but for completion:
+-                    break;
+-                default:
+-                    Validate.wtf("Unexpected state: " + t.type); // XmlDecl only in XmlTreeBuilder
+-            }
+-            return true;
+-        }
+-
+-        boolean processAsHtml(Token t, HtmlTreeBuilder tb) {
+-            return tb.state().process(t, tb);
++            return HtmlTreeBuilderStateForeignContentHandler.processForeignContent(t, tb);
+         }
+     };
+ 
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignContentHandler.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignContentHandler.java
+new file mode 100644
+index 00000000..070c7664
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateForeignContentHandler.java
+@@ -0,0 +1,99 @@
++package org.jsoup.parser;
++
++import org.jsoup.helper.Validate;
++import org.jsoup.internal.StringUtil;
++import org.jsoup.nodes.Element;
++
++import java.util.ArrayList;
++
++final class HtmlTreeBuilderStateForeignContentHandler {
++
++    static boolean processForeignContent(Token t, HtmlTreeBuilder tb) {
++        switch (t.type) {
++            case Character:
++                Token.Character c = t.asCharacter();
++                if (HtmlTreeBuilderStateHelper.isWhitespace(c))
++                    tb.insertCharacterNode(c);
++                else {
++                    tb.insertCharacterNode(c, true); // replace nulls
++                    tb.framesetOk(false);
++                }
++                break;
++            case Comment:
++                tb.insertCommentNode(t.asComment());
++                break;
++            case Doctype:
++                tb.error(HtmlTreeBuilderState.ForeignContent);
++                break;
++            case StartTag:
++                Token.StartTag start = t.asStartTag();
++                if (StringUtil.in(start.normalName, HtmlTreeBuilderStateConstants.InForeignToHtml))
++                    return processAsHtml(t, tb);
++                if (start.normalName.equals("font") && (
++                    start.hasAttributeIgnoreCase("color")
++                        || start.hasAttributeIgnoreCase("face")
++                        || start.hasAttributeIgnoreCase("size")))
++                    return processAsHtml(t, tb);
++
++                // Any other start:
++                // (whatwg says to fix up tag name and attribute case per a table - we will preserve original case instead)
++                String namespace = tb.currentElement().tag().namespace();
++                tb.insertForeignElementFor(start, namespace);
++                // (self-closing handled in insert)
++                // if self-closing svg script -- level and execution elided
++
++                // seemingly not in spec, but as browser behavior, get into ScriptData state for svg script; and allow custom data tags
++                TokeniserState textState = tb.tagFor(start.tagName.value(), start.normalName, namespace, tb.settings).textState();
++                if (textState != null) {
++                    if (start.normalName.equals("script"))
++                        tb.tokeniser.transition(TokeniserState.ScriptData);
++                    else
++                        tb.tokeniser.transition(textState);
++                }
++
++                break;
++
++            case EndTag:
++                Token.EndTag end = t.asEndTag();
++                if (end.normalName.equals("br") || end.normalName.equals("p"))
++                    return processAsHtml(t, tb);
++                if (end.normalName.equals("script") && tb.currentElementIs("script", Parser.NamespaceSvg)) {
++                    // script level and execution elided.
++                    tb.pop();
++                    return true;
++                }
++
++                // Any other end tag
++                ArrayList<Element> stack = tb.getStack();
++                if (stack.isEmpty())
++                    Validate.wtf("Stack unexpectedly empty");
++                int i = stack.size() - 1;
++                Element el = stack.get(i);
++                if (!el.nameIs(end.normalName))
++                    tb.error(HtmlTreeBuilderState.ForeignContent);
++                while (i != 0) {
++                    if (el.nameIs(end.normalName)) {
++                        tb.popStackToCloseAnyNamespace(el.normalName());
++                        return true;
++                    }
++                    i--;
++                    el = stack.get(i);
++                    if (el.tag().namespace().equals(Parser.NamespaceHtml)) {
++                        return processAsHtml(t, tb);
++                    }
++                }
++                break;
++
++            case EOF:
++                // won't come through here, but for completion:
++                break;
++            default:
++                Validate.wtf("Unexpected state: " + t.type); // XmlDecl only in XmlTreeBuilder
++        }
++        return true;
++    }
++
++    static boolean processAsHtml(Token t, HtmlTreeBuilder tb) {
++        return tb.state().process(t, tb);
++    }
++}

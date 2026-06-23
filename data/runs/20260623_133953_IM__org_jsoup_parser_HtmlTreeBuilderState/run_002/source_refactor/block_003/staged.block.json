@@ -1,0 +1,46 @@
+{
+  "id": 3,
+  "goal": "Create a dedicated helper class to host head-related state processing logic (initial preparation). This prepares for moving InHead-family logic out of the enum.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+      ],
+      "details": "Create a new class org.jsoup.parser.HtmlTreeBuilderStateHeadHandlers containing static method signatures for head-related states: processInHead, processInHeadNoscript, processBeforeHead, processAfterHead (signatures: Token, HtmlTreeBuilder). This file is created first so it can be referenced when moving logic out of the enum.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateHeadHandlers.java"
+      ],
+      "details": "Add necessary imports mirroring those used in the head-related code in HtmlTreeBuilderState (Token, Element, HtmlTreeBuilderStateHelper, etc.).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

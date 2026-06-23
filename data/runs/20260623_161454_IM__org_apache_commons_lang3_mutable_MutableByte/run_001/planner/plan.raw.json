@@ -1,0 +1,123 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.mutable.MutableByte",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a dedicated helper class to host the byte arithmetic and state-manipulation implementations so that MutableByte's public API is smaller and more cohesive.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::add(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::add(java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::subtract(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::subtract(java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::increment()",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::decrement()",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::addAndGet(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::addAndGet(java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndAdd(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndAdd(java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::incrementAndGet()",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::decrementAndGet()",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndIncrement()",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndDecrement()"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java"
+          ],
+          "details": "Create a new class org.apache.commons.lang3.mutable.MutableByteArithmetic with public static methods implementing the byte arithmetic and get/and variants. Method signatures use primitives and java.lang.Number where appropriate so the helper is independent of MutableByte's private fields. Example methods to create: add(byte current, byte operand), add(byte current, java.lang.Number operand), subtract(...), increment(...), decrement(...), addAndGet(...), getAndAdd(...), incrementAndGet(...), getAndIncrement(...), decrementAndGet(...), getAndDecrement(...). The helper will be placed in the same package org.apache.commons.lang3.mutable.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce MutableByte's implementation by delegating arithmetic and state-change operations to MutableByteArithmetic, leaving a smaller, cohesive public API surface in MutableByte.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::add(byte) - implementation moved to MutableByteArithmetic.add(byte,byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::add(java.lang.Number) - implementation moved to MutableByteArithmetic.add(byte,java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::subtract(byte) - implementation moved to MutableByteArithmetic.subtract(byte,byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::subtract(java.lang.Number) - implementation moved to MutableByteArithmetic.subtract(byte,java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::increment() - implementation moved to MutableByteArithmetic.increment(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::decrement() - implementation moved to MutableByteArithmetic.decrement(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::addAndGet(byte) - implementation moved to MutableByteArithmetic.addAndGet(byte,byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::addAndGet(java.lang.Number) - implementation moved to MutableByteArithmetic.addAndGet(byte,java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndAdd(byte) - implementation moved to MutableByteArithmetic.getAndAdd(byte,byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndAdd(java.lang.Number) - implementation moved to MutableByteArithmetic.getAndAdd(byte,java.lang.Number)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::incrementAndGet() - implementation moved to MutableByteArithmetic.incrementAndGet(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::decrementAndGet() - implementation moved to MutableByteArithmetic.decrementAndGet(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndIncrement() - implementation moved to MutableByteArithmetic.getAndIncrement(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java::getAndDecrement() - implementation moved to MutableByteArithmetic.getAndDecrement(byte)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::(corresponding static methods)"
+          ],
+          "details": "Transfer the logic of the listed methods from MutableByte into corresponding static methods on MutableByteArithmetic. The moved implementations become static, accepting the current byte value and operand(s) and returning the appropriate result (and where necessary new value). This makes the helper the canonical location for byte arithmetic semantics.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "details": "Replace the bodies of the moved methods in MutableByte with thin delegating implementations that call MutableByteArithmetic static methods and update the private field 'value' appropriately. Examples: add(byte operand) -> this.value = MutableByteArithmetic.add(this.value, operand); getAndAdd(byte operand) -> return MutableByteArithmetic.getAndAddAndUpdateField(this, operand) or (preferably) use helper methods that return a pair-like result; since pairs are not being introduced, implement helper methods to return the necessary primitive and update MutableByte.value by the returned value or use helper methods that accept the current value and return the new/current value as required. Ensure method signatures on MutableByte remain unchanged so external callers are unaffected.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Finalize API surface: keep non-arithmetic responsibilities in MutableByte (Number conversions, equals, hashCode, toString, constructors) and ensure the class size and public method count are reduced and cohesive. Optionally define an interface for arithmetic operations if needed by other mutables.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::add(byte,byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::subtract(byte,byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::increment(byte)",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java::decrement(byte)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java"
+          ],
+          "details": "Optionally extract an interface (ByteArithmetic) describing the arithmetic operations implemented by MutableByteArithmetic. This is useful if other mutable numeric classes in the package should depend on the abstraction. Placing the interface in the same package keeps visibility simple. Implement MutableByteArithmetic to implement the new interface.",
+          "risk": "low"
+        },
+        {
+          "op": "REPLACE_DEPENDENCY",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByteArithmetic.java",
+            "src/main/java/org/apache/commons/lang3/mutable/ByteArithmetic.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+          ],
+          "details": "If the interface ByteArithmetic is extracted, update MutableByte (and any other classes) to depend on the interface rather than the concrete MutableByteArithmetic class. Use dependency inversion to reduce coupling and make future testing/mocking easier.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

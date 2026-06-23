@@ -1,0 +1,46 @@
+{
+  "id": 1,
+  "goal": "Create a dedicated helper class to host table-related state processing logic (initial preparation). This reduces size of the enum by providing a target for subsequent method moves.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+      ],
+      "details": "Create a new class org.jsoup.parser.HtmlTreeBuilderStateTableHandlers in the same package. Add static method signatures to receive (Token t, HtmlTreeBuilder tb) for table-related state processing: processInTable, processInTableText, processInCaption, processInColumnGroup, processInTableBody, processInRow, processInCell, and helper closeCell(Token t, HtmlTreeBuilder tb) as needed. No changes to the enum are done in this step; this only adds the new helper class file so subsequent refactors can move logic into it.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateTableHandlers.java"
+      ],
+      "details": "Add imports needed by the helper: org.jsoup.nodes.Element, java.util.ArrayList and other referenced types (Token, TokeniserState, Parser, etc.) mirroring those already used in HtmlTreeBuilderState so the new class compiles standalone.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

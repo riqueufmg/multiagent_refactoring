@@ -1,0 +1,172 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.TokeniserState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce size and complexity of data-related states by extracting their handling logic to a dedicated facade class and delegating from the enum constants.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateDataFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateDataFacade.java"
+          ],
+          "details": "Create a new class org.jsoup.parser.TokeniserStateDataFacade with static methods that encapsulate the logic currently implemented inside the following TokeniserState enum constants: Data, CharacterReferenceInData, Rcdata, CharacterReferenceInRcdata, Rawtext, PLAINTEXT. Each facade method will have the signature: static void read(Tokeniser t, CharacterReader r, TokeniserState state) or a named variant (e.g., readData, readCharRefInData, readRcdata, readCharRefInRcdata, readRawtext, readPlaintext). The methods will reuse Tokeniser and CharacterReader and will call TokeniserStateHelper as needed. The facade lives in the same package org.jsoup.parser.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java",
+            "src/main/java/org/jsoup/parser/TokeniserStateDataFacade.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Modify the read(...) implementations of the enum constants Data, CharacterReferenceInData, Rcdata, CharacterReferenceInRcdata, Rawtext, and PLAINTEXT to delegate to the corresponding TokeniserStateDataFacade static method (e.g., TokeniserStateDataFacade.readData(t, r); ). Keep enum constant names and transitions (references to other TokeniserState constants) unchanged; delegation centralizes complex switch logic into the facade.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Group tag-opening and name handling into a Tag facade to decouple tag-parsing complexity from the TokeniserState enum.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java"
+          ],
+          "details": "Create org.jsoup.parser.TokeniserStateTagFacade with static methods encapsulating logic for TagOpen, EndTagOpen, TagName and the small helper RCDATA-related lessthan handling that directly routes into tag creation. Methods should be named to reflect intent (e.g., readTagOpen, readEndTagOpen, readTagName) and accept Tokeniser and CharacterReader parameters. The new class sits in the same package and calls existing Tokeniser APIs (createTagPending, transition, advanceTransition, emit, error, eofError) as needed.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java",
+            "src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Change the read(...) bodies for TagOpen, EndTagOpen and TagName to delegate to TokeniserStateTagFacade methods (for example, TokeniserStateTagFacade.readTagOpen(t, r); ). Preserve existing transitions between TokeniserState constants (the facade should invoke transitions on the passed Tokeniser instance).",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract attribute-related parsing logic into a dedicated Attribute facade to reduce the number of responsibilities inside the enum and improve cohesion.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java"
+          ],
+          "details": "Create org.jsoup.parser.TokeniserStateAttributeFacade with static methods covering BeforeAttributeName, AttributeName, AfterAttributeName, BeforeAttributeValue, AttributeValue_doubleQuoted, AttributeValue_singleQuoted, AttributeValue_unquoted, AfterAttributeValue_quoted and SelfClosingStartTag. The facade methods will encapsulate long switch and consume logic, call Tokeniser APIs (tagPending manipulation, transition, error, eofError, emitTagPending), and delegate any character reference handling to Tokeniser where required.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java",
+            "src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Update the enum constants listed above so each read(...) implementation is a simple delegation to the corresponding TokeniserStateAttributeFacade method (for example TokeniserStateAttributeFacade.readAttributeName(t, r); ). This centralizes attribute parsing and reduces enum size. Ensure behavior is preserved: the facade must use Tokeniser.tagPending and other Tokeniser state exactly as the original code does.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Move comment and bogus-comment handling into a Comment facade to isolate comment parsing behavior.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java"
+          ],
+          "details": "Create org.jsoup.parser.TokeniserStateCommentFacade with static methods to handle CommentStart, CommentStartDash, Comment, CommentEndDash, CommentEnd, CommentEndBang, BogusComment, and part of MarkupDeclarationOpen/MarkupProcessingOpen paths that lead to comments. Methods will append to t.commentPending, call emitCommentPending, transition Tokeniser as appropriate, and preserve error/eof handling.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java",
+            "src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Replace the bodies of read(...) for the comment-related enum constants with delegations to TokeniserStateCommentFacade (e.g., TokeniserStateCommentFacade.readCommentStart(t, r); ). Keep transitions and pending-buffer semantics unchanged: the facade must operate on t.commentPending and Tokeniser transitions exactly as original code.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "goal": "Extract DOCTYPE parsing logic into a Doctype facade to isolate and simplify the enum by delegating the long state machine that handles DOCTYPE parsing.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java"
+          ],
+          "details": "Create org.jsoup.parser.TokeniserStateDoctypeFacade with static methods encapsulating the logic for Doctype, BeforeDoctypeName, DoctypeName, AfterDoctypeName, AfterDoctypePublicKeyword, BeforeDoctypePublicIdentifier, DoctypePublicIdentifier_doubleQuoted, DoctypePublicIdentifier_singleQuoted, AfterDoctypePublicIdentifier, BetweenDoctypePublicAndSystemIdentifiers, AfterDoctypeSystemKeyword, BeforeDoctypeSystemIdentifier, DoctypeSystemIdentifier_doubleQuoted, DoctypeSystemIdentifier_singleQuoted, AfterDoctypeSystemIdentifier, BogusDoctype, and DoctypeInternalSubset. Facade methods should construct and manipulate Tokeniser.doctypePending, set forceQuirks or sawInternalSubset as appropriate, call emitDoctypePending, and preserve Tokeniser error/eof handling.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java",
+            "src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Delegate read(...) implementations for the DOCTYPE-related states to TokeniserStateDoctypeFacade (for example TokeniserStateDoctypeFacade.readDoctype(t, r); ). The facade must preserve the same calls to t.createDoctypePending(), t.doctypePending manipulation, t.emitDoctypePending(), and transition/error behavior as the original code.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

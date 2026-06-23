@@ -1,0 +1,99 @@
+{
+  "id": 1,
+  "goal": "Extract invocation and varargs-handling responsibilities into a new helper class to reduce MethodUtils size and group cohesive invocation logic.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java",
+    "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "MethodUtils.invokeExactMethod(Object,String)",
+        "MethodUtils.invokeExactMethod(Object,String,Object...)",
+        "MethodUtils.invokeExactMethod(Object,String,Object[],Class<?>[])",
+        "MethodUtils.invokeExactStaticMethod(Class<?>,String,Object...)",
+        "MethodUtils.invokeExactStaticMethod(Class<?>,String,Object[],Class<?>[])",
+        "MethodUtils.invokeMethod(Object,boolean,String)",
+        "MethodUtils.invokeMethod(Object,boolean,String,Object...)",
+        "MethodUtils.invokeMethod(Object,boolean,String,Object[],Class<?>[])",
+        "MethodUtils.invokeMethod(Object,String)",
+        "MethodUtils.invokeMethod(Object,String,Object...)",
+        "MethodUtils.invokeMethod(Object,String,Object[],Class<?>[])",
+        "MethodUtils.invokeStaticMethod(Class<?>,String,Object...)",
+        "MethodUtils.invokeStaticMethod(Class<?>,String,Object[],Class<?>[])",
+        "MethodUtils.getInvokeMethod(boolean,String,Class<?>[],Class<?>)",
+        "MethodUtils.toVarArgs(Executable,Object[])",
+        "MethodUtils.toVarArgs(Object[],Class<?>[])",
+        "MethodUtils.requireNonNull(Method,Class<?>,String,Class<?>[])"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.reflect.MethodInvoker (new class)",
+        "MethodInvoker.invokeExactMethod(Object,String)",
+        "MethodInvoker.invokeExactMethod(Object,String,Object...)",
+        "MethodInvoker.invokeExactMethod(Object,String,Object[],Class<?>[])",
+        "MethodInvoker.invokeExactStaticMethod(Class<?>,String,Object...)",
+        "MethodInvoker.invokeExactStaticMethod(Class<?>,String,Object[],Class<?>[])",
+        "MethodInvoker.invokeMethod(Object,boolean,String)",
+        "MethodInvoker.invokeMethod(Object,boolean,String,Object...)",
+        "MethodInvoker.invokeMethod(Object,boolean,String,Object[],Class<?>[])",
+        "MethodInvoker.invokeMethod(Object,String)",
+        "MethodInvoker.invokeMethod(Object,String,Object...)",
+        "MethodInvoker.invokeMethod(Object,String,Object[],Class<?>[])",
+        "MethodInvoker.invokeStaticMethod(Class<?>,String,Object...)",
+        "MethodInvoker.invokeStaticMethod(Class<?>,String,Object[],Class<?>[])",
+        "MethodInvoker.getInvokeMethod(boolean,String,Class<?>[],Class<?>)",
+        "MethodInvoker.toVarArgs(Executable,Object[])",
+        "MethodInvoker.toVarArgs(Object[],Class<?>[])",
+        "MethodInvoker.requireNonNull(Method,Class<?>,String,Class<?>[])"
+      ],
+      "details": "Create a new class MethodInvoker in package org.apache.commons.lang3.reflect containing all invocation entry points and varargs transformation helpers. Methods retain original signatures but are made public static so callers (including MethodUtils) can delegate. Implementation reuses existing utilities (ClassUtils, MemberUtils, ArrayUtils) by importing them. This reduces MethodUtils size by grouping invocation concerns.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodInvoker.java"
+      ],
+      "outputs": [
+        "MethodInvoker imports for java.lang.reflect.Executable, java.lang.reflect.InvocationTargetException, java.lang.reflect.Method, java.lang.reflect.Array, java.lang.reflect.TypeVariable, java.lang.annotation.Annotation, java.util.*, java.util.stream.* and org.apache.commons.lang3.* as needed"
+      ],
+      "details": "Ensure MethodInvoker has all imports required for compilation (ArrayUtils, ClassUtils, MemberUtils, Streams, LangCollectors, Validate, TypeUtils where used).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java"
+      ],
+      "outputs": [
+        "MethodUtils delegates invocation-related calls to MethodInvoker (e.g., replace internal calls to invokeMethod/invokeStaticMethod/... with MethodInvoker.invokeMethod/...)"
+      ],
+      "details": "Update the original MethodUtils source to delegate invocation calls to MethodInvoker. Keep MethodUtils as a façade for backward compatibility by forwarding public API to MethodInvoker.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/EqualsBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/ConstructorUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsAnnotationsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java"
+  ]
+}

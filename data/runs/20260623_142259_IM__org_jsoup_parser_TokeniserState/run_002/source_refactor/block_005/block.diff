@@ -1,0 +1,1107 @@
+commit 793942efa74dadd00dd9907d072315b802476350
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:56:09 2026 -0300
+
+    source_refactor: apply block 5
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserState.java b/src/main/java/org/jsoup/parser/TokeniserState.java
+index a4524dd3..d5d2c4ca 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserState.java
++++ b/src/main/java/org/jsoup/parser/TokeniserState.java
+@@ -537,542 +537,87 @@ enum TokeniserState {
+     },
+     Doctype {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BeforeDoctypeName);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    // note: fall through to > case
+-                case '>': // catch invalid <!DOCTYPE>
+-                    t.error(this);
+-                    t.createDoctypePending();
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.transition(BeforeDoctypeName);
+-            }
++            TokeniserStateDoctypeFacade.readDoctype(t, r);
+         }
+     },
+     BeforeDoctypeName {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            if (r.matchesAsciiAlpha()) {
+-                t.createDoctypePending();
+-                t.transition(DoctypeName);
+-                return;
+-            }
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    break; // ignore whitespace
+-                case TokeniserState.nullChar:
+-                    t.error(this);
+-                    t.createDoctypePending();
+-                    t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
+-                    t.transition(DoctypeName);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.createDoctypePending();
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.createDoctypePending();
+-                    t.doctypePending.name.append(c);
+-                    t.transition(DoctypeName);
+-            }
++            TokeniserStateDoctypeFacade.readBeforeDoctypeName(t, r);
+         }
+     },
+     DoctypeName {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            if (r.matchesAsciiAlpha()) {
+-                String name = r.consumeLetterSequence();
+-                t.doctypePending.name.append(name);
+-                return;
+-            }
+-            char c = r.consume();
+-            switch (c) {
+-                case '>':
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(AfterDoctypeName);
+-                    break;
+-                case TokeniserState.nullChar:
+-                    t.error(this);
+-                    t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.doctypePending.name.append(c);
+-            }
++            TokeniserStateDoctypeFacade.readDoctypeName(t, r);
+         }
+     },
+     AfterDoctypeName {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            if (r.isEmpty()) {
+-                t.eofError(this);
+-                t.doctypePending.forceQuirks = true;
+-                t.emitDoctypePending();
+-                t.transition(Data);
+-                return;
+-            }
+-            if (r.matchesAny('\t', '\n', '\r', '\f', ' '))
+-                r.advance(); // ignore whitespace
+-            else if (r.matches('>')) {
+-                t.emitDoctypePending();
+-                t.advanceTransition(Data);
+-            } else if (t.syntax == xml && r.matches('[')) {
+-                // special case when in XML parse mode so we can support entity round trop
+-                t.doctypePending.sawInternalSubset = true;
+-                t.advanceTransition(DoctypeInternalSubset);
+-            } else if (r.matchConsumeIgnoreCase(DocumentType.PUBLIC_KEY)) {
+-                t.doctypePending.pubSysKey = DocumentType.PUBLIC_KEY;
+-                t.transition(AfterDoctypePublicKeyword);
+-            } else if (r.matchConsumeIgnoreCase(DocumentType.SYSTEM_KEY)) {
+-                t.doctypePending.pubSysKey = DocumentType.SYSTEM_KEY;
+-                t.transition(AfterDoctypeSystemKeyword);
+-            } else {
+-                t.error(this);
+-                t.doctypePending.forceQuirks = true;
+-                t.advanceTransition(BogusDoctype);
+-            }
+-
++            TokeniserStateDoctypeFacade.readAfterDoctypeName(t, r);
+         }
+     },
+     AfterDoctypePublicKeyword {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BeforeDoctypePublicIdentifier);
+-                    break;
+-                case '"':
+-                    t.error(this);
+-                    // set public id to empty string
+-                    t.transition(DoctypePublicIdentifier_doubleQuoted);
+-                    break;
+-                case '\'':
+-                    t.error(this);
+-                    // set public id to empty string
+-                    t.transition(DoctypePublicIdentifier_singleQuoted);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.transition(BogusDoctype);
+-            }
++            TokeniserStateDoctypeFacade.readAfterDoctypePublicKeyword(t, r);
+         }
+     },
+     BeforeDoctypePublicIdentifier {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    break;
+-                case '"':
+-                    // set public id to empty string
+-                    t.transition(DoctypePublicIdentifier_doubleQuoted);
+-                    break;
+-                case '\'':
+-                    // set public id to empty string
+-                    t.transition(DoctypePublicIdentifier_singleQuoted);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.transition(BogusDoctype);
+-            }
++            TokeniserStateDoctypeFacade.readBeforeDoctypePublicIdentifier(t, r);
+         }
+     },
+     DoctypePublicIdentifier_doubleQuoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '"':
+-                    t.transition(AfterDoctypePublicIdentifier);
+-                    break;
+-                case TokeniserState.nullChar:
+-                    t.error(this);
+-                    t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.doctypePending.publicIdentifier.append(c);
+-            }
++            TokeniserStateDoctypeFacade.readDoctypePublicIdentifier_doubleQuoted(t, r);
+         }
+     },
+     DoctypePublicIdentifier_singleQuoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\'':
+-                    t.transition(AfterDoctypePublicIdentifier);
+-                    break;
+-                case TokeniserState.nullChar:
+-                    t.error(this);
+-                    t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.doctypePending.publicIdentifier.append(c);
+-            }
++            TokeniserStateDoctypeFacade.readDoctypePublicIdentifier_singleQuoted(t, r);
+         }
+     },
+     AfterDoctypePublicIdentifier {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BetweenDoctypePublicAndSystemIdentifiers);
+-                    break;
+-                case '>':
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case '"':
+-                    t.error(this);
+-                    // system id empty
+-                    t.transition(DoctypeSystemIdentifier_doubleQuoted);
+-                    break;
+-                case '\'':
+-                    t.error(this);
+-                    // system id empty
+-                    t.transition(DoctypeSystemIdentifier_singleQuoted);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.transition(BogusDoctype);
+-            }
++            TokeniserStateDoctypeFacade.readAfterDoctypePublicIdentifier(t, r);
+         }
+     },
+     BetweenDoctypePublicAndSystemIdentifiers {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    break;
+-                case '>':
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case '[':
+-                    if (t.syntax == xml) {
+-                        t.doctypePending.sawInternalSubset = true;
+-                        t.transition(DoctypeInternalSubset);
+-                        break;
+-                    }
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.transition(BogusDoctype);
+-                    break;
+-                case '"':
+-                    t.error(this);
+-                    // system id empty
+-                    t.transition(DoctypeSystemIdentifier_doubleQuoted);
+-                    break;
+-                case '\'':
+-                    t.error(this);
+-                    // system id empty
+-                    t.transition(DoctypeSystemIdentifier_singleQuoted);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.transition(BogusDoctype);
+-            }
++            TokeniserStateDoctypeFacade.readBetweenDoctypePublicAndSystemIdentifiers(t, r);
+         }
+     },
+     AfterDoctypeSystemKeyword {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BeforeDoctypeSystemIdentifier);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case '"':
+-                    t.error(this);
+-                    // system id empty
+-                    t.transition(DoctypeSystemIdentifier_doubleQuoted);
+-                    break;
+-                case '\'':
+-                    t.error(this);
+-                    // system id empty
+-                    t.transition(DoctypeSystemIdentifier_singleQuoted);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-            }
++            TokeniserStateDoctypeFacade.readAfterDoctypeSystemKeyword(t, r);
+         }
+     },
+     BeforeDoctypeSystemIdentifier {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    break;
+-                case '"':
+-                    // set system id to empty string
+-                    t.transition(DoctypeSystemIdentifier_doubleQuoted);
+-                    break;
+-                case '\'':
+-                    // set public id to empty string
+-                    t.transition(DoctypeSystemIdentifier_singleQuoted);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.transition(BogusDoctype);
+-            }
++            TokeniserStateDoctypeFacade.readBeforeDoctypeSystemIdentifier(t, r);
+         }
+     },
+     DoctypeSystemIdentifier_doubleQuoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '"':
+-                    t.transition(AfterDoctypeSystemIdentifier);
+-                    break;
+-                case TokeniserState.nullChar:
+-                    t.error(this);
+-                    t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.doctypePending.systemIdentifier.append(c);
+-            }
++            TokeniserStateDoctypeFacade.readDoctypeSystemIdentifier_doubleQuoted(t, r);
+         }
+     },
+     DoctypeSystemIdentifier_singleQuoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\'':
+-                    t.transition(AfterDoctypeSystemIdentifier);
+-                    break;
+-                case TokeniserState.nullChar:
+-                    t.error(this);
+-                    t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.doctypePending.systemIdentifier.append(c);
+-            }
++            TokeniserStateDoctypeFacade.readDoctypeSystemIdentifier_singleQuoted(t, r);
+         }
+     },
+     AfterDoctypeSystemIdentifier {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    break;
+-                case '>':
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case '[':
+-                    if (t.syntax == xml) {
+-                        t.doctypePending.sawInternalSubset = true;
+-                        t.transition(DoctypeInternalSubset);
+-                        break;
+-                    }
+-                    t.error(this);
+-                    t.transition(BogusDoctype);
+-                    // NOT force quirks
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.doctypePending.forceQuirks = true;
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    t.error(this);
+-                    t.transition(BogusDoctype);
+-                    // NOT force quirks
+-            }
++            TokeniserStateDoctypeFacade.readAfterDoctypeSystemIdentifier(t, r);
+         }
+     },
+     BogusDoctype {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '>':
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.emitDoctypePending();
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    // ignore char
+-                    break;
+-            }
++            TokeniserStateDoctypeFacade.readBogusDoctype(t, r);
+         }
+     },
+     DoctypeInternalSubset {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            TokeniserStateHelper.readDoctypeInternalSubset(t, r, this);
++            TokeniserStateDoctypeFacade.readDoctypeInternalSubset(t, r);
+         }
+     },
+     CdataSection {
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java b/src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java
+new file mode 100644
+index 00000000..3444efb5
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/TokeniserStateDoctypeFacade.java
+@@ -0,0 +1,531 @@
++package org.jsoup.parser;
++
++import org.jsoup.nodes.DocumentType;
++
++import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
++
++final class TokeniserStateDoctypeFacade {
++
++    static void readDoctype(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BeforeDoctypeName);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.Doctype);
++                // note: fall through to > case
++            case '>': // catch invalid <!DOCTYPE>
++                t.error(TokeniserState.Doctype);
++                t.createDoctypePending();
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.Doctype);
++                t.transition(TokeniserState.BeforeDoctypeName);
++        }
++    }
++
++    static void readBeforeDoctypeName(Tokeniser t, CharacterReader r) {
++        if (r.matchesAsciiAlpha()) {
++            t.createDoctypePending();
++            t.transition(TokeniserState.DoctypeName);
++            return;
++        }
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                break; // ignore whitespace
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.BeforeDoctypeName);
++                t.createDoctypePending();
++                t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
++                t.transition(TokeniserState.DoctypeName);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.BeforeDoctypeName);
++                t.createDoctypePending();
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.createDoctypePending();
++                t.doctypePending.name.append(c);
++                t.transition(TokeniserState.DoctypeName);
++        }
++    }
++
++    static void readDoctypeName(Tokeniser t, CharacterReader r) {
++        if (r.matchesAsciiAlpha()) {
++            String name = r.consumeLetterSequence();
++            t.doctypePending.name.append(name);
++            return;
++        }
++        char c = r.consume();
++        switch (c) {
++            case '>':
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.AfterDoctypeName);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.DoctypeName);
++                t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.DoctypeName);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.doctypePending.name.append(c);
++        }
++    }
++
++    static void readAfterDoctypeName(Tokeniser t, CharacterReader r) {
++        if (r.isEmpty()) {
++            t.eofError(TokeniserState.AfterDoctypeName);
++            t.doctypePending.forceQuirks = true;
++            t.emitDoctypePending();
++            t.transition(TokeniserState.Data);
++            return;
++        }
++        if (r.matchesAny('\t', '\n', '\r', '\f', ' '))
++            r.advance(); // ignore whitespace
++        else if (r.matches('>')) {
++            t.emitDoctypePending();
++            t.advanceTransition(TokeniserState.Data);
++        } else if (t.syntax == xml && r.matches('[')) {
++            // special case when in XML parse mode so we can support entity round trop
++            t.doctypePending.sawInternalSubset = true;
++            t.advanceTransition(TokeniserState.DoctypeInternalSubset);
++        } else if (r.matchConsumeIgnoreCase(DocumentType.PUBLIC_KEY)) {
++            t.doctypePending.pubSysKey = DocumentType.PUBLIC_KEY;
++            t.transition(TokeniserState.AfterDoctypePublicKeyword);
++        } else if (r.matchConsumeIgnoreCase(DocumentType.SYSTEM_KEY)) {
++            t.doctypePending.pubSysKey = DocumentType.SYSTEM_KEY;
++            t.transition(TokeniserState.AfterDoctypeSystemKeyword);
++        } else {
++            t.error(TokeniserState.AfterDoctypeName);
++            t.doctypePending.forceQuirks = true;
++            t.advanceTransition(TokeniserState.BogusDoctype);
++        }
++
++    }
++
++    static void readAfterDoctypePublicKeyword(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BeforeDoctypePublicIdentifier);
++                break;
++            case '"':
++                t.error(TokeniserState.AfterDoctypePublicKeyword);
++                // set public id to empty string
++                t.transition(TokeniserState.DoctypePublicIdentifier_doubleQuoted);
++                break;
++            case '\'':
++                t.error(TokeniserState.AfterDoctypePublicKeyword);
++                // set public id to empty string
++                t.transition(TokeniserState.DoctypePublicIdentifier_singleQuoted);
++                break;
++            case '>':
++                t.error(TokeniserState.AfterDoctypePublicKeyword);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AfterDoctypePublicKeyword);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.AfterDoctypePublicKeyword);
++                t.doctypePending.forceQuirks = true;
++                t.transition(TokeniserState.BogusDoctype);
++        }
++    }
++
++    static void readBeforeDoctypePublicIdentifier(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                break;
++            case '"':
++                // set public id to empty string
++                t.transition(TokeniserState.DoctypePublicIdentifier_doubleQuoted);
++                break;
++            case '\'':
++                // set public id to empty string
++                t.transition(TokeniserState.DoctypePublicIdentifier_singleQuoted);
++                break;
++            case '>':
++                t.error(TokeniserState.BeforeDoctypePublicIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.BeforeDoctypePublicIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.BeforeDoctypePublicIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.transition(TokeniserState.BogusDoctype);
++        }
++    }
++
++    static void readDoctypePublicIdentifier_doubleQuoted(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '"':
++                t.transition(TokeniserState.AfterDoctypePublicIdentifier);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.DoctypePublicIdentifier_doubleQuoted);
++                t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
++                break;
++            case '>':
++                t.error(TokeniserState.DoctypePublicIdentifier_doubleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.DoctypePublicIdentifier_doubleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.doctypePending.publicIdentifier.append(c);
++        }
++    }
++
++    static void readDoctypePublicIdentifier_singleQuoted(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\'':
++                t.transition(TokeniserState.AfterDoctypePublicIdentifier);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.DoctypePublicIdentifier_singleQuoted);
++                t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
++                break;
++            case '>':
++                t.error(TokeniserState.DoctypePublicIdentifier_singleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.DoctypePublicIdentifier_singleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.doctypePending.publicIdentifier.append(c);
++        }
++    }
++
++    static void readAfterDoctypePublicIdentifier(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BetweenDoctypePublicAndSystemIdentifiers);
++                break;
++            case '>':
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '"':
++                t.error(TokeniserState.AfterDoctypePublicIdentifier);
++                // system id empty
++                t.transition(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                break;
++            case '\'':
++                t.error(TokeniserState.AfterDoctypePublicIdentifier);
++                // system id empty
++                t.transition(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AfterDoctypePublicIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.AfterDoctypePublicIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.transition(TokeniserState.BogusDoctype);
++        }
++    }
++
++    static void readBetweenDoctypePublicAndSystemIdentifiers(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                break;
++            case '>':
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '[':
++                if (t.syntax == xml) {
++                    t.doctypePending.sawInternalSubset = true;
++                    t.transition(TokeniserState.DoctypeInternalSubset);
++                    break;
++                }
++                t.error(TokeniserState.BetweenDoctypePublicAndSystemIdentifiers);
++                t.doctypePending.forceQuirks = true;
++                t.transition(TokeniserState.BogusDoctype);
++                break;
++            case '"':
++                t.error(TokeniserState.BetweenDoctypePublicAndSystemIdentifiers);
++                // system id empty
++                t.transition(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                break;
++            case '\'':
++                t.error(TokeniserState.BetweenDoctypePublicAndSystemIdentifiers);
++                // system id empty
++                t.transition(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.BetweenDoctypePublicAndSystemIdentifiers);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.BetweenDoctypePublicAndSystemIdentifiers);
++                t.doctypePending.forceQuirks = true;
++                t.transition(TokeniserState.BogusDoctype);
++        }
++    }
++
++    static void readAfterDoctypeSystemKeyword(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BeforeDoctypeSystemIdentifier);
++                break;
++            case '>':
++                t.error(TokeniserState.AfterDoctypeSystemKeyword);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '"':
++                t.error(TokeniserState.AfterDoctypeSystemKeyword);
++                // system id empty
++                t.transition(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                break;
++            case '\'':
++                t.error(TokeniserState.AfterDoctypeSystemKeyword);
++                // system id empty
++                t.transition(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AfterDoctypeSystemKeyword);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.AfterDoctypeSystemKeyword);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++        }
++    }
++
++    static void readBeforeDoctypeSystemIdentifier(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                break;
++            case '"':
++                // set system id to empty string
++                t.transition(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                break;
++            case '\'':
++                // set public id to empty string
++                t.transition(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                break;
++            case '>':
++                t.error(TokeniserState.BeforeDoctypeSystemIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.BeforeDoctypeSystemIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.BeforeDoctypeSystemIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.transition(TokeniserState.BogusDoctype);
++        }
++    }
++
++    static void readDoctypeSystemIdentifier_doubleQuoted(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '"':
++                t.transition(TokeniserState.AfterDoctypeSystemIdentifier);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
++                break;
++            case '>':
++                t.error(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.DoctypeSystemIdentifier_doubleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.doctypePending.systemIdentifier.append(c);
++        }
++    }
++
++    static void readDoctypeSystemIdentifier_singleQuoted(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\'':
++                t.transition(TokeniserState.AfterDoctypeSystemIdentifier);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
++                break;
++            case '>':
++                t.error(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.DoctypeSystemIdentifier_singleQuoted);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.doctypePending.systemIdentifier.append(c);
++        }
++    }
++
++    static void readAfterDoctypeSystemIdentifier(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                break;
++            case '>':
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '[':
++                if (t.syntax == xml) {
++                    t.doctypePending.sawInternalSubset = true;
++                    t.transition(TokeniserState.DoctypeInternalSubset);
++                    break;
++                }
++                t.error(TokeniserState.AfterDoctypeSystemIdentifier);
++                t.transition(TokeniserState.BogusDoctype);
++                // NOT force quirks
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AfterDoctypeSystemIdentifier);
++                t.doctypePending.forceQuirks = true;
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                t.error(TokeniserState.AfterDoctypeSystemIdentifier);
++                t.transition(TokeniserState.BogusDoctype);
++                // NOT force quirks
++        }
++    }
++
++    static void readBogusDoctype(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '>':
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.emitDoctypePending();
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                // ignore char
++                break;
++        }
++    }
++
++    static void readDoctypeInternalSubset(Tokeniser t, CharacterReader r) {
++        TokeniserStateHelper.readDoctypeInternalSubset(t, r, TokeniserState.DoctypeInternalSubset);
++    }
++}

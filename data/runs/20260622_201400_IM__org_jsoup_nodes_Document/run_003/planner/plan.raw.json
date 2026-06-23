@@ -1,0 +1,39 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Document",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Document size and API surface by extracting the large, cohesive nested OutputSettings class into a top-level class in the same package.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/OutputSettings.java",
+        "src/main/java/org/jsoup/nodes/Document.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Document.java::Document.OutputSettings"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/OutputSettings.java::org.jsoup.nodes.OutputSettings"
+          ],
+          "details": "Move the static nested class Document.OutputSettings to a new top-level class OutputSettings in package org.jsoup.nodes. Preserve all nested types (Syntax enum), fields, and methods, and keep Cloneable. Retain references to Entities, DataUtil, Validate, and other types used by the class; add required imports in the new file. Maintain the same public API surface (method names and signatures) so existing Document usage remains valid.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Document.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Document.java"
+          ],
+          "details": "Update Document.java so it compiles against the new top-level OutputSettings class. Because the new OutputSettings is in the same package, no import may be necessary; ensure any references (field declarations, return types, parameter types) remain correct. If the codebase uses fully-qualified or nested references elsewhere, update those call sites in subsequent steps.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

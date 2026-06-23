@@ -1,0 +1,39 @@
+{
+  "id": 1,
+  "goal": "Introduce a narrow interface that exposes only raw get/set access to the byte storage. This decouples future operation implementations from MutableByte internals and enables moving cohesive operation implementations out of the class.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java",
+    "src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java",
+    "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+    "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByteAccessor.java",
+        "src/main/java/org/apache/commons/lang3/mutable/MutableByte.java"
+      ],
+      "details": "Create a new interface MutableByteAccessor in package org.apache.commons.lang3.mutable with two methods: byte getRaw(); void setRaw(byte value); Update MutableByte to implement MutableByteAccessor by adding implementations that delegate to the existing field 'value' (getRaw -> byteValue(), setRaw -> setValue(byte)). Do not change other logic. This prepares a stable API for extracted operation classes to depend on.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+        "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/RecursiveToStringStyleTest.java",
+    "src/test/java/org/apache/commons/lang3/mutable/MutableByteTest.java"
+  ]
+}

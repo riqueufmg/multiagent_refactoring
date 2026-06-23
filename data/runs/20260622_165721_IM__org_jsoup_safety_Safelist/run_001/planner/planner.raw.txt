@@ -1,0 +1,204 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.safety.Safelist",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce type clutter inside Safelist by extracting the small typed helper nested classes (TypedValue and its concrete subclasses) into a dedicated top-level source to improve modularity and readability.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistTypes.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java:TypedValue",
+            "src/main/java/org/jsoup/safety/Safelist.java:TagName",
+            "src/main/java/org/jsoup/safety/Safelist.java:AttributeKey",
+            "src/main/java/org/jsoup/safety/Safelist.java:AttributeValue",
+            "src/main/java/org/jsoup/safety/Safelist.java:Protocol"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/SafelistTypes.java"
+          ],
+          "details": "Move the nested static classes TypedValue, TagName, AttributeKey, AttributeValue, and Protocol into a new top-level source file SafelistTypes.java in package org.jsoup.safety. The new file will declare the abstract class TypedValue and the four concrete subclasses as package-private (or public if necessary) so existing code in Safelist can continue to reference them. Preserve existing constructors and implementations (e.g. TypedValue constructor validation, equals/hashCode/toString; TagName.valueOf using Normalizer.lowerCase).",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "details": "Update Safelist.java imports to reference the extracted top-level types (TagName, AttributeKey, AttributeValue, Protocol, TypedValue) from the same package instead of using nested type references. Remove the nested type declarations from Safelist.java after extraction.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Group configuration state and the related configuration/manipulation methods into a single cohesive class (SafelistConfig) to shrink Safelist's size and move a cohesive set of public and private methods out of the target class.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistConfig.java",
+        "src/main/java/org/jsoup/safety/SafelistTypes.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java:tagNames",
+            "src/main/java/org/jsoup/safety/Safelist.java:attributes",
+            "src/main/java/org/jsoup/safety/Safelist.java:enforcedAttributes",
+            "src/main/java/org/jsoup/safety/Safelist.java:protocols",
+            "src/main/java/org/jsoup/safety/Safelist.java:preserveRelativeLinks",
+            "src/main/java/org/jsoup/safety/Safelist.java:addTags(String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeTags(String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:addAttributes(String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeAttributes(String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:addEnforcedAttribute(String, String, String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeEnforcedAttribute(String, String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:preserveRelativeLinks(boolean)",
+            "src/main/java/org/jsoup/safety/Safelist.java:preserveRelativeLinks()",
+            "src/main/java/org/jsoup/safety/Safelist.java:addProtocols(String, String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeProtocols(String, String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:isSafeTag(String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:getEnforcedAttributes(String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:getProtocolValue(Element, Attribute)",
+            "src/main/java/org/jsoup/safety/Safelist.java:isSafeProtocol(String, Set)",
+            "src/main/java/org/jsoup/safety/Safelist.java:isValidAnchor(String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:shouldAbsUrl(String, String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:shouldAbsUrl(TagName, AttributeKey)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/SafelistConfig.java"
+          ],
+          "details": "Create a new class SafelistConfig in package org.jsoup.safety containing the configuration state (tagNames, attributes, enforcedAttributes, protocols, preserveRelativeLinks) and the methods that operate on that state. Move the implementations of the public configuration API (addTags, removeTags, addAttributes, removeAttributes, addEnforcedAttribute, removeEnforcedAttribute, preserveRelativeLinks setter/getter, addProtocols, removeProtocols, isSafeTag, getEnforcedAttributes) and the private helpers they depend on (getProtocolValue, isSafeProtocol, isValidAnchor, shouldAbsUrl overloads) into SafelistConfig. The extracted class will use the same helper types (TagName, AttributeKey, AttributeValue, Protocol, TypedValue) now provided by SafelistTypes. Preserve the copy constructor logic by providing a SafelistConfig(SafelistConfig copy) or by making an appropriate copy constructor invoked by Safelist(Safelist) when updating the next block.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java:tagNames",
+            "src/main/java/org/jsoup/safety/Safelist.java:attributes",
+            "src/main/java/org/jsoup/safety/Safelist.java:enforcedAttributes",
+            "src/main/java/org/jsoup/safety/Safelist.java:protocols",
+            "src/main/java/org/jsoup/safety/Safelist.java:preserveRelativeLinks"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:tagNames",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:attributes",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:enforcedAttributes",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:protocols",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:preserveRelativeLinks"
+          ],
+          "details": "Move the five configuration fields into SafelistConfig. Ensure visibility is appropriate for Safelist usage (package-private or private with accessor methods inside SafelistConfig).",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java:addTags(String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeTags(String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:addAttributes(String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeAttributes(String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:addEnforcedAttribute(String, String, String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeEnforcedAttribute(String, String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:preserveRelativeLinks(boolean)",
+            "src/main/java/org/jsoup/safety/Safelist.java:preserveRelativeLinks()",
+            "src/main/java/org/jsoup/safety/Safelist.java:addProtocols(String, String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:removeProtocols(String, String, String...)",
+            "src/main/java/org/jsoup/safety/Safelist.java:isSafeTag(String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:getEnforcedAttributes(String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:getProtocolValue(Element, Attribute)",
+            "src/main/java/org/jsoup/safety/Safelist.java:isSafeProtocol(String, Set)",
+            "src/main/java/org/jsoup/safety/Safelist.java:isValidAnchor(String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:shouldAbsUrl(String, String)",
+            "src/main/java/org/jsoup/safety/Safelist.java:shouldAbsUrl(TagName, AttributeKey)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:addTags(String...)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:removeTags(String...)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:addAttributes(String, String...)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:removeAttributes(String, String...)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:addEnforcedAttribute(String, String, String)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:removeEnforcedAttribute(String, String)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:preserveRelativeLinks(boolean)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:preserveRelativeLinks()",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:addProtocols(String, String, String...)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:removeProtocols(String, String, String...)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:isSafeTag(String)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:getEnforcedAttributes(String)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:getProtocolValue(Element, Attribute)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:isSafeProtocol(String, Set)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:isValidAnchor(String)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:shouldAbsUrl(String, String)",
+            "src/main/java/org/jsoup/safety/SafelistConfig.java:shouldAbsUrl(TagName, AttributeKey)"
+          ],
+          "details": "Move the listed public API methods and the private helpers they depend on into SafelistConfig. Preserve method signatures that are part of the public API. Implement copy logic in SafelistConfig so the existing Safelist(Safelist) copy constructor can delegate to SafelistConfig(SafelistConfig).",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Make Safelist a thin façade that preserves its public fluent API while delegating configuration responsibilities to SafelistConfig and using the extracted typed helper classes; update imports and internal call sites accordingly.",
+      "files": [
+        "src/main/java/org/jsoup/safety/Safelist.java",
+        "src/main/java/org/jsoup/safety/SafelistConfig.java",
+        "src/main/java/org/jsoup/safety/SafelistTypes.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "details": "Add imports for org.jsoup.safety.SafelistConfig and (if needed) for types from SafelistTypes. Remove any imports that referenced nested types (no longer present) and adjust references to the moved methods/fields so that Safelist delegates to a private final SafelistConfig config field.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java:<implicit internal state now replaced>"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java:config"
+          ],
+          "details": "Introduce a new private final field 'config' of type SafelistConfig in Safelist. Initialize it in constructors: Safelist() -> new SafelistConfig(); Safelist(Safelist copy) -> new SafelistConfig(copy.config). Remove direct usages of the old fields in Safelist and replace with delegation to config.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java",
+            "src/main/java/org/jsoup/cleaner/Cleaner.java"
+          ],
+          "details": "Update internal call sites inside Safelist to delegate to SafelistConfig (e.g., methods left on Safelist should call config.addTags(...), config.isSafeAttribute(...), config.shouldAbsUrl(...)). Also update any other project call sites that referenced moved internal helpers directly (search for direct access to tagNames/attributes/enforcedAttributes/protocols or moved private helpers and replace with calls to Safelist's public delegating methods or to SafelistConfig if package-local access is used). This preserves the public Safelist API while removing the implementation from the long class body.",
+          "risk": "medium"
+        },
+        {
+          "op": "REPLACE_DEPENDENCY",
+          "inputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/safety/Safelist.java"
+          ],
+          "details": "Where necessary, replace references that previously relied on nested helper classes with references to the extracted top-level classes (TagName, AttributeKey, AttributeValue, Protocol) and references to configuration now provided by SafelistConfig. Ensure the fluent chaining of the public API (methods return Safelist) still works by having Safelist delegating methods return 'this' after invoking config.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

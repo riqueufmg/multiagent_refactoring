@@ -1,0 +1,574 @@
+commit d8f010c5501099919953ce01f90e60a81023a565
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:39:16 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserState.java b/src/main/java/org/jsoup/parser/TokeniserState.java
+index d88c8c14..8dbdfce2 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserState.java
++++ b/src/main/java/org/jsoup/parser/TokeniserState.java
+@@ -23,7 +23,7 @@ enum TokeniserState {
+                     t.error(this); // NOT replacement character (oddly?)
+                     t.emit(r.consume());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.emit(new Token.EOF());
+                     break;
+                 default:
+@@ -52,9 +52,9 @@ enum TokeniserState {
+                 case nullChar:
+                     t.error(this);
+                     r.advance();
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.emit(new Token.EOF());
+                     break;
+                 default:
+@@ -85,9 +85,9 @@ enum TokeniserState {
+                 case nullChar:
+                     t.error(this);
+                     r.advance();
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.emit(new Token.EOF());
+                     break;
+                 default:
+@@ -172,9 +172,9 @@ enum TokeniserState {
+                     t.transition(Data);
+                     break;
+                 case nullChar: // replacement
+-                    t.tagPending.appendTagName(TokeniserStateHelper.replacementStr);
++                    t.tagPending.appendTagName(TokeniserStateHelper.replacementStr());
+                     break;
+-                case TokeniserStateHelper.eof: // should emit pending tag?
++                case TokeniserStateHelper.EOF: // should emit pending tag?
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -293,7 +293,7 @@ enum TokeniserState {
+                     t.emit("<!");
+                     t.transition(ScriptDataEscapeStart);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.emit('<');
+                     t.eofError(this);
+                     t.transition(Data);
+@@ -354,7 +354,7 @@ enum TokeniserState {
+                 case nullChar:
+                     t.error(this);
+                     r.advance();
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     break;
+                 default:
+                     String data = r.consumeToAny('-', '<', nullChar);
+@@ -381,7 +381,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     t.transition(ScriptDataEscaped);
+                     break;
+                 default:
+@@ -412,7 +412,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     t.transition(ScriptDataEscaped);
+                     break;
+                 default:
+@@ -476,9 +476,9 @@ enum TokeniserState {
+                 case nullChar:
+                     t.error(this);
+                     r.advance();
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -502,10 +502,10 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     t.transition(ScriptDataDoubleEscaped);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -532,10 +532,10 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.emit(TokeniserStateHelper.replacementChar);
++                    t.emit(TokeniserStateHelper.replacementChar());
+                     t.transition(ScriptDataDoubleEscaped);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -585,7 +585,7 @@ enum TokeniserState {
+                     t.tagPending.newAttribute();
+                     t.transition(AttributeName);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -612,7 +612,7 @@ enum TokeniserState {
+         // from before attribute name
+         @Override void read(Tokeniser t, CharacterReader r) {
+             int pos = r.pos();
+-            String name = r.consumeToAnySorted(TokeniserStateHelper.attributeNameCharsSorted); // spec deviate - consume and emit nulls in one hit vs stepping
++            String name = r.consumeToAnySorted(TokeniserStateHelper.attributeNameCharsSorted()); // spec deviate - consume and emit nulls in one hit vs stepping
+             t.tagPending.appendAttributeName(name, pos, r.pos());
+ 
+             pos = r.pos();
+@@ -635,7 +635,7 @@ enum TokeniserState {
+                     t.emitTagPending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -678,10 +678,10 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.tagPending.appendAttributeName(TokeniserStateHelper.replacementChar, r.pos()-1, r.pos());
++                    t.tagPending.appendAttributeName(TokeniserStateHelper.replacementChar(), r.pos()-1, r.pos());
+                     t.transition(AttributeName);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -723,10 +723,10 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar, r.pos()-1, r.pos());
++                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), r.pos()-1, r.pos());
+                     t.transition(AttributeValue_unquoted);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitTagPending();
+                     t.transition(Data);
+@@ -773,9 +773,9 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar, pos, r.pos());
++                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -808,9 +808,9 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar, pos, r.pos());
++                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -822,7 +822,7 @@ enum TokeniserState {
+     AttributeValue_unquoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+             int pos = r.pos();
+-            String value = r.consumeToAnySorted(TokeniserStateHelper.attributeValueUnquoted);
++            String value = r.consumeToAnySorted(TokeniserStateHelper.attributeValueUnquoted());
+             if (value.length() > 0)
+                 t.tagPending.appendAttributeValue(value, pos, r.pos());
+ 
+@@ -849,9 +849,9 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar, pos, r.pos());
++                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -888,7 +888,7 @@ enum TokeniserState {
+                     t.emitTagPending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -913,7 +913,7 @@ enum TokeniserState {
+                     t.emitTagPending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+@@ -930,7 +930,7 @@ enum TokeniserState {
+             t.commentPending.append(r.consumeTo('>'));
+             // todo: replace nullChar with replaceChar
+             char next = r.current();
+-            if (next == '>' || next == TokeniserStateHelper.eof) {
++            if (next == '>' || next == TokeniserStateHelper.EOF) {
+                 r.consume();
+                 t.emitCommentPending();
+                 t.transition(Data);
+@@ -984,7 +984,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.commentPending.append(TokeniserStateHelper.replacementChar);
++                    t.commentPending.append(TokeniserStateHelper.replacementChar());
+                     t.transition(Comment);
+                     break;
+                 case '>':
+@@ -992,7 +992,7 @@ enum TokeniserState {
+                     t.emitCommentPending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitCommentPending();
+                     t.transition(Data);
+@@ -1012,7 +1012,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.commentPending.append(TokeniserStateHelper.replacementChar);
++                    t.commentPending.append(TokeniserStateHelper.replacementChar());
+                     t.transition(Comment);
+                     break;
+                 case '>':
+@@ -1020,7 +1020,7 @@ enum TokeniserState {
+                     t.emitCommentPending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitCommentPending();
+                     t.transition(Data);
+@@ -1041,9 +1041,9 @@ enum TokeniserState {
+                 case nullChar:
+                     t.error(this);
+                     r.advance();
+-                    t.commentPending.append(TokeniserStateHelper.replacementChar);
++                    t.commentPending.append(TokeniserStateHelper.replacementChar());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitCommentPending();
+                     t.transition(Data);
+@@ -1062,10 +1062,10 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.commentPending.append('-').append(TokeniserStateHelper.replacementChar);
++                    t.commentPending.append('-').append(TokeniserStateHelper.replacementChar());
+                     t.transition(Comment);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitCommentPending();
+                     t.transition(Data);
+@@ -1086,7 +1086,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.commentPending.append("--").append(TokeniserStateHelper.replacementChar);
++                    t.commentPending.append("--").append(TokeniserStateHelper.replacementChar());
+                     t.transition(Comment);
+                     break;
+                 case '!':
+@@ -1095,7 +1095,7 @@ enum TokeniserState {
+                 case '-':
+                     t.commentPending.append('-');
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitCommentPending();
+                     t.transition(Data);
+@@ -1120,10 +1120,10 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.commentPending.append("--!").append(TokeniserStateHelper.replacementChar);
++                    t.commentPending.append("--!").append(TokeniserStateHelper.replacementChar());
+                     t.transition(Comment);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.emitCommentPending();
+                     t.transition(Data);
+@@ -1145,7 +1145,7 @@ enum TokeniserState {
+                 case ' ':
+                     t.transition(BeforeDoctypeName);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     // note: fall through to > case
+                 case '>': // catch invalid <!DOCTYPE>
+@@ -1179,10 +1179,10 @@ enum TokeniserState {
+                 case nullChar:
+                     t.error(this);
+                     t.createDoctypePending();
+-                    t.doctypePending.name.append(TokeniserStateHelper.replacementChar);
++                    t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
+                     t.transition(DoctypeName);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.createDoctypePending();
+                     t.doctypePending.forceQuirks = true;
+@@ -1218,9 +1218,9 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.doctypePending.name.append(TokeniserStateHelper.replacementChar);
++                    t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1290,7 +1290,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1327,7 +1327,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1349,7 +1349,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar);
++                    t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+                 case '>':
+                     t.error(this);
+@@ -1357,7 +1357,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1377,7 +1377,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar);
++                    t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+                 case '>':
+                     t.error(this);
+@@ -1385,7 +1385,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1421,7 +1421,7 @@ enum TokeniserState {
+                     // system id empty
+                     t.transition(DoctypeSystemIdentifier_singleQuoted);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1468,7 +1468,7 @@ enum TokeniserState {
+                     // system id empty
+                     t.transition(DoctypeSystemIdentifier_singleQuoted);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1508,7 +1508,7 @@ enum TokeniserState {
+                     // system id empty
+                     t.transition(DoctypeSystemIdentifier_singleQuoted);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1545,7 +1545,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1567,7 +1567,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar);
++                    t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+                 case '>':
+                     t.error(this);
+@@ -1575,7 +1575,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1595,7 +1595,7 @@ enum TokeniserState {
+                     break;
+                 case nullChar:
+                     t.error(this);
+-                    t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar);
++                    t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+                 case '>':
+                     t.error(this);
+@@ -1603,7 +1603,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1638,7 +1638,7 @@ enum TokeniserState {
+                     t.transition(BogusDoctype);
+                     // NOT force quirks
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.eofError(this);
+                     t.doctypePending.forceQuirks = true;
+                     t.emitDoctypePending();
+@@ -1659,7 +1659,7 @@ enum TokeniserState {
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+-                case TokeniserStateHelper.eof:
++                case TokeniserStateHelper.EOF:
+                     t.emitDoctypePending();
+                     t.transition(Data);
+                     break;
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateHelper.java b/src/main/java/org/jsoup/parser/TokeniserStateHelper.java
+index e44a7574..c840733c 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserStateHelper.java
++++ b/src/main/java/org/jsoup/parser/TokeniserStateHelper.java
+@@ -8,13 +8,24 @@ import org.jsoup.nodes.DocumentType;
+  */
+ final class TokeniserStateHelper {
+ 
+-    static final char nullChar = '\u0000';
+-    static final char[] attributeNameCharsSorted = new char[]{'\t', '\n', '\f', '\r', ' ', '"', '\'', '/', '<', '=', '>', '?'};
+-    static final char[] attributeValueUnquoted = new char[]{nullChar, '\t', '\n', '\f', '\r', ' ', '"', '&', '\'', '<', '=', '>', '`'};
++    // facade: keep fields private, expose only what TokeniserState (and tests) need via methods
++    private static final char nullChar = '\u0000';
++    private static final char[] attributeNameCharsSorted = new char[]{'\t', '\n', '\f', '\r', ' ', '"', '\'', '/', '<', '=', '>', '?'};
++    private static final char[] attributeValueUnquoted = new char[]{nullChar, '\t', '\n', '\f', '\r', ' ', '"', '&', '\'', '<', '=', '>', '`'};
+ 
+-    static final char replacementChar = Tokeniser.replacementChar;
+-    static final String replacementStr = String.valueOf(Tokeniser.replacementChar);
+-    static final char eof = CharacterReader.EOF;
++    private static final char replacementChar = Tokeniser.replacementChar;
++    private static final String replacementStr = String.valueOf(Tokeniser.replacementChar);
++    private static final char eof = CharacterReader.EOF;
++
++    // Expose a compile-time constant alias for use in switch case labels
++    static final char EOF = CharacterReader.EOF;
++
++    // Facade accessors
++    static char eof() { return eof; }
++    static char replacementChar() { return replacementChar; }
++    static String replacementStr() { return replacementStr; }
++    static char[] attributeNameCharsSorted() { return attributeNameCharsSorted; }
++    static char[] attributeValueUnquoted() { return attributeValueUnquoted; }
+ 
+     static void handleDataEndTag(Tokeniser t, CharacterReader r, TokeniserState elseTransition) {
+         if (r.matchesAsciiAlpha()) {
+diff --git a/src/test/java/org/jsoup/parser/TokeniserStateTest.java b/src/test/java/org/jsoup/parser/TokeniserStateTest.java
+index d17a6ba3..86c6f9df 100644
+--- a/src/test/java/org/jsoup/parser/TokeniserStateTest.java
++++ b/src/test/java/org/jsoup/parser/TokeniserStateTest.java
+@@ -22,8 +22,8 @@ public class TokeniserStateTest {
+     @Test
+     public void ensureSearchArraysAreSorted() {
+         char[][] arrays = {
+-            TokeniserStateHelper.attributeNameCharsSorted,
+-            TokeniserStateHelper.attributeValueUnquoted
++            TokeniserStateHelper.attributeNameCharsSorted(),
++            TokeniserStateHelper.attributeValueUnquoted()
+         };
+ 
+         for (char[] array : arrays) {

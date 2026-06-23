@@ -1,0 +1,804 @@
+commit 73b98e4de516f67a35aef6625fe42b1c7b45a539
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:51:01 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserState.java b/src/main/java/org/jsoup/parser/TokeniserState.java
+index 3454238a..1f77d4c2 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserState.java
++++ b/src/main/java/org/jsoup/parser/TokeniserState.java
+@@ -445,364 +445,49 @@ enum TokeniserState {
+     BeforeAttributeName {
+         // from tagname <xxx
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    break; // ignore whitespace
+-                case '/':
+-                    t.transition(SelfClosingStartTag);
+-                    break;
+-                case '>':
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case nullChar:
+-                    r.unconsume();
+-                    t.error(this);
+-                    t.tagPending.newAttribute();
+-                    t.transition(AttributeName);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                case '"':
+-                case '\'':
+-                case '=':
+-                    t.error(this);
+-                    t.tagPending.newAttribute();
+-                    t.tagPending.appendAttributeName(c, r.pos()-1, r.pos());
+-                    t.transition(AttributeName);
+-                    break;
+-                case '?': // Handle trailing ? in <?xml...?>
+-                    if (t.tagPending instanceof Token.XmlDecl)
+-                        break;
+-                    // otherwise fall through to default
+-                default: // A-Z, anything else
+-                    t.tagPending.newAttribute();
+-                    r.unconsume();
+-                    t.transition(AttributeName);
+-            }
++            TokeniserStateAttributeFacade.readBeforeAttributeName(t, r);
+         }
+     },
+     AttributeName {
+         // from before attribute name
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            int pos = r.pos();
+-            String name = r.consumeToAnySorted(TokeniserStateHelper.attributeNameCharsSorted()); // spec deviate - consume and emit nulls in one hit vs stepping
+-            t.tagPending.appendAttributeName(name, pos, r.pos());
+-
+-            pos = r.pos();
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(AfterAttributeName);
+-                    break;
+-                case '/':
+-                    t.transition(SelfClosingStartTag);
+-                    break;
+-                case '=':
+-                    t.transition(BeforeAttributeValue);
+-                    break;
+-                case '>':
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                case '"':
+-                case '\'':
+-                case '<':
+-                    t.error(this);
+-                    t.tagPending.appendAttributeName(c, pos, r.pos());
+-                    break;
+-                case '?':
+-                    if (t.syntax == xml && t.tagPending instanceof Token.XmlDecl) {
+-                        t.transition(AfterAttributeName);
+-                        break;
+-                    } // otherwise default - take it
+-                default: // buffer underrun
+-                    t.tagPending.appendAttributeName(c, pos, r.pos());
+-            }
++            TokeniserStateAttributeFacade.readAttributeName(t, r);
+         }
+     },
+     AfterAttributeName {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    // ignore
+-                    break;
+-                case '/':
+-                    t.transition(SelfClosingStartTag);
+-                    break;
+-                case '=':
+-                    t.transition(BeforeAttributeValue);
+-                    break;
+-                case '>':
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.tagPending.appendAttributeName(TokeniserStateHelper.replacementChar(), r.pos()-1, r.pos());
+-                    t.transition(AttributeName);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                case '"':
+-                case '\'':
+-                case '<':
+-                    t.error(this);
+-                    t.tagPending.newAttribute();
+-                    t.tagPending.appendAttributeName(c, r.pos()-1, r.pos());
+-                    t.transition(AttributeName);
+-                    break;
+-                default: // A-Z, anything else
+-                    t.tagPending.newAttribute();
+-                    r.unconsume();
+-                    t.transition(AttributeName);
+-            }
++            TokeniserStateAttributeFacade.readAfterAttributeName(t, r);
+         }
+     },
+     BeforeAttributeValue {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    // ignore
+-                    break;
+-                case '"':
+-                    t.transition(AttributeValue_doubleQuoted);
+-                    break;
+-                case '&':
+-                    r.unconsume();
+-                    t.transition(AttributeValue_unquoted);
+-                    break;
+-                case '\'':
+-                    t.transition(AttributeValue_singleQuoted);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), r.pos()-1, r.pos());
+-                    t.transition(AttributeValue_unquoted);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case '>':
+-                    t.error(this);
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case '<':
+-                case '=':
+-                case '`':
+-                    t.error(this);
+-                    t.tagPending.appendAttributeValue(c, r.pos()-1, r.pos());
+-                    t.transition(AttributeValue_unquoted);
+-                    break;
+-                default:
+-                    r.unconsume();
+-                    t.transition(AttributeValue_unquoted);
+-            }
++            TokeniserStateAttributeFacade.readBeforeAttributeValue(t, r);
+         }
+     },
+     AttributeValue_doubleQuoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            int pos = r.pos();
+-            String value = r.consumeAttributeQuoted(false);
+-            if (value.length() > 0)
+-                t.tagPending.appendAttributeValue(value, pos, r.pos());
+-            else
+-                t.tagPending.setEmptyAttributeValue();
+-
+-            pos = r.pos();
+-            char c = r.consume();
+-            switch (c) {
+-                case '"':
+-                    t.transition(AfterAttributeValue_quoted);
+-                    break;
+-                case '&':
+-                    int[] ref = t.consumeCharacterReference('"', true);
+-                    if (ref != null)
+-                        t.tagPending.appendAttributeValue(ref, pos, r.pos());
+-                    else
+-                        t.tagPending.appendAttributeValue('&', pos, r.pos());
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                default: // hit end of buffer in first read, still in attribute
+-                    t.tagPending.appendAttributeValue(c, pos, r.pos());
+-            }
++            TokeniserStateAttributeFacade.readAttributeValue_doubleQuoted(t, r);
+         }
+     },
+     AttributeValue_singleQuoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            int pos = r.pos();
+-            String value = r.consumeAttributeQuoted(true);
+-            if (value.length() > 0)
+-                t.tagPending.appendAttributeValue(value, pos, r.pos());
+-            else
+-                t.tagPending.setEmptyAttributeValue();
+-
+-            pos = r.pos();
+-            char c = r.consume();
+-            switch (c) {
+-                case '\'':
+-                    t.transition(AfterAttributeValue_quoted);
+-                    break;
+-                case '&':
+-                    int[] ref = t.consumeCharacterReference('\'', true);
+-                    if (ref != null)
+-                        t.tagPending.appendAttributeValue(ref, pos, r.pos());
+-                    else
+-                        t.tagPending.appendAttributeValue('&', pos, r.pos());
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                default: // hit end of buffer in first read, still in attribute
+-                    t.tagPending.appendAttributeValue(c, pos, r.pos());
+-            }
++            TokeniserStateAttributeFacade.readAttributeValue_singleQuoted(t, r);
+         }
+     },
+     AttributeValue_unquoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            int pos = r.pos();
+-            String value = r.consumeToAnySorted(TokeniserStateHelper.attributeValueUnquoted());
+-            if (value.length() > 0)
+-                t.tagPending.appendAttributeValue(value, pos, r.pos());
+-
+-            pos = r.pos();
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BeforeAttributeName);
+-                    break;
+-                case '&':
+-                    int[] ref = t.consumeCharacterReference('>', true);
+-                    if (ref != null)
+-                        t.tagPending.appendAttributeValue(ref, pos, r.pos());
+-                    else
+-                        t.tagPending.appendAttributeValue('&', pos, r.pos());
+-                    break;
+-                case '>':
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case nullChar:
+-                    t.error(this);
+-                    t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                case '"':
+-                case '\'':
+-                case '<':
+-                case '=':
+-                case '`':
+-                    t.error(this);
+-                    t.tagPending.appendAttributeValue(c, pos, r.pos());
+-                    break;
+-                default: // hit end of buffer in first read, still in attribute
+-                    t.tagPending.appendAttributeValue(c, pos, r.pos());
+-            }
+-
++            TokeniserStateAttributeFacade.readAttributeValue_unquoted(t, r);
+         }
+     },
+     // CharacterReferenceInAttributeValue state handled inline
+     AfterAttributeValue_quoted {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BeforeAttributeName);
+-                    break;
+-                case '/':
+-                    t.transition(SelfClosingStartTag);
+-                    break;
+-                case '>':
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                case '?': // Handle trailing ? in <?xml...?>
+-                    if (t.tagPending instanceof Token.XmlDecl)
+-                        break;
+-                    // otherwise fall through to default
+-                default:
+-                    r.unconsume();
+-                    t.error(this);
+-                    t.transition(BeforeAttributeName);
+-            }
+-
++            TokeniserStateAttributeFacade.readAfterAttributeValue_quoted(t, r);
+         }
+     },
+     SelfClosingStartTag {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '>':
+-                    t.tagPending.selfClosing = true;
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case TokeniserStateHelper.EOF:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                default:
+-                    r.unconsume();
+-                    t.error(this);
+-                    t.transition(BeforeAttributeName);
+-            }
++            TokeniserStateAttributeFacade.readSelfClosingStartTag(t, r);
+         }
+     },
+     BogusComment {
+@@ -1057,7 +742,7 @@ enum TokeniserState {
+                 case '\f':
+                 case ' ':
+                     break; // ignore whitespace
+-                case nullChar:
++                case TokeniserState.nullChar:
+                     t.error(this);
+                     t.createDoctypePending();
+                     t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
+@@ -1097,7 +782,7 @@ enum TokeniserState {
+                 case ' ':
+                     t.transition(AfterDoctypeName);
+                     break;
+-                case nullChar:
++                case TokeniserState.nullChar:
+                     t.error(this);
+                     t.doctypePending.name.append(TokeniserStateHelper.replacementChar());
+                     break;
+@@ -1228,7 +913,7 @@ enum TokeniserState {
+                 case '"':
+                     t.transition(AfterDoctypePublicIdentifier);
+                     break;
+-                case nullChar:
++                case TokeniserState.nullChar:
+                     t.error(this);
+                     t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+@@ -1256,7 +941,7 @@ enum TokeniserState {
+                 case '\'':
+                     t.transition(AfterDoctypePublicIdentifier);
+                     break;
+-                case nullChar:
++                case TokeniserState.nullChar:
+                     t.error(this);
+                     t.doctypePending.publicIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+@@ -1446,7 +1131,7 @@ enum TokeniserState {
+                 case '"':
+                     t.transition(AfterDoctypeSystemIdentifier);
+                     break;
+-                case nullChar:
++                case TokeniserState.nullChar:
+                     t.error(this);
+                     t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+@@ -1474,7 +1159,7 @@ enum TokeniserState {
+                 case '\'':
+                     t.transition(AfterDoctypeSystemIdentifier);
+                     break;
+-                case nullChar:
++                case TokeniserState.nullChar:
+                     t.error(this);
+                     t.doctypePending.systemIdentifier.append(TokeniserStateHelper.replacementChar());
+                     break;
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java b/src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java
+new file mode 100644
+index 00000000..eed569eb
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/TokeniserStateAttributeFacade.java
+@@ -0,0 +1,360 @@
++package org.jsoup.parser;
++
++import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
++
++/**
++ * Facade to encapsulate attribute-related tokeniser state logic extracted from TokeniserState enum.
++ */
++class TokeniserStateAttributeFacade {
++
++    static void readBeforeAttributeName(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                break; // ignore whitespace
++            case '/':
++                t.transition(TokeniserState.SelfClosingStartTag);
++                break;
++            case '>':
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserState.nullChar:
++                r.unconsume();
++                t.error(TokeniserState.BeforeAttributeName);
++                t.tagPending.newAttribute();
++                t.transition(TokeniserState.AttributeName);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.BeforeAttributeName);
++                t.transition(TokeniserState.Data);
++                break;
++            case '"':
++            case '\'':
++            case '=':
++                t.error(TokeniserState.BeforeAttributeName);
++                t.tagPending.newAttribute();
++                t.tagPending.appendAttributeName(c, r.pos()-1, r.pos());
++                t.transition(TokeniserState.AttributeName);
++                break;
++            case '?': // Handle trailing ? in <?xml...?>
++                if (t.tagPending instanceof Token.XmlDecl)
++                    break;
++                // otherwise fall through to default
++            default: // A-Z, anything else
++                t.tagPending.newAttribute();
++                r.unconsume();
++                t.transition(TokeniserState.AttributeName);
++        }
++    }
++
++    static void readAttributeName(Tokeniser t, CharacterReader r) {
++        int pos = r.pos();
++        String name = r.consumeToAnySorted(TokeniserStateHelper.attributeNameCharsSorted()); // spec deviate - consume and emit nulls in one hit vs stepping
++        t.tagPending.appendAttributeName(name, pos, r.pos());
++
++        pos = r.pos();
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.AfterAttributeName);
++                break;
++            case '/':
++                t.transition(TokeniserState.SelfClosingStartTag);
++                break;
++            case '=':
++                t.transition(TokeniserState.BeforeAttributeValue);
++                break;
++            case '>':
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AttributeName);
++                t.transition(TokeniserState.Data);
++                break;
++            case '"':
++            case '\'':
++            case '<':
++                t.error(TokeniserState.AttributeName);
++                t.tagPending.appendAttributeName(c, pos, r.pos());
++                break;
++            case '?':
++                if (t.syntax == xml && t.tagPending instanceof Token.XmlDecl) {
++                    t.transition(TokeniserState.AfterAttributeName);
++                    break;
++                } // otherwise default - take it
++            default: // buffer underrun
++                t.tagPending.appendAttributeName(c, pos, r.pos());
++        }
++    }
++
++    static void readAfterAttributeName(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                // ignore
++                break;
++            case '/':
++                t.transition(TokeniserState.SelfClosingStartTag);
++                break;
++            case '=':
++                t.transition(TokeniserState.BeforeAttributeValue);
++                break;
++            case '>':
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.AfterAttributeName);
++                t.tagPending.appendAttributeName(TokeniserStateHelper.replacementChar(), r.pos()-1, r.pos());
++                t.transition(TokeniserState.AttributeName);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AfterAttributeName);
++                t.transition(TokeniserState.Data);
++                break;
++            case '"':
++            case '\'':
++            case '<':
++                t.error(TokeniserState.AfterAttributeName);
++                t.tagPending.newAttribute();
++                t.tagPending.appendAttributeName(c, r.pos()-1, r.pos());
++                t.transition(TokeniserState.AttributeName);
++                break;
++            default: // A-Z, anything else
++                t.tagPending.newAttribute();
++                r.unconsume();
++                t.transition(TokeniserState.AttributeName);
++        }
++    }
++
++    static void readBeforeAttributeValue(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                // ignore
++                break;
++            case '"':
++                t.transition(TokeniserState.AttributeValue_doubleQuoted);
++                break;
++            case '&':
++                r.unconsume();
++                t.transition(TokeniserState.AttributeValue_unquoted);
++                break;
++            case '\'':
++                t.transition(TokeniserState.AttributeValue_singleQuoted);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.BeforeAttributeValue);
++                t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), r.pos()-1, r.pos());
++                t.transition(TokeniserState.AttributeValue_unquoted);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.BeforeAttributeValue);
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '>':
++                t.error(TokeniserState.BeforeAttributeValue);
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case '<':
++            case '=':
++            case '`':
++                t.error(TokeniserState.BeforeAttributeValue);
++                t.tagPending.appendAttributeValue(c, r.pos()-1, r.pos());
++                t.transition(TokeniserState.AttributeValue_unquoted);
++                break;
++            default:
++                r.unconsume();
++                t.transition(TokeniserState.AttributeValue_unquoted);
++        }
++    }
++
++    static void readAttributeValue_doubleQuoted(Tokeniser t, CharacterReader r) {
++        int pos = r.pos();
++        String value = r.consumeAttributeQuoted(false);
++        if (value.length() > 0)
++            t.tagPending.appendAttributeValue(value, pos, r.pos());
++        else
++            t.tagPending.setEmptyAttributeValue();
++
++        pos = r.pos();
++        char c = r.consume();
++        switch (c) {
++            case '"':
++                t.transition(TokeniserState.AfterAttributeValue_quoted);
++                break;
++            case '&':
++                int[] ref = t.consumeCharacterReference('"', true);
++                if (ref != null)
++                    t.tagPending.appendAttributeValue(ref, pos, r.pos());
++                else
++                    t.tagPending.appendAttributeValue('&', pos, r.pos());
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.AttributeValue_doubleQuoted);
++                t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AttributeValue_doubleQuoted);
++                t.transition(TokeniserState.Data);
++                break;
++            default: // hit end of buffer in first read, still in attribute
++                t.tagPending.appendAttributeValue(c, pos, r.pos());
++        }
++    }
++
++    static void readAttributeValue_singleQuoted(Tokeniser t, CharacterReader r) {
++        int pos = r.pos();
++        String value = r.consumeAttributeQuoted(true);
++        if (value.length() > 0)
++            t.tagPending.appendAttributeValue(value, pos, r.pos());
++        else
++            t.tagPending.setEmptyAttributeValue();
++
++        pos = r.pos();
++        char c = r.consume();
++        switch (c) {
++            case '\'':
++                t.transition(TokeniserState.AfterAttributeValue_quoted);
++                break;
++            case '&':
++                int[] ref = t.consumeCharacterReference('\'', true);
++                if (ref != null)
++                    t.tagPending.appendAttributeValue(ref, pos, r.pos());
++                else
++                    t.tagPending.appendAttributeValue('&', pos, r.pos());
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.AttributeValue_singleQuoted);
++                t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AttributeValue_singleQuoted);
++                t.transition(TokeniserState.Data);
++                break;
++            default: // hit end of buffer in first read, still in attribute
++                t.tagPending.appendAttributeValue(c, pos, r.pos());
++        }
++    }
++
++    static void readAttributeValue_unquoted(Tokeniser t, CharacterReader r) {
++        int pos = r.pos();
++        String value = r.consumeToAnySorted(TokeniserStateHelper.attributeValueUnquoted());
++        if (value.length() > 0)
++            t.tagPending.appendAttributeValue(value, pos, r.pos());
++
++        pos = r.pos();
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BeforeAttributeName);
++                break;
++            case '&':
++                int[] ref = t.consumeCharacterReference('>', true);
++                if (ref != null)
++                    t.tagPending.appendAttributeValue(ref, pos, r.pos());
++                else
++                    t.tagPending.appendAttributeValue('&', pos, r.pos());
++                break;
++            case '>':
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserState.nullChar:
++                t.error(TokeniserState.AttributeValue_unquoted);
++                t.tagPending.appendAttributeValue(TokeniserStateHelper.replacementChar(), pos, r.pos());
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AttributeValue_unquoted);
++                t.transition(TokeniserState.Data);
++                break;
++            case '"':
++            case '\'':
++            case '<':
++            case '=':
++            case '`':
++                t.error(TokeniserState.AttributeValue_unquoted);
++                t.tagPending.appendAttributeValue(c, pos, r.pos());
++                break;
++            default: // hit end of buffer in first read, still in attribute
++                t.tagPending.appendAttributeValue(c, pos, r.pos());
++        }
++
++    }
++
++    static void readAfterAttributeValue_quoted(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BeforeAttributeName);
++                break;
++            case '/':
++                t.transition(TokeniserState.SelfClosingStartTag);
++                break;
++            case '>':
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.AfterAttributeValue_quoted);
++                t.transition(TokeniserState.Data);
++                break;
++            case '?': // Handle trailing ? in <?xml...?>
++                if (t.tagPending instanceof Token.XmlDecl)
++                    break;
++                // otherwise fall through to default
++            default:
++                r.unconsume();
++                t.error(TokeniserState.AfterAttributeValue_quoted);
++                t.transition(TokeniserState.BeforeAttributeName);
++        }
++
++    }
++
++    static void readSelfClosingStartTag(Tokeniser t, CharacterReader r) {
++        char c = r.consume();
++        switch (c) {
++            case '>':
++                t.tagPending.selfClosing = true;
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserStateHelper.EOF:
++                t.eofError(TokeniserState.SelfClosingStartTag);
++                t.transition(TokeniserState.Data);
++                break;
++            default:
++                r.unconsume();
++                t.error(TokeniserState.SelfClosingStartTag);
++                t.transition(TokeniserState.BeforeAttributeName);
++        }
++    }
++}

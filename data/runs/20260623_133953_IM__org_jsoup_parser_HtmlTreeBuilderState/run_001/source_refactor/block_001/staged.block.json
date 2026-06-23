@@ -1,0 +1,46 @@
+{
+  "id": 1,
+  "goal": "Extract the large nested Constants holder out of the enum into a separate top-level class to reduce the size and responsibilities of HtmlTreeBuilderState.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::Constants"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java"
+      ],
+      "details": "Create a new top-level class org.jsoup.parser.HtmlTreeBuilderStateConstants containing the arrays and static constant declarations that were previously in the nested Constants class of HtmlTreeBuilderState. The new class will expose the same static String[] fields (InHeadEmpty, InHeadRaw, InHeadEnd, AfterHeadBody, BeforeHtmlToHead, InHeadNoScriptHead, InBodyStartToHead, InBodyStartPClosers, Headings, InBodyStartLiBreakers, DdDt, InBodyStartApplets, InBodyStartMedia, InBodyStartInputAttribs, InBodyStartDrop, InBodyEndClosers, InBodyEndOtherErrors, InBodyEndAdoptionFormatters, InTableToBody, InTableAddBody, InTableToHead, InCellNames, InCellBody, InCellTable, InCellCol, InTableEndErr, InTableFoster, InTableBodyExit, InTableBodyEndIgnore, InRowMissing, InRowIgnore, InSelectEnd, InSelectTableEnd, InTableEndIgnore, InHeadNoscriptIgnore, InCaptionIgnore, InTemplateToHead, InTemplateToTable, InForeignToHtml) with the same values so existing logic can reference them. Update HtmlTreeBuilderState to remove the nested Constants class and replace the static import 'import static org.jsoup.parser.HtmlTreeBuilderState.Constants.*;' with 'import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;'. This produces a compileable state where constant data is in its own class.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Replace the existing static import of the nested Constants (import static org.jsoup.parser.HtmlTreeBuilderState.Constants.*;) with a static import of the new class (import static org.jsoup.parser.HtmlTreeBuilderStateConstants.*;). Keep other imports unchanged.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

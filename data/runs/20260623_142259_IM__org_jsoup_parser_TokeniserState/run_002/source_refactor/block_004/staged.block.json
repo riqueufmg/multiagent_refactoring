@@ -1,0 +1,34 @@
+{
+  "id": 4,
+  "goal": "Move comment and bogus-comment handling into a Comment facade to isolate comment parsing behavior.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java"
+      ],
+      "details": "Create org.jsoup.parser.TokeniserStateCommentFacade with static methods to handle CommentStart, CommentStartDash, Comment, CommentEndDash, CommentEnd, CommentEndBang, BogusComment, and part of MarkupDeclarationOpen/MarkupProcessingOpen paths that lead to comments. Methods will append to t.commentPending, call emitCommentPending, transition Tokeniser as appropriate, and preserve error/eof handling.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateCommentFacade.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "details": "Replace the bodies of read(...) for the comment-related enum constants with delegations to TokeniserStateCommentFacade (e.g., TokeniserStateCommentFacade.readCommentStart(t, r); ). Keep transitions and pending-buffer semantics unchanged: the facade must operate on t.commentPending and Tokeniser transitions exactly as original code.",
+      "risk": "medium"
+    }
+  ],
+  "test_files": []
+}

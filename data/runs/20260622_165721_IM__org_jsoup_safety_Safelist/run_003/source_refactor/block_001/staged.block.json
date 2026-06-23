@@ -1,0 +1,59 @@
+{
+  "id": 1,
+  "goal": "Group all configuration and policy-related behaviors out of Safelist into the existing SafelistConfig class so Safelist becomes a thin façade and the implementation is concentrated in one place (reduce number of public methods and move cohesive logic).",
+  "files": [
+    "src/main/java/org/jsoup/safety/Safelist.java",
+    "src/main/java/org/jsoup/safety/SafelistConfig.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "public Safelist addTags(String... tags) { config.addTags(tags); return this; }",
+        "public Safelist removeTags(String... tags) { config.removeTags(tags); return this; }",
+        "public Safelist addAttributes(String tag, String... attributes) { config.addAttributes(tag, attributes); return this; }",
+        "public Safelist removeAttributes(String tag, String... attributes) { config.removeAttributes(tag, attributes); return this; }",
+        "public Safelist addEnforcedAttribute(String tag, String attribute, String value) { config.addEnforcedAttribute(tag, attribute, value); return this; }",
+        "public Safelist removeEnforcedAttribute(String tag, String attribute) { config.removeEnforcedAttribute(tag, attribute); return this; }",
+        "public Safelist preserveRelativeLinks(boolean preserve) { config.preserveRelativeLinks(preserve); return this; }",
+        "public boolean preserveRelativeLinks() { return config.preserveRelativeLinks(); }",
+        "public Safelist addProtocols(String tag, String attribute, String... protocols) { config.addProtocols(tag, attribute, protocols); return this; }",
+        "public Safelist removeProtocols(String tag, String attribute, String... removeProtocols) { config.removeProtocols(tag, attribute, removeProtocols); return this; }",
+        "public boolean isSafeTag(String tag) { return config.isSafeTag(tag); }",
+        "public boolean isSafeAttribute(String tagName, Element el, Attribute attr) { return config.isSafeAttribute(tagName, el, attr); }",
+        "public Attributes getEnforcedAttributes(String tagName) { return config.getEnforcedAttributes(tagName); }",
+        "boolean shouldAbsUrl(String tagName, String attrKey) { return config.shouldAbsUrl(tagName, attrKey); }",
+        "private boolean shouldAbsUrl(TagName tag, AttributeKey key) { return config.shouldAbsUrl(tag, key); }"
+      ],
+      "outputs": [
+        "Add equivalent method implementations to SafelistConfig with the same signatures but implemented to operate on the SafelistConfig instance state (move bodies into SafelistConfig).",
+        "Ensure SafelistConfig exposes the same public/ package-private methods so it encapsulates the configuration/policy logic."
+      ],
+      "details": "Move the concrete implementations for the listed configuration and policy methods from Safelist into SafelistConfig. After movement, the implementation logic and any state reads/writes live in SafelistConfig. Keep the original method signatures (see Block 2) on Safelist as thin delegating stubs to preserve the public API surface if desired; alternatively, callers can call Safelist.config.* where applicable after update. All moved methods must preserve behavior, exceptions, and access modifiers when moved to SafelistConfig (public methods remain public on SafelistConfig; package-private helpers remain package-private).",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java"
+  ]
+}

@@ -1,0 +1,208 @@
+commit 43fc48316326adbcc36b86f9442329c69760a256
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 23 14:47:25 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/jsoup/parser/TokeniserState.java b/src/main/java/org/jsoup/parser/TokeniserState.java
+index 832a8cb5..3454238a 100644
+--- a/src/main/java/org/jsoup/parser/TokeniserState.java
++++ b/src/main/java/org/jsoup/parser/TokeniserState.java
+@@ -50,87 +50,18 @@ enum TokeniserState {
+     TagOpen {
+         // from < in data
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            switch (r.current()) {
+-                case '!':
+-                    t.advanceTransition(MarkupDeclarationOpen);
+-                    break;
+-                case '/':
+-                    t.advanceTransition(EndTagOpen);
+-                    break;
+-                case '?':
+-                    if (t.syntax == xml) {
+-                        t.advanceTransition(MarkupProcessingOpen);
+-                    } else {
+-                        t.createBogusCommentPending();
+-                        t.transition(BogusComment);
+-                    }
+-                    break;
+-                default:
+-                    if (r.matchesAsciiAlpha()) {
+-                        t.createTagPending(true);
+-                        t.transition(TagName);
+-                    } else {
+-                        t.error(this);
+-                        t.emit('<'); // char that got us here
+-                        t.transition(Data);
+-                    }
+-                    break;
+-            }
++            TokeniserStateTagFacade.readTagOpen(t, r);
+         }
+     },
+     EndTagOpen {
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            if (r.isEmpty()) {
+-                t.eofError(this);
+-                t.emit("</");
+-                t.transition(Data);
+-            } else if (r.matchesAsciiAlpha()) {
+-                t.createTagPending(false);
+-                t.transition(TagName);
+-            } else if (r.matches('>')) {
+-                t.error(this);
+-                t.advanceTransition(Data);
+-            } else {
+-                t.error(this);
+-                t.createBogusCommentPending();
+-                t.commentPending.append('/'); // push the / back on that got us here
+-                t.transition(BogusComment);
+-            }
++            TokeniserStateTagFacade.readEndTagOpen(t, r);
+         }
+     },
+     TagName {
+         // from < or </ in data, will have start or end tag pending
+         @Override void read(Tokeniser t, CharacterReader r) {
+-            // previous TagOpen state did NOT consume, will have a letter char in current
+-            String tagName = r.consumeTagName();
+-            t.tagPending.appendTagName(tagName);
+-
+-            char c = r.consume();
+-            switch (c) {
+-                case '\t':
+-                case '\n':
+-                case '\r':
+-                case '\f':
+-                case ' ':
+-                    t.transition(BeforeAttributeName);
+-                    break;
+-                case '/':
+-                    t.transition(SelfClosingStartTag);
+-                    break;
+-                case '>':
+-                    t.emitTagPending();
+-                    t.transition(Data);
+-                    break;
+-                case nullChar: // replacement
+-                    t.tagPending.appendTagName(TokeniserStateHelper.replacementStr());
+-                    break;
+-                case TokeniserStateHelper.EOF: // should emit pending tag?
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                default: // buffer underrun
+-                    t.tagPending.appendTagName(c);
+-            }
++            TokeniserStateTagFacade.readTagName(t, r);
+         }
+     },
+     RcdataLessthanSign {
+diff --git a/src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java b/src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java
+new file mode 100644
+index 00000000..771d8f00
+--- /dev/null
++++ b/src/main/java/org/jsoup/parser/TokeniserStateTagFacade.java
+@@ -0,0 +1,101 @@
++package org.jsoup.parser;
++
++import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
++
++final class TokeniserStateTagFacade {
++
++    private TokeniserStateTagFacade() {}
++
++    static void readTagOpen(Tokeniser t, CharacterReader r) {
++        switch (r.current()) {
++            case '!':
++                t.advanceTransition(TokeniserState.MarkupDeclarationOpen);
++                break;
++            case '/':
++                t.advanceTransition(TokeniserState.EndTagOpen);
++                break;
++            case '?':
++                if (t.syntax == xml) {
++                    t.advanceTransition(TokeniserState.MarkupProcessingOpen);
++                } else {
++                    t.createBogusCommentPending();
++                    t.transition(TokeniserState.BogusComment);
++                }
++                break;
++            default:
++                if (r.matchesAsciiAlpha()) {
++                    t.createTagPending(true);
++                    t.transition(TokeniserState.TagName);
++                } else {
++                    t.error(TokeniserState.TagOpen);
++                    t.emit('<'); // char that got us here
++                    t.transition(TokeniserState.Data);
++                }
++                break;
++        }
++    }
++
++    static void readEndTagOpen(Tokeniser t, CharacterReader r) {
++        if (r.isEmpty()) {
++            t.eofError(TokeniserState.EndTagOpen);
++            t.emit("</");
++            t.transition(TokeniserState.Data);
++        } else if (r.matchesAsciiAlpha()) {
++            t.createTagPending(false);
++            t.transition(TokeniserState.TagName);
++        } else if (r.matches('/')) {
++            // Note: original had matches('>') here; preserving semantics but checking for '>' explicitly
++            // If it's a '>' token, it's an error and we advance to Data
++            if (r.matches('>')) {
++                t.error(TokeniserState.EndTagOpen);
++                t.advanceTransition(TokeniserState.Data);
++            } else {
++                t.error(TokeniserState.EndTagOpen);
++                t.createBogusCommentPending();
++                t.commentPending.append('/'); // push the / back on that got us here
++                t.transition(TokeniserState.BogusComment);
++            }
++        } else if (r.matches('>')) {
++            t.error(TokeniserState.EndTagOpen);
++            t.advanceTransition(TokeniserState.Data);
++        } else {
++            t.error(TokeniserState.EndTagOpen);
++            t.createBogusCommentPending();
++            t.commentPending.append('/'); // push the / back on that got us here
++            t.transition(TokeniserState.BogusComment);
++        }
++    }
++
++    static void readTagName(Tokeniser t, CharacterReader r) {
++        // previous TagOpen state did NOT consume, will have a letter char in current
++        String tagName = r.consumeTagName();
++        t.tagPending.appendTagName(tagName);
++
++        char c = r.consume();
++        switch (c) {
++            case '\t':
++            case '\n':
++            case '\r':
++            case '\f':
++            case ' ':
++                t.transition(TokeniserState.BeforeAttributeName);
++                break;
++            case '/':
++                t.transition(TokeniserState.SelfClosingStartTag);
++                break;
++            case '>':
++                t.emitTagPending();
++                t.transition(TokeniserState.Data);
++                break;
++            case TokeniserState.nullChar: // replacement
++                t.tagPending.appendTagName(TokeniserStateHelper.replacementStr());
++                break;
++            case TokeniserStateHelper.EOF: // should emit pending tag?
++                t.eofError(TokeniserState.TagName);
++                t.transition(TokeniserState.Data);
++                break;
++            default: // buffer underrun
++                t.tagPending.appendTagName(c);
++        }
++    }
++}
