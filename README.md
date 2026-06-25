@@ -21,6 +21,14 @@ root
 |-orquestrator
 |-tools
 
+```text
+multiagent_refactoring/
+├── mvp/
+├── data/
+├── orchestrator/
+└── tools/
+```
+
 ### mvp
 The *mvp* directory contains three modules:
 - **planner**: responsible for generating a refactoring plan.
