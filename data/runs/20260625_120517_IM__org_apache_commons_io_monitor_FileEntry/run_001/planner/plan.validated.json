@@ -1,0 +1,131 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.monitor.FileEntry",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a new helper class FileAttributes in the same package to encapsulate file attribute state and related behavior (name, exists, directory, lastModified, length and operations on them). This prepares for extracting attribute-related members out of FileEntry to reduce its size and improve cohesion.",
+      "files": [
+        "src/main/java/org/apache/commons/io/monitor/FileAttributes.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileAttributes.java"
+          ],
+          "details": "Create new class org.apache.commons.io.monitor.FileAttributes. The class will live in the same package as FileEntry and will encapsulate the following fields: String name; boolean exists; boolean directory; SerializableFileTime lastModified; long length. It will provide the corresponding public getters and setters present in FileEntry (getLastModified(), getLastModifiedFileTime(), getLength(), getName(), isDirectory(), isExists(), setLastModified(FileTime), setLastModified(long), package-private setLastModified(SerializableFileTime), setLength(long), setName(String), setDirectory(boolean), setExists(boolean)) and a public boolean refresh(File file) method that performs the same refresh logic currently implemented in FileEntry (including using Files.exists, file.isDirectory, FileUtils.lastModifiedFileTime and handling IOException by setting EPOCH). Also provide a constructor FileAttributes(File file) that initializes the attributes from the provided File (mirroring FileEntry(FileEntry, File) initialization of name etc.). The class will import the same types used by the moved logic: java.io.File, java.io.IOException, java.nio.file.Files, java.nio.file.attribute.FileTime, org.apache.commons.io.FileUtils, org.apache.commons.io.file.attribute.FileTimes. No changes to FileEntry are made in this block.",
+          "risk": "low"
+        }
+      ],
+      "test_files": []
+    },
+    {
+      "id": 2,
+      "goal": "Move attribute fields and related methods from FileEntry into FileAttributes and change FileEntry to delegate attribute operations to FileAttributes, reducing FileEntry's number of public members and grouping cohesive behavior.",
+      "files": [
+        "src/main/java/org/apache/commons/io/monitor/FileAttributes.java",
+        "src/main/java/org/apache/commons/io/monitor/FileEntry.java",
+        "src/test/java/org/apache/commons/io/monitor/FileEntryTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "org.apache.commons.io.monitor.FileEntry#name",
+            "org.apache.commons.io.monitor.FileEntry#exists",
+            "org.apache.commons.io.monitor.FileEntry#directory",
+            "org.apache.commons.io.monitor.FileEntry#lastModified",
+            "org.apache.commons.io.monitor.FileEntry#length"
+          ],
+          "outputs": [
+            "org.apache.commons.io.monitor.FileAttributes#name",
+            "org.apache.commons.io.monitor.FileAttributes#exists",
+            "org.apache.commons.io.monitor.FileAttributes#directory",
+            "org.apache.commons.io.monitor.FileAttributes#lastModified",
+            "org.apache.commons.io.monitor.FileAttributes#length"
+          ],
+          "details": "Move the five attribute fields from FileEntry into FileAttributes. In FileEntry add a new final field: private final FileAttributes attributes; Initialize attributes in both FileEntry constructors: attributes = new FileAttributes(file); Remove the original fields from FileEntry after moving them.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.apache.commons.io.monitor.FileEntry#getLastModified()",
+            "org.apache.commons.io.monitor.FileEntry#getLastModifiedFileTime()",
+            "org.apache.commons.io.monitor.FileEntry#getLength()",
+            "org.apache.commons.io.monitor.FileEntry#getName()",
+            "org.apache.commons.io.monitor.FileEntry#isDirectory()",
+            "org.apache.commons.io.monitor.FileEntry#isExists()",
+            "org.apache.commons.io.monitor.FileEntry#newChildInstance(java.io.File)",
+            "org.apache.commons.io.monitor.FileEntry#refresh(java.io.File)",
+            "org.apache.commons.io.monitor.FileEntry#setDirectory(boolean)",
+            "org.apache.commons.io.monitor.FileEntry#setExists(boolean)",
+            "org.apache.commons.io.monitor.FileEntry#setLastModified(java.nio.file.attribute.FileTime)",
+            "org.apache.commons.io.monitor.FileEntry#setLastModified(long)",
+            "org.apache.commons.io.monitor.FileEntry#setName(java.lang.String)",
+            "org.apache.commons.io.monitor.FileEntry#setLength(long)",
+            "org.apache.commons.io.monitor.FileEntry#(package-private)setLastModified(org.apache.commons.io.monitor.SerializableFileTime)"
+          ],
+          "outputs": [
+            "org.apache.commons.io.monitor.FileAttributes#getLastModified()",
+            "org.apache.commons.io.monitor.FileAttributes#getLastModifiedFileTime()",
+            "org.apache.commons.io.monitor.FileAttributes#getLength()",
+            "org.apache.commons.io.monitor.FileAttributes#getName()",
+            "org.apache.commons.io.monitor.FileAttributes#isDirectory()",
+            "org.apache.commons.io.monitor.FileAttributes#isExists()",
+            "org.apache.commons.io.monitor.FileAttributes#refresh(java.io.File)",
+            "org.apache.commons.io.monitor.FileAttributes#setDirectory(boolean)",
+            "org.apache.commons.io.monitor.FileAttributes#setExists(boolean)",
+            "org.apache.commons.io.monitor.FileAttributes#setLastModified(java.nio.file.attribute.FileTime)",
+            "org.apache.commons.io.monitor.FileAttributes#setLastModified(long)",
+            "org.apache.commons.io.monitor.FileAttributes#setName(java.lang.String)",
+            "org.apache.commons.io.monitor.FileAttributes#setLength(long)",
+            "org.apache.commons.io.monitor.FileAttributes#setLastModified(org.apache.commons.io.monitor.SerializableFileTime)"
+          ],
+          "details": "Move all attribute-related methods into FileAttributes. The refresh(File) method and the three overloads of setLastModified are moved intact. The newChildInstance(File) method remains in FileEntry (do not move), since it constructs FileEntry children; it should not be moved to the attribute holder. After moving, remove the moved methods from FileEntry.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java",
+            "src/main/java/org/apache/commons/io/monitor/FileAttributes.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java",
+            "src/main/java/org/apache/commons/io/monitor/FileAttributes.java"
+          ],
+          "details": "Ensure FileEntry imports/uses org.apache.commons.io.monitor.FileAttributes. Ensure FileAttributes file has necessary imports (java.io.File, java.io.IOException, java.nio.file.Files, java.nio.file.attribute.FileTime, org.apache.commons.io.FileUtils, org.apache.commons.io.file.attribute.FileTimes). Update FileEntry to remove unused imports if any fields/methods referencing them were moved.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "details": "Replace uses of moved fields and methods inside FileEntry with delegating calls to the new attributes field. For example: getName() will delegate to attributes.getName(); setName(...) delegates to attributes.setName(...); refresh(File file) in FileEntry becomes return attributes.refresh(file); getLastModified() delegates to attributes.getLastModified(); isDirectory() delegates to attributes.isDirectory(), etc. Preserve existing public API of FileEntry by keeping the public method signatures in FileEntry where backward compatibility is required, but implement them as simple delegates to attributes (this reduces FileEntry's internal size while keeping its API intact). Adjust logic in FileEntry that previously compared orig values using the moved fields to instead call attributes getters to capture orig values before refresh and then compare after refresh where needed. Ensure constructors set attributes appropriately.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/io/monitor/FileEntryTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/io/monitor/FileEntryTest.java"
+      ]
+    }
+  ]
+}

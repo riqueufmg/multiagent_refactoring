@@ -1,0 +1,159 @@
+commit 4a676dd48486aa41aaabe13d8e3aedbdd94fd166
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 16:00:28 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtils.java b/src/main/java/org/apache/commons/io/EndianUtils.java
+index 87805e875..95bf9e4f7 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtils.java
++++ b/src/main/java/org/apache/commons/io/EndianUtils.java
+@@ -239,60 +239,6 @@ public static int readSwappedUnsignedShort(final InputStream input) throws IOExc
+         return EndianUtilsStream.readSwappedUnsignedShort(input);
+     }
+ 
+-    /**
+-     * Converts a {@code double} value from big-endian to little-endian
+-     * and vice versa. That is, it converts the {@code double} to bytes,
+-     * reverses the bytes, and then reinterprets those bytes as a new {@code double}.
+-     * This can be useful if you have a number that was read from the
+-     * underlying source in the wrong endianness.
+-     *
+-     * @param value value to convert.
+-     * @return the converted value.
+-     */
+-    public static double swapDouble(final double value) {
+-        return Double.longBitsToDouble(EndianUtilsSwap.swapLong(Double.doubleToLongBits(value)));
+-    }
+-
+-    /**
+-     * Converts a {@code float} value from big-endian to little-endian and vice versa.
+-     *
+-     * @param value value to convert.
+-     * @return the converted value.
+-     */
+-    public static float swapFloat(final float value) {
+-        return Float.intBitsToFloat(EndianUtilsSwap.swapInteger(Float.floatToIntBits(value)));
+-    }
+-
+-    /**
+-     * Converts an {@code int} value from big-endian to little-endian and vice versa.
+-     *
+-     * @param value value to convert.
+-     * @return the converted value.
+-     */
+-    public static int swapInteger(final int value) {
+-        return EndianUtilsSwap.swapInteger(value);
+-    }
+-
+-    /**
+-     * Converts a {@code long} value from big-endian to little-endian and vice versa.
+-     *
+-     * @param value value to convert.
+-     * @return the converted value.
+-     */
+-    public static long swapLong(final long value) {
+-        return EndianUtilsSwap.swapLong(value);
+-    }
+-
+-    /**
+-     * Converts a {@code short} value from big-endian to little-endian and vice versa.
+-     *
+-     * @param value value to convert.
+-     * @return the converted value.
+-     */
+-    public static short swapShort(final short value) {
+-        return EndianUtilsSwap.swapShort(value);
+-    }
+-
+     /**
+      * Writes the 8 bytes of a {@code double} to a byte array at a given offset in little-endian order.
+      *
+diff --git a/src/test/java/org/apache/commons/io/EndianUtilsTest.java b/src/test/java/org/apache/commons/io/EndianUtilsTest.java
+index 99651c2d3..88a55c5ba 100644
+--- a/src/test/java/org/apache/commons/io/EndianUtilsTest.java
++++ b/src/test/java/org/apache/commons/io/EndianUtilsTest.java
+@@ -126,45 +126,45 @@ void testReadSwappedUnsignedShort() throws IOException {
+ 
+     @Test
+     void testSwapDouble() {
+-        assertEquals(0.0, EndianUtils.swapDouble(0.0), 0.0);
++        assertEquals(0.0, EndianUtilsSwap.swapDouble(0.0), 0.0);
+         final double d1 = Double.longBitsToDouble(0x0102030405060708L);
+         final double d2 = Double.longBitsToDouble(0x0807060504030201L);
+-        assertEquals(d2, EndianUtils.swapDouble(d1), 0.0);
++        assertEquals(d2, EndianUtilsSwap.swapDouble(d1), 0.0);
+     }
+ 
+     @Test
+     void testSwapFloat() {
+-        assertEquals(0.0f, EndianUtils.swapFloat(0.0f), 0.0);
++        assertEquals(0.0f, EndianUtilsSwap.swapFloat(0.0f), 0.0);
+         final float f1 = Float.intBitsToFloat(0x01020304);
+         final float f2 = Float.intBitsToFloat(0x04030201);
+-        assertEquals(f2, EndianUtils.swapFloat(f1), 0.0);
++        assertEquals(f2, EndianUtilsSwap.swapFloat(f1), 0.0);
+     }
+ 
+     @Test
+     void testSwapInteger() {
+-        assertEquals(0, EndianUtils.swapInteger(0));
+-        assertEquals(0x04030201, EndianUtils.swapInteger(0x01020304));
+-        assertEquals(0x01000000, EndianUtils.swapInteger(0x00000001));
+-        assertEquals(0x00000001, EndianUtils.swapInteger(0x01000000));
+-        assertEquals(0x11111111, EndianUtils.swapInteger(0x11111111));
+-        assertEquals(0xabcdef10, EndianUtils.swapInteger(0x10efcdab));
+-        assertEquals(0xab, EndianUtils.swapInteger(0xab000000));
++        assertEquals(0, EndianUtilsSwap.swapInteger(0));
++        assertEquals(0x04030201, EndianUtilsSwap.swapInteger(0x01020304));
++        assertEquals(0x01000000, EndianUtilsSwap.swapInteger(0x00000001));
++        assertEquals(0x00000001, EndianUtilsSwap.swapInteger(0x01000000));
++        assertEquals(0x11111111, EndianUtilsSwap.swapInteger(0x11111111));
++        assertEquals(0xabcdef10, EndianUtilsSwap.swapInteger(0x10efcdab));
++        assertEquals(0xab, EndianUtilsSwap.swapInteger(0xab000000));
+     }
+ 
+     @Test
+     void testSwapLong() {
+-        assertEquals(0, EndianUtils.swapLong(0));
+-        assertEquals(0x0807060504030201L, EndianUtils.swapLong(0x0102030405060708L));
+-        assertEquals(0xffffffffffffffffL, EndianUtils.swapLong(0xffffffffffffffffL));
+-        assertEquals(0xab, EndianUtils.swapLong(0xab00000000000000L));
++        assertEquals(0, EndianUtilsSwap.swapLong(0));
++        assertEquals(0x0807060504030201L, EndianUtilsSwap.swapLong(0x0102030405060708L));
++        assertEquals(0xffffffffffffffffL, EndianUtilsSwap.swapLong(0xffffffffffffffffL));
++        assertEquals(0xab, EndianUtilsSwap.swapLong(0xab00000000000000L));
+     }
+ 
+     @Test
+     void testSwapShort() {
+-        assertEquals((short) 0, EndianUtils.swapShort((short) 0));
+-        assertEquals((short) 0x0201, EndianUtils.swapShort((short) 0x0102));
+-        assertEquals((short) 0xffff, EndianUtils.swapShort((short) 0xffff));
+-        assertEquals((short) 0x0102, EndianUtils.swapShort((short) 0x0201));
++        assertEquals((short) 0, EndianUtilsSwap.swapShort((short) 0));
++        assertEquals((short) 0x0201, EndianUtilsSwap.swapShort((short) 0x0102));
++        assertEquals((short) 0xffff, EndianUtilsSwap.swapShort((short) 0xffff));
++        assertEquals((short) 0x0102, EndianUtilsSwap.swapShort((short) 0x0201));
+     }
+ 
+     /**
+@@ -172,13 +172,13 @@ void testSwapShort() {
+      */
+     @Test
+     void testSymmetry() {
+-        assertEquals((short) 0x0102, EndianUtils.swapShort(EndianUtils.swapShort((short) 0x0102)));
+-        assertEquals(0x01020304, EndianUtils.swapInteger(EndianUtils.swapInteger(0x01020304)));
+-        assertEquals(0x0102030405060708L, EndianUtils.swapLong(EndianUtils.swapLong(0x0102030405060708L)));
++        assertEquals((short) 0x0102, EndianUtilsSwap.swapShort(EndianUtilsSwap.swapShort((short) 0x0102)));
++        assertEquals(0x01020304, EndianUtilsSwap.swapInteger(EndianUtilsSwap.swapInteger(0x01020304)));
++        assertEquals(0x0102030405060708L, EndianUtilsSwap.swapLong(EndianUtilsSwap.swapLong(0x0102030405060708L)));
+         final float f1 = Float.intBitsToFloat(0x01020304);
+-        assertEquals(f1, EndianUtils.swapFloat(EndianUtils.swapFloat(f1)), 0.0);
++        assertEquals(f1, EndianUtilsSwap.swapFloat(EndianUtilsSwap.swapFloat(f1)), 0.0);
+         final double d1 = Double.longBitsToDouble(0x0102030405060708L);
+-        assertEquals(d1, EndianUtils.swapDouble(EndianUtils.swapDouble(d1)), 0.0);
++        assertEquals(d1, EndianUtilsSwap.swapDouble(EndianUtilsSwap.swapDouble(d1)), 0.0);
+     }
+ 
+     // tests #IO-101

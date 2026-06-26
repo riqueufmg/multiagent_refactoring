@@ -1,0 +1,117 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.input.Tailer",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the inner RandomAccessResourceBridge interface out of Tailer into its own top-level file to reduce Tailer size and make the API re-usable.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/RandomAccessResourceBridge.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:RandomAccessResourceBridge (inner interface)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/RandomAccessResourceBridge.java",
+            "src/main/java/org/apache/commons/io/input/Tailer.java (updated)"
+          ],
+          "details": "Create a new top-level interface RandomAccessResourceBridge in package org.apache.commons.io.input with the same API (close, getPointer, read, seek). Remove the inner interface declaration from Tailer and keep references unchanged (same simple name, same package).",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move the inner Tailable interface out of Tailer into its own top-level file to decouple responsibilities and reduce Tailer size.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/Tailable.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:Tailable (inner interface)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/Tailable.java",
+            "src/main/java/org/apache/commons/io/input/Tailer.java (updated)"
+          ],
+          "details": "Create a new top-level interface Tailable in package org.apache.commons.io.input with the same API (getRandomAccess, isNewer, lastModifiedFileTime, size). Remove the inner interface declaration from Tailer and keep existing references.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract the RandomAccessFileBridge inner class into a top-level class implementing RandomAccessResourceBridge, separating file-access bridging concerns from Tailer.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:RandomAccessFileBridge (private static inner class)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java",
+            "src/main/java/org/apache/commons/io/input/Tailer.java (updated)"
+          ],
+          "details": "Create a new package-private (default) top-level class RandomAccessFileBridge in org.apache.commons.io.input that implements RandomAccessResourceBridge. Move the constructor and methods (close, getPointer, read, seek) verbatim. Update Tailer to remove the inner class. The new class uses java.io.RandomAccessFile and java.io.File as before.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Extract the TailablePath private static inner class into a top-level class to reduce Tailer size and isolate path-based tailable logic.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/TailablePath.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:TailablePath (private static inner class)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailablePath.java",
+            "src/main/java/org/apache/commons/io/input/Tailer.java (updated)"
+          ],
+          "details": "Create a new package-private (default) top-level class TailablePath in org.apache.commons.io.input that implements Tailable. Move fields (path, linkOptions), constructor, getPath(), getRandomAccess, isNewer, lastModifiedFileTime, size, and toString() methods. Update Tailer to remove the inner class. Keep behavior identical and reuse PathUtils and Files APIs.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "goal": "Move the complex readLines logic out of Tailer into a dedicated helper class TailerReader to reduce method complexity and Tailer size.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/TailerReader.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:readLines(RandomAccessResourceBridge) (private method)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerReader.java:readLines(RandomAccessResourceBridge, byte[], java.nio.charset.Charset, TailerListener, Tailer) (public static)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java (updated)"
+          ],
+          "details": "Create a new helper class TailerReader in the same package with a public static method readLines(RandomAccessResourceBridge reader, byte[] inbuf, Charset charset, TailerListener listener, Tailer tailer) that contains the existing logic from Tailer.readLines. The method will use tailer.getRun() to check whether to continue. Update Tailer to call TailerReader.readLines(reader, inbuf, charset, listener, this) and remove the private readLines implementation. Add necessary imports in the new file (ByteArrayOutputStream, IOException).",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

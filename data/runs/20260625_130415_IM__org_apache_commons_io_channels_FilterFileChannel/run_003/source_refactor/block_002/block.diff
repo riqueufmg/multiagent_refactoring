@@ -1,0 +1,189 @@
+commit 44b9e4c5e1cb92978bebce36ab5785e11579d0ed
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 14:04:35 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+index 07e9a631d..56a316fdc 100644
+--- a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+@@ -21,8 +21,6 @@
+ import java.nio.channels.Channel;
+ import java.nio.channels.FileChannel;
+ 
+-import org.apache.commons.io.build.AbstractStreamBuilder;
+-
+ /**
+  * Filters a {@link FileChannel}.
+  * <p>
+@@ -33,7 +31,7 @@
+  * </p>
+  * <p>
+  * You construct s simple instance with the {@link FilterFileChannel#FilterFileChannel(FileChannel) channel constructor} and more advanced instances through the
+- * {@link Builder}.
++ * {@link org.apache.commons.io.channels.FilterFileChannelBuilder}.
+  * </p>
+  *
+  * @since 2.22.0
+@@ -41,51 +39,15 @@
+ public class FilterFileChannel extends FilterFileChannelBase {
+ 
+     /**
+-     * Builds instances of {@link FilterFileChannel} for subclasses.
+-     *
+-     * @param <F> The {@link FilterFileChannel} type.
+-     * @param <C> The {@link Channel} type wrapped by the FilterChannel.
+-     * @param <B> The builder type.
+-     */
+-    public abstract static class AbstractBuilder<F extends FilterFileChannel, C extends FileChannel, B extends AbstractBuilder<F, C, B>>
+-            extends AbstractStreamBuilder<F, AbstractBuilder<F, C, B>> {
+-
+-        /**
+-         * Constructs instance for subclasses.
+-         */
+-        protected AbstractBuilder() {
+-            // empty
+-        }
+-    }
+-
+-    /**
+-     * Builds instances of {@link FilterFileChannel}.
+-     */
+-    public static class Builder extends AbstractBuilder<FilterFileChannel, FileChannel, Builder> {
+-
+-        /**
+-         * Builds instances of {@link FilterChannel}.
+-         */
+-        protected Builder() {
+-            // empty
+-        }
+-
+-        @Override
+-        public FilterFileChannel get() throws IOException {
+-            return new FilterFileChannel(this);
+-        }
+-    }
+-
+-    /**
+-     * Creates a new {@link Builder}.
++     * Creates a new {@link org.apache.commons.io.channels.FilterFileChannelBuilder}.
+      *
+-     * @return a new {@link Builder}.
++     * @return a new {@link org.apache.commons.io.channels.FilterFileChannelBuilder}.
+      */
+-    public static Builder forFilterFileChannel() {
+-        return new Builder();
++    public static FilterFileChannelBuilder forFilterFileChannel() {
++        return new FilterFileChannelBuilder();
+     }
+ 
+-    private FilterFileChannel(final Builder builder) throws IOException {
++    FilterFileChannel(final FilterFileChannelBuilder builder) throws IOException {
+         super(builder);
+     }
+ 
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannelAbstractBuilder.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannelAbstractBuilder.java
+new file mode 100644
+index 000000000..873ffe90b
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannelAbstractBuilder.java
+@@ -0,0 +1,40 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.apache.commons.io.channels;
++
++import java.nio.channels.FileChannel;
++
++import org.apache.commons.io.build.AbstractStreamBuilder;
++
++/**
++ * Builds instances of {@link FilterFileChannel} for subclasses.
++ *
++ * @param <F> The {@link FilterFileChannel} type.
++ * @param <C> The {@link FileChannel} type wrapped by the FilterChannel.
++ * @param <B> The builder type.
++ */
++public abstract class FilterFileChannelAbstractBuilder<F extends FilterFileChannel, C extends FileChannel, B extends FilterFileChannelAbstractBuilder<F, C, B>>
++        extends AbstractStreamBuilder<F, FilterFileChannelAbstractBuilder<F, C, B>> {
++
++    /**
++     * Constructs instance for subclasses.
++     */
++    protected FilterFileChannelAbstractBuilder() {
++        // empty
++    }
++}
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java
+index e7463a267..e361c4f48 100644
+--- a/src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java
+@@ -37,7 +37,7 @@ public class FilterFileChannelBase extends FileChannel {
+ 
+     private final FilterFileChannelCore core;
+ 
+-    protected FilterFileChannelBase(final FilterFileChannel.Builder builder) throws IOException {
++    protected FilterFileChannelBase(final FilterFileChannelAbstractBuilder<?, FileChannel, ?> builder) throws IOException {
+         this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(builder.getChannel(FileChannel.class)));
+     }
+ 
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannelBuilder.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannelBuilder.java
+new file mode 100644
+index 000000000..3704827e1
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannelBuilder.java
+@@ -0,0 +1,39 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.apache.commons.io.channels;
++
++import java.io.IOException;
++import java.nio.channels.FileChannel;
++
++/**
++ * Builds instances of {@link FilterFileChannel}.
++ */
++public class FilterFileChannelBuilder extends FilterFileChannelAbstractBuilder<FilterFileChannel, FileChannel, FilterFileChannelBuilder> {
++
++    /**
++     * Builds instances of {@link FilterChannel}.
++     */
++    protected FilterFileChannelBuilder() {
++        // empty
++    }
++
++    @Override
++    public FilterFileChannel get() throws IOException {
++        return new FilterFileChannel(this);
++    }
++}

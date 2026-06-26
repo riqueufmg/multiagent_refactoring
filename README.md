@@ -1,9 +1,9 @@
 # Multi-Agent Refactoring
 
 ## Requirements
-Apache Maven 3.9.12
-Java 23.0.2
-Python 3.13
+- Apache Maven 3.9.12
+- Java 23.0.2
+- Python 3.13
 
 In addition to the requirements listed above, you need to run the command below in the repository root to install the dependencies required to run the scripts.
 
@@ -14,12 +14,6 @@ pip install -r requirements.txt
 ## Repository Structure
 
 This repository is divided as follows:
-
-root
-|-mvp
-|-data
-|-orquestrator
-|-tools
 
 ```text
 multiagent_refactoring/

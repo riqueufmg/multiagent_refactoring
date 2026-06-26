@@ -1,0 +1,55 @@
+{
+  "id": 2,
+  "goal": "Reduce the size of IOStream by delegating terminal methods to the newly created IOStreamTerminal interface and keep IOStream focused on stream transformation / construction utilities.",
+  "files": [
+    "src/main/java/org/apache/commons/io/function/IOStream.java",
+    "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+    "src/test/java/org/apache/commons/io/function/IOStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "IOStream#allMatch(IOPredicate<? super T>)",
+        "IOStream#anyMatch(IOPredicate<? super T>)",
+        "IOStream#collect(Collector<? super T, A, R>)",
+        "IOStream#collect(IOSupplier<R>, IOBiConsumer<R, ? super T>, IOBiConsumer<R, R>)",
+        "IOStream#count()",
+        "IOStream#findAny()",
+        "IOStream#findFirst()",
+        "IOStream#forAll(IOConsumer<T>)",
+        "IOStream#forAll(IOConsumer<T>, BiFunction<Integer, IOException, IOException>)",
+        "IOStream#forEach(IOConsumer<? super T>)",
+        "IOStream#forEachOrdered(IOConsumer<? super T>)",
+        "IOStream#toArray()",
+        "IOStream#toArray(IntFunction<A[]>)",
+        "IOStream#reduce(IOBinaryOperator<T>)",
+        "IOStream#reduce(T, IOBinaryOperator<T>)",
+        "IOStream#reduce(U, IOBiFunction<U, ? super T, U>, IOBinaryOperator<U>)",
+        "IOStream#max(IOComparator<? super T>)",
+        "IOStream#min(IOComparator<? super T>)",
+        "IOStream#noneMatch(IOPredicate<? super T>)"
+      ],
+      "outputs": [
+        "IOStreamTerminal: these methods are implemented as defaults"
+      ],
+      "details": "Modify IOStream declaration to extend IOStreamTerminal<T> in addition to IOBaseStream. Remove the listed default method implementations from IOStream (they are now provided by IOStreamTerminal). This keeps all moved behavior available to existing callers while making IOStream smaller and more focused. No change in method signatures visible to callers. Ensure imports in IOStream are updated if any become unused/needed.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+        "src/test/java/org/apache/commons/io/function/IOStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+    "src/test/java/org/apache/commons/io/function/IOStreamTest.java"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "goal": "Create a dedicated interface holding terminal and terminal-like operations currently implemented as many default methods in IOStream, so these methods can be moved out of the large IOStream interface without breaking compilation.",
+  "files": [
+    "src/main/java/org/apache/commons/io/function/IOStreamTerminal.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/function/IOStreamTerminal.java"
+      ],
+      "details": "Create a new interface org.apache.commons.io.function.IOStreamTerminal<T> in the same package. The new interface will extend IOBaseStream<T, IOStream<T>, Stream<T>> and provide default implementations for terminal and terminal-like methods copied from IOStream: allMatch, anyMatch, collect(Collector), collect(IOSupplier, IOBiConsumer, IOBiConsumer), count, findAny, findFirst, forAll, forEach, forEachOrdered, toArray(), toArray(IntFunction), reduce variants (reduce(IOBinaryOperator), reduce(identity, IOBinaryOperator), reduce(identity, IOBiFunction, IOBinaryOperator)), max, min, noneMatch. The default implementations will be exact copies from IOStream so they rely on unwrap() from IOBaseStream and Erase helper methods already present in the project.",
+      "risk": "low"
+    }
+  ],
+  "test_files": []
+}

@@ -1,0 +1,298 @@
+commit 7b4093ce06355c25aefa604b83fee7b13cd7be95
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 18:07:29 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java b/src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java
+new file mode 100644
+index 000000000..ed6536009
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java
+@@ -0,0 +1,53 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.io.input;
++
++import java.io.File;
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.io.RandomAccessFile;
++
++/* package-private */
++class RandomAccessFileBridge implements Tailer.RandomAccessResourceBridge {
++
++    private final RandomAccessFile randomAccessFile;
++
++    RandomAccessFileBridge(final File file, final String mode) throws FileNotFoundException {
++        randomAccessFile = new RandomAccessFile(file, mode);
++    }
++
++    @Override
++    public void close() throws IOException {
++        randomAccessFile.close();
++    }
++
++    @Override
++    public long getPointer() throws IOException {
++        return randomAccessFile.getFilePointer();
++    }
++
++    @Override
++    public int read(final byte[] b) throws IOException {
++        return randomAccessFile.read(b);
++    }
++
++    @Override
++    public void seek(final long position) throws IOException {
++        randomAccessFile.seek(position);
++    }
++
++}
+diff --git a/src/main/java/org/apache/commons/io/input/TailablePath.java b/src/main/java/org/apache/commons/io/input/TailablePath.java
+new file mode 100644
+index 000000000..f1b9b86de
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/input/TailablePath.java
+@@ -0,0 +1,69 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.io.input;
++
++import java.io.File;
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.nio.file.Files;
++import java.nio.file.LinkOption;
++import java.nio.file.Path;
++import java.nio.file.attribute.FileTime;
++import java.util.Arrays;
++
++import org.apache.commons.io.file.PathUtils;
++
++/* package-private */
++class TailablePath implements Tailer.Tailable {
++
++    private final Path path;
++    private final LinkOption[] linkOptions;
++
++    TailablePath(final Path path, final LinkOption... linkOptions) {
++        this.path = java.util.Objects.requireNonNull(path, "path");
++        this.linkOptions = linkOptions;
++    }
++
++    Path getPath() {
++        return path;
++    }
++
++    @Override
++    public Tailer.RandomAccessResourceBridge getRandomAccess(final String mode) throws FileNotFoundException {
++        return new RandomAccessFileBridge(path.toFile(), mode);
++    }
++
++    @Override
++    public boolean isNewer(final FileTime fileTime) throws IOException {
++        return PathUtils.isNewer(path, fileTime, linkOptions);
++    }
++
++    @Override
++    public FileTime lastModifiedFileTime() throws IOException {
++        return Files.getLastModifiedTime(path, linkOptions);
++    }
++
++    @Override
++    public long size() throws IOException {
++        return Files.size(path);
++    }
++
++    @Override
++    public String toString() {
++        return "TailablePath [file=" + path + ", linkOptions=" + Arrays.toString(linkOptions) + "]";
++    }
++}
+diff --git a/src/main/java/org/apache/commons/io/input/Tailer.java b/src/main/java/org/apache/commons/io/input/Tailer.java
+index ab2539b55..9ba3ecb46 100644
+--- a/src/main/java/org/apache/commons/io/input/Tailer.java
++++ b/src/main/java/org/apache/commons/io/input/Tailer.java
+@@ -80,53 +80,17 @@
+  * <pre>
+  * TailerListener listener = new MyTailerListener();
+  * Tailer tailer = Tailer.builder()
+- *   .setFile(file)
+- *   .setTailerListener(listener)
+- *   .setDelayDuration(delay)
+- *   .get();
++ *   .setPath(path)
++ *   .setCharset(StandardCharsets.UTF_8)
++ *   .setDelayDuration(Duration.ofSeconds(1))
++ *   .setExecutorService(Executors.newSingleThreadExecutor(Builder::newDaemonThread))
++ *   .setReOpen(false)
++ *   .setStartThread(true)
++ *   .setTailable(tailable)
++ *   .setTailerListener(tailerListener)
++ *   .setTailFromEnd(false)
++ *   .get();}
+  * </pre>
+- * <h3>2.2 Using an Executor</h3>
+- * <pre>
+- * TailerListener listener = new MyTailerListener();
+- * Tailer tailer = new Tailer(file, listener, delay);
+- *
+- * // stupid executor impl. for demo purposes
+- * Executor executor = new Executor() {
+- *     public void execute(Runnable command) {
+- *         command.run();
+- *     }
+- * };
+- *
+- * executor.execute(tailer);
+- * </pre>
+- * <h3>2.3 Using a Thread</h3>
+- * <pre>
+- * TailerListener listener = new MyTailerListener();
+- * Tailer tailer = new Tailer(file, listener, delay);
+- * Thread thread = new Thread(tailer);
+- * thread.setDaemon(true); // optional
+- * thread.start();
+- * </pre>
+- * <h2>3. Stopping a Tailer</h2>
+- * <p>
+- * Remember to stop the tailer when you have done with it:
+- * </p>
+- * <pre>
+- * tailer.stop();
+- * </pre>
+- * <h2>4. Interrupting a Tailer</h2>
+- * <p>
+- * You can interrupt the thread a tailer is running on by calling {@link Thread#interrupt()}.
+- * </p>
+- * <pre>
+- * thread.interrupt();
+- * </pre>
+- * <p>
+- * If you interrupt a tailer, the tailer listener is called with the {@link InterruptedException}.
+- * </p>
+- * <p>
+- * The file is read using the default Charset; this can be overridden if necessary.
+- * </p>
+  *
+  * @see Builder
+  * @see TailerListener
+@@ -328,39 +292,6 @@ public Builder setTailFromEnd(final boolean end) {
+         }
+     }
+ 
+-    /**
+-     * Bridges random access to a {@link RandomAccessFile}.
+-     */
+-    private static final class RandomAccessFileBridge implements RandomAccessResourceBridge {
+-
+-        private final RandomAccessFile randomAccessFile;
+-
+-        private RandomAccessFileBridge(final File file, final String mode) throws FileNotFoundException {
+-            randomAccessFile = new RandomAccessFile(file, mode);
+-        }
+-
+-        @Override
+-        public void close() throws IOException {
+-            randomAccessFile.close();
+-        }
+-
+-        @Override
+-        public long getPointer() throws IOException {
+-            return randomAccessFile.getFilePointer();
+-        }
+-
+-        @Override
+-        public int read(final byte[] b) throws IOException {
+-            return randomAccessFile.read(b);
+-        }
+-
+-        @Override
+-        public void seek(final long position) throws IOException {
+-            randomAccessFile.seek(position);
+-        }
+-
+-    }
+-
+     /**
+      * Bridges access to a resource for random access, normally a file. Allows substitution of remote files for example
+      * using jCIFS.
+@@ -445,49 +376,6 @@ public interface Tailable {
+         long size() throws IOException;
+     }
+ 
+-    /**
+-     * A tailable for a file {@link Path}.
+-     */
+-    private static final class TailablePath implements Tailable {
+-
+-        private final Path path;
+-        private final LinkOption[] linkOptions;
+-
+-        private TailablePath(final Path path, final LinkOption... linkOptions) {
+-            this.path = Objects.requireNonNull(path, "path");
+-            this.linkOptions = linkOptions;
+-        }
+-
+-        Path getPath() {
+-            return path;
+-        }
+-
+-        @Override
+-        public RandomAccessResourceBridge getRandomAccess(final String mode) throws FileNotFoundException {
+-            return new RandomAccessFileBridge(path.toFile(), mode);
+-        }
+-
+-        @Override
+-        public boolean isNewer(final FileTime fileTime) throws IOException {
+-            return PathUtils.isNewer(path, fileTime, linkOptions);
+-        }
+-
+-        @Override
+-        public FileTime lastModifiedFileTime() throws IOException {
+-            return Files.getLastModifiedTime(path, linkOptions);
+-        }
+-
+-        @Override
+-        public long size() throws IOException {
+-            return Files.size(path);
+-        }
+-
+-        @Override
+-        public String toString() {
+-            return "TailablePath [file=" + path + ", linkOptions=" + Arrays.toString(linkOptions) + "]";
+-        }
+-    }
+-
+     private static final boolean DEFAULT_IGNORE_TOUCH = false;
+ 
+     private static final int DEFAULT_DELAY_MILLIS = 1000;

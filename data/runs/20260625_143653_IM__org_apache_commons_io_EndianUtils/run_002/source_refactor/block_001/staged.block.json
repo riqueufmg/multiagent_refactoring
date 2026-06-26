@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "goal": "Extract all byte-array-based read/write utilities and the byte-array validation helper into a new helper class to group cohesive array-oriented functionality and reduce the size and responsibility of EndianUtils.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtilsArray.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtilsArray.java"
+      ],
+      "details": "Create a new class org.apache.commons.io.EndianUtilsArray containing the following public static methods copied from EndianUtils: readSwappedDouble(byte[], int), readSwappedFloat(byte[], int), readSwappedInteger(byte[], int), readSwappedLong(byte[], int), readSwappedShort(byte[], int), readSwappedUnsignedInteger(byte[], int), readSwappedUnsignedShort(byte[], int), writeSwappedDouble(byte[], int, double), writeSwappedFloat(byte[], int, float), writeSwappedInteger(byte[], int, int), writeSwappedLong(byte[], int, long), writeSwappedShort(byte[], int, short). Also include the private static helper validateByteArrayOffset(byte[], int, int) in EndianUtilsArray. Methods that delegate to EndianUtilsStream or EndianUtilsSwap are not moved. The new class is placed in the same package org.apache.commons.io so no cross-package import changes are required.",
+      "risk": "low"
+    }
+  ],
+  "test_files": []
+}

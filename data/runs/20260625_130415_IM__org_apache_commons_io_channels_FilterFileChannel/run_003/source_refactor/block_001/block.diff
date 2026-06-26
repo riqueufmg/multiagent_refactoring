@@ -1,0 +1,263 @@
+commit 7f37eb39d73073cc4231ab191328d3b9a3fa559e
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 13:56:43 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+index aa6591ebe..07e9a631d 100644
+--- a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+@@ -18,14 +18,8 @@
+ package org.apache.commons.io.channels;
+ 
+ import java.io.IOException;
+-import java.nio.ByteBuffer;
+-import java.nio.MappedByteBuffer;
+ import java.nio.channels.Channel;
+ import java.nio.channels.FileChannel;
+-import java.nio.channels.FileLock;
+-import java.nio.channels.ReadableByteChannel;
+-import java.nio.channels.WritableByteChannel;
+-import java.util.Objects;
+ 
+ import org.apache.commons.io.build.AbstractStreamBuilder;
+ 
+@@ -44,7 +38,7 @@
+  *
+  * @since 2.22.0
+  */
+-public class FilterFileChannel extends FileChannel {
++public class FilterFileChannel extends FilterFileChannelBase {
+ 
+     /**
+      * Builds instances of {@link FilterFileChannel} for subclasses.
+@@ -91,10 +85,8 @@ public static Builder forFilterFileChannel() {
+         return new Builder();
+     }
+ 
+-    private final FilterFileChannelCore core;
+-
+     private FilterFileChannel(final Builder builder) throws IOException {
+-        this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(builder.getChannel(FileChannel.class)));
++        super(builder);
+     }
+ 
+     /**
+@@ -103,120 +95,6 @@ private FilterFileChannel(final Builder builder) throws IOException {
+      * @param fileChannel the file channel to wrap.
+      */
+     public FilterFileChannel(final FileChannel fileChannel) {
+-        this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(Objects.requireNonNull(fileChannel, "fileChannel")));
+-    }
+-
+-    @Override
+-    public boolean equals(final Object o) {
+-        return core.equals(o);
+-    }
+-
+-    @Override
+-    public void force(final boolean metaData) throws IOException {
+-        core.force(metaData);
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-        return core.hashCode();
+-    }
+-
+-    @Override
+-    protected void implCloseChannel() throws IOException {
+-        core.implCloseChannel();
+-    }
+-
+-    @Override
+-    public FileLock lock(final long position, final long size, final boolean shared) throws IOException {
+-        return core.lock(position, size, shared);
+-    }
+-
+-    @Override
+-    public MappedByteBuffer map(final MapMode mode, final long position, final long size) throws IOException {
+-        return core.map(mode, position, size);
+-    }
+-
+-    @Override
+-    public long position() throws IOException {
+-        return core.position();
+-    }
+-
+-    @Override
+-    public FileChannel position(final long newPosition) throws IOException {
+-        core.position(newPosition);
+-        return (FileChannel) core.unwrap();
+-    }
+-
+-    @Override
+-    public int read(final ByteBuffer dst) throws IOException {
+-        return core.read(dst);
+-    }
+-
+-    @Override
+-    public int read(final ByteBuffer dst, final long position) throws IOException {
+-        return core.read(dst, position);
+-    }
+-
+-    @Override
+-    public long read(final ByteBuffer[] dsts, final int offset, final int length) throws IOException {
+-        return core.read(dsts, offset, length);
+-    }
+-
+-    @Override
+-    public long size() throws IOException {
+-        return core.size();
+-    }
+-
+-    @Override
+-    public String toString() {
+-        return core.toString();
+-    }
+-
+-    @Override
+-    public long transferFrom(final ReadableByteChannel src, final long position, final long count) throws IOException {
+-        return core.transferFrom(src, position, count);
+-    }
+-
+-    @Override
+-    public long transferTo(final long position, final long count, final WritableByteChannel target) throws IOException {
+-        return core.transferTo(position, count, target);
+-    }
+-
+-    @Override
+-    public FileChannel truncate(final long size) throws IOException {
+-        core.truncate(size);
+-        return (FileChannel) core.unwrap();
+-    }
+-
+-    @Override
+-    public FileLock tryLock(final long position, final long size, final boolean shared) throws IOException {
+-        return core.tryLock(position, size, shared);
+-    }
+-
+-    /**
+-     * Unwraps this instance by returning the underlying {@link FileChannel}.
+-     * <p>
+-     * Use with caution.
+-     * </p>
+-     *
+-     * @return the underlying {@link FileChannel}.
+-     */
+-    public FileChannel unwrap() {
+-        return (FileChannel) core.unwrap();
+-    }
+-
+-    @Override
+-    public int write(final ByteBuffer src) throws IOException {
+-        return core.write(src);
+-    }
+-
+-    @Override
+-    public int write(final ByteBuffer src, final long position) throws IOException {
+-        return core.write(src, position);
+-    }
+-
+-    @Override
+-    public long write(final ByteBuffer[] srcs, final int offset, final int length) throws IOException {
+-        return core.write(srcs, offset, length);
++        super(fileChannel);
+     }
+ }
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java
+similarity index 67%
+copy from src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+copy to src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java
+index aa6591ebe..e7463a267 100644
+--- a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java
+@@ -27,73 +27,17 @@
+ import java.nio.channels.WritableByteChannel;
+ import java.util.Objects;
+ 
+-import org.apache.commons.io.build.AbstractStreamBuilder;
+-
+ /**
+- * Filters a {@link FileChannel}.
+- * <p>
+- * A {@code FilterFileChannel} wraps some other channel, which it uses as its basic source of data, possibly transforming the data along the way or providing
+- * additional functionality. The class {@code FilterFileChannel} itself simply overrides methods of {@code FileChannel} with versions that pass all requests to
+- * the wrapped channel. Subclasses of {@code FilterFileChannel} may of course override any methods declared or inherited by {@code FilterFileChannel}, and may
+- * also provide additional fields and methods.
+- * </p>
+- * <p>
+- * You construct s simple instance with the {@link FilterFileChannel#FilterFileChannel(FileChannel) channel constructor} and more advanced instances through the
+- * {@link Builder}.
+- * </p>
++ * Base implementation that contains the core field and FileChannel API overrides.
+  *
+- * @since 2.22.0
++ * This class was extracted from FilterFileChannel to group the FileChannel API
++ * implementation and the backing core field.
+  */
+-public class FilterFileChannel extends FileChannel {
+-
+-    /**
+-     * Builds instances of {@link FilterFileChannel} for subclasses.
+-     *
+-     * @param <F> The {@link FilterFileChannel} type.
+-     * @param <C> The {@link Channel} type wrapped by the FilterChannel.
+-     * @param <B> The builder type.
+-     */
+-    public abstract static class AbstractBuilder<F extends FilterFileChannel, C extends FileChannel, B extends AbstractBuilder<F, C, B>>
+-            extends AbstractStreamBuilder<F, AbstractBuilder<F, C, B>> {
+-
+-        /**
+-         * Constructs instance for subclasses.
+-         */
+-        protected AbstractBuilder() {
+-            // empty
+-        }
+-    }
+-
+-    /**
+-     * Builds instances of {@link FilterFileChannel}.
+-     */
+-    public static class Builder extends AbstractBuilder<FilterFileChannel, FileChannel, Builder> {
+-
+-        /**
+-         * Builds instances of {@link FilterChannel}.
+-         */
+-        protected Builder() {
+-            // empty
+-        }
+-
+-        @Override
+-        public FilterFileChannel get() throws IOException {
+-            return new FilterFileChannel(this);
+-        }
+-    }
+-
+-    /**
+-     * Creates a new {@link Builder}.
+-     *
+-     * @return a new {@link Builder}.
+-     */
+-    public static Builder forFilterFileChannel() {
+-        return new Builder();
+-    }
++public class FilterFileChannelBase extends FileChannel {
+ 
+     private final FilterFileChannelCore core;
+ 
+-    private FilterFileChannel(final Builder builder) throws IOException {
++    protected FilterFileChannelBase(final FilterFileChannel.Builder builder) throws IOException {
+         this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(builder.getChannel(FileChannel.class)));
+     }
+ 
+@@ -102,7 +46,7 @@ private FilterFileChannel(final Builder builder) throws IOException {
+      *
+      * @param fileChannel the file channel to wrap.
+      */
+-    public FilterFileChannel(final FileChannel fileChannel) {
++    public FilterFileChannelBase(final FileChannel fileChannel) {
+         this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(Objects.requireNonNull(fileChannel, "fileChannel")));
+     }
+ 

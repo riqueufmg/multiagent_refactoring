@@ -1,0 +1,64 @@
+commit eef2da14b02b485e0a1cb04eece9ab01cc5c4d7e
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 13:46:55 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java b/src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java
+new file mode 100644
+index 000000000..b2a76ed96
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java
+@@ -0,0 +1,52 @@
++package org.apache.commons.io.channels;
++
++import java.io.IOException;
++import java.nio.ByteBuffer;
++import java.nio.MappedByteBuffer;
++import java.nio.channels.FileLock;
++import java.nio.channels.ReadableByteChannel;
++import java.nio.channels.WritableByteChannel;
++import java.nio.channels.FileChannel;
++
++/**
++ * Interface extracted to represent the core operations used by FilterFileChannel.
++ *
++ * This interface declares the common FileChannel-like operations that the
++ * FilterFileChannel forwards to its core implementation. It is intentionally
++ * minimal and mirrors the signatures typically forwarded by a FileChannel
++ * wrapper so alternative core implementations or test doubles can be provided.
++ */
++public interface IFilterFileChannelCore {
++
++    int read(ByteBuffer dst) throws IOException;
++
++    long read(ByteBuffer[] dsts, int offset, int length) throws IOException;
++
++    int write(ByteBuffer src) throws IOException;
++
++    long write(ByteBuffer[] srcs, int offset, int length) throws IOException;
++
++    long position() throws IOException;
++
++    FileChannel position(long newPosition) throws IOException;
++
++    long size() throws IOException;
++
++    FileChannel truncate(long size) throws IOException;
++
++    void force(boolean metaData) throws IOException;
++
++    long transferTo(long position, long count, WritableByteChannel target) throws IOException;
++
++    long transferFrom(ReadableByteChannel src, long position, long count) throws IOException;
++
++    MappedByteBuffer map(FileChannel.MapMode mode, long position, long size) throws IOException;
++
++    FileLock lock(long position, long size, boolean shared) throws IOException;
++
++    FileLock tryLock(long position, long size, boolean shared) throws IOException;
++
++    boolean isOpen();
++
++    void close() throws IOException;
++}

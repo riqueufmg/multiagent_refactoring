@@ -1,0 +1,162 @@
+commit 547e43793badbf5e586627c7b043eeb7a52dfe74
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 13:39:10 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+index c79541138..aa6591ebe 100644
+--- a/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannel.java
+@@ -91,10 +91,10 @@ public static Builder forFilterFileChannel() {
+         return new Builder();
+     }
+ 
+-    private final FilterFileChannelDelegate delegate;
++    private final FilterFileChannelCore core;
+ 
+     private FilterFileChannel(final Builder builder) throws IOException {
+-        this.delegate = new FilterFileChannelDelegate(builder.getChannel(FileChannel.class));
++        this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(builder.getChannel(FileChannel.class)));
+     }
+ 
+     /**
+@@ -103,92 +103,94 @@ private FilterFileChannel(final Builder builder) throws IOException {
+      * @param fileChannel the file channel to wrap.
+      */
+     public FilterFileChannel(final FileChannel fileChannel) {
+-        this.delegate = new FilterFileChannelDelegate(Objects.requireNonNull(fileChannel, "fileChannel"));
++        this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(Objects.requireNonNull(fileChannel, "fileChannel")));
+     }
+ 
+     @Override
+     public boolean equals(final Object o) {
+-        return delegate.equals(o);
++        return core.equals(o);
+     }
+ 
+     @Override
+     public void force(final boolean metaData) throws IOException {
+-        delegate.force(metaData);
++        core.force(metaData);
+     }
+ 
+     @Override
+     public int hashCode() {
+-        return delegate.hashCode();
++        return core.hashCode();
+     }
+ 
+     @Override
+     protected void implCloseChannel() throws IOException {
+-        delegate.implCloseChannel();
++        core.implCloseChannel();
+     }
+ 
+     @Override
+     public FileLock lock(final long position, final long size, final boolean shared) throws IOException {
+-        return delegate.lock(position, size, shared);
++        return core.lock(position, size, shared);
+     }
+ 
+     @Override
+     public MappedByteBuffer map(final MapMode mode, final long position, final long size) throws IOException {
+-        return delegate.map(mode, position, size);
++        return core.map(mode, position, size);
+     }
+ 
+     @Override
+     public long position() throws IOException {
+-        return delegate.position();
++        return core.position();
+     }
+ 
+     @Override
+     public FileChannel position(final long newPosition) throws IOException {
+-        return delegate.position(newPosition);
++        core.position(newPosition);
++        return (FileChannel) core.unwrap();
+     }
+ 
+     @Override
+     public int read(final ByteBuffer dst) throws IOException {
+-        return delegate.read(dst);
++        return core.read(dst);
+     }
+ 
+     @Override
+     public int read(final ByteBuffer dst, final long position) throws IOException {
+-        return delegate.read(dst, position);
++        return core.read(dst, position);
+     }
+ 
+     @Override
+     public long read(final ByteBuffer[] dsts, final int offset, final int length) throws IOException {
+-        return delegate.read(dsts, offset, length);
++        return core.read(dsts, offset, length);
+     }
+ 
+     @Override
+     public long size() throws IOException {
+-        return delegate.size();
++        return core.size();
+     }
+ 
+     @Override
+     public String toString() {
+-        return delegate.toString();
++        return core.toString();
+     }
+ 
+     @Override
+     public long transferFrom(final ReadableByteChannel src, final long position, final long count) throws IOException {
+-        return delegate.transferFrom(src, position, count);
++        return core.transferFrom(src, position, count);
+     }
+ 
+     @Override
+     public long transferTo(final long position, final long count, final WritableByteChannel target) throws IOException {
+-        return delegate.transferTo(position, count, target);
++        return core.transferTo(position, count, target);
+     }
+ 
+     @Override
+     public FileChannel truncate(final long size) throws IOException {
+-        return delegate.truncate(size);
++        core.truncate(size);
++        return (FileChannel) core.unwrap();
+     }
+ 
+     @Override
+     public FileLock tryLock(final long position, final long size, final boolean shared) throws IOException {
+-        return delegate.tryLock(position, size, shared);
++        return core.tryLock(position, size, shared);
+     }
+ 
+     /**
+@@ -200,21 +202,21 @@ public FileLock tryLock(final long position, final long size, final boolean shar
+      * @return the underlying {@link FileChannel}.
+      */
+     public FileChannel unwrap() {
+-        return delegate.unwrap();
++        return (FileChannel) core.unwrap();
+     }
+ 
+     @Override
+     public int write(final ByteBuffer src) throws IOException {
+-        return delegate.write(src);
++        return core.write(src);
+     }
+ 
+     @Override
+     public int write(final ByteBuffer src, final long position) throws IOException {
+-        return delegate.write(src, position);
++        return core.write(src, position);
+     }
+ 
+     @Override
+     public long write(final ByteBuffer[] srcs, final int offset, final int length) throws IOException {
+-        return delegate.write(srcs, offset, length);
++        return core.write(srcs, offset, length);
+     }
+ }

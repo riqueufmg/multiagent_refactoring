@@ -1,0 +1,319 @@
+commit cd6ab395df7074a60c421dd922d5fdc63d8e7268
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 14:55:25 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtils.java b/src/main/java/org/apache/commons/io/EndianUtils.java
+index b6cb2ebd8..255f4e095 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtils.java
++++ b/src/main/java/org/apache/commons/io/EndianUtils.java
+@@ -48,21 +48,6 @@
+  */
+ public class EndianUtils {
+ 
+-    /**
+-     * Reads the next byte from the input stream.
+-     *
+-     * @param input  the stream.
+-     * @return the byte.
+-     * @throws IOException if the end of file is reached.
+-     */
+-    private static int read(final InputStream input) throws IOException {
+-        final int value = input.read();
+-        if (EOF == value) {
+-            throw new EOFException("Unexpected EOF reached");
+-        }
+-        return value;
+-    }
+-
+     /**
+      * Reads a little-endian {@code double} value from a byte array at a given offset.
+      *
+@@ -83,7 +68,7 @@ public static double readSwappedDouble(final byte[] data, final int offset) {
+      * @throws IOException in case of an I/O problem.
+      */
+     public static double readSwappedDouble(final InputStream input) throws IOException {
+-        return Double.longBitsToDouble(readSwappedLong(input));
++        return EndianUtilsStream.readSwappedDouble(input);
+     }
+ 
+     /**
+@@ -106,7 +91,7 @@ public static float readSwappedFloat(final byte[] data, final int offset) {
+      * @throws IOException in case of an I/O problem.
+      */
+     public static float readSwappedFloat(final InputStream input) throws IOException {
+-        return Float.intBitsToFloat(readSwappedInteger(input));
++        return EndianUtilsStream.readSwappedFloat(input);
+     }
+ 
+     /**
+@@ -134,15 +119,7 @@ public static int readSwappedInteger(final byte[] data, final int offset) {
+      * @throws IOException in case of an I/O problem.
+      */
+     public static int readSwappedInteger(final InputStream input) throws IOException {
+-        final int value1 = read(input);
+-        final int value2 = read(input);
+-        final int value3 = read(input);
+-        final int value4 = read(input);
+-        return
+-            ((value1 & 0xff) << 0) +
+-            ((value2 & 0xff) << 8) +
+-            ((value3 & 0xff) << 16) +
+-            ((value4 & 0xff) << 24);
++        return EndianUtilsStream.readSwappedInteger(input);
+     }
+ 
+     /**
+@@ -168,11 +145,7 @@ public static long readSwappedLong(final byte[] data, final int offset) {
+      * @throws IOException in case of an I/O problem.
+      */
+     public static long readSwappedLong(final InputStream input) throws IOException {
+-        final byte[] bytes = new byte[8];
+-        for (int i = 0; i < 8; i++) {
+-            bytes[i] = (byte) read(input);
+-        }
+-        return readSwappedLong(bytes, 0);
++        return EndianUtilsStream.readSwappedLong(input);
+     }
+ 
+     /**
+@@ -199,10 +172,7 @@ public static short readSwappedShort(final byte[] data, final int offset) {
+      * @throws IOException in case of an I/O problem.
+      */
+     public static short readSwappedShort(final InputStream input) throws IOException {
+-        return (short) (
+-            ((read(input) & 0xff) << 0) +
+-            ((read(input) & 0xff) << 8)
+-        );
++        return EndianUtilsStream.readSwappedShort(input);
+     }
+ 
+     /**
+@@ -231,15 +201,7 @@ public static long readSwappedUnsignedInteger(final byte[] data, final int offse
+      * @throws IOException in case of an I/O problem.
+      */
+     public static long readSwappedUnsignedInteger(final InputStream input) throws IOException {
+-        final int value1 = read(input);
+-        final int value2 = read(input);
+-        final int value3 = read(input);
+-        final int value4 = read(input);
+-        final long low = ((value1 & 0xff) << 0) +
+-                         ((value2 & 0xff) << 8) +
+-                         ((value3 & 0xff) << 16);
+-        final long high = value4 & 0xff;
+-        return (high << 24) + (0xffffffffL & low);
++        return EndianUtilsStream.readSwappedUnsignedInteger(input);
+     }
+ 
+     /**
+@@ -265,11 +227,7 @@ public static int readSwappedUnsignedShort(final byte[] data, final int offset)
+      * @throws IOException in case of an I/O problem.
+      */
+     public static int readSwappedUnsignedShort(final InputStream input) throws IOException {
+-        final int value1 = read(input);
+-        final int value2 = read(input);
+-
+-        return ((value1 & 0xff) << 0) +
+-               ((value2 & 0xff) << 8);
++        return EndianUtilsStream.readSwappedUnsignedShort(input);
+     }
+ 
+     /**
+@@ -375,7 +333,7 @@ public static void writeSwappedDouble(final byte[] data, final int offset, final
+      * @throws IOException in case of an I/O problem.
+      */
+     public static void writeSwappedDouble(final OutputStream output, final double value) throws IOException {
+-        writeSwappedLong(output, Double.doubleToLongBits(value));
++        EndianUtilsStream.writeSwappedLong(output, Double.doubleToLongBits(value));
+     }
+ 
+     /**
+@@ -398,7 +356,7 @@ public static void writeSwappedFloat(final byte[] data, final int offset, final
+      * @throws IOException in case of an I/O problem.
+     */
+     public static void writeSwappedFloat(final OutputStream output, final float value) throws IOException {
+-        writeSwappedInteger(output, Float.floatToIntBits(value));
++        EndianUtilsStream.writeSwappedInteger(output, Float.floatToIntBits(value));
+     }
+ 
+     /**
+@@ -425,10 +383,7 @@ public static void writeSwappedInteger(final byte[] data, final int offset, fina
+      * @throws IOException in case of an I/O problem.
+      */
+     public static void writeSwappedInteger(final OutputStream output, final int value) throws IOException {
+-        output.write((byte) (value >> 0 & 0xff));
+-        output.write((byte) (value >> 8 & 0xff));
+-        output.write((byte) (value >> 16 & 0xff));
+-        output.write((byte) (value >> 24 & 0xff));
++        EndianUtilsStream.writeSwappedInteger(output, value);
+     }
+ 
+     /**
+@@ -459,14 +414,7 @@ public static void writeSwappedLong(final byte[] data, final int offset, final l
+      * @throws IOException in case of an I/O problem.
+      */
+     public static void writeSwappedLong(final OutputStream output, final long value) throws IOException {
+-        output.write((byte) (value >> 0 & 0xff));
+-        output.write((byte) (value >> 8 & 0xff));
+-        output.write((byte) (value >> 16 & 0xff));
+-        output.write((byte) (value >> 24 & 0xff));
+-        output.write((byte) (value >> 32 & 0xff));
+-        output.write((byte) (value >> 40 & 0xff));
+-        output.write((byte) (value >> 48 & 0xff));
+-        output.write((byte) (value >> 56 & 0xff));
++        EndianUtilsStream.writeSwappedLong(output, value);
+     }
+ 
+     /**
+@@ -491,8 +439,7 @@ public static void writeSwappedShort(final byte[] data, final int offset, final
+      * @throws IOException in case of an I/O problem.
+      */
+     public static void writeSwappedShort(final OutputStream output, final short value) throws IOException {
+-        output.write((byte) (value >> 0 & 0xff));
+-        output.write((byte) (value >> 8 & 0xff));
++        EndianUtilsStream.writeSwappedShort(output, value);
+     }
+ 
+     /**
+diff --git a/src/main/java/org/apache/commons/io/EndianUtilsStream.java b/src/main/java/org/apache/commons/io/EndianUtilsStream.java
+new file mode 100644
+index 000000000..c3ace2eb8
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/EndianUtilsStream.java
+@@ -0,0 +1,135 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.io;
++
++import static org.apache.commons.io.IOUtils.EOF;
++
++import java.io.EOFException;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
++
++/**
++ * Helper class that contains InputStream/OutputStream based EndianUtils methods.
++ */
++public final class EndianUtilsStream {
++
++    private EndianUtilsStream() {
++        // no instance
++    }
++
++    /**
++     * Reads the next byte from the input stream.
++     *
++     * @param input  the stream.
++     * @return the byte.
++     * @throws IOException if the end of file is reached.
++     */
++    private static int read(final InputStream input) throws IOException {
++        final int value = input.read();
++        if (EOF == value) {
++            throw new EOFException("Unexpected EOF reached");
++        }
++        return value;
++    }
++
++    public static double readSwappedDouble(final InputStream input) throws IOException {
++        return Double.longBitsToDouble(readSwappedLong(input));
++    }
++
++    public static float readSwappedFloat(final InputStream input) throws IOException {
++        return Float.intBitsToFloat(readSwappedInteger(input));
++    }
++
++    public static int readSwappedInteger(final InputStream input) throws IOException {
++        final int value1 = read(input);
++        final int value2 = read(input);
++        final int value3 = read(input);
++        final int value4 = read(input);
++        return
++            ((value1 & 0xff) << 0) +
++            ((value2 & 0xff) << 8) +
++            ((value3 & 0xff) << 16) +
++            ((value4 & 0xff) << 24);
++    }
++
++    public static long readSwappedLong(final InputStream input) throws IOException {
++        final byte[] bytes = new byte[8];
++        for (int i = 0; i < 8; i++) {
++            bytes[i] = (byte) read(input);
++        }
++        return EndianUtils.readSwappedLong(bytes, 0);
++    }
++
++    public static short readSwappedShort(final InputStream input) throws IOException {
++        return (short) (
++            ((read(input) & 0xff) << 0) +
++            ((read(input) & 0xff) << 8)
++        );
++    }
++
++    public static long readSwappedUnsignedInteger(final InputStream input) throws IOException {
++        final int value1 = read(input);
++        final int value2 = read(input);
++        final int value3 = read(input);
++        final int value4 = read(input);
++        final long low = ((value1 & 0xff) << 0) +
++                         ((value2 & 0xff) << 8) +
++                         ((value3 & 0xff) << 16);
++        final long high = value4 & 0xff;
++        return (high << 24) + (0xffffffffL & low);
++    }
++
++    public static int readSwappedUnsignedShort(final InputStream input) throws IOException {
++        final int value1 = read(input);
++        final int value2 = read(input);
++
++        return ((value1 & 0xff) << 0) +
++               ((value2 & 0xff) << 8);
++    }
++
++    public static void writeSwappedDouble(final OutputStream output, final double value) throws IOException {
++        writeSwappedLong(output, Double.doubleToLongBits(value));
++    }
++
++    public static void writeSwappedFloat(final OutputStream output, final float value) throws IOException {
++        writeSwappedInteger(output, Float.floatToIntBits(value));
++    }
++
++    public static void writeSwappedInteger(final OutputStream output, final int value) throws IOException {
++        output.write((byte) (value >> 0 & 0xff));
++        output.write((byte) (value >> 8 & 0xff));
++        output.write((byte) (value >> 16 & 0xff));
++        output.write((byte) (value >> 24 & 0xff));
++    }
++
++    public static void writeSwappedLong(final OutputStream output, final long value) throws IOException {
++        output.write((byte) (value >> 0 & 0xff));
++        output.write((byte) (value >> 8 & 0xff));
++        output.write((byte) (value >> 16 & 0xff));
++        output.write((byte) (value >> 24 & 0xff));
++        output.write((byte) (value >> 32 & 0xff));
++        output.write((byte) (value >> 40 & 0xff));
++        output.write((byte) (value >> 48 & 0xff));
++        output.write((byte) (value >> 56 & 0xff));
++    }
++
++    public static void writeSwappedShort(final OutputStream output, final short value) throws IOException {
++        output.write((byte) (value >> 0 & 0xff));
++        output.write((byte) (value >> 8 & 0xff));
++    }
++}

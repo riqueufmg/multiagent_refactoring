@@ -1,0 +1,45 @@
+{
+  "id": 1,
+  "goal": "Group the large, cohesive set of FileChannel API overrides and the backing core field into a dedicated implementation class so the FilterFileChannel class is reduced to a thin, clear extension that primarily hosts builder APIs and construction logic.",
+  "files": [
+    "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java",
+    "src/test/java/org/apache/commons/io/channels/FileChannelsTest.java",
+    "src/test/java/org/apache/commons/io/channels/FilterFileChannelTest.java",
+    "src/test/java/org/apache/commons/io/channels/FixedReadSizeFileChannelProxy.java",
+    "src/test/java/org/apache/commons/io/channels/NonBlockingFileChannelProxy.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java",
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "details": "Create a new top-level class FilterFileChannelBase in package org.apache.commons.io.channels that extends java.nio.channels.FileChannel and contains the private final FilterFileChannelCore core field, the two constructors that initialize core (one taking FileChannel, one taking Builder), and all FileChannel API overrides currently implemented in FilterFileChannel (equals, hashCode, implCloseChannel, force, lock, map, position()/position(long), read(...), read(..., long), read(ByteBuffer[],int,int), size, toString, transferFrom, transferTo, truncate, tryLock, unwrap, write(...), write(..., long), write(ByteBuffer[],int,int)). Update the original FilterFileChannel.java to remove the moved field and methods and change its declaration to extend FilterFileChannelBase. Update constructors in FilterFileChannel to call super(...) and preserve nested builder classes and static forFilterFileChannel() factory. Keep package and imports consistent. This operation atomically moves implementation code into the new class and updates the original so the project compiles after the change.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/channels/FileChannelsTest.java",
+        "src/test/java/org/apache/commons/io/channels/FilterFileChannelTest.java",
+        "src/test/java/org/apache/commons/io/channels/FixedReadSizeFileChannelProxy.java",
+        "src/test/java/org/apache/commons/io/channels/NonBlockingFileChannelProxy.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/channels/FileChannelsTest.java",
+    "src/test/java/org/apache/commons/io/channels/FilterFileChannelTest.java",
+    "src/test/java/org/apache/commons/io/channels/FixedReadSizeFileChannelProxy.java",
+    "src/test/java/org/apache/commons/io/channels/NonBlockingFileChannelProxy.java"
+  ]
+}

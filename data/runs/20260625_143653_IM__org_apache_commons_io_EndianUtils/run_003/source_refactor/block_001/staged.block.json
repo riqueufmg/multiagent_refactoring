@@ -1,0 +1,73 @@
+{
+  "id": 1,
+  "goal": "Move all array-based read/write helpers and their helper validateByteArrayOffset out of EndianUtils into a dedicated EndianUtilsArray class to group array-related functionality and reduce the public surface of EndianUtils.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsArray.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.commons.io.EndianUtils#readSwappedDouble(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedFloat(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedInteger(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedLong(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedShort(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedInteger(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedShort(byte[],int)",
+        "org.apache.commons.io.EndianUtils#writeSwappedDouble(byte[],int,double)",
+        "org.apache.commons.io.EndianUtils#writeSwappedFloat(byte[],int,float)",
+        "org.apache.commons.io.EndianUtils#writeSwappedInteger(byte[],int,int)",
+        "org.apache.commons.io.EndianUtils#writeSwappedLong(byte[],int,long)",
+        "org.apache.commons.io.EndianUtils#writeSwappedShort(byte[],int,short)",
+        "org.apache.commons.io.EndianUtils#validateByteArrayOffset(byte[],int,int)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtilsArray.java"
+      ],
+      "details": "Create a new class EndianUtilsArray in package org.apache.commons.io. Move the array-based public static read/write methods and the private helper validateByteArrayOffset into this class. Preserve the original implementations (including the same try-catch behavior that throws IllegalArgumentException on IndexOutOfBoundsException). Ensure EndianUtilsArray keeps references to EndianUtilsSwap and EndianUtilsStream as required by the implementations. Make methods public static so callers can use them directly.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.apache.commons.io.EndianUtils#readSwappedDouble(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedFloat(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedInteger(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedLong(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedShort(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedInteger(byte[],int)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedShort(byte[],int)",
+        "org.apache.commons.io.EndianUtils#writeSwappedDouble(byte[],int,double)",
+        "org.apache.commons.io.EndianUtils#writeSwappedFloat(byte[],int,float)",
+        "org.apache.commons.io.EndianUtils#writeSwappedInteger(byte[],int,int)",
+        "org.apache.commons.io.EndianUtils#writeSwappedLong(byte[],int,long)",
+        "org.apache.commons.io.EndianUtils#writeSwappedShort(byte[],int,short)",
+        "org.apache.commons.io.EndianUtils#validateByteArrayOffset(byte[],int,int)"
+      ],
+      "outputs": [
+        "org.apache.commons.io.EndianUtilsArray#<same signatures>"
+      ],
+      "details": "Move the method bodies from EndianUtils into EndianUtilsArray. After this step EndianUtilsArray will contain the full implementations for array-based operations and the validator. Keep EndianUtils methods unchanged for now (they will be updated in a later step) to avoid breaking the build while new class appears.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

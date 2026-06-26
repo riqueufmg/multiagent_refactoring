@@ -137,6 +137,29 @@ def set_planner_contract_path(
     return cfg
 
 
+def set_source_refactor_contract_path(
+    quality_checker_cfg: dict[str, Any],
+    contract_path: Path,
+) -> dict[str, Any]:
+    cfg = deepcopy(quality_checker_cfg)
+    contract = str(contract_path)
+
+    # Main expected locations.
+    cfg.setdefault("input", {})
+    cfg["input"]["source_refactor_contract"] = contract
+    cfg["input"]["source_refactor_contract_path"] = contract
+
+    # Extra aliases. They are harmless if ignored by the MVP.
+    cfg["source_refactor_contract"] = contract
+    cfg["source_refactor_contract_path"] = contract
+
+    cfg.setdefault("source_refactor", {})
+    cfg["source_refactor"]["contract"] = contract
+    cfg["source_refactor"]["contract_path"] = contract
+
+    return cfg
+
+
 def run_command(
     cmd: list[str],
     cwd: Path,
@@ -208,6 +231,241 @@ def detect_planner_stop_reason(
 
     return "planner_contract_not_ok", details
 
+def get_optional(data: dict[str, Any] | None, dotted_key: str, default: Any = None) -> Any:
+    if not isinstance(data, dict):
+        return default
+
+    current: Any = data
+
+    for part in dotted_key.split("."):
+        if not isinstance(current, dict) or part not in current:
+            return default
+        current = current[part]
+
+    return current
+
+
+def json_exists(path: Path) -> bool:
+    return path.exists() and path.is_file()
+
+
+def build_run_summary(run_dir: Path) -> dict[str, Any]:
+    run_id = run_dir.name
+
+    planner_contract_path = run_dir / "planner" / "contract.json"
+    planner_status_path = run_dir / "planner" / "status.json"
+
+    source_contract_path = run_dir / "source_refactor" / "contract.json"
+    source_status_path = run_dir / "source_refactor" / "status.json"
+
+    checker_contract_path = run_dir / "quality_checker" / "contract.json"
+    checker_status_path = run_dir / "quality_checker" / "status.json"
+    checker_skipped_path = run_dir / "quality_checker.skipped.json"
+
+    planner_contract = read_json_if_exists(planner_contract_path)
+    planner_status = read_json_if_exists(planner_status_path)
+
+    source_contract = read_json_if_exists(source_contract_path)
+    source_status = read_json_if_exists(source_status_path)
+
+    checker_contract = read_json_if_exists(checker_contract_path)
+    checker_status = read_json_if_exists(checker_status_path)
+    checker_skipped = read_json_if_exists(checker_skipped_path)
+
+    source_execution = get_optional(source_contract, "execution", {}) or {}
+    source_commits = get_optional(source_contract, "commits", {}) or {}
+
+    checker_smells = get_optional(checker_status, "smells", {}) or {}
+    checker_metrics = get_optional(checker_status, "metrics", {}) or {}
+    checker_refactoringminer = get_optional(checker_status, "refactoringminer", {}) or {}
+
+    return {
+        "run_id": run_id,
+        "paths": {
+            "run_dir": str(run_dir),
+            "planner_config": str(run_dir / "planner.config.yml"),
+            "source_refactor_config": str(run_dir / "source_refactor.config.yml"),
+            "quality_checker_config": str(run_dir / "quality_checker.config.yml"),
+            "planner_stdout": str(run_dir / "planner.stdout.txt"),
+            "planner_stderr": str(run_dir / "planner.stderr.txt"),
+            "source_refactor_stdout": str(run_dir / "source_refactor.stdout.txt"),
+            "source_refactor_stderr": str(run_dir / "source_refactor.stderr.txt"),
+            "quality_checker_stdout": str(run_dir / "quality_checker.stdout.txt"),
+            "quality_checker_stderr": str(run_dir / "quality_checker.stderr.txt"),
+        },
+        "planner": {
+            "contract_exists": json_exists(planner_contract_path),
+            "status_exists": json_exists(planner_status_path),
+            "ok": get_optional(planner_contract, "ok", None),
+            "target_has_smell": get_optional(planner_status, "target_has_smell", None),
+            "plan_ok": get_optional(planner_status, "plan_ok", None),
+            "contract_path": str(planner_contract_path) if planner_contract_path.exists() else "",
+            "status_path": str(planner_status_path) if planner_status_path.exists() else "",
+        },
+        "source_refactor": {
+            "contract_exists": json_exists(source_contract_path),
+            "status_exists": json_exists(source_status_path),
+            "ok": get_optional(source_contract, "ok", None),
+            "contract_path": str(source_contract_path) if source_contract_path.exists() else "",
+            "status_path": str(source_status_path) if source_status_path.exists() else "",
+            "execution": {
+                "blocks_count": source_execution.get("blocks_count", None),
+                "blocks_applied": source_execution.get("blocks_applied", None),
+                "blocks_failed": source_execution.get("blocks_failed", None),
+                "failed_block_id": source_execution.get("failed_block_id", ""),
+                "failed_stage": source_execution.get("failed_stage", ""),
+                "rolled_back": source_execution.get("rolled_back", None),
+                "rollback_reason": source_execution.get("rollback_reason", ""),
+                "stop_reason": source_execution.get("stop_reason", ""),
+            },
+            "commits": {
+                "initial_commit": source_commits.get("initial_commit", ""),
+                "last_good_commit": source_commits.get("last_good_commit", ""),
+                "final_commit": source_commits.get("final_commit", ""),
+            },
+        },
+        "quality_checker": {
+            "contract_exists": json_exists(checker_contract_path),
+            "status_exists": json_exists(checker_status_path),
+            "skipped": checker_skipped is not None,
+            "skip_reason": get_optional(checker_skipped, "reason", ""),
+            "ok": get_optional(checker_status, "ok", None),
+            "contract_path": str(checker_contract_path) if checker_contract_path.exists() else "",
+            "status_path": str(checker_status_path) if checker_status_path.exists() else "",
+            "designite": {
+                "before_ok": get_optional(checker_status, "designite.before_ok", None),
+                "after_ok": get_optional(checker_status, "designite.after_ok", None),
+                "before_dir": get_optional(checker_status, "designite.before_dir", ""),
+                "after_dir": get_optional(checker_status, "designite.after_dir", ""),
+            },
+            "smells": {
+                "before_count": checker_smells.get("before_count", None),
+                "after_count": checker_smells.get("after_count", None),
+                "removed_count": checker_smells.get("removed_count", None),
+                "added_count": checker_smells.get("added_count", None),
+                "persisted_count": checker_smells.get("persisted_count", None),
+                "removed": checker_smells.get("removed", []),
+                "added": checker_smells.get("added", []),
+            },
+            "metrics": {
+                "target": checker_metrics.get("target", ""),
+                "values": checker_metrics.get("values", {}),
+            },
+            "refactoringminer": {
+                "enabled": checker_refactoringminer.get("enabled", None),
+                "ok": checker_refactoringminer.get("ok", None),
+                "refactorings_count": checker_refactoringminer.get(
+                    "refactorings_count",
+                    None,
+                ),
+                "types": checker_refactoringminer.get("types", {}),
+                "json_path": checker_refactoringminer.get("json_path", ""),
+            },
+        },
+    }
+
+
+def build_instance_summary(
+    *,
+    instance_dir: Path,
+    orchestrator_cfg: dict[str, Any],
+    runs_requested: int,
+) -> dict[str, Any]:
+    run_dirs = sorted(
+        p for p in instance_dir.iterdir()
+        if p.is_dir() and re.fullmatch(r"run_\d{3}", p.name)
+    )
+
+    runs_summary = [build_run_summary(run_dir) for run_dir in run_dirs]
+
+    planner_contracts = [
+        r for r in runs_summary
+        if r["planner"]["contract_exists"]
+    ]
+    source_contracts = [
+        r for r in runs_summary
+        if r["source_refactor"]["contract_exists"]
+    ]
+    checker_statuses = [
+        r for r in runs_summary
+        if r["quality_checker"]["status_exists"]
+    ]
+
+    stop = read_json_if_exists(instance_dir / "stop.json")
+
+    return {
+        "summary_version": "1.0",
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "instance_dir": str(instance_dir),
+        "config_path": str(instance_dir / "config.yml"),
+        "target": {
+            "project": get_optional(orchestrator_cfg, "project.name", ""),
+            "repo_path": get_optional(orchestrator_cfg, "project.repo_path", ""),
+            "smell": get_optional(orchestrator_cfg, "target.smell", ""),
+            "smell_name": get_optional(orchestrator_cfg, "target.smell_name", ""),
+            "target_type": get_optional(orchestrator_cfg, "target.target_type", ""),
+            "target_name": get_optional(orchestrator_cfg, "target.target_name", ""),
+        },
+        "runs_requested": runs_requested,
+        "runs_found": len(runs_summary),
+        "stop": stop or {},
+        "counts": {
+            "planner_contracts": len(planner_contracts),
+            "planner_ok": sum(
+                1 for r in runs_summary
+                if r["planner"]["ok"] is True
+            ),
+            "source_refactor_contracts": len(source_contracts),
+            "source_refactor_ok": sum(
+                1 for r in runs_summary
+                if r["source_refactor"]["ok"] is True
+            ),
+            "quality_checker_statuses": len(checker_statuses),
+            "quality_checker_ok": sum(
+                1 for r in runs_summary
+                if r["quality_checker"]["ok"] is True
+            ),
+            "quality_checker_skipped": sum(
+                1 for r in runs_summary
+                if r["quality_checker"]["skipped"] is True
+            ),
+            "smells_removed_total": sum(
+                int(r["quality_checker"]["smells"]["removed_count"] or 0)
+                for r in runs_summary
+            ),
+            "smells_added_total": sum(
+                int(r["quality_checker"]["smells"]["added_count"] or 0)
+                for r in runs_summary
+            ),
+            "refactorings_total": sum(
+                int(
+                    r["quality_checker"]["refactoringminer"][
+                        "refactorings_count"
+                    ] or 0
+                )
+                for r in runs_summary
+            ),
+        },
+        "runs": runs_summary,
+    }
+
+
+def write_instance_summary(
+    *,
+    instance_dir: Path,
+    orchestrator_cfg: dict[str, Any],
+    runs_requested: int,
+) -> Path:
+    summary = build_instance_summary(
+        instance_dir=instance_dir,
+        orchestrator_cfg=orchestrator_cfg,
+        runs_requested=runs_requested,
+    )
+
+    summary_path = instance_dir / "summary.json"
+    write_json(summary_path, summary)
+
+    return summary_path
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -232,6 +490,12 @@ def main() -> int:
 
     write_yaml(instance_dir / "config.yml", orchestrator_cfg)
 
+    write_instance_summary(
+        instance_dir=instance_dir,
+        orchestrator_cfg=orchestrator_cfg,
+        runs_requested=runs,
+    )
+
     planner_base_config_path = Path(
         require(orchestrator_cfg, "planner.base_config")
     ).resolve()
@@ -240,8 +504,13 @@ def main() -> int:
         require(orchestrator_cfg, "source_refactor.base_config")
     ).resolve()
 
+    quality_checker_base_config_path = Path(
+        require(orchestrator_cfg, "quality_checker.base_config")
+    ).resolve()
+
     planner_base_cfg = load_yaml(planner_base_config_path)
     source_base_cfg = load_yaml(source_base_config_path)
+    quality_checker_base_cfg = load_yaml(quality_checker_base_config_path)
 
     print(f"Instance dir: {instance_dir}")
     print(f"Target: {target_name}")
@@ -255,6 +524,7 @@ def main() -> int:
 
         print(f"\n=== {run_id} / {runs} ===")
 
+        # Planner
         planner_cfg = set_common_mvp_config(
             base_cfg=planner_base_cfg,
             orchestrator_cfg=orchestrator_cfg,
@@ -293,14 +563,20 @@ def main() -> int:
                 },
             )
 
+            write_instance_summary(
+                instance_dir=instance_dir,
+                orchestrator_cfg=orchestrator_cfg,
+                runs_requested=runs,
+            )
+
             break
 
-        contract_path = instance_dir / run_id / "planner" / "contract.json"
-        status_path = instance_dir / run_id / "planner" / "status.json"
+        planner_contract_path = instance_dir / run_id / "planner" / "contract.json"
+        planner_status_path = instance_dir / run_id / "planner" / "status.json"
 
         stop_reason, stop_details = detect_planner_stop_reason(
-            contract_path=contract_path,
-            status_path=status_path,
+            contract_path=planner_contract_path,
+            status_path=planner_status_path,
         )
 
         if stop_reason is not None:
@@ -313,10 +589,17 @@ def main() -> int:
                 details=stop_details,
             )
 
+            write_instance_summary(
+                instance_dir=instance_dir,
+                orchestrator_cfg=orchestrator_cfg,
+                runs_requested=runs,
+            )
+
             break
 
-        print(f"Planner contract: {contract_path}")
+        print(f"Planner contract: {planner_contract_path}")
 
+        # SourceRefactor
         source_cfg_base = set_common_mvp_config(
             base_cfg=source_base_cfg,
             orchestrator_cfg=orchestrator_cfg,
@@ -326,7 +609,7 @@ def main() -> int:
 
         source_cfg = set_planner_contract_path(
             source_cfg_base,
-            contract_path=contract_path,
+            contract_path=planner_contract_path,
         )
 
         source_cfg_path = run_dir / "source_refactor.config.yml"
@@ -350,9 +633,95 @@ def main() -> int:
         else:
             print("SourceRefactor finished")
 
+        source_refactor_contract_path = (
+            instance_dir / run_id / "source_refactor" / "contract.json"
+        )
+
+        # QualityChecker
+        if not source_refactor_contract_path.exists():
+            print("QualityChecker skipped: missing source_refactor contract")
+
+            write_json(
+                run_dir / "quality_checker.skipped.json",
+                {
+                    "skipped": True,
+                    "reason": "missing_source_refactor_contract",
+                    "source_refactor_contract": str(source_refactor_contract_path),
+                    "source_refactor_return_code": source_result.returncode,
+                },
+            )
+
+            write_instance_summary(
+                instance_dir=instance_dir,
+                orchestrator_cfg=orchestrator_cfg,
+                runs_requested=runs,
+            )
+
+            continue
+
+        quality_checker_cfg_base = set_common_mvp_config(
+            base_cfg=quality_checker_base_cfg,
+            orchestrator_cfg=orchestrator_cfg,
+            instance_dir=instance_dir,
+            run_id=run_id,
+        )
+
+        quality_checker_cfg = set_source_refactor_contract_path(
+            quality_checker_cfg_base,
+            contract_path=source_refactor_contract_path,
+        )
+
+        quality_checker_cfg_path = run_dir / "quality_checker.config.yml"
+        write_yaml(quality_checker_cfg_path, quality_checker_cfg)
+
+        quality_checker_cmd = [
+            sys.executable,
+            "-m",
+            "mvp.quality_checker.run",
+            "--config",
+            str(quality_checker_cfg_path),
+        ]
+
+        quality_checker_result = run_command(
+            quality_checker_cmd,
+            cwd=project_root,
+        )
+
+        write_text(
+            run_dir / "quality_checker.stdout.txt",
+            quality_checker_result.stdout,
+        )
+        write_text(
+            run_dir / "quality_checker.stderr.txt",
+            quality_checker_result.stderr,
+        )
+
+        if quality_checker_result.returncode != 0:
+            print(
+                "QualityChecker failed with return code "
+                f"{quality_checker_result.returncode}"
+            )
+        else:
+            print("QualityChecker finished")
+        
+        summary_path = write_instance_summary(
+            instance_dir=instance_dir,
+            orchestrator_cfg=orchestrator_cfg,
+            runs_requested=runs,
+        )
+
+        print(f"Summary updated: {summary_path}")
+
+    summary_path = write_instance_summary(
+        instance_dir=instance_dir,
+        orchestrator_cfg=orchestrator_cfg,
+        runs_requested=runs,
+    )
+
+    print(f"\nSummary: {summary_path}")
+
     print(f"\nDone: {instance_dir}")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

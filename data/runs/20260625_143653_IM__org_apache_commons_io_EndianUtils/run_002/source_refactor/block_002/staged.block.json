@@ -1,0 +1,38 @@
+{
+  "id": 2,
+  "goal": "Reduce EndianUtils size by replacing the moved byte-array method implementations with stable delegating wrappers to preserve the existing public API while moving implementation details to EndianUtilsArray.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsArray.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java"
+      ],
+      "details": "Replace the bodies of the following EndianUtils methods with one-line delegating calls to EndianUtilsArray: readSwappedDouble(byte[], int) -> return EndianUtilsArray.readSwappedDouble(data, offset); readSwappedFloat(byte[], int) -> delegate; readSwappedInteger(byte[], int) -> delegate; readSwappedLong(byte[], int) -> delegate; readSwappedShort(byte[], int) -> delegate; readSwappedUnsignedInteger(byte[], int) -> delegate; readSwappedUnsignedShort(byte[], int) -> delegate; writeSwappedDouble(byte[], int, double) -> EndianUtilsArray.writeSwappedDouble(...); writeSwappedFloat(byte[], int, float) -> delegate; writeSwappedInteger(byte[], int, int) -> delegate; writeSwappedLong(byte[], int, long) -> delegate; writeSwappedShort(byte[], int, short) -> delegate. Keep the original method signatures and visibility so external call sites do not need updating. No change to stream-based methods or swap methods which already delegate to EndianUtilsStream and EndianUtilsSwap.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

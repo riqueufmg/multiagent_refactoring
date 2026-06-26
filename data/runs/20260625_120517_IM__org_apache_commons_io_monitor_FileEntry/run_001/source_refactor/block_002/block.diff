@@ -1,0 +1,233 @@
+commit ea916a604ad4219ae417f280d0a20aa015b5c13c
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 12:24:30 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/monitor/FileAttributes.java b/src/main/java/org/apache/commons/io/monitor/FileAttributes.java
+index cda244b21..37d87d0ba 100644
+--- a/src/main/java/org/apache/commons/io/monitor/FileAttributes.java
++++ b/src/main/java/org/apache/commons/io/monitor/FileAttributes.java
+@@ -2,13 +2,16 @@
+ 
+ import java.io.File;
+ import java.io.IOException;
++import java.io.Serializable;
+ import java.nio.file.Files;
+ import java.nio.file.attribute.FileTime;
+ 
+ import org.apache.commons.io.FileUtils;
+ import org.apache.commons.io.file.attribute.FileTimes;
+ 
+-public class FileAttributes {
++public class FileAttributes implements Serializable {
++
++    private static final long serialVersionUID = 1L;
+ 
+     private String name;
+     private boolean exists;
+diff --git a/src/main/java/org/apache/commons/io/monitor/FileEntry.java b/src/main/java/org/apache/commons/io/monitor/FileEntry.java
+index fac331795..cf26467f2 100644
+--- a/src/main/java/org/apache/commons/io/monitor/FileEntry.java
++++ b/src/main/java/org/apache/commons/io/monitor/FileEntry.java
+@@ -17,15 +17,10 @@
+ package org.apache.commons.io.monitor;
+ 
+ import java.io.File;
+-import java.io.IOException;
+ import java.io.Serializable;
+-import java.nio.file.Files;
+ import java.nio.file.attribute.FileTime;
+ import java.util.Objects;
+ 
+-import org.apache.commons.io.FileUtils;
+-import org.apache.commons.io.file.attribute.FileTimes;
+-
+ /**
+  * The state of a file or directory, capturing the following {@link File} attributes at a point in time.
+  * <ul>
+@@ -67,20 +62,8 @@ public class FileEntry implements Serializable {
+     /** Monitored file. */
+     private final File file;
+ 
+-    /** Monitored file name. */
+-    private String name;
+-
+-    /** Whether the file exists. */
+-    private boolean exists;
+-
+-    /** Whether the file is a directory or not. */
+-    private boolean directory;
+-
+-    /** The file's last modified timestamp. */
+-    private SerializableFileTime lastModified = SerializableFileTime.EPOCH;
+-
+-    /** The file's length. */
+-    private long length;
++    /** Attribute holder. */
++    private final FileAttributes attributes;
+ 
+     /**
+      * Constructs a new monitor for a specified {@link File}.
+@@ -100,7 +83,7 @@ public FileEntry(final File file) {
+     public FileEntry(final FileEntry parent, final File file) {
+         this.file = Objects.requireNonNull(file, "file");
+         this.parent = parent;
+-        this.name = file.getName();
++        this.attributes = new FileAttributes(file);
+     }
+ 
+     /**
+@@ -130,7 +113,7 @@ public File getFile() {
+      * @return the last modified time in milliseconds.
+      */
+     public long getLastModified() {
+-        return lastModified.toMillis();
++        return attributes.getLastModified();
+     }
+ 
+     /**
+@@ -140,7 +123,7 @@ public long getLastModified() {
+      * @since 2.12.0
+      */
+     public FileTime getLastModifiedFileTime() {
+-        return lastModified.unwrap();
++        return attributes.getLastModifiedFileTime();
+     }
+ 
+     /**
+@@ -149,7 +132,7 @@ public FileTime getLastModifiedFileTime() {
+      * @return the length.
+      */
+     public long getLength() {
+-        return length;
++        return attributes.getLength();
+     }
+ 
+     /**
+@@ -167,7 +150,7 @@ public int getLevel() {
+      * @return the file name.
+      */
+     public String getName() {
+-        return name;
++        return attributes.getName();
+     }
+ 
+     /**
+@@ -185,7 +168,7 @@ public FileEntry getParent() {
+      * @return whether the file is a directory or not.
+      */
+     public boolean isDirectory() {
+-        return directory;
++        return attributes.isDirectory();
+     }
+ 
+     /**
+@@ -195,7 +178,7 @@ public boolean isDirectory() {
+      * @return whether the file existed.
+      */
+     public boolean isExists() {
+-        return exists;
++        return attributes.isExists();
+     }
+ 
+     /**
+@@ -229,26 +212,20 @@ public FileEntry newChildInstance(final File file) {
+      * @return {@code true} if the file has changed, otherwise {@code false}.
+      */
+     public boolean refresh(final File file) {
+-        // cache original values
+-        final boolean origExists = exists;
+-        final SerializableFileTime origLastModified = lastModified;
+-        final boolean origDirectory = directory;
+-        final long origLength = length;
+-
+-        // refresh the values
+-        name = file.getName();
+-        exists = Files.exists(file.toPath());
+-        directory = exists && file.isDirectory();
+-        try {
+-            setLastModified(exists ? FileUtils.lastModifiedFileTime(file) : FileTimes.EPOCH);
+-        } catch (final IOException e) {
+-            setLastModified(SerializableFileTime.EPOCH);
+-        }
+-        length = exists && !directory ? file.length() : 0;
+-
+-        // Return if there are changes
+-        return exists != origExists || !lastModified.equals(origLastModified) || directory != origDirectory
+-            || length != origLength;
++        // cache original values from attributes
++        final boolean origExists = attributes.isExists();
++        final long origLastModified = attributes.getLastModified();
++        final boolean origDirectory = attributes.isDirectory();
++        final long origLength = attributes.getLength();
++
++        // refresh attributes
++        attributes.refresh(file);
++
++        // Return if there are changes (only consider these attributes as before)
++        return attributes.isExists() != origExists
++            || attributes.getLastModified() != origLastModified
++            || attributes.isDirectory() != origDirectory
++            || attributes.getLength() != origLength;
+     }
+ 
+     /**
+@@ -266,7 +243,7 @@ public void setChildren(final FileEntry... children) {
+      * @param directory whether the file is a directory or not.
+      */
+     public void setDirectory(final boolean directory) {
+-        this.directory = directory;
++        attributes.setDirectory(directory);
+     }
+ 
+     /**
+@@ -276,7 +253,7 @@ public void setDirectory(final boolean directory) {
+      * @param exists whether the file exists or not.
+      */
+     public void setExists(final boolean exists) {
+-        this.exists = exists;
++        attributes.setExists(exists);
+     }
+ 
+     /**
+@@ -286,7 +263,7 @@ public void setExists(final boolean exists) {
+      * @since 2.12.0
+      */
+     public void setLastModified(final FileTime lastModified) {
+-        setLastModified(new SerializableFileTime(lastModified));
++        attributes.setLastModified(lastModified);
+     }
+ 
+     /**
+@@ -296,11 +273,11 @@ public void setLastModified(final FileTime lastModified) {
+      * @param lastModified The last modified time in milliseconds.
+      */
+     public void setLastModified(final long lastModified) {
+-        setLastModified(FileTime.fromMillis(lastModified));
++        attributes.setLastModified(lastModified);
+     }
+ 
+     void setLastModified(final SerializableFileTime lastModified) {
+-        this.lastModified = lastModified;
++        attributes.setLastModified(lastModified);
+     }
+ 
+     /**
+@@ -309,7 +286,7 @@ void setLastModified(final SerializableFileTime lastModified) {
+      * @param length the length.
+      */
+     public void setLength(final long length) {
+-        this.length = length;
++        attributes.setLength(length);
+     }
+ 
+     /**
+@@ -318,6 +295,6 @@ public void setLength(final long length) {
+      * @param name the file name.
+      */
+     public void setName(final String name) {
+-        this.name = name;
++        attributes.setName(name);
+     }
+ }

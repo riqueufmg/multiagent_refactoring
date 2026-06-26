@@ -1,0 +1,85 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.monitor.FileEntry",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the public surface and implementation size of FileEntry by moving attribute-related state and all attribute accessors into a new, cohesive helper class in the same package. This removes many public methods from FileEntry that are simple delegations and groups attribute concerns together.",
+      "files": [
+        "src/main/java/org/apache/commons/io/monitor/FileEntry.java",
+        "src/main/java/org/apache/commons/io/monitor/FileEntryState.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java",
+            "src/main/java/org/apache/commons/io/monitor/FileEntryState.java"
+          ],
+          "details": "Create a new class FileEntryState in package org.apache.commons.io.monitor. Move the existing field 'private final FileAttributes attributes;' out of FileEntry into FileEntryState as a private final FileAttributes attributes; implement in FileEntryState the attribute-related methods currently on FileEntry: getLastModified(), getLastModifiedFileTime(), getLength(), getName(), isDirectory(), isExists(), refresh(File), setDirectory(boolean), setExists(boolean), setLastModified(FileTime), setLastModified(long), setLastModified(SerializableFileTime) (package-private), setLength(long), setName(String). Provide a constructor FileEntryState(File) that constructs the underlying FileAttributes(file). The moved refresh(File) implementation must preserve original semantics (cache original values, call attributes.refresh(file), then compare and return boolean). Ensure FileEntryState is placed in the same package (org.apache.commons.io.monitor).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "details": "Replace direct references to 'attributes' in FileEntry with a single final field 'state' of type FileEntryState. Update constructor(s) in FileEntry to set this.state = new FileEntryState(file). Replace calls like 'attributes.getLastModified()' with 'state.getLastModified()', etc. Remove the moved methods from FileEntry and keep only methods that are intrinsic to the tree structure (getChildren, getFile, getLevel, getParent, newChildInstance, setChildren). Keep getFile()/getChildren() semantics unchanged.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntryState.java",
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntryState.java",
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "details": "Ensure necessary imports are present (java.io.File, java.nio.file.attribute.FileTime, java.io.Serializable or SerializableFileTime as already used). No new external packages are introduced; imports mirror those in the original FileEntry where required.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Expose a single attribute-holder accessor to callers who need attribute information so external code can use the new class instead of many FileEntry methods, enabling future removal of simple delegating methods and improving cohesion.",
+      "files": [
+        "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntryState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntryState.java",
+            "src/main/java/org/apache/commons/io/monitor/FileEntryAttributes.java"
+          ],
+          "details": "Extract an interface FileEntryAttributes in the same package that declares the attribute accessors: getLastModified(), getLastModifiedFileTime(), getLength(), getName(), isDirectory(), isExists(), refresh(File), setDirectory(boolean), setExists(boolean), setLastModified(FileTime), setLastModified(long), setLength(long), setName(String). Have FileEntryState implement FileEntryAttributes. This provides a stable, narrow type for callers to depend on.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/monitor/FileEntry.java"
+          ],
+          "details": "Add a new accessor on FileEntry: public FileEntryAttributes getAttributes() { return state; } and update any internal uses to prefer state or getAttributes(). Do not remove existing public methods in this step; this provides a migration path for external clients to use the new attribute holder type.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

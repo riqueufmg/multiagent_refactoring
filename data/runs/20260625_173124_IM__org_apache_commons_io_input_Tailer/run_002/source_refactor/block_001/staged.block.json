@@ -1,0 +1,66 @@
+{
+  "id": 1,
+  "goal": "Reduce the number of public methods on Tailer by moving the deprecated static factory methods into a dedicated helper class, keeping Tailer focused on tailing behavior.",
+  "files": [
+    "src/main/java/org/apache/commons/io/input/Tailer.java",
+    "src/main/java/org/apache/commons/io/input/TailerFactory.java",
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "public static Tailer create(File file, Charset charset, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen, int bufferSize)",
+        "public static Tailer create(File file, TailerListener tailerListener)",
+        "public static Tailer create(File file, TailerListener tailerListener, long delayMillis)",
+        "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end)",
+        "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen)",
+        "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen, int bufferSize)",
+        "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, int bufferSize)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/TailerFactory.java"
+      ],
+      "details": "Create a new top-level class org.apache.commons.io.input.TailerFactory that contains the seven deprecated static create(...) factory methods currently on Tailer. Each method in TailerFactory will delegate to Tailer.builder() or to the existing Tailer constructors exactly as the original implementations do (preserving deprecation and behavior). Remove these static methods from Tailer so Tailer has fewer public methods and a smaller public API surface.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "TailerFactory.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/TailerFactory.java"
+      ],
+      "details": "Add necessary imports to TailerFactory (java.io.File, java.nio.charset.Charset, java.time.Duration and org.apache.commons.io.input.Tailer and TailerListener) matching usages in the moved implementations.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "All calls to org.apache.commons.io.input.Tailer.create(...) in the codebase"
+      ],
+      "outputs": [
+        "All updated call sites referencing org.apache.commons.io.input.TailerFactory.create(...)"
+      ],
+      "details": "Replace usages of Tailer.create(...) with TailerFactory.create(...) across the codebase to preserve external behavior. Keep deprecated annotation and javadoc semantics on the moved methods. Note: tests will be updated separately.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ]
+}

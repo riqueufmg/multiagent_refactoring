@@ -1,0 +1,127 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.channels.FilterFileChannel",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a small helper class that owns the wrapped FileChannel and all direct delegation logic so the FilterFileChannel class can be reduced to a thin fa\u00e7ade.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+          ],
+          "details": "Create a new class FilterFileChannelDelegate in package org.apache.commons.io.channels. The class holds a final FileChannel fileChannel and implements all low-level delegation methods currently present in FilterFileChannel that directly forward to the wrapped FileChannel (equals, hashCode, implCloseChannel, force, lock, map, position(), position(long), read(ByteBuffer), read(ByteBuffer,long), read(ByteBuffer[],int,int), size, toString, transferFrom, transferTo, truncate, tryLock, write(ByteBuffer), write(ByteBuffer,long), write(ByteBuffer[],int,int), and an unwrap() method returning the wrapped FileChannel). The delegate's constructor accepts a FileChannel. The new class uses only JDK types already imported in the original file (java.io.IOException, java.nio.*, java.nio.channels.*). The implementations simply forward to fileChannel. This file is added alongside the existing FilterFileChannel class in the same package.",
+          "risk": "low"
+        }
+      ],
+      "test_files": []
+    },
+    {
+      "id": 2,
+      "goal": "Reduce size and surface area of FilterFileChannel by moving the wrapped FileChannel field and all direct forwarding methods into the new delegate class and adapt constructors to use the delegate.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java",
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java",
+        "src/test/java/org/apache/commons/io/channels/FileChannelsTest.java",
+        "src/test/java/org/apache/commons/io/channels/FilterFileChannelTest.java",
+        "src/test/java/org/apache/commons/io/channels/FixedReadSizeFileChannelProxy.java",
+        "src/test/java/org/apache/commons/io/channels/NonBlockingFileChannelProxy.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:fileChannel"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java:fileChannel"
+          ],
+          "details": "Move the final FileChannel fileChannel field out of FilterFileChannel into FilterFileChannelDelegate. Replace the original field in FilterFileChannel with a private final FilterFileChannelDelegate delegate field. Update constructors so they initialize delegate = new FilterFileChannelDelegate(builder.getChannel(FileChannel.class)) and delegate = new FilterFileChannelDelegate(fileChannel) respectively.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:equals(Object)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:hashCode()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:implCloseChannel()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:force(boolean)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:lock(long,long,boolean)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:map(MapMode,long,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:position()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:position(long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:read(ByteBuffer)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:read(ByteBuffer,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:read(ByteBuffer[],int,int)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:size()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:toString()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:transferFrom(ReadableByteChannel,long,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:transferTo(long,long,WritableByteChannel)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:truncate(long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:tryLock(long,long,boolean)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:unwrap()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:write(ByteBuffer)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:write(ByteBuffer,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:write(ByteBuffer[],int,int)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+          ],
+          "details": "Move all listed methods that directly forward to the wrapped FileChannel into FilterFileChannelDelegate. Each moved method should perform the same forwarding to the delegate's internal fileChannel. Remove the bodies of these methods from FilterFileChannel (leave method declarations only if subclasses of FilterFileChannel are expected to override them; otherwise remove entirely).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "details": "Update all call sites inside FilterFileChannel to call the corresponding methods on the delegate field (e.g., delegate.size(), delegate.read(dst), delegate.force(metaData), delegate.unwrap(), etc.). Ensure constructors use the delegate as described. Preserve the public API of FilterFileChannel by delegating public calls to the delegate methods so external callers observe the same behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+          ],
+          "details": "Ensure both files import the JDK types they use (java.io.IOException, java.nio.ByteBuffer, java.nio.MappedByteBuffer, java.nio.channels.FileChannel, FileLock, ReadableByteChannel, WritableByteChannel, and java.util.Objects if needed). The delegate class requires the same imports used by the original delegation code.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/io/channels/FileChannelsTest.java",
+            "src/test/java/org/apache/commons/io/channels/FilterFileChannelTest.java",
+            "src/test/java/org/apache/commons/io/channels/FixedReadSizeFileChannelProxy.java",
+            "src/test/java/org/apache/commons/io/channels/NonBlockingFileChannelProxy.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/io/channels/FileChannelsTest.java",
+        "src/test/java/org/apache/commons/io/channels/FilterFileChannelTest.java",
+        "src/test/java/org/apache/commons/io/channels/FixedReadSizeFileChannelProxy.java",
+        "src/test/java/org/apache/commons/io/channels/NonBlockingFileChannelProxy.java"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.EndianUtils",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Group and move all InputStream/OutputStream-based read/write methods into a dedicated helper class to separate stream I/O concerns from byte-array and swap logic, reducing the size and complexity of EndianUtils.",
+      "files": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "public static double readSwappedDouble(InputStream)",
+            "public static float readSwappedFloat(InputStream)",
+            "public static int readSwappedInteger(InputStream)",
+            "public static long readSwappedLong(InputStream)",
+            "public static short readSwappedShort(InputStream)",
+            "public static long readSwappedUnsignedInteger(InputStream)",
+            "public static int readSwappedUnsignedShort(InputStream)",
+            "public static void writeSwappedDouble(OutputStream, double)",
+            "public static void writeSwappedFloat(OutputStream, float)",
+            "public static void writeSwappedInteger(OutputStream, int)",
+            "public static void writeSwappedLong(OutputStream, long)",
+            "public static void writeSwappedShort(OutputStream, short)",
+            "private static int read(InputStream)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+          ],
+          "details": "Create a new public final class org.apache.commons.io.EndianUtilsStream containing the implementations of the listed InputStream/OutputStream-based methods and the private read(InputStream) helper. In EndianUtils, replace the bodies of the moved methods with delegating implementations that call the corresponding EndianUtilsStream methods (preserve method signatures in EndianUtils to keep API compatibility). Ensure EndianUtilsStream uses the same imports (java.io.InputStream, java.io.OutputStream, java.io.IOException, java.io.EOFException) and that read(InputStream) is private within EndianUtilsStream. Keep EndianUtils' byte-array based methods and validateByteArrayOffset unchanged.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/EndianUtils.java",
+            "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/EndianUtils.java",
+            "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+          ],
+          "details": "Ensure EndianUtils imports remain unchanged. Add necessary imports to EndianUtilsStream: java.io.InputStream, java.io.OutputStream, java.io.IOException, java.io.EOFException and static import of IOUtils.EOF if required. Update package declaration to org.apache.commons.io.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Group and move all endianness 'swap' operations into a dedicated helper class so EndianUtils focuses on reading/writing and validation responsibilities.",
+      "files": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "public static double swapDouble(double)",
+            "public static float swapFloat(float)",
+            "public static int swapInteger(int)",
+            "public static long swapLong(long)",
+            "public static short swapShort(short)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+          ],
+          "details": "Create a new public final class org.apache.commons.io.EndianUtilsSwap containing the implementations of the listed swap methods. In EndianUtils, replace the bodies of these swap methods with delegating calls to EndianUtilsSwap.swapDouble(...), etc., preserving the original public signatures in EndianUtils for API compatibility. Ensure EndianUtilsSwap is in package org.apache.commons.io and uses only java.lang classes (no extra imports).",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/EndianUtils.java",
+            "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/EndianUtils.java",
+            "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+          ],
+          "details": "Ensure EndianUtilsSwap has the package declaration org.apache.commons.io and no unnecessary imports. Update EndianUtils imports if necessary to preserve compilation when delegating to EndianUtilsSwap.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Update call sites in the codebase that prefer to use the new focused helper classes directly (optional / lower-priority). This reduces coupling to EndianUtils for stream or swap specific operations.",
+      "files": [
+        "all project source files that reference org.apache.commons.io.EndianUtils"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "calls to EndianUtils.readSwappedDouble(InputStream)",
+            "calls to EndianUtils.readSwappedFloat(InputStream)",
+            "calls to EndianUtils.readSwappedInteger(InputStream)",
+            "calls to EndianUtils.readSwappedLong(InputStream)",
+            "calls to EndianUtils.readSwappedShort(InputStream)",
+            "calls to EndianUtils.readSwappedUnsignedInteger(InputStream)",
+            "calls to EndianUtils.readSwappedUnsignedShort(InputStream)",
+            "calls to EndianUtils.writeSwappedDouble(OutputStream, double)",
+            "calls to EndianUtils.writeSwappedFloat(OutputStream, float)",
+            "calls to EndianUtils.writeSwappedInteger(OutputStream, int)",
+            "calls to EndianUtils.writeSwappedLong(OutputStream, long)",
+            "calls to EndianUtils.writeSwappedShort(OutputStream, short)",
+            "calls to EndianUtils.swapDouble(double)",
+            "calls to EndianUtils.swapFloat(float)",
+            "calls to EndianUtils.swapInteger(int)",
+            "calls to EndianUtils.swapLong(long)",
+            "calls to EndianUtils.swapShort(short)"
+          ],
+          "outputs": [
+            "updated call sites (optional) to use EndianUtilsStream.* or EndianUtilsSwap.* where callers prefer the specialized helper"
+          ],
+          "details": "Optionally update external callers to reference the new classes directly (EndianUtilsStream and EndianUtilsSwap) when they only need stream-based or swap operations. This reduces the surface area of EndianUtils usage in the codebase. Because EndianUtils retains delegating methods, external update is optional and backward compatible; perform updates where it improves modularization and readability.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

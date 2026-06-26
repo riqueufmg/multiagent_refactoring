@@ -1,0 +1,19 @@
+{
+  "id": 1,
+  "goal": "Introduce a new helper class FileAttributes in the same package to encapsulate file attribute state and related behavior (name, exists, directory, lastModified, length and operations on them). This prepares for extracting attribute-related members out of FileEntry to reduce its size and improve cohesion.",
+  "files": [
+    "src/main/java/org/apache/commons/io/monitor/FileAttributes.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/monitor/FileAttributes.java"
+      ],
+      "details": "Create new class org.apache.commons.io.monitor.FileAttributes. The class will live in the same package as FileEntry and will encapsulate the following fields: String name; boolean exists; boolean directory; SerializableFileTime lastModified; long length. It will provide the corresponding public getters and setters present in FileEntry (getLastModified(), getLastModifiedFileTime(), getLength(), getName(), isDirectory(), isExists(), setLastModified(FileTime), setLastModified(long), package-private setLastModified(SerializableFileTime), setLength(long), setName(String), setDirectory(boolean), setExists(boolean)) and a public boolean refresh(File file) method that performs the same refresh logic currently implemented in FileEntry (including using Files.exists, file.isDirectory, FileUtils.lastModifiedFileTime and handling IOException by setting EPOCH). Also provide a constructor FileAttributes(File file) that initializes the attributes from the provided File (mirroring FileEntry(FileEntry, File) initialization of name etc.). The class will import the same types used by the moved logic: java.io.File, java.io.IOException, java.nio.file.Files, java.nio.file.attribute.FileTime, org.apache.commons.io.FileUtils, org.apache.commons.io.file.attribute.FileTimes. No changes to FileEntry are made in this block.",
+      "risk": "low"
+    }
+  ],
+  "test_files": []
+}

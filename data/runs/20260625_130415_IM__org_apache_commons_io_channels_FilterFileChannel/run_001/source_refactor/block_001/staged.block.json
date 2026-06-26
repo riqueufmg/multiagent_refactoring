@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "goal": "Introduce a small helper class that owns the wrapped FileChannel and all direct delegation logic so the FilterFileChannel class can be reduced to a thin façade.",
+  "files": [
+    "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java"
+      ],
+      "details": "Create a new class FilterFileChannelDelegate in package org.apache.commons.io.channels. The class holds a final FileChannel fileChannel and implements all low-level delegation methods currently present in FilterFileChannel that directly forward to the wrapped FileChannel (equals, hashCode, implCloseChannel, force, lock, map, position(), position(long), read(ByteBuffer), read(ByteBuffer,long), read(ByteBuffer[],int,int), size, toString, transferFrom, transferTo, truncate, tryLock, write(ByteBuffer), write(ByteBuffer,long), write(ByteBuffer[],int,int), and an unwrap() method returning the wrapped FileChannel). The delegate's constructor accepts a FileChannel. The new class uses only JDK types already imported in the original file (java.io.IOException, java.nio.*, java.nio.channels.*). The implementations simply forward to fileChannel. This file is added alongside the existing FilterFileChannel class in the same package.",
+      "risk": "low"
+    }
+  ],
+  "test_files": []
+}

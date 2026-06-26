@@ -1,0 +1,51 @@
+{
+  "enabled": false,
+  "block_id": "2",
+  "block_index": 1,
+  "ops": [
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "private static final class RandomAccessFileBridge (originally nested in Tailer)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java"
+      ],
+      "details": "Move the private static nested class RandomAccessFileBridge to a package-private top-level class org.apache.commons.io.input.RandomAccessFileBridge. The moved class will implement the nested interface org.apache.commons.io.input.Tailer.RandomAccessResourceBridge (fully qualified). Preserve constructors and method implementations unchanged. Adjust visibility to package-private.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "private static final class TailablePath (originally nested in Tailer)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/TailablePath.java"
+      ],
+      "details": "Move the private static nested class TailablePath to a package-private top-level class org.apache.commons.io.input.TailablePath. The moved class will implement the nested interface org.apache.commons.io.input.Tailer.Tailable (fully qualified) and keep the same constructor, fields, and methods. Preserve the toString implementation. Ensure imports for java.nio.file.Path, java.nio.file.Files, java.nio.file.LinkOption, java.io.File, java.io.FileNotFoundException, java.io.IOException and java.nio.file.attribute.FileTime are added.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "References inside Tailer to the nested classes RandomAccessFileBridge and TailablePath"
+      ],
+      "outputs": [
+        "Updated references in Tailer to use the top-level types RandomAccessFileBridge and TailablePath"
+      ],
+      "details": "Update Tailer to reference the new top-level classes. Where code previously created new RandomAccessFileBridge(...) or new TailablePath(...), adjust to the new package-level classes. Fully-qualify references to the nested interfaces when needed (e.g. Tailer.RandomAccessResourceBridge and Tailer.Tailable). Add any necessary imports.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ]
+}

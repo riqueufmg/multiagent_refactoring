@@ -1,0 +1,205 @@
+commit 9d9aa1682fe0bbc8980fc0f240f5a7ea8b76b68a
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 16:55:25 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java b/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java
+new file mode 100644
+index 000000000..82e5623b8
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java
+@@ -0,0 +1,193 @@
++package org.apache.commons.io.function;
++
++import java.io.IOException;
++import java.io.UncheckedIOException;
++import java.util.Comparator;
++import java.util.Optional;
++import java.util.function.*;
++import java.util.stream.Collector;
++import java.util.stream.Stream;
++
++/**
++ * A dedicated interface holding terminal and terminal-like operations for IOStream.
++ *
++ * Default implementations delegate to the underlying Stream obtained from unwrap()
++ * (defined in IOBaseStream) and use local helper methods to convert IO-* functional
++ * interfaces into the corresponding java.util.function ones.
++ */
++public interface IOStreamTerminal<T>
++        extends IOBaseStream<T, IOStream<T>, Stream<T>> {
++
++    default boolean allMatch(final IOPredicate<? super T> predicate) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.allMatch(erasePredicate(predicate));
++        }
++    }
++
++    default boolean anyMatch(final IOPredicate<? super T> predicate) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.anyMatch(erasePredicate(predicate));
++        }
++    }
++
++    default <A, R> R collect(final Collector<? super T, A, R> collector) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.collect(collector);
++        }
++    }
++
++    default <A> A collect(final IOSupplier<A> supplier,
++                          final IOBiConsumer<A, ? super T> accumulator,
++                          final IOBiConsumer<A, A> combiner) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.collect(eraseSupplier(supplier), eraseBiConsumer(accumulator), eraseBiConsumer(combiner));
++        }
++    }
++
++    default long count() throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.count();
++        }
++    }
++
++    default Optional<T> findAny() throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.findAny();
++        }
++    }
++
++    default Optional<T> findFirst() throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.findFirst();
++        }
++    }
++
++    default void forAll(final IOConsumer<? super T> consumer) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            s.forEach(eraseConsumer(consumer));
++        }
++    }
++
++    default void forEach(final IOConsumer<? super T> action) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            s.forEach(eraseConsumer(action));
++        }
++    }
++
++    default void forEachOrdered(final IOConsumer<? super T> action) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            s.forEachOrdered(eraseConsumer(action));
++        }
++    }
++
++    default Object[] toArray() throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.toArray();
++        }
++    }
++
++    default <A> A[] toArray(final IntFunction<A[]> generator) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.toArray(generator);
++        }
++    }
++
++    default Optional<T> reduce(final IOBinaryOperator<T> accumulator) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.reduce(eraseBinaryOperator(accumulator));
++        }
++    }
++
++    default T reduce(final T identity, final IOBinaryOperator<T> accumulator) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.reduce(identity, eraseBinaryOperator(accumulator));
++        }
++    }
++
++    default <U> U reduce(final U identity,
++                          final IOBiFunction<U, ? super T, U> accumulator,
++                          final IOBinaryOperator<U> combiner) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.reduce(identity, eraseBiFunction(accumulator), eraseBinaryOperator(combiner));
++        }
++    }
++
++    default Optional<T> max(final Comparator<? super T> comparator) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.max(comparator);
++        }
++    }
++
++    default Optional<T> min(final Comparator<? super T> comparator) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.min(comparator);
++        }
++    }
++
++    default boolean noneMatch(final IOPredicate<? super T> predicate) throws IOException {
++        try (Stream<T> s = unwrap()) {
++            return s.noneMatch(erasePredicate(predicate));
++        }
++    }
++
++    // Helper adapters to convert IO-* functional interfaces into java.util.function ones
++    static <X> java.util.function.Predicate<X> erasePredicate(final IOPredicate<? super X> p) {
++        return x -> {
++            try {
++                return p.test(x);
++            } catch (IOException e) {
++                throw new UncheckedIOException(e);
++            }
++        };
++    }
++
++    static <A> java.util.function.Supplier<A> eraseSupplier(final IOSupplier<A> s) {
++        return () -> {
++            try {
++                return s.get();
++            } catch (IOException e) {
++                throw new UncheckedIOException(e);
++            }
++        };
++    }
++
++    static <A, B> java.util.function.BiConsumer<A, B> eraseBiConsumer(final IOBiConsumer<A, ? super B> c) {
++        return (a, b) -> {
++            try {
++                c.accept(a, b);
++            } catch (IOException e) {
++                throw new UncheckedIOException(e);
++            }
++        };
++    }
++
++    static <X> java.util.function.Consumer<X> eraseConsumer(final IOConsumer<? super X> c) {
++        return x -> {
++            try {
++                c.accept(x);
++            } catch (IOException e) {
++                throw new UncheckedIOException(e);
++            }
++        };
++    }
++
++    static <X> java.util.function.BinaryOperator<X> eraseBinaryOperator(final IOBinaryOperator<X> op) {
++        return (a, b) -> {
++            try {
++                return op.apply(a, b);
++            } catch (IOException e) {
++                throw new UncheckedIOException(e);
++            }
++        };
++    }
++
++    static <U, V> java.util.function.BiFunction<U, V, U> eraseBiFunction(final IOBiFunction<U, ? super V, U> f) {
++        return (u, v) -> {
++            try {
++                return f.apply(u, v);
++            } catch (IOException e) {
++                throw new UncheckedIOException(e);
++            }
++        };
++    }
++}

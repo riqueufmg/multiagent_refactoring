@@ -1,0 +1,115 @@
+commit 1a924764262cd7db232c446fdd8bdb304e192f86
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 15:13:57 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtilsArray.java b/src/main/java/org/apache/commons/io/EndianUtilsArray.java
+new file mode 100644
+index 000000000..cad023f92
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/EndianUtilsArray.java
+@@ -0,0 +1,103 @@
++package org.apache.commons.io;
++
++/**
++ * Helper utilities for reading/writing primitive types to/from byte arrays
++ * using little-endian (swapped) byte order. Extracted from EndianUtils.
++ */
++public final class EndianUtilsArray {
++
++    private EndianUtilsArray() {
++        // no instances
++    }
++
++    public static double readSwappedDouble(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 8);
++        return Double.longBitsToDouble(readSwappedLong(data, offset));
++    }
++
++    public static float readSwappedFloat(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 4);
++        return Float.intBitsToFloat(readSwappedInteger(data, offset));
++    }
++
++    public static int readSwappedInteger(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 4);
++        return ((data[offset + 3] & 0xff) << 24) |
++               ((data[offset + 2] & 0xff) << 16) |
++               ((data[offset + 1] & 0xff) << 8) |
++               (data[offset] & 0xff);
++    }
++
++    public static long readSwappedLong(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 8);
++        return (((long) data[offset + 7] & 0xffL) << 56) |
++               (((long) data[offset + 6] & 0xffL) << 48) |
++               (((long) data[offset + 5] & 0xffL) << 40) |
++               (((long) data[offset + 4] & 0xffL) << 32) |
++               (((long) data[offset + 3] & 0xffL) << 24) |
++               (((long) data[offset + 2] & 0xffL) << 16) |
++               (((long) data[offset + 1] & 0xffL) << 8) |
++               ((long) data[offset] & 0xffL);
++    }
++
++    public static short readSwappedShort(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 2);
++        return (short) (((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff));
++    }
++
++    public static long readSwappedUnsignedInteger(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 4);
++        return ((long) (data[offset + 3] & 0xff) << 24) |
++               ((long) (data[offset + 2] & 0xff) << 16) |
++               ((long) (data[offset + 1] & 0xff) << 8) |
++               ((long) (data[offset] & 0xff));
++    }
++
++    public static int readSwappedUnsignedShort(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, 2);
++        return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
++    }
++
++    public static void writeSwappedDouble(final byte[] data, final int offset, final double value) {
++        writeSwappedLong(data, offset, Double.doubleToLongBits(value));
++    }
++
++    public static void writeSwappedFloat(final byte[] data, final int offset, final float value) {
++        writeSwappedInteger(data, offset, Float.floatToIntBits(value));
++    }
++
++    public static void writeSwappedInteger(final byte[] data, final int offset, final int value) {
++        validateByteArrayOffset(data, offset, 4);
++        data[offset]     = (byte) (value & 0xff);
++        data[offset + 1] = (byte) ((value >>> 8) & 0xff);
++        data[offset + 2] = (byte) ((value >>> 16) & 0xff);
++        data[offset + 3] = (byte) ((value >>> 24) & 0xff);
++    }
++
++    public static void writeSwappedLong(final byte[] data, final int offset, final long value) {
++        validateByteArrayOffset(data, offset, 8);
++        data[offset]     = (byte) (value & 0xffL);
++        data[offset + 1] = (byte) ((value >>> 8) & 0xffL);
++        data[offset + 2] = (byte) ((value >>> 16) & 0xffL);
++        data[offset + 3] = (byte) ((value >>> 24) & 0xffL);
++        data[offset + 4] = (byte) ((value >>> 32) & 0xffL);
++        data[offset + 5] = (byte) ((value >>> 40) & 0xffL);
++        data[offset + 6] = (byte) ((value >>> 48) & 0xffL);
++        data[offset + 7] = (byte) ((value >>> 56) & 0xffL);
++    }
++
++    public static void writeSwappedShort(final byte[] data, final int offset, final short value) {
++        validateByteArrayOffset(data, offset, 2);
++        data[offset]     = (byte) (value & 0xff);
++        data[offset + 1] = (byte) ((value >>> 8) & 0xff);
++    }
++
++    private static void validateByteArrayOffset(final byte[] data, final int offset, final int length) {
++        if (data == null) {
++            throw new IllegalArgumentException("The byte array must not be null");
++        }
++        if (offset < 0 || length < 0 || offset + length > data.length) {
++            throw new IndexOutOfBoundsException("Offset and length must be valid for the byte array");
++        }
++    }
++}

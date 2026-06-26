@@ -1,0 +1,598 @@
+commit a653a8153e69578c3e93b678c6ce951e35c1634d
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 17:05:30 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/function/IOStream.java b/src/main/java/org/apache/commons/io/function/IOStream.java
+index 87c6c832b..939069601 100644
+--- a/src/main/java/org/apache/commons/io/function/IOStream.java
++++ b/src/main/java/org/apache/commons/io/function/IOStream.java
+@@ -50,7 +50,7 @@
+  * @param <T> the type of the stream elements.
+  * @since 2.12.0
+  */
+-public interface IOStream<T> extends IOBaseStream<T, IOStream<T>, Stream<T>> {
++public interface IOStream<T> extends IOBaseStream<T, IOStream<T>, Stream<T>>, IOStreamTerminal<T> {
+ 
+     /**
+      * Constructs a new IOStream for the given Stream.
+@@ -143,79 +143,6 @@ static <T> IOStream<T> of(final T t) {
+         return adapt(Stream.of(t));
+     }
+ 
+-    /**
+-     * Like {@link Stream#allMatch(java.util.function.Predicate)} but throws {@link IOException}.
+-     *
+-     * @param predicate {@link Stream#allMatch(java.util.function.Predicate)}.
+-     * @return Like {@link Stream#allMatch(java.util.function.Predicate)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default boolean allMatch(final IOPredicate<? super T> predicate) throws IOException {
+-        return unwrap().allMatch(t -> Erase.test(predicate, t));
+-    }
+-
+-    /**
+-     * Like {@link Stream#anyMatch(java.util.function.Predicate)} but throws {@link IOException}.
+-     *
+-     * @param predicate {@link Stream#anyMatch(java.util.function.Predicate)}.
+-     * @return Like {@link Stream#anyMatch(java.util.function.Predicate)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default boolean anyMatch(final IOPredicate<? super T> predicate) throws IOException {
+-        return unwrap().anyMatch(t -> Erase.test(predicate, t));
+-    }
+-
+-    /**
+-     * TODO Package-private for now, needs IOCollector?
+-     *
+-     * Adding this method now and an IO version later is an issue because call sites would have to type-cast to pick one. It
+-     * would be ideal to have only one.
+-     *
+-     * Like {@link Stream#collect(Collector)}.
+-     *
+-     * Package private for now.
+-     *
+-     * @param <R> Like {@link Stream#collect(Collector)}.
+-     * @param <A> Like {@link Stream#collect(Collector)}.
+-     * @param collector Like {@link Stream#collect(Collector)}.
+-     * @return Like {@link Stream#collect(Collector)}.
+-     */
+-    default <R, A> R collect(final Collector<? super T, A, R> collector) {
+-        return unwrap().collect(collector);
+-    }
+-
+-    /**
+-     * Like
+-     * {@link Stream#collect(java.util.function.Supplier, java.util.function.BiConsumer, java.util.function.BiConsumer)}.
+-     *
+-     * @param <R> Like
+-     *        {@link Stream#collect(java.util.function.Supplier, java.util.function.BiConsumer, java.util.function.BiConsumer)}.
+-     * @param supplier Like
+-     *        {@link Stream#collect(java.util.function.Supplier, java.util.function.BiConsumer, java.util.function.BiConsumer)}.
+-     * @param accumulator Like
+-     *        {@link Stream#collect(java.util.function.Supplier, java.util.function.BiConsumer, java.util.function.BiConsumer)}.
+-     * @param combiner Like
+-     *        {@link Stream#collect(java.util.function.Supplier, java.util.function.BiConsumer, java.util.function.BiConsumer)}.
+-     * @return Like
+-     *         {@link Stream#collect(java.util.function.Supplier, java.util.function.BiConsumer, java.util.function.BiConsumer)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default <R> R collect(final IOSupplier<R> supplier, final IOBiConsumer<R, ? super T> accumulator, final IOBiConsumer<R, R> combiner) throws IOException {
+-        return unwrap().collect(() -> Erase.get(supplier), (t, u) -> Erase.accept(accumulator, t, u), (t, u) -> Erase.accept(combiner, t, u));
+-    }
+-
+-    /**
+-     * Like {@link Stream#count()}.
+-     *
+-     * @return Like {@link Stream#count()}.
+-     */
+-    default long count() {
+-        return unwrap().count();
+-    }
+-
+     /**
+      * Like {@link Stream#distinct()}.
+      *
+@@ -238,24 +165,11 @@ default IOStream<T> filter(final IOPredicate<? super T> predicate) throws IOExce
+     }
+ 
+     /**
+-     * Like {@link Stream#findAny()}.
++     * TODO Package-private for now, needs IOCollector?
+      *
+-     * @return Like {@link Stream#findAny()}.
+-     */
+-    default Optional<T> findAny() {
+-        return unwrap().findAny();
+-    }
+-
+-    /**
+-     * Like {@link Stream#findFirst()}.
++     * Adding this method now and an IO version later is an issue because call sites would have to type-cast to pick one. It
++     * would be ideal to have only one.
+      *
+-     * @return Like {@link Stream#findFirst()}.
+-     */
+-    default Optional<T> findFirst() {
+-        return unwrap().findFirst();
+-    }
+-
+-    /**
+      * Like {@link Stream#flatMap(java.util.function.Function)}.
+      *
+      * @param <R> Like {@link Stream#flatMap(java.util.function.Function)}.
+@@ -319,66 +233,6 @@ default LongStream flatMapToLong(final IOFunction<? super T, ? extends LongStrea
+         return unwrap().flatMapToLong(t -> Erase.apply(mapper, t));
+     }
+ 
+-    /**
+-     * Performs an action for each element gathering any exceptions.
+-     *
+-     * @param action The action to apply to each element.
+-     * @throws IOExceptionList if any I/O errors occur.
+-     */
+-    default void forAll(final IOConsumer<T> action) throws IOExceptionList {
+-        forAll(action, (i, e) -> e);
+-    }
+-
+-    /**
+-     * Performs an action for each element gathering any exceptions.
+-     *
+-     * @param action The action to apply to each element.
+-     * @param exSupplier The exception supplier.
+-     * @throws IOExceptionList if any I/O errors occur.
+-     */
+-    default void forAll(final IOConsumer<T> action, final BiFunction<Integer, IOException, IOException> exSupplier) throws IOExceptionList {
+-        final AtomicReference<List<IOException>> causeList = new AtomicReference<>();
+-        final AtomicInteger index = new AtomicInteger();
+-        final IOConsumer<T> safeAction = IOStreams.toIOConsumer(action);
+-        unwrap().forEach(e -> {
+-            try {
+-                safeAction.accept(e);
+-            } catch (final IOException innerEx) {
+-                if (causeList.get() == null) {
+-                    // Only allocate if required
+-                    causeList.set(new ArrayList<>());
+-                }
+-                if (exSupplier != null) {
+-                    causeList.get().add(exSupplier.apply(index.get(), innerEx));
+-                }
+-            }
+-            index.incrementAndGet();
+-        });
+-        IOExceptionList.checkEmpty(causeList.get(), null);
+-    }
+-
+-    /**
+-     * Like {@link Stream#forEach(java.util.function.Consumer)} but throws {@link IOException}.
+-     *
+-     * @param action Like {@link Stream#forEach(java.util.function.Consumer)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default void forEach(final IOConsumer<? super T> action) throws IOException {
+-        unwrap().forEach(e -> Erase.accept(action, e));
+-    }
+-
+-    /**
+-     * Like {@link Stream#forEachOrdered(java.util.function.Consumer)}.
+-     *
+-     * @param action Like {@link Stream#forEachOrdered(java.util.function.Consumer)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default void forEachOrdered(final IOConsumer<? super T> action) throws IOException {
+-        unwrap().forEachOrdered(e -> Erase.accept(action, e));
+-    }
+-
+     /**
+      * Like {@link Stream#limit(long)}.
+      *
+@@ -453,42 +307,6 @@ default LongStream mapToLong(final ToLongFunction<? super T> mapper) {
+         return unwrap().mapToLong(mapper);
+     }
+ 
+-    /**
+-     * Like {@link Stream#max(java.util.Comparator)}.
+-     *
+-     * @param comparator Like {@link Stream#max(java.util.Comparator)}.
+-     * @return Like {@link Stream#max(java.util.Comparator)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default Optional<T> max(final IOComparator<? super T> comparator) throws IOException {
+-        return unwrap().max((t, u) -> Erase.compare(comparator, t, u));
+-    }
+-
+-    /**
+-     * Like {@link Stream#min(java.util.Comparator)}.
+-     *
+-     * @param comparator Like {@link Stream#min(java.util.Comparator)}.
+-     * @return Like {@link Stream#min(java.util.Comparator)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default Optional<T> min(final IOComparator<? super T> comparator) throws IOException {
+-        return unwrap().min((t, u) -> Erase.compare(comparator, t, u));
+-    }
+-
+-    /**
+-     * Like {@link Stream#noneMatch(java.util.function.Predicate)}.
+-     *
+-     * @param predicate Like {@link Stream#noneMatch(java.util.function.Predicate)}.
+-     * @return Like {@link Stream#noneMatch(java.util.function.Predicate)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default boolean noneMatch(final IOPredicate<? super T> predicate) throws IOException {
+-        return unwrap().noneMatch(t -> Erase.test(predicate, t));
+-    }
+-
+     /**
+      * Like {@link Stream#peek(java.util.function.Consumer)}.
+      *
+@@ -501,46 +319,6 @@ default IOStream<T> peek(final IOConsumer<? super T> action) throws IOException
+         return adapt(unwrap().peek(t -> Erase.accept(action, t)));
+     }
+ 
+-    /**
+-     * Like {@link Stream#reduce(java.util.function.BinaryOperator)}.
+-     *
+-     * @param accumulator Like {@link Stream#reduce(java.util.function.BinaryOperator)}.
+-     * @return Like {@link Stream#reduce(java.util.function.BinaryOperator)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default Optional<T> reduce(final IOBinaryOperator<T> accumulator) throws IOException {
+-        return unwrap().reduce((t, u) -> Erase.apply(accumulator, t, u));
+-    }
+-
+-    /**
+-     * Like {@link Stream#reduce(Object, java.util.function.BinaryOperator)}.
+-     *
+-     * @param identity Like {@link Stream#reduce(Object, java.util.function.BinaryOperator)}.
+-     * @param accumulator Like {@link Stream#reduce(Object, java.util.function.BinaryOperator)}.
+-     * @return Like {@link Stream#reduce(Object, java.util.function.BinaryOperator)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default T reduce(final T identity, final IOBinaryOperator<T> accumulator) throws IOException {
+-        return unwrap().reduce(identity, (t, u) -> Erase.apply(accumulator, t, u));
+-    }
+-
+-    /**
+-     * Like {@link Stream#reduce(Object, BiFunction, java.util.function.BinaryOperator)}.
+-     *
+-     * @param <U> Like {@link Stream#reduce(Object, BiFunction, java.util.function.BinaryOperator)}.
+-     * @param identity Like {@link Stream#reduce(Object, BiFunction, java.util.function.BinaryOperator)}.
+-     * @param accumulator Like {@link Stream#reduce(Object, BiFunction, java.util.function.BinaryOperator)}.
+-     * @param combiner Like {@link Stream#reduce(Object, BiFunction, java.util.function.BinaryOperator)}.
+-     * @return Like {@link Stream#reduce(Object, BiFunction, java.util.function.BinaryOperator)}.
+-     * @throws IOException if an I/O error occurs.
+-     */
+-    @SuppressWarnings("unused") // thrown by Erase.
+-    default <U> U reduce(final U identity, final IOBiFunction<U, ? super T, U> accumulator, final IOBinaryOperator<U> combiner) throws IOException {
+-        return unwrap().reduce(identity, (t, u) -> Erase.apply(accumulator, t, u), (t, u) -> Erase.apply(combiner, t, u));
+-    }
+-
+     /**
+      * Like {@link Stream#skip(long)}.
+      *
+@@ -572,31 +350,4 @@ default IOStream<T> sorted(final IOComparator<? super T> comparator) throws IOEx
+         return adapt(unwrap().sorted((t, u) -> Erase.compare(comparator, t, u)));
+     }
+ 
+-    /**
+-     * Like {@link Stream#toArray()}.
+-     *
+-     * @return {@link Stream#toArray()}.
+-     */
+-    default Object[] toArray() {
+-        return unwrap().toArray();
+-    }
+-
+-    /**
+-     * TODO Package-private for now, needs IOIntFunction?
+-     *
+-     * Adding this method now and an IO version later is an issue because call sites would have to type-cast to pick one. It
+-     * would be ideal to have only one.
+-     *
+-     * Like {@link Stream#toArray(IntFunction)}.
+-     *
+-     * Package private for now.
+-     *
+-     * @param <A> Like {@link Stream#toArray(IntFunction)}.
+-     * @param generator Like {@link Stream#toArray(IntFunction)}.
+-     * @return Like {@link Stream#toArray(IntFunction)}.
+-     */
+-    default <A> A[] toArray(final IntFunction<A[]> generator) {
+-        return unwrap().toArray(generator);
+-    }
+-
+ }
+diff --git a/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java b/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java
+index 82e5623b8..6c8830586 100644
+--- a/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java
++++ b/src/main/java/org/apache/commons/io/function/IOStreamTerminal.java
+@@ -1,193 +1,136 @@
+ package org.apache.commons.io.function;
+ 
+ import java.io.IOException;
+-import java.io.UncheckedIOException;
+-import java.util.Comparator;
++import java.util.ArrayList;
++import java.util.List;
+ import java.util.Optional;
+-import java.util.function.*;
++import java.util.concurrent.atomic.AtomicInteger;
++import java.util.concurrent.atomic.AtomicReference;
++import java.util.function.BiFunction;
++import java.util.function.IntFunction;
+ import java.util.stream.Collector;
+ import java.util.stream.Stream;
+ 
++import org.apache.commons.io.IOExceptionList;
++
+ /**
+- * A dedicated interface holding terminal and terminal-like operations for IOStream.
+- *
+- * Default implementations delegate to the underlying Stream obtained from unwrap()
+- * (defined in IOBaseStream) and use local helper methods to convert IO-* functional
+- * interfaces into the corresponding java.util.function ones.
++ * Interface that holds terminal operations for IOStream. These methods were moved out
++ * of IOStream to improve modularization; IOStream extends this interface so callers
++ * see the same API. Default implementations delegate to the underlying wrapped
++ * Stream via IOBaseStream.unwrap() using an unchecked cast.
+  */
+-public interface IOStreamTerminal<T>
+-        extends IOBaseStream<T, IOStream<T>, Stream<T>> {
++public interface IOStreamTerminal<T> {
+ 
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+     default boolean allMatch(final IOPredicate<? super T> predicate) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.allMatch(erasePredicate(predicate));
+-        }
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).allMatch(t -> Erase.test(predicate, t));
+     }
+ 
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+     default boolean anyMatch(final IOPredicate<? super T> predicate) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.anyMatch(erasePredicate(predicate));
+-        }
+-    }
+-
+-    default <A, R> R collect(final Collector<? super T, A, R> collector) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.collect(collector);
+-        }
+-    }
+-
+-    default <A> A collect(final IOSupplier<A> supplier,
+-                          final IOBiConsumer<A, ? super T> accumulator,
+-                          final IOBiConsumer<A, A> combiner) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.collect(eraseSupplier(supplier), eraseBiConsumer(accumulator), eraseBiConsumer(combiner));
+-        }
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).anyMatch(t -> Erase.test(predicate, t));
+     }
+ 
+-    default long count() throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.count();
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default <R, A> R collect(final Collector<? super T, A, R> collector) {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).collect(collector);
+     }
+ 
+-    default Optional<T> findAny() throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.findAny();
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default <R> R collect(final IOSupplier<R> supplier, final IOBiConsumer<R, ? super T> accumulator, final IOBiConsumer<R, R> combiner) throws IOException {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).collect(() -> Erase.get(supplier), (t, u) -> Erase.accept(accumulator, t, u), (t, u) -> Erase.accept(combiner, t, u));
+     }
+ 
+-    default Optional<T> findFirst() throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.findFirst();
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default long count() {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).count();
+     }
+ 
+-    default void forAll(final IOConsumer<? super T> consumer) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            s.forEach(eraseConsumer(consumer));
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default Optional<T> findAny() {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).findAny();
+     }
+ 
+-    default void forEach(final IOConsumer<? super T> action) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            s.forEach(eraseConsumer(action));
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default Optional<T> findFirst() {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).findFirst();
+     }
+ 
+-    default void forEachOrdered(final IOConsumer<? super T> action) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            s.forEachOrdered(eraseConsumer(action));
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default void forAll(final IOConsumer<T> action) throws IOExceptionList {
++        forAll(action, (i, e) -> e);
+     }
+ 
+-    default Object[] toArray() throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.toArray();
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default void forAll(final IOConsumer<T> action, final BiFunction<Integer, IOException, IOException> exSupplier) throws IOExceptionList {
++        final AtomicReference<List<IOException>> causeList = new AtomicReference<>();
++        final AtomicInteger index = new AtomicInteger();
++        final IOConsumer<T> safeAction = IOStreams.toIOConsumer(action);
++        ((Stream<T>) ((IOBaseStream) this).unwrap()).forEach(e -> {
++            try {
++                safeAction.accept(e);
++            } catch (final IOException innerEx) {
++                if (causeList.get() == null) {
++                    // Only allocate if required
++                    causeList.set(new ArrayList<>());
++                }
++                if (exSupplier != null) {
++                    causeList.get().add(exSupplier.apply(index.get(), innerEx));
++                }
++            }
++            index.incrementAndGet();
++        });
++        IOExceptionList.checkEmpty(causeList.get(), null);
+     }
+ 
+-    default <A> A[] toArray(final IntFunction<A[]> generator) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.toArray(generator);
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default void forEach(final IOConsumer<? super T> action) throws IOException {
++        ((Stream<T>) ((IOBaseStream) this).unwrap()).forEach(e -> Erase.accept(action, e));
+     }
+ 
+-    default Optional<T> reduce(final IOBinaryOperator<T> accumulator) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.reduce(eraseBinaryOperator(accumulator));
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default void forEachOrdered(final IOConsumer<? super T> action) throws IOException {
++        ((Stream<T>) ((IOBaseStream) this).unwrap()).forEachOrdered(e -> Erase.accept(action, e));
+     }
+ 
+-    default T reduce(final T identity, final IOBinaryOperator<T> accumulator) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.reduce(identity, eraseBinaryOperator(accumulator));
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default Object[] toArray() {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).toArray();
+     }
+ 
+-    default <U> U reduce(final U identity,
+-                          final IOBiFunction<U, ? super T, U> accumulator,
+-                          final IOBinaryOperator<U> combiner) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.reduce(identity, eraseBiFunction(accumulator), eraseBinaryOperator(combiner));
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked" })
++    default <A> A[] toArray(final IntFunction<A[]> generator) {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).toArray(generator);
+     }
+ 
+-    default Optional<T> max(final Comparator<? super T> comparator) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.max(comparator);
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default Optional<T> max(final IOComparator<? super T> comparator) throws IOException {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).max((t, u) -> Erase.compare(comparator, t, u));
+     }
+ 
+-    default Optional<T> min(final Comparator<? super T> comparator) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.min(comparator);
+-        }
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default Optional<T> min(final IOComparator<? super T> comparator) throws IOException {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).min((t, u) -> Erase.compare(comparator, t, u));
+     }
+ 
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+     default boolean noneMatch(final IOPredicate<? super T> predicate) throws IOException {
+-        try (Stream<T> s = unwrap()) {
+-            return s.noneMatch(erasePredicate(predicate));
+-        }
+-    }
+-
+-    // Helper adapters to convert IO-* functional interfaces into java.util.function ones
+-    static <X> java.util.function.Predicate<X> erasePredicate(final IOPredicate<? super X> p) {
+-        return x -> {
+-            try {
+-                return p.test(x);
+-            } catch (IOException e) {
+-                throw new UncheckedIOException(e);
+-            }
+-        };
+-    }
+-
+-    static <A> java.util.function.Supplier<A> eraseSupplier(final IOSupplier<A> s) {
+-        return () -> {
+-            try {
+-                return s.get();
+-            } catch (IOException e) {
+-                throw new UncheckedIOException(e);
+-            }
+-        };
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).noneMatch(t -> Erase.test(predicate, t));
+     }
+ 
+-    static <A, B> java.util.function.BiConsumer<A, B> eraseBiConsumer(final IOBiConsumer<A, ? super B> c) {
+-        return (a, b) -> {
+-            try {
+-                c.accept(a, b);
+-            } catch (IOException e) {
+-                throw new UncheckedIOException(e);
+-            }
+-        };
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default Optional<T> reduce(final IOBinaryOperator<T> accumulator) throws IOException {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).reduce((t, u) -> Erase.apply(accumulator, t, u));
+     }
+ 
+-    static <X> java.util.function.Consumer<X> eraseConsumer(final IOConsumer<? super X> c) {
+-        return x -> {
+-            try {
+-                c.accept(x);
+-            } catch (IOException e) {
+-                throw new UncheckedIOException(e);
+-            }
+-        };
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default T reduce(final T identity, final IOBinaryOperator<T> accumulator) throws IOException {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).reduce(identity, (t, u) -> Erase.apply(accumulator, t, u));
+     }
+ 
+-    static <X> java.util.function.BinaryOperator<X> eraseBinaryOperator(final IOBinaryOperator<X> op) {
+-        return (a, b) -> {
+-            try {
+-                return op.apply(a, b);
+-            } catch (IOException e) {
+-                throw new UncheckedIOException(e);
+-            }
+-        };
++    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
++    default <U> U reduce(final U identity, final IOBiFunction<U, ? super T, U> accumulator, final IOBinaryOperator<U> combiner) throws IOException {
++        return ((Stream<T>) ((IOBaseStream) this).unwrap()).reduce(identity, (t, u) -> Erase.apply(accumulator, t, u), (t, u) -> Erase.apply(combiner, t, u));
+     }
+ 
+-    static <U, V> java.util.function.BiFunction<U, V, U> eraseBiFunction(final IOBiFunction<U, ? super V, U> f) {
+-        return (u, v) -> {
+-            try {
+-                return f.apply(u, v);
+-            } catch (IOException e) {
+-                throw new UncheckedIOException(e);
+-            }
+-        };
+-    }
+ }

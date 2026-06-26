@@ -1,0 +1,84 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.channels.FilterFileChannel",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Group the large, cohesive set of FileChannel API overrides and the backing core field into a dedicated implementation class so the FilterFileChannel class is reduced to a thin, clear extension that primarily hosts builder APIs and construction logic.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java",
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelBase.java",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "details": "Create a new top-level class FilterFileChannelBase in package org.apache.commons.io.channels that extends java.nio.channels.FileChannel and contains the private final FilterFileChannelCore core field, the two constructors that initialize core (one taking FileChannel, one taking Builder), and all FileChannel API overrides currently implemented in FilterFileChannel (equals, hashCode, implCloseChannel, force, lock, map, position()/position(long), read(...), read(..., long), read(ByteBuffer[],int,int), size, toString, transferFrom, transferTo, truncate, tryLock, unwrap, write(...), write(..., long), write(ByteBuffer[],int,int)). Update the original FilterFileChannel.java to remove the moved field and methods and change its declaration to extend FilterFileChannelBase. Update constructors in FilterFileChannel to call super(...) and preserve nested builder classes and static forFilterFileChannel() factory. Keep package and imports consistent. This operation atomically moves implementation code into the new class and updates the original so the project compiles after the change.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Further reduce the size and nested-member surface of the target class by extracting the nested Builder types into dedicated top-level builder classes, clarifying responsibilities and simplifying FilterFileChannel source.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java",
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelAbstractBuilder.java",
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelBuilder.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelAbstractBuilder.java",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelBuilder.java",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "details": "Extract the nested abstract static class AbstractBuilder and the nested static class Builder into two top-level classes named FilterFileChannelAbstractBuilder and FilterFileChannelBuilder respectively, placed in the same package. Preserve generic signatures: FilterFileChannelAbstractBuilder<F extends FilterFileChannel, C extends FileChannel, B extends FilterFileChannelAbstractBuilder<F,C,B>> extends AbstractStreamBuilder<F, FilterFileChannelAbstractBuilder<F,C,B>>; and FilterFileChannelBuilder extends FilterFileChannelAbstractBuilder<FilterFileChannel, FileChannel, FilterFileChannelBuilder>. Make their constructors protected as before and move the get() implementation in the concrete builder to return new FilterFileChannel(this). Update imports and update FilterFileChannel to reference these new top-level builder classes and keep the static factory method forFilterFileChannel() returning new FilterFileChannelBuilder(). This decreases the nested-member count in FilterFileChannel and groups builder responsibilities into dedicated files.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Ensure call sites and imports remain correct after extraction and update any references if needed so that compilation is preserved and external usage is unaffected.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "details": "Update the imports in FilterFileChannel.java to reference the newly created top-level builder classes (FilterFileChannelAbstractBuilder and FilterFileChannelBuilder) if necessary. Ensure no unused imports remain and that package declarations remain 'org.apache.commons.io.channels'.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java"
+          ],
+          "outputs": [
+            "src/main/java"
+          ],
+          "details": "(Conservative sweep) Update any internal project call sites that referenced the nested builder types (FilterFileChannel.Builder or FilterFileChannel.AbstractBuilder) to use the new top-level names if found. Because FilterFileChannel preserves its public factory forFilterFileChannel(), most external code should be unaffected. This step ensures there are no broken references after extraction.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

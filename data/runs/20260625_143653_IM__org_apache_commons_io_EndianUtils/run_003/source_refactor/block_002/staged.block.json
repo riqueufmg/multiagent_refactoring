@@ -1,0 +1,71 @@
+{
+  "id": 2,
+  "goal": "Move all InputStream/OutputStream based read/write helpers into a dedicated EndianUtilsStream class to group stream-related functionality and reduce EndianUtils responsibility.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsStream.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.commons.io.EndianUtils#readSwappedDouble(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedFloat(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedInteger(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedLong(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedShort(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedInteger(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedShort(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#writeSwappedDouble(java.io.OutputStream,double)",
+        "org.apache.commons.io.EndianUtils#writeSwappedFloat(java.io.OutputStream,float)",
+        "org.apache.commons.io.EndianUtils#writeSwappedInteger(java.io.OutputStream,int)",
+        "org.apache.commons.io.EndianUtils#writeSwappedLong(java.io.OutputStream,long)",
+        "org.apache.commons.io.EndianUtils#writeSwappedShort(java.io.OutputStream,short)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+      ],
+      "details": "Create a new class EndianUtilsStream in package org.apache.commons.io. Move the stream-based public static read/write methods into this class preserving signatures and behavior. Ensure methods declare the same IOExceptions as in the original EndianUtils methods. Keep implementations identical to preserve behavior.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.apache.commons.io.EndianUtils#readSwappedDouble(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedFloat(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedInteger(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedLong(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedShort(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedInteger(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#readSwappedUnsignedShort(java.io.InputStream)",
+        "org.apache.commons.io.EndianUtils#writeSwappedDouble(java.io.OutputStream,double)",
+        "org.apache.commons.io.EndianUtils#writeSwappedFloat(java.io.OutputStream,float)",
+        "org.apache.commons.io.EndianUtils#writeSwappedInteger(java.io.OutputStream,int)",
+        "org.apache.commons.io.EndianUtils#writeSwappedLong(java.io.OutputStream,long)",
+        "org.apache.commons.io.EndianUtils#writeSwappedShort(java.io.OutputStream,short)"
+      ],
+      "outputs": [
+        "org.apache.commons.io.EndianUtilsStream#<same signatures>"
+      ],
+      "details": "Move the method bodies from EndianUtils into EndianUtilsStream. After this step EndianUtilsStream will contain the stream-handling implementations. Leave EndianUtils wrappers intact for now to maintain compilation while making the new class available.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

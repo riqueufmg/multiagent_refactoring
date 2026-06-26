@@ -1,0 +1,72 @@
+mvp:
+  name: source_refactor
+  run_id: run_002
+input:
+  planner_contract: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer/run_002/planner/contract.json
+  planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer/run_002/planner/contract.json
+models:
+  executor: gpt-5-mini
+  repair: gpt-5-mini
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/system.md
+  execute_plan: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/execute_plan.md
+  repair_compile: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/repair_compile.md
+executor:
+  temperature: 0.0
+  timeout: 600
+  max_retries: 3
+  max_block_attempts: 3
+repair:
+  enabled: true
+  max_attempts: 1
+compile:
+  timeout: 900
+  command:
+  - mvn
+  - -q
+  - -Djapicmp.skip=true
+  - -Drat.skip=true
+  - -Dcheckstyle.skip=true
+  - -Dspotbugs.skip=true
+  - -Dpmd.skip=true
+  - -DskipITs
+  - clean
+  - test
+mechanical_tools:
+  openrewrite_enabled: false
+  openrewrite_timeout: 600
+  openrewrite_command:
+  - mvn
+  - -U
+  - -Dmaven.test.skip=true
+  - -DskipTests
+  - -DskipITs
+  - -Djapicmp.skip=true
+  - -Drat.skip=true
+  - -Dcheckstyle.skip=true
+  - -Dspotbugs.skip=true
+  - -Dpmd.skip=true
+  - -Danimal.sniffer.skip=true
+  - -Dforbiddenapis.skip=true
+  - -Denforcer.skip=true
+  - -Dlicense.skip=true
+  - -Dskip.npm=true
+  - -Dskip.yarn=true
+  - org.openrewrite.maven:rewrite-maven-plugin:runNoFork
+tests:
+  update_tests: true
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer
+project:
+  name: commons-io
+  repo_path: /data/henrique/multiagent_refactoring/data/repositories/commons-io
+target:
+  smell: IM
+  smell_name: Insufficient Modularization
+  target_type: class
+  target_name: org.apache.commons.io.input.Tailer
+planner_contract: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer/run_002/planner/contract.json
+planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer/run_002/planner/contract.json
+planner:
+  contract: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer/run_002/planner/contract.json
+  contract_path: /data/henrique/multiagent_refactoring/data/runs/20260625_173124_IM__org_apache_commons_io_input_Tailer/run_002/planner/contract.json

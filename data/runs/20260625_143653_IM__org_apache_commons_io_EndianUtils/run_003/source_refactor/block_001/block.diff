@@ -1,0 +1,51 @@
+commit 0a962c20c804b21c6f1e69ef7b3688187df6017d
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 15:42:36 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtils.java b/src/main/java/org/apache/commons/io/EndianUtils.java
+index 6187eeb7b..87805e875 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtils.java
++++ b/src/main/java/org/apache/commons/io/EndianUtils.java
+@@ -293,20 +293,6 @@ public static short swapShort(final short value) {
+         return EndianUtilsSwap.swapShort(value);
+     }
+ 
+-    /**
+-     * Validates if the provided byte array has enough data.
+-     *
+-     * @param data the input byte array.
+-     * @param offset the input offset.
+-     * @param byteNeeded the needed number of bytes.
+-     * @throws IllegalArgumentException if the byte array does not have enough data.
+-     */
+-    private static void validateByteArrayOffset(final byte[] data, final int offset, final int byteNeeded) {
+-        if (data.length < offset + byteNeeded) {
+-            throw new IllegalArgumentException("Data only has " + data.length + "bytes, needed " + (offset + byteNeeded) + "bytes.");
+-        }
+-    }
+-
+     /**
+      * Writes the 8 bytes of a {@code double} to a byte array at a given offset in little-endian order.
+      *
+diff --git a/src/main/java/org/apache/commons/io/EndianUtilsArray.java b/src/main/java/org/apache/commons/io/EndianUtilsArray.java
+index cad023f92..f12042466 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtilsArray.java
++++ b/src/main/java/org/apache/commons/io/EndianUtilsArray.java
+@@ -92,12 +92,9 @@ public static void writeSwappedShort(final byte[] data, final int offset, final
+         data[offset + 1] = (byte) ((value >>> 8) & 0xff);
+     }
+ 
+-    private static void validateByteArrayOffset(final byte[] data, final int offset, final int length) {
+-        if (data == null) {
+-            throw new IllegalArgumentException("The byte array must not be null");
+-        }
+-        if (offset < 0 || length < 0 || offset + length > data.length) {
+-            throw new IndexOutOfBoundsException("Offset and length must be valid for the byte array");
++    private static void validateByteArrayOffset(final byte[] data, final int offset, final int byteNeeded) {
++        if (data.length < offset + byteNeeded) {
++            throw new IllegalArgumentException("Data only has " + data.length + "bytes, needed " + (offset + byteNeeded) + "bytes.");
+         }
+     }
+ }

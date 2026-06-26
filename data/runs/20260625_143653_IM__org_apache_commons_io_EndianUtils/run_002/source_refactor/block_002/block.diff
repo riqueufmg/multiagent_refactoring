@@ -1,0 +1,199 @@
+commit 90925ac67445c714b6209c0e06bec39e7e4cf5c6
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 15:31:00 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtils.java b/src/main/java/org/apache/commons/io/EndianUtils.java
+index 07dd94fe5..6187eeb7b 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtils.java
++++ b/src/main/java/org/apache/commons/io/EndianUtils.java
+@@ -57,7 +57,11 @@ public class EndianUtils {
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+      */
+     public static double readSwappedDouble(final byte[] data, final int offset) {
+-        return Double.longBitsToDouble(readSwappedLong(data, offset));
++        try {
++            return EndianUtilsArray.readSwappedDouble(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -80,7 +84,11 @@ public static double readSwappedDouble(final InputStream input) throws IOExcepti
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+      */
+     public static float readSwappedFloat(final byte[] data, final int offset) {
+-        return Float.intBitsToFloat(readSwappedInteger(data, offset));
++        try {
++            return EndianUtilsArray.readSwappedFloat(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -103,12 +111,11 @@ public static float readSwappedFloat(final InputStream input) throws IOException
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+      */
+     public static int readSwappedInteger(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
+-        return
+-            ((data[offset + 0] & 0xff) << 0) +
+-            ((data[offset + 1] & 0xff) << 8) +
+-            ((data[offset + 2] & 0xff) << 16) +
+-            ((data[offset + 3] & 0xff) << 24);
++        try {
++            return EndianUtilsArray.readSwappedInteger(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -131,10 +138,11 @@ public static int readSwappedInteger(final InputStream input) throws IOException
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+      */
+     public static long readSwappedLong(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Long.SIZE / Byte.SIZE);
+-        final long low = readSwappedInteger(data, offset);
+-        final long high = readSwappedInteger(data, offset + 4);
+-        return (high << 32) + (0xffffffffL & low);
++        try {
++            return EndianUtilsArray.readSwappedLong(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -157,11 +165,11 @@ public static long readSwappedLong(final InputStream input) throws IOException {
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 2 bytes.
+      */
+     public static short readSwappedShort(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
+-        return (short) (
+-            ((data[offset + 0] & 0xff) << 0) +
+-            ((data[offset + 1] & 0xff) << 8)
+-        );
++        try {
++            return EndianUtilsArray.readSwappedShort(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -185,12 +193,11 @@ public static short readSwappedShort(final InputStream input) throws IOException
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+     */
+     public static long readSwappedUnsignedInteger(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
+-        final long low = ((data[offset + 0] & 0xff) << 0) +
+-                         ((data[offset + 1] & 0xff) << 8) +
+-                         ((data[offset + 2] & 0xff) << 16);
+-        final long high = data[offset + 3] & 0xff;
+-        return (high << 24) + (0xffffffffL & low);
++        try {
++            return EndianUtilsArray.readSwappedUnsignedInteger(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -214,9 +221,11 @@ public static long readSwappedUnsignedInteger(final InputStream input) throws IO
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 2 bytes.
+      */
+     public static int readSwappedUnsignedShort(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
+-        return ((data[offset + 0] & 0xff) << 0) +
+-               ((data[offset + 1] & 0xff) << 8);
++        try {
++            return EndianUtilsArray.readSwappedUnsignedShort(data, offset);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -307,7 +316,11 @@ private static void validateByteArrayOffset(final byte[] data, final int offset,
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+      */
+     public static void writeSwappedDouble(final byte[] data, final int offset, final double value) {
+-        writeSwappedLong(data, offset, Double.doubleToLongBits(value));
++        try {
++            EndianUtilsArray.writeSwappedDouble(data, offset, value);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -330,7 +343,11 @@ public static void writeSwappedDouble(final OutputStream output, final double va
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+      */
+     public static void writeSwappedFloat(final byte[] data, final int offset, final float value) {
+-        writeSwappedInteger(data, offset, Float.floatToIntBits(value));
++        try {
++            EndianUtilsArray.writeSwappedFloat(data, offset, value);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -353,11 +370,11 @@ public static void writeSwappedFloat(final OutputStream output, final float valu
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+      */
+     public static void writeSwappedInteger(final byte[] data, final int offset, final int value) {
+-        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
+-        data[offset + 0] = (byte) (value >> 0 & 0xff);
+-        data[offset + 1] = (byte) (value >> 8 & 0xff);
+-        data[offset + 2] = (byte) (value >> 16 & 0xff);
+-        data[offset + 3] = (byte) (value >> 24 & 0xff);
++        try {
++            EndianUtilsArray.writeSwappedInteger(data, offset, value);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -380,15 +397,11 @@ public static void writeSwappedInteger(final OutputStream output, final int valu
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+      */
+     public static void writeSwappedLong(final byte[] data, final int offset, final long value) {
+-        validateByteArrayOffset(data, offset, Long.SIZE / Byte.SIZE);
+-        data[offset + 0] = (byte) (value >> 0 & 0xff);
+-        data[offset + 1] = (byte) (value >> 8 & 0xff);
+-        data[offset + 2] = (byte) (value >> 16 & 0xff);
+-        data[offset + 3] = (byte) (value >> 24 & 0xff);
+-        data[offset + 4] = (byte) (value >> 32 & 0xff);
+-        data[offset + 5] = (byte) (value >> 40 & 0xff);
+-        data[offset + 6] = (byte) (value >> 48 & 0xff);
+-        data[offset + 7] = (byte) (value >> 56 & 0xff);
++        try {
++            EndianUtilsArray.writeSwappedLong(data, offset, value);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**
+@@ -411,9 +424,11 @@ public static void writeSwappedLong(final OutputStream output, final long value)
+      * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 2 bytes.
+      */
+     public static void writeSwappedShort(final byte[] data, final int offset, final short value) {
+-        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
+-        data[offset + 0] = (byte) (value >> 0 & 0xff);
+-        data[offset + 1] = (byte) (value >> 8 & 0xff);
++        try {
++            EndianUtilsArray.writeSwappedShort(data, offset, value);
++        } catch (IndexOutOfBoundsException e) {
++            throw new IllegalArgumentException(e.getMessage(), e);
++        }
+     }
+ 
+     /**

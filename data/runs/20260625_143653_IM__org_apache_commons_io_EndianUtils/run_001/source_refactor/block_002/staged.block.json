@@ -1,0 +1,55 @@
+{
+  "id": 2,
+  "goal": "Group and move all endianness 'swap' operations into a dedicated helper class so EndianUtils focuses on reading/writing and validation responsibilities.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsSwap.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "public static double swapDouble(double)",
+        "public static float swapFloat(float)",
+        "public static int swapInteger(int)",
+        "public static long swapLong(long)",
+        "public static short swapShort(short)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+      ],
+      "details": "Create a new public final class org.apache.commons.io.EndianUtilsSwap containing the implementations of the listed swap methods. In EndianUtils, replace the bodies of these swap methods with delegating calls to EndianUtilsSwap.swapDouble(...), etc., preserving the original public signatures in EndianUtils for API compatibility. Ensure EndianUtilsSwap is in package org.apache.commons.io and uses only java.lang classes (no extra imports).",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsSwap.java"
+      ],
+      "details": "Ensure EndianUtilsSwap has the package declaration org.apache.commons.io and no unnecessary imports. Update EndianUtils imports if necessary to preserve compilation when delegating to EndianUtilsSwap.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

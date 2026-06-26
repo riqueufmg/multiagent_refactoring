@@ -1,0 +1,32 @@
+{
+  "id": 3,
+  "goal": "Optionally introduce a small interface to decouple FilterFileChannel from the concrete core implementation so other implementations or mocks can be introduced later.",
+  "files": [
+    "src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java"
+      ],
+      "details": "Extract an interface IFilterFileChannelCore that declares the public methods used by FilterFileChannel (the same signatures forwarded by FilterFileChannel). Change FilterFileChannelCore to implement IFilterFileChannelCore and change the core field in FilterFileChannel to type IFilterFileChannelCore. This enables dependency inversion and easier testing. Keep the interface in the same package.",
+      "risk": "low"
+    },
+    {
+      "op": "DEPENDENCY_INVERSION",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "details": "Change the type of the core field in FilterFileChannel to IFilterFileChannelCore and adapt constructors to assign an instance of FilterFileChannelCore to the interface-typed field. No behavioral change; improves modularity and allows alternate core implementations.",
+      "risk": "low"
+    }
+  ],
+  "test_files": []
+}

@@ -1,0 +1,100 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.input.Tailer",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the number of public methods on Tailer by moving the deprecated static factory methods into a dedicated helper class, keeping Tailer focused on tailing behavior.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/TailerFactory.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "public static Tailer create(File file, Charset charset, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen, int bufferSize)",
+            "public static Tailer create(File file, TailerListener tailerListener)",
+            "public static Tailer create(File file, TailerListener tailerListener, long delayMillis)",
+            "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end)",
+            "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen)",
+            "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen, int bufferSize)",
+            "public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, int bufferSize)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerFactory.java"
+          ],
+          "details": "Create a new top-level class org.apache.commons.io.input.TailerFactory that contains the seven deprecated static create(...) factory methods currently on Tailer. Each method in TailerFactory will delegate to Tailer.builder() or to the existing Tailer constructors exactly as the original implementations do (preserving deprecation and behavior). Remove these static methods from Tailer so Tailer has fewer public methods and a smaller public API surface.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "TailerFactory.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerFactory.java"
+          ],
+          "details": "Add necessary imports to TailerFactory (java.io.File, java.nio.charset.Charset, java.time.Duration and org.apache.commons.io.input.Tailer and TailerListener) matching usages in the moved implementations.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "All calls to org.apache.commons.io.input.Tailer.create(...) in the codebase"
+          ],
+          "outputs": [
+            "All updated call sites referencing org.apache.commons.io.input.TailerFactory.create(...)"
+          ],
+          "details": "Replace usages of Tailer.create(...) with TailerFactory.create(...) across the codebase to preserve external behavior. Keep deprecated annotation and javadoc semantics on the moved methods. Note: tests will be updated separately.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce Tailer class size by extracting the two private helper classes (RandomAccessFileBridge and TailablePath) to package-level classes so Tailer focuses on orchestration.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java",
+        "src/main/java/org/apache/commons/io/input/TailablePath.java",
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "private static final class RandomAccessFileBridge (originally nested in Tailer)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java"
+          ],
+          "details": "Move the private static nested class RandomAccessFileBridge to a package-private top-level class org.apache.commons.io.input.RandomAccessFileBridge. The moved class will implement the nested interface org.apache.commons.io.input.Tailer.RandomAccessResourceBridge (fully qualified). Preserve constructors and method implementations unchanged. Adjust visibility to package-private.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "private static final class TailablePath (originally nested in Tailer)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailablePath.java"
+          ],
+          "details": "Move the private static nested class TailablePath to a package-private top-level class org.apache.commons.io.input.TailablePath. The moved class will implement the nested interface org.apache.commons.io.input.Tailer.Tailable (fully qualified) and keep the same constructor, fields, and methods. Preserve the toString implementation. Ensure imports for java.nio.file.Path, java.nio.file.Files, java.nio.file.LinkOption, java.io.File, java.io.FileNotFoundException, java.io.IOException and java.nio.file.attribute.FileTime are added.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "References inside Tailer to the nested classes RandomAccessFileBridge and TailablePath"
+          ],
+          "outputs": [
+            "Updated references in Tailer to use the top-level types RandomAccessFileBridge and TailablePath"
+          ],
+          "details": "Update Tailer to reference the new top-level classes. Where code previously created new RandomAccessFileBridge(...) or new TailablePath(...), adjust to the new package-level classes. Fully-qualify references to the nested interfaces when needed (e.g. Tailer.RandomAccessResourceBridge and Tailer.Tailable). Add any necessary imports.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

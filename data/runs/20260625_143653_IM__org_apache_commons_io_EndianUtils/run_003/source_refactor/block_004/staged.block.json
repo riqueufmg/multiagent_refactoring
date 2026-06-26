@@ -1,0 +1,108 @@
+{
+  "id": 4,
+  "goal": "Update call sites across the project so callers use the specialized EndianUtilsArray, EndianUtilsStream, and EndianUtilsSwap classes instead of the large EndianUtils class, and reduce EndianUtils to a minimal facade.",
+  "files": [
+    "all project source files that reference EndianUtils",
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "usages of org.apache.commons.io.EndianUtils#readSwappedDouble(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedFloat(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedInteger(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedLong(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedShort(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedUnsignedInteger(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedUnsignedShort(byte[],int)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedDouble(byte[],int,double)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedFloat(byte[],int,float)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedInteger(byte[],int,int)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedLong(byte[],int,long)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedShort(byte[],int,short)"
+      ],
+      "outputs": [
+        "updated usages to org.apache.commons.io.EndianUtilsArray#<same signatures>"
+      ],
+      "details": "Replace calls that targeted array-based EndianUtils methods with calls to EndianUtilsArray methods. Update imports where necessary to reference org.apache.commons.io.EndianUtilsArray. This directs array-specific calls to the new specialized class.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "usages of org.apache.commons.io.EndianUtils#readSwappedDouble(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedFloat(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedInteger(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedLong(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedShort(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedUnsignedInteger(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#readSwappedUnsignedShort(java.io.InputStream)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedDouble(java.io.OutputStream,double)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedFloat(java.io.OutputStream,float)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedInteger(java.io.OutputStream,int)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedLong(java.io.OutputStream,long)",
+        "usages of org.apache.commons.io.EndianUtils#writeSwappedShort(java.io.OutputStream,short)"
+      ],
+      "outputs": [
+        "updated usages to org.apache.commons.io.EndianUtilsStream#<same signatures>"
+      ],
+      "details": "Replace calls that targeted stream-based EndianUtils methods with calls to EndianUtilsStream methods. Update imports to reference org.apache.commons.io.EndianUtilsStream.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "usages of org.apache.commons.io.EndianUtils#swapDouble(double)",
+        "usages of org.apache.commons.io.EndianUtils#swapFloat(float)",
+        "usages of org.apache.commons.io.EndianUtils#swapInteger(int)",
+        "usages of org.apache.commons.io.EndianUtils#swapLong(long)",
+        "usages of org.apache.commons.io.EndianUtils#swapShort(short)"
+      ],
+      "outputs": [
+        "updated usages to org.apache.commons.io.EndianUtilsSwap#<same signatures>"
+      ],
+      "details": "Replace calls that targeted swap* methods on EndianUtils with calls to EndianUtilsSwap. Update imports accordingly.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "source files updated in previous ops"
+      ],
+      "outputs": [
+        "source files with corrected imports for EndianUtilsArray, EndianUtilsStream, EndianUtilsSwap"
+      ],
+      "details": "Where call sites were updated, add or adjust imports to reference the new classes in org.apache.commons.io. Remove unused EndianUtils imports where applicable.",
+      "risk": "low"
+    },
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java (reduced)"
+      ],
+      "details": "Replace the large EndianUtils implementation with a minimal facade that documents and delegates to the specialized classes for compatibility where desired. The new EndianUtils will be a small class (same package) that either (a) exposes a very small curated subset of convenience methods delegating internally to EndianUtilsArray/EndianUtilsStream/EndianUtilsSwap, or (b) is left as a formally deprecated holder with only the deprecated constructor and Javadoc, advising callers to use the specialized classes directly. This reduces the public method count on EndianUtils and centralizes responsibilities.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

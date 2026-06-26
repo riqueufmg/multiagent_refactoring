@@ -1,0 +1,39 @@
+{
+  "id": 1,
+  "goal": "Move the inner RandomAccessResourceBridge interface out of Tailer into its own top-level file to reduce Tailer size and make the API re-usable.",
+  "files": [
+    "src/main/java/org/apache/commons/io/input/RandomAccessResourceBridge.java",
+    "src/main/java/org/apache/commons/io/input/Tailer.java",
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java:RandomAccessResourceBridge (inner interface)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/RandomAccessResourceBridge.java",
+        "src/main/java/org/apache/commons/io/input/Tailer.java (updated)"
+      ],
+      "details": "Create a new top-level interface RandomAccessResourceBridge in package org.apache.commons.io.input with the same API (close, getPointer, read, seek). Remove the inner interface declaration from Tailer and keep references unchanged (same simple name, same package).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ]
+}

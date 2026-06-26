@@ -1,0 +1,121 @@
+commit 8a0e30eaa54cffc68319b006ad322bb43723177f
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 13:12:42 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java b/src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java
+new file mode 100644
+index 000000000..713483098
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/channels/FilterFileChannelDelegate.java
+@@ -0,0 +1,109 @@
++package org.apache.commons.io.channels;
++
++import java.io.IOException;
++import java.nio.*;
++import java.nio.channels.*;
++
++public class FilterFileChannelDelegate {
++
++    private final FileChannel fileChannel;
++
++    public FilterFileChannelDelegate(final FileChannel fileChannel) {
++        this.fileChannel = fileChannel;
++    }
++
++    public FileChannel unwrap() {
++        return fileChannel;
++    }
++
++    @Override
++    public boolean equals(final Object obj) {
++        return fileChannel.equals(obj);
++    }
++
++    @Override
++    public int hashCode() {
++        return fileChannel.hashCode();
++    }
++
++    public void implCloseChannel() throws IOException {
++        fileChannel.close();
++    }
++
++    public void force(final boolean metaData) throws IOException {
++        fileChannel.force(metaData);
++    }
++
++    public FileLock lock() throws IOException {
++        return fileChannel.lock();
++    }
++
++    public FileLock lock(final long position, final long size, final boolean shared) throws IOException {
++        return fileChannel.lock(position, size, shared);
++    }
++
++    public MappedByteBuffer map(final FileChannel.MapMode mode, final long position, final long size) throws IOException {
++        return fileChannel.map(mode, position, size);
++    }
++
++    public long position() throws IOException {
++        return fileChannel.position();
++    }
++
++    public FileChannel position(final long newPosition) throws IOException {
++        return fileChannel.position(newPosition);
++    }
++
++    public int read(final ByteBuffer dst) throws IOException {
++        return fileChannel.read(dst);
++    }
++
++    public int read(final ByteBuffer dst, final long position) throws IOException {
++        return fileChannel.read(dst, position);
++    }
++
++    public long read(final ByteBuffer[] dsts, final int offset, final int length) throws IOException {
++        return fileChannel.read(dsts, offset, length);
++    }
++
++    public long size() throws IOException {
++        return fileChannel.size();
++    }
++
++    @Override
++    public String toString() {
++        return fileChannel.toString();
++    }
++
++    public long transferFrom(final ReadableByteChannel src, final long position, final long count) throws IOException {
++        return fileChannel.transferFrom(src, position, count);
++    }
++
++    public long transferTo(final long position, final long count, final WritableByteChannel target) throws IOException {
++        return fileChannel.transferTo(position, count, target);
++    }
++
++    public FileChannel truncate(final long size) throws IOException {
++        return fileChannel.truncate(size);
++    }
++
++    public FileLock tryLock() throws IOException {
++        return fileChannel.tryLock();
++    }
++
++    public FileLock tryLock(final long position, final long size, final boolean shared) throws IOException {
++        return fileChannel.tryLock(position, size, shared);
++    }
++
++    public int write(final ByteBuffer src) throws IOException {
++        return fileChannel.write(src);
++    }
++
++    public int write(final ByteBuffer src, final long position) throws IOException {
++        return fileChannel.write(src, position);
++    }
++
++    public long write(final ByteBuffer[] srcs, final int offset, final int length) throws IOException {
++        return fileChannel.write(srcs, offset, length);
++    }
++}

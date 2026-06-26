@@ -1,0 +1,136 @@
+commit 956141a7c67f1c46c037e8f1e9dbe3b93d0b66a6
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 15:51:26 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/test/java/org/apache/commons/io/EndianUtilsTest.java b/src/test/java/org/apache/commons/io/EndianUtilsTest.java
+index b7cd538e4..99651c2d3 100644
+--- a/src/test/java/org/apache/commons/io/EndianUtilsTest.java
++++ b/src/test/java/org/apache/commons/io/EndianUtilsTest.java
+@@ -40,7 +40,7 @@ void testCtor() {
+     @Test
+     void testEOFException() {
+         final ByteArrayInputStream input = new ByteArrayInputStream(new byte[] {});
+-        assertThrows(EOFException.class, () -> EndianUtils.readSwappedDouble(input));
++        assertThrows(EOFException.class, () -> EndianUtilsStream.readSwappedDouble(input));
+     }
+ 
+     @Test
+@@ -65,7 +65,7 @@ void testReadSwappedDouble() throws IOException {
+         assertEquals(d1, d2, 0.0);
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(d1, EndianUtils.readSwappedDouble(input), 0.0);
++        assertEquals(d1, EndianUtilsStream.readSwappedDouble(input), 0.0);
+     }
+ 
+     @Test
+@@ -76,7 +76,7 @@ void testReadSwappedFloat() throws IOException {
+         assertEquals(f1, f2, 0.0);
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(f1, EndianUtils.readSwappedFloat(input), 0.0);
++        assertEquals(f1, EndianUtilsStream.readSwappedFloat(input), 0.0);
+     }
+ 
+     @Test
+@@ -85,7 +85,7 @@ void testReadSwappedInteger() throws IOException {
+         assertEquals(0x01020304, EndianUtils.readSwappedInteger(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(0x01020304, EndianUtils.readSwappedInteger(input));
++        assertEquals(0x01020304, EndianUtilsStream.readSwappedInteger(input));
+     }
+ 
+     @Test
+@@ -94,7 +94,7 @@ void testReadSwappedLong() throws IOException {
+         assertEquals(0x0102030405060708L, EndianUtils.readSwappedLong(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(0x0102030405060708L, EndianUtils.readSwappedLong(input));
++        assertEquals(0x0102030405060708L, EndianUtilsStream.readSwappedLong(input));
+     }
+ 
+     @Test
+@@ -103,7 +103,7 @@ void testReadSwappedShort() throws IOException {
+         assertEquals(0x0102, EndianUtils.readSwappedShort(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(0x0102, EndianUtils.readSwappedShort(input));
++        assertEquals(0x0102, EndianUtilsStream.readSwappedShort(input));
+     }
+ 
+     @Test
+@@ -112,7 +112,7 @@ void testReadSwappedUnsignedInteger() throws IOException {
+         assertEquals(0x0000000001020304L, EndianUtils.readSwappedUnsignedInteger(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(0x0000000001020304L, EndianUtils.readSwappedUnsignedInteger(input));
++        assertEquals(0x0000000001020304L, EndianUtilsStream.readSwappedUnsignedInteger(input));
+     }
+ 
+     @Test
+@@ -121,7 +121,7 @@ void testReadSwappedUnsignedShort() throws IOException {
+         assertEquals(0x00000102, EndianUtils.readSwappedUnsignedShort(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+-        assertEquals(0x00000102, EndianUtils.readSwappedUnsignedShort(input));
++        assertEquals(0x00000102, EndianUtilsStream.readSwappedUnsignedShort(input));
+     }
+ 
+     @Test
+@@ -213,7 +213,7 @@ void testUnsignedOverrun() throws Exception {
+         assertEquals(expected, actual, "readSwappedUnsignedInteger(byte[], int) was incorrect");
+ 
+         final ByteArrayInputStream in = new ByteArrayInputStream(target);
+-        actual = EndianUtils.readSwappedUnsignedInteger(in);
++        actual = EndianUtilsStream.readSwappedUnsignedInteger(in);
+         assertEquals(expected, actual, "readSwappedUnsignedInteger(InputStream) was incorrect");
+     }
+ 
+@@ -232,7 +232,7 @@ void testWriteSwappedDouble() throws IOException {
+         assertEquals(0x01, bytes[7]);
+ 
+         final ByteArrayOutputStream baos = new ByteArrayOutputStream(8);
+-        EndianUtils.writeSwappedDouble(baos, d1);
++        EndianUtilsStream.writeSwappedDouble(baos, d1);
+         bytes = baos.toByteArray();
+         assertEquals(0x08, bytes[0]);
+         assertEquals(0x07, bytes[1]);
+@@ -255,7 +255,7 @@ void testWriteSwappedFloat() throws IOException {
+         assertEquals(0x01, bytes[3]);
+ 
+         final ByteArrayOutputStream baos = new ByteArrayOutputStream(4);
+-        EndianUtils.writeSwappedFloat(baos, f1);
++        EndianUtilsStream.writeSwappedFloat(baos, f1);
+         bytes = baos.toByteArray();
+         assertEquals(0x04, bytes[0]);
+         assertEquals(0x03, bytes[1]);
+@@ -273,7 +273,7 @@ void testWriteSwappedInteger() throws IOException {
+         assertEquals(0x01, bytes[3]);
+ 
+         final ByteArrayOutputStream baos = new ByteArrayOutputStream(4);
+-        EndianUtils.writeSwappedInteger(baos, 0x01020304);
++        EndianUtilsStream.writeSwappedInteger(baos, 0x01020304);
+         bytes = baos.toByteArray();
+         assertEquals(0x04, bytes[0]);
+         assertEquals(0x03, bytes[1]);
+@@ -295,7 +295,7 @@ void testWriteSwappedLong() throws IOException {
+         assertEquals(0x01, bytes[7]);
+ 
+         final ByteArrayOutputStream baos = new ByteArrayOutputStream(8);
+-        EndianUtils.writeSwappedLong(baos, 0x0102030405060708L);
++        EndianUtilsStream.writeSwappedLong(baos, 0x0102030405060708L);
+         bytes = baos.toByteArray();
+         assertEquals(0x08, bytes[0]);
+         assertEquals(0x07, bytes[1]);
+@@ -315,7 +315,7 @@ void testWriteSwappedShort() throws IOException {
+         assertEquals(0x01, bytes[1]);
+ 
+         final ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
+-        EndianUtils.writeSwappedShort(baos, (short) 0x0102);
++        EndianUtilsStream.writeSwappedShort(baos, (short) 0x0102);
+         bytes = baos.toByteArray();
+         assertEquals(0x02, bytes[0]);
+         assertEquals(0x01, bytes[1]);

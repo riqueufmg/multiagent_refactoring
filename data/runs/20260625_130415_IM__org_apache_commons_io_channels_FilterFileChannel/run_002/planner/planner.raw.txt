@@ -1,0 +1,120 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.channels.FilterFileChannel",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Create a focused helper class that contains the bulk of FileChannel delegating methods currently implemented in FilterFileChannel so the target class can be reduced in size and responsibility.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+          ],
+          "details": "Introduce a new class FilterFileChannelCore in package org.apache.commons.io.channels. The class holds a private final FilterFileChannelDelegate delegate (same type referenced by the original class) and exposes public methods with the same signatures as the delegating methods currently in FilterFileChannel: equals(Object), force(boolean), hashCode(), implCloseChannel(), lock(long,long,boolean), map(FileChannel.MapMode,long,long), position(), position(long), read(ByteBuffer), read(ByteBuffer,long), read(ByteBuffer[],int,int), size(), toString(), transferFrom(ReadableByteChannel,long,long), transferTo(long,long,WritableByteChannel), truncate(long), tryLock(long,long,boolean), unwrap(), write(ByteBuffer), write(ByteBuffer,long), write(ByteBuffer[],int,int). Provide a constructor FilterFileChannelCore(FilterFileChannelDelegate delegate) that stores the delegate. Implement each method by delegating to the contained delegate (same behavior as the existing methods). Add necessary imports for types used (ByteBuffer, MappedByteBuffer, FileLock, ReadableByteChannel, WritableByteChannel, IOException, FileChannel).",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce FilterFileChannel's surface by moving method implementations to FilterFileChannelCore and update FilterFileChannel to delegate to the new core, leaving a slimmer class (improves cohesion and modularization).",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:private final FilterFileChannelDelegate delegate;"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java:private final FilterFileChannelDelegate delegate;"
+          ],
+          "details": "Move the storage of the underlying delegate into FilterFileChannelCore (already done in EXTRACT_CLASS). In FilterFileChannel replace the existing field declaration with a private final FilterFileChannelCore core; field.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:equals(Object)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:force(boolean)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:hashCode()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:implCloseChannel()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:lock(long,long,boolean)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:map(FileChannel.MapMode,long,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:position()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:position(long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:read(ByteBuffer)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:read(ByteBuffer,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:read(ByteBuffer[],int,int)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:size()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:toString()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:transferFrom(ReadableByteChannel,long,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:transferTo(long,long,WritableByteChannel)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:truncate(long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:tryLock(long,long,boolean)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:unwrap()",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:write(ByteBuffer)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:write(ByteBuffer,long)",
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java:write(ByteBuffer[],int,int)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+          ],
+          "details": "Move the implementation bodies of the listed methods from FilterFileChannel into FilterFileChannelCore. In the original FilterFileChannel, replace each moved method with a small forwarding method that calls the corresponding method on the new core field (for example, public int read(ByteBuffer dst) throws IOException { return core.read(dst); }). Maintain signatures, checked exceptions, and Javadoc references. This reduces the amount of code in FilterFileChannel while preserving behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "details": "Update constructors in FilterFileChannel to initialize the new core field. Replace previous initializations of delegate (this.delegate = new FilterFileChannelDelegate(...)) with this.core = new FilterFileChannelCore(new FilterFileChannelDelegate(...)) or this.core = new FilterFileChannelCore(delegate) as appropriate. Update any direct uses of the delegate field in FilterFileChannel to use core where necessary (after MOVE_METHODs there should be minimal or no direct delegate usage in the class). Ensure imports remain correct.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Optionally introduce a small interface to decouple FilterFileChannel from the concrete core implementation so other implementations or mocks can be introduced later.",
+      "files": [
+        "src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_INTERFACE",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/IFilterFileChannelCore.java"
+          ],
+          "details": "Extract an interface IFilterFileChannelCore that declares the public methods used by FilterFileChannel (the same signatures forwarded by FilterFileChannel). Change FilterFileChannelCore to implement IFilterFileChannelCore and change the core field in FilterFileChannel to type IFilterFileChannelCore. This enables dependency inversion and easier testing. Keep the interface in the same package.",
+          "risk": "low"
+        },
+        {
+          "op": "DEPENDENCY_INVERSION",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+          ],
+          "details": "Change the type of the core field in FilterFileChannel to IFilterFileChannelCore and adapt constructors to assign an instance of FilterFileChannelCore to the interface-typed field. No behavioral change; improves modularity and allows alternate core implementations.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

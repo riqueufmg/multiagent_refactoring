@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "goal": "Create a focused helper class that contains the bulk of FileChannel delegating methods currently implemented in FilterFileChannel so the target class can be reduced in size and responsibility.",
+  "files": [
+    "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannel.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/channels/FilterFileChannelCore.java"
+      ],
+      "details": "Introduce a new class FilterFileChannelCore in package org.apache.commons.io.channels. The class holds a private final FilterFileChannelDelegate delegate (same type referenced by the original class) and exposes public methods with the same signatures as the delegating methods currently in FilterFileChannel: equals(Object), force(boolean), hashCode(), implCloseChannel(), lock(long,long,boolean), map(FileChannel.MapMode,long,long), position(), position(long), read(ByteBuffer), read(ByteBuffer,long), read(ByteBuffer[],int,int), size(), toString(), transferFrom(ReadableByteChannel,long,long), transferTo(long,long,WritableByteChannel), truncate(long), tryLock(long,long,boolean), unwrap(), write(ByteBuffer), write(ByteBuffer,long), write(ByteBuffer[],int,int). Provide a constructor FilterFileChannelCore(FilterFileChannelDelegate delegate) that stores the delegate. Implement each method by delegating to the contained delegate (same behavior as the existing methods). Add necessary imports for types used (ByteBuffer, MappedByteBuffer, FileLock, ReadableByteChannel, WritableByteChannel, IOException, FileChannel).",
+      "risk": "low"
+    }
+  ],
+  "test_files": []
+}

@@ -1,0 +1,53 @@
+{
+  "id": 5,
+  "goal": "Safety and consistency passes: ensure no duplicate behavior remains and update any internal references or package-private helpers that were moved.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsArray.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsStream.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsSwap.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "the newly created EndianUtilsArray.java",
+        "the newly created EndianUtilsStream.java",
+        "the modified EndianUtils.java"
+      ],
+      "outputs": [
+        "these files with correct imports (java.io.InputStream, java.io.OutputStream, java.io.IOException, static IOUtils.EOF if used)"
+      ],
+      "details": "Ensure each new/modified file contains the necessary imports preserved from the original EndianUtils (e.g., java.io.InputStream, java.io.OutputStream, java.io.IOException, and static import of IOUtils.EOF if used). This ensures each block compiles after extraction.",
+      "risk": "low"
+    },
+    {
+      "op": "REPLACE_DEPENDENCY",
+      "inputs": [
+        "internal references inside moved methods that referenced private helpers in EndianUtils"
+      ],
+      "outputs": [
+        "references adjusted to use EndianUtilsArray/EndianUtilsStream/EndianUtilsSwap as appropriate"
+      ],
+      "details": "Adjust any internal references (for example private validator) so moved methods reference the helpers in their new host class. If a helper was shared and necessary in multiple classes, duplicate it conservatively or consider making it package-private in the appropriate class.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

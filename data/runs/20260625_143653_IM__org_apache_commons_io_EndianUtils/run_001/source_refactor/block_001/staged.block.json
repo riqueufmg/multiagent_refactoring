@@ -1,0 +1,63 @@
+{
+  "id": 1,
+  "goal": "Group and move all InputStream/OutputStream-based read/write methods into a dedicated helper class to separate stream I/O concerns from byte-array and swap logic, reducing the size and complexity of EndianUtils.",
+  "files": [
+    "src/main/java/org/apache/commons/io/EndianUtils.java",
+    "src/main/java/org/apache/commons/io/EndianUtilsStream.java",
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "public static double readSwappedDouble(InputStream)",
+        "public static float readSwappedFloat(InputStream)",
+        "public static int readSwappedInteger(InputStream)",
+        "public static long readSwappedLong(InputStream)",
+        "public static short readSwappedShort(InputStream)",
+        "public static long readSwappedUnsignedInteger(InputStream)",
+        "public static int readSwappedUnsignedShort(InputStream)",
+        "public static void writeSwappedDouble(OutputStream, double)",
+        "public static void writeSwappedFloat(OutputStream, float)",
+        "public static void writeSwappedInteger(OutputStream, int)",
+        "public static void writeSwappedLong(OutputStream, long)",
+        "public static void writeSwappedShort(OutputStream, short)",
+        "private static int read(InputStream)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+      ],
+      "details": "Create a new public final class org.apache.commons.io.EndianUtilsStream containing the implementations of the listed InputStream/OutputStream-based methods and the private read(InputStream) helper. In EndianUtils, replace the bodies of the moved methods with delegating implementations that call the corresponding EndianUtilsStream methods (preserve method signatures in EndianUtils to keep API compatibility). Ensure EndianUtilsStream uses the same imports (java.io.InputStream, java.io.OutputStream, java.io.IOException, java.io.EOFException) and that read(InputStream) is private within EndianUtilsStream. Keep EndianUtils' byte-array based methods and validateByteArrayOffset unchanged.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/EndianUtils.java",
+        "src/main/java/org/apache/commons/io/EndianUtilsStream.java"
+      ],
+      "details": "Ensure EndianUtils imports remain unchanged. Add necessary imports to EndianUtilsStream: java.io.InputStream, java.io.OutputStream, java.io.IOException, java.io.EOFException and static import of IOUtils.EOF if required. Update package declaration to org.apache.commons.io.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+        "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/EndianUtilsTest.java",
+    "src/test/java/org/apache/commons/io/input/SwappedDataInputStreamTest.java"
+  ]
+}

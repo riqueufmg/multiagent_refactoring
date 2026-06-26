@@ -1,0 +1,175 @@
+commit c1a1c153fae014e958fc58b05de7e18ae43be8b6
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jun 25 15:04:04 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtils.java b/src/main/java/org/apache/commons/io/EndianUtils.java
+index 255f4e095..07dd94fe5 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtils.java
++++ b/src/main/java/org/apache/commons/io/EndianUtils.java
+@@ -241,7 +241,7 @@ public static int readSwappedUnsignedShort(final InputStream input) throws IOExc
+      * @return the converted value.
+      */
+     public static double swapDouble(final double value) {
+-        return Double.longBitsToDouble(swapLong(Double.doubleToLongBits(value)));
++        return Double.longBitsToDouble(EndianUtilsSwap.swapLong(Double.doubleToLongBits(value)));
+     }
+ 
+     /**
+@@ -251,7 +251,7 @@ public static double swapDouble(final double value) {
+      * @return the converted value.
+      */
+     public static float swapFloat(final float value) {
+-        return Float.intBitsToFloat(swapInteger(Float.floatToIntBits(value)));
++        return Float.intBitsToFloat(EndianUtilsSwap.swapInteger(Float.floatToIntBits(value)));
+     }
+ 
+     /**
+@@ -261,11 +261,7 @@ public static float swapFloat(final float value) {
+      * @return the converted value.
+      */
+     public static int swapInteger(final int value) {
+-        return
+-            ((value >> 0 & 0xff) << 24) +
+-            ((value >> 8 & 0xff) << 16) +
+-            ((value >> 16 & 0xff) << 8) +
+-            ((value >> 24 & 0xff) << 0);
++        return EndianUtilsSwap.swapInteger(value);
+     }
+ 
+     /**
+@@ -275,15 +271,7 @@ public static int swapInteger(final int value) {
+      * @return the converted value.
+      */
+     public static long swapLong(final long value) {
+-        return
+-            ((value >> 0 & 0xff) << 56) +
+-            ((value >> 8 & 0xff) << 48) +
+-            ((value >> 16 & 0xff) << 40) +
+-            ((value >> 24 & 0xff) << 32) +
+-            ((value >> 32 & 0xff) << 24) +
+-            ((value >> 40 & 0xff) << 16) +
+-            ((value >> 48 & 0xff) << 8) +
+-            ((value >> 56 & 0xff) << 0);
++        return EndianUtilsSwap.swapLong(value);
+     }
+ 
+     /**
+@@ -293,10 +281,7 @@ public static long swapLong(final long value) {
+      * @return the converted value.
+      */
+     public static short swapShort(final short value) {
+-        return (short) (
+-            ((value >> 0 & 0xff) << 8) +
+-            ((value >> 8 & 0xff) << 0)
+-        );
++        return EndianUtilsSwap.swapShort(value);
+     }
+ 
+     /**
+diff --git a/src/main/java/org/apache/commons/io/EndianUtilsSwap.java b/src/main/java/org/apache/commons/io/EndianUtilsSwap.java
+new file mode 100644
+index 000000000..8725a9134
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/EndianUtilsSwap.java
+@@ -0,0 +1,99 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.io;
++
++/**
++ * Helper class that contains byte-order swapping operations.
++ *
++ * This class centralizes swap implementations so EndianUtils can delegate
++ * to it and focus on reading/writing and validation responsibilities.
++ */
++public final class EndianUtilsSwap {
++
++    private EndianUtilsSwap() {
++        // prevent instantiation
++    }
++
++    /**
++     * Converts a {@code double} value from big-endian to little-endian
++     * and vice versa. That is, it converts the {@code double} to bytes,
++     * reverses the bytes, and then reinterprets those bytes as a new {@code double}.
++     * This can be useful if you have a number that was read from the
++     * underlying source in the wrong endianness.
++     *
++     * @param value value to convert.
++     * @return the converted value.
++     */
++    public static double swapDouble(final double value) {
++        return Double.longBitsToDouble(swapLong(Double.doubleToLongBits(value)));
++    }
++
++    /**
++     * Converts a {@code float} value from big-endian to little-endian and vice versa.
++     *
++     * @param value value to convert.
++     * @return the converted value.
++     */
++    public static float swapFloat(final float value) {
++        return Float.intBitsToFloat(swapInteger(Float.floatToIntBits(value)));
++    }
++
++    /**
++     * Converts an {@code int} value from big-endian to little-endian and vice versa.
++     *
++     * @param value value to convert.
++     * @return the converted value.
++     */
++    public static int swapInteger(final int value) {
++        return
++            ((value >> 0 & 0xff) << 24) +
++            ((value >> 8 & 0xff) << 16) +
++            ((value >> 16 & 0xff) << 8) +
++            ((value >> 24 & 0xff) << 0);
++    }
++
++    /**
++     * Converts a {@code long} value from big-endian to little-endian and vice versa.
++     *
++     * @param value value to convert.
++     * @return the converted value.
++     */
++    public static long swapLong(final long value) {
++        return
++            ((value >> 0 & 0xff) << 56) +
++            ((value >> 8 & 0xff) << 48) +
++            ((value >> 16 & 0xff) << 40) +
++            ((value >> 24 & 0xff) << 32) +
++            ((value >> 32 & 0xff) << 24) +
++            ((value >> 40 & 0xff) << 16) +
++            ((value >> 48 & 0xff) << 8) +
++            ((value >> 56 & 0xff) << 0);
++    }
++
++    /**
++     * Converts a {@code short} value from big-endian to little-endian and vice versa.
++     *
++     * @param value value to convert.
++     * @return the converted value.
++     */
++    public static short swapShort(final short value) {
++        return (short) (
++            ((value >> 0 & 0xff) << 8) +
++            ((value >> 8 & 0xff) << 0)
++        );
++    }
++}

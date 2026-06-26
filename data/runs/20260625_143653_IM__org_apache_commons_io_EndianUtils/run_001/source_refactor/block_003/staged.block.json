@@ -1,0 +1,36 @@
+{
+  "id": 3,
+  "goal": "Update call sites in the codebase that prefer to use the new focused helper classes directly (optional / lower-priority). This reduces coupling to EndianUtils for stream or swap specific operations.",
+  "files": [
+    "all project source files that reference org.apache.commons.io.EndianUtils"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "calls to EndianUtils.readSwappedDouble(InputStream)",
+        "calls to EndianUtils.readSwappedFloat(InputStream)",
+        "calls to EndianUtils.readSwappedInteger(InputStream)",
+        "calls to EndianUtils.readSwappedLong(InputStream)",
+        "calls to EndianUtils.readSwappedShort(InputStream)",
+        "calls to EndianUtils.readSwappedUnsignedInteger(InputStream)",
+        "calls to EndianUtils.readSwappedUnsignedShort(InputStream)",
+        "calls to EndianUtils.writeSwappedDouble(OutputStream, double)",
+        "calls to EndianUtils.writeSwappedFloat(OutputStream, float)",
+        "calls to EndianUtils.writeSwappedInteger(OutputStream, int)",
+        "calls to EndianUtils.writeSwappedLong(OutputStream, long)",
+        "calls to EndianUtils.writeSwappedShort(OutputStream, short)",
+        "calls to EndianUtils.swapDouble(double)",
+        "calls to EndianUtils.swapFloat(float)",
+        "calls to EndianUtils.swapInteger(int)",
+        "calls to EndianUtils.swapLong(long)",
+        "calls to EndianUtils.swapShort(short)"
+      ],
+      "outputs": [
+        "updated call sites (optional) to use EndianUtilsStream.* or EndianUtilsSwap.* where callers prefer the specialized helper"
+      ],
+      "details": "Optionally update external callers to reference the new classes directly (EndianUtilsStream and EndianUtilsSwap) when they only need stream-based or swap operations. This reduces the surface area of EndianUtils usage in the codebase. Because EndianUtils retains delegating methods, external update is optional and backward compatible; perform updates where it improves modularization and readability.",
+      "risk": "medium"
+    }
+  ]
+}
