@@ -1,0 +1,32 @@
+{
+  "id": 1,
+  "goal": "Reduce FAN-OUT by extracting argument and lambda-argument resolution logic out of JavaParserFacade into a dedicated helper class to centralize responsibility for building argument type lists and lambda placeholders.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/ArgumentResolver.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver)",
+      "inputs": [
+        "private void solveArguments(Node node, NodeList<Expression> args, boolean solveLambdas, List<ResolvedType> argumentTypes, List<LambdaArgumentTypePlaceholder> placeholders)"
+      ],
+      "outputs": [
+        "class com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver { public ArgumentResolver(TypeSolver typeSolver, JavaParserFacade facade, FailureHandler failureHandler); public void solveArguments(Node node, NodeList<Expression> args, boolean solveLambdas, List<ResolvedType> argumentTypes, List<LambdaArgumentTypePlaceholder> placeholders); }"
+      ],
+      "details": "Extract the private solveArguments method into ArgumentResolver. The new class will encapsulate logic that detects lambda expressions and method references among arguments, creates LambdaArgumentTypePlaceholder instances, calls back into the facade only where necessary (via a provided JavaParserFacade reference or via a minimal functional accessor), and uses FailureHandler for error wrapping. Inject TypeSolver and FailureHandler via constructor. Update JavaParserFacade to hold a final ArgumentResolver argumentResolver field and delegate calls to it.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(file)",
+      "inputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/ArgumentResolver.java"
+      ],
+      "outputs": [
+        "ArgumentResolver imports for: com.github.javaparser.ast.Node, com.github.javaparser.ast.NodeList, com.github.javaparser.ast.expr.Expression, com.github.javaparser.resolution.model.LambdaArgumentTypePlaceholder, com.github.javaparser.resolution.types.ResolvedType, com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.FailureHandler, com.github.javaparser.symbolsolver.resolution.SymbolSolver, java.util.List, java.util.Optional"
+      ],
+      "details": "Add the imports needed by the extracted class. Remove imports from JavaParserFacade if no longer required by leftover code.",
+      "risk": "low"
+    }
+  ]
+}

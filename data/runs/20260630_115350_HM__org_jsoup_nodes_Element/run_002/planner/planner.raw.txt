@@ -1,0 +1,170 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Element",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Element's responsibility for class attribute parsing/manipulation by extracting class-name related logic into a dedicated helper class, and replace implementations in Element with small delegating calls.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementClassNames.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementClassNames)",
+          "inputs": [
+            "org.jsoup.nodes.Element.className()",
+            "org.jsoup.nodes.Element.classNames()",
+            "org.jsoup.nodes.Element.classList()",
+            "org.jsoup.nodes.Element.nextClassStart(String,int,int)",
+            "org.jsoup.nodes.Element.nextClassEnd(String,int,int)",
+            "org.jsoup.nodes.Element.classToken(String,int,int)",
+            "org.jsoup.nodes.Element.classNames(Set)",
+            "org.jsoup.nodes.Element.hasClass(String)",
+            "org.jsoup.nodes.Element.addClass(String)",
+            "org.jsoup.nodes.Element.removeClass(String)",
+            "org.jsoup.nodes.Element.toggleClass(String)"
+          ],
+          "outputs": [
+            "org.jsoup.nodes.ElementClassNames.className(Element)",
+            "org.jsoup.nodes.ElementClassNames.classNames(Element)",
+            "org.jsoup.nodes.ElementClassNames.classList(Element)",
+            "org.jsoup.nodes.ElementClassNames.nextClassStart(String,int,int)",
+            "org.jsoup.nodes.ElementClassNames.nextClassEnd(String,int,int)",
+            "org.jsoup.nodes.ElementClassNames.classToken(String,int,int)",
+            "org.jsoup.nodes.ElementClassNames.classNames(Element,Set)",
+            "org.jsoup.nodes.ElementClassNames.hasClass(Element,String)",
+            "org.jsoup.nodes.ElementClassNames.addClass(Element,String)",
+            "org.jsoup.nodes.ElementClassNames.removeClass(Element,String)",
+            "org.jsoup.nodes.ElementClassNames.toggleClass(Element,String)"
+          ],
+          "details": "Create a new package-private helper class ElementClassNames in org.jsoup.nodes that implements all logic for parsing the \"class\" attribute, tokenization helpers (nextClassStart/nextClassEnd/classToken), and mutation helpers. Methods moved will be implemented to accept an Element instance (or use package-private access) and interact with Element.attributes as needed. Element retains the same public signatures but delegates to ElementClassNames to preserve callers.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(src/main/java/org/jsoup/nodes/Element.java)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java (updated imports)"
+          ],
+          "details": "Add imports if necessary for the new ElementClassNames (none expected because same package), ensure Element references compile when delegating to ElementClassNames.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.className(), org.jsoup.nodes.ElementClassNames.className(Element))",
+          "inputs": [
+            "org.jsoup.nodes.Element.className()"
+          ],
+          "outputs": [
+            "org.jsoup.nodes.Element.className() (delegates to ElementClassNames)"
+          ],
+          "details": "Update Element.className() and other moved methods to call ElementClassNames static helpers or instance helpers, preserving method signatures so external callers are unaffected.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move child-element caching and related user-data logic out of Element into a dedicated ElementChildCache helper to reduce Element's direct dependencies and responsibilities for cache management.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementChildCache.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementChildCache)",
+          "inputs": [
+            "org.jsoup.nodes.Element.childElementsList()",
+            "org.jsoup.nodes.Element.cachedChildren()",
+            "org.jsoup.nodes.Element.stashChildren(List<Element>)",
+            "org.jsoup.nodes.Element.childElsKey",
+            "org.jsoup.nodes.Element.childElsMod"
+          ],
+          "outputs": [
+            "org.jsoup.nodes.ElementChildCache.childElementsList(Element)",
+            "org.jsoup.nodes.ElementChildCache.cachedChildren(Element)",
+            "org.jsoup.nodes.ElementChildCache.stashChildren(Element,List<Element>)",
+            "org.jsoup.nodes.ElementChildCache.childElsKey",
+            "org.jsoup.nodes.ElementChildCache.childElsMod"
+          ],
+          "details": "Create a new helper class ElementChildCache in the same package that encapsulates the cached child-elements logic and the two user-data keys (childElsKey, childElsMod). Because Element's fields (attributes, childNodes) are package-private, the helper can access them directly. Element methods will be replaced with small delegating calls to ElementChildCache. This reduces the number of methods and internal logic in Element related to child caching.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(src/main/java/org/jsoup/nodes/Element.java)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java (updated imports)"
+          ],
+          "details": "Ensure Element imports remain valid; new helper is same package so no new import required. Adjust any static references if needed.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.childElementsList(), org.jsoup.nodes.ElementChildCache.childElementsList(Element))",
+          "inputs": [
+            "org.jsoup.nodes.Element.childElementsList()"
+          ],
+          "outputs": [
+            "org.jsoup.nodes.Element.childElementsList() (delegates to ElementChildCache)"
+          ],
+          "details": "Replace implementation of Element.childElementsList() to delegate to ElementChildCache.childElementsList(this) so external callers see no change.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract CSS path / selector component construction from Element into a focused ElementSelectorSupport helper to isolate selector-generation dependencies and reduce Element's direct fan-out to selector-related helpers.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementSelectorSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementSelectorSupport)",
+          "inputs": [
+            "org.jsoup.nodes.Element.uniqueIdSelector(@Nullable Document)",
+            "org.jsoup.nodes.Element.cssSelector()",
+            "org.jsoup.nodes.Element.cssSelectorComponent()",
+            "org.jsoup.nodes.Element.cssSelectorComponent uses TokenQueue::escapeCssIdentifier",
+            "org.jsoup.nodes.Element.cssSelectorComponent uses StringUtil"
+          ],
+          "outputs": [
+            "org.jsoup.nodes.ElementSelectorSupport.uniqueIdSelector(Element,@Nullable Document)",
+            "org.jsoup.nodes.ElementSelectorSupport.cssSelector(Element)",
+            "org.jsoup.nodes.ElementSelectorSupport.cssSelectorComponent(Element)"
+          ],
+          "details": "Create ElementSelectorSupport in org.jsoup.nodes containing the logic to compute uniqueIdSelector, cssSelector, and cssSelectorComponent. The helper will use package-private access to Element fields and methods (parent(), tagName(), baseUri(), etc.). Element will keep the public methods but delegate to the new helper to preserve callers. This isolates selector creation and reduces Element's mixed responsibilities.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(src/main/java/org/jsoup/nodes/ElementSelectorSupport.java)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/ElementSelectorSupport.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementSelectorSupport.java (imports as needed)"
+          ],
+          "details": "Add any required imports used by the selector support helper (TokenQueue is in same project and referenced by Element already). The helper will be in the same package; update Element to delegate to it.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.cssSelector(), org.jsoup.nodes.ElementSelectorSupport.cssSelector(Element))",
+          "inputs": [
+            "org.jsoup.nodes.Element.cssSelector()"
+          ],
+          "outputs": [
+            "org.jsoup.nodes.Element.cssSelector() (delegates to ElementSelectorSupport)"
+          ],
+          "details": "Replace Element.cssSelector() implementation with a small delegating call to ElementSelectorSupport.cssSelector(this), preserving the public API and avoiding changes to callers.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

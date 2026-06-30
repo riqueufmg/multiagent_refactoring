@@ -1,0 +1,146 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move dependency-heavy argument and lambda-handling logic out of JavaParserFacade into a dedicated helper to reduce fan-out and simplify the facade's responsibilities.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/ArgumentResolver.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver)",
+          "inputs": [
+            "private void solveArguments(Node node, NodeList<Expression> args, boolean solveLambdas, List<ResolvedType> argumentTypes, List<LambdaArgumentTypePlaceholder> placeholders)",
+            "private Optional<ForEachStmt> forEachStmtWithVariableDeclarator(VariableDeclarator variableDeclarator)",
+            "uses: LambdaArgumentTypePlaceholder",
+            "uses: FailureHandler",
+            "uses: TypeSolver",
+            "uses: JavaParserFacade#getType(Node, boolean)"
+          ],
+          "outputs": [
+            "new class com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver with methods:",
+            " - public ArgumentResolver(TypeSolver typeSolver, JavaParserFacade facade, FailureHandler failureHandler)",
+            " - public void solveArguments(Node node, NodeList<Expression> args, boolean solveLambdas, List<ResolvedType> argumentTypes, List<LambdaArgumentTypePlaceholder> placeholders)",
+            " - public Optional<ForEachStmt> forEachStmtWithVariableDeclarator(VariableDeclarator variableDeclarator)"
+          ],
+          "details": "Extract private argument and lambda placeholder collection logic and the helper that detects foreach variable declarators into ArgumentResolver. The new class will depend on TypeSolver and will call back to the facade for per-expression type resolution via a JavaParserFacade instance passed in the constructor. Replace the original private methods in JavaParserFacade with thin delegating calls to an ArgumentResolver instance field.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/ArgumentResolver.java)",
+          "inputs": [
+            "com.github.javaparser.ast.Node",
+            "com.github.javaparser.ast.NodeList",
+            "com.github.javaparser.ast.expr.Expression",
+            "com.github.javaparser.ast.stmt.ForEachStmt",
+            "com.github.javaparser.ast.body.VariableDeclarator",
+            "com.github.javaparser.resolution.ResolvedType",
+            "com.github.javaparser.resolution.model.LambdaArgumentTypePlaceholder",
+            "java.util.List",
+            "java.util.Optional"
+          ],
+          "outputs": [
+            "ArgumentResolver.java with necessary imports"
+          ],
+          "details": "Add required imports for the newly extracted ArgumentResolver class.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Group node-type resolution and traversal helpers into a TypeResolutionHelper to concentrate type logic away from JavaParserFacade and reduce its direct collaborations.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/TypeResolutionHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.TypeResolutionHelper)",
+          "inputs": [
+            "private ResolvedType getTypeConcrete(Node node, boolean solveLambdas)",
+            "protected ResolvedType getBinaryTypeConcrete(Node left, Node right, boolean solveLambdas, BinaryExpr.Operator operator)",
+            "protected TypeDeclaration<?> findContainingTypeDecl(Node node)",
+            "protected Node findContainingTypeDeclOrObjectCreationExpr(Node node)",
+            "protected Node findContainingTypeDeclOrObjectCreationExpr(Node node, String className)",
+            "protected ResolvedType getTypeOfThisIn(Node node)",
+            "uses: TypeExtractor",
+            "uses: ReferenceTypeImpl",
+            "uses: JavaParserAnonymousClassDeclaration",
+            "uses: JavaParserEnumDeclaration",
+            "uses: demandParentNode"
+          ],
+          "outputs": [
+            "new class com.github.javaparser.symbolsolver.javaparsermodel.TypeResolutionHelper with methods:",
+            " - public TypeResolutionHelper(TypeExtractor typeExtractor, TypeSolver typeSolver, JavaParserFacade facade)",
+            " - public ResolvedType getTypeConcrete(Node node, boolean solveLambdas)",
+            " - public ResolvedType getBinaryTypeConcrete(Node left, Node right, boolean solveLambdas, BinaryExpr.Operator operator)",
+            " - public TypeDeclaration<?> findContainingTypeDecl(Node node)",
+            " - public Node findContainingTypeDeclOrObjectCreationExpr(Node node)",
+            " - public Node findContainingTypeDeclOrObjectCreationExpr(Node node, String className)",
+            " - public ResolvedType getTypeOfThisIn(Node node)"
+          ],
+          "details": "Extract protected/private node traversal and low-level type resolution code into TypeResolutionHelper. The new helper will accept the existing TypeExtractor and TypeSolver (and a reference to the facade if some callbacks to public facade methods are required). Replace moved methods in JavaParserFacade with delegating calls. Keep public caching/getType overloads in JavaParserFacade so existing callers are unaffected.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/TypeResolutionHelper.java)",
+          "inputs": [
+            "com.github.javaparser.ast.Node",
+            "com.github.javaparser.ast.body.TypeDeclaration",
+            "com.github.javaparser.ast.expr.ObjectCreationExpr",
+            "com.github.javaparser.resolution.ResolvedType",
+            "com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl",
+            "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserAnonymousClassDeclaration",
+            "com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserEnumDeclaration",
+            "com.github.javaparser.resolution.typesolvers.TypeSolver"
+          ],
+          "outputs": [
+            "TypeResolutionHelper.java with necessary imports"
+          ],
+          "details": "Add imports required by the extracted type resolution helper.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Wire the new helper classes into JavaParserFacade: add fields for helpers, initialize them in the constructor, and replace internal calls to moved methods with delegating calls so public API remains stable while FAN-OUT is reduced.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java)",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver",
+            "com.github.javaparser.symbolsolver.javaparsermodel.TypeResolutionHelper"
+          ],
+          "outputs": [
+            "JavaParserFacade.java updated imports"
+          ],
+          "details": "Add imports for the newly created helper classes so JavaParserFacade can reference them.",
+          "risk": "low"
+        },
+        {
+          "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade)",
+          "inputs": [
+            "update: add fields 'private final ArgumentResolver argumentResolver' and 'private final TypeResolutionHelper typeResolutionHelper' to JavaParserFacade",
+            "update: initialize these fields in the private constructor using existing typeSolver, typeExtractor and failureHandler instances",
+            "update: replace internal direct calls to the moved methods with calls to argumentResolver.* or typeResolutionHelper.*",
+            "ensure: public methods (solve, getType, convert, etc.) remain in JavaParserFacade and delegate to helpers as needed"
+          ],
+          "outputs": [
+            "modified JavaParserFacade.java that holds helper instances and delegates internal responsibilities without changing public API signatures"
+          ],
+          "details": "Introduce fields for the new helper classes and update the constructor to instantiate them. Replace original private/protected method bodies with single-line delegations to the corresponding helper. This reduces the number of direct dependencies (fan-out) of JavaParserFacade by moving collaboration details into focused classes while keeping the external facade unchanged.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

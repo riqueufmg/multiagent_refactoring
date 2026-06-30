@@ -1,0 +1,34 @@
+{
+  "id": 1,
+  "goal": "Reduce FAN-OUT by extracting type-resolution responsibilities from JavaParserFacade into a dedicated helper class so JavaParserFacade keeps high-level API while delegation centralizes type logic.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/TypeResolutionFacade.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.TypeResolutionFacade)",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getType(Node)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getType(Node, boolean)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getTypeConcrete(Node, boolean)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getBinaryTypeConcrete(Node, Node, boolean, com.github.javaparser.ast.expr.BinaryExpr.Operator)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getTypeOfThisIn(Node)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getTypeDeclaration(Node)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getTypeDeclaration(com.github.javaparser.ast.body.ClassOrInterfaceDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.getTypeDeclaration(com.github.javaparser.ast.body.TypeDeclaration<?>)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.convertToUsage(com.github.javaparser.ast.type.Type, com.github.javaparser.symbolsolver.javaparsermodel.contexts.Context)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.convert(com.github.javaparser.ast.type.Type, Node)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.convert(com.github.javaparser.ast.type.Type, com.github.javaparser.symbolsolver.javaparsermodel.contexts.Context)",
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.classToResolvedType(java.lang.Class<?>)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.TypeResolutionFacade (new)",
+        "modified com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade (delegating methods to TypeResolutionFacade)",
+        "ADD_OR_UPDATE_IMPORTS in JavaParserFacade and TypeResolutionFacade as required"
+      ],
+      "details": "Create new class TypeResolutionFacade in package com.github.javaparser.symbolsolver.javaparsermodel. Move the concrete type-resolution methods and related helpers from JavaParserFacade into TypeResolutionFacade as instance methods. TypeResolutionFacade will be constructed with the existing collaborators required by the moved code (TypeSolver root, TypeExtractor, SymbolResolver, Solver, FailureHandler). Replace the implementations of the moved methods in JavaParserFacade with small delegating methods that forward to a final TypeResolutionFacade instance. Update imports in both files. Keep static DataKey constants and any caches accessed by the moved methods either kept in JavaParserFacade if they are used elsewhere or duplicated as read-only references passed into the helper; prefer passing necessary references to avoid breaking other users.",
+      "risk": "medium"
+    }
+  ]
+}

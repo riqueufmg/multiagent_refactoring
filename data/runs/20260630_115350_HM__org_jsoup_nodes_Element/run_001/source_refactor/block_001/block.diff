@@ -1,0 +1,220 @@
+commit 5d46102fade763478e912ebcb0c0185f1cabb218
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Jun 30 12:01:13 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/nodes/Element.java b/src/main/java/org/jsoup/nodes/Element.java
+index 82e2d0ff..80fe4db3 100644
+--- a/src/main/java/org/jsoup/nodes/Element.java
++++ b/src/main/java/org/jsoup/nodes/Element.java
+@@ -16,6 +16,7 @@ import org.jsoup.select.NodeFilter;
+ import org.jsoup.select.NodeVisitor;
+ import org.jsoup.select.Nodes;
+ import org.jsoup.select.Selector;
++import org.jsoup.nodes.ElementQuerySupport;
+ import org.jspecify.annotations.Nullable;
+ 
+ import java.lang.ref.WeakReference;
+@@ -514,7 +515,7 @@ public class Element extends Node implements Iterable<Element> {
+      * @throws Selector.SelectorParseException (unchecked) on an invalid CSS query.
+      */
+     public Elements select(String cssQuery) {
+-        return Selector.select(cssQuery, this);
++        return ElementQuerySupport.select(this, cssQuery);
+     }
+ 
+     /**
+@@ -526,7 +527,7 @@ public class Element extends Node implements Iterable<Element> {
+      * @see Selector#evaluatorOf(String css)
+      */
+     public Elements select(Evaluator evaluator) {
+-        return Selector.select(evaluator, this);
++        return ElementQuerySupport.select(this, evaluator);
+     }
+ 
+     /**
+@@ -548,7 +549,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.19.1
+      */
+     public Stream<Element> selectStream(String cssQuery) {
+-        return Selector.selectStream(cssQuery, this);
++        return ElementQuerySupport.selectStream(this, cssQuery);
+     }
+ 
+     /**
+@@ -560,7 +561,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.19.1
+      */
+     public Stream<Element> selectStream(Evaluator evaluator) {
+-        return Selector.selectStream(evaluator, this);
++        return ElementQuerySupport.selectStream(this, evaluator);
+     }
+ 
+     /**
+@@ -573,7 +574,7 @@ public class Element extends Node implements Iterable<Element> {
+      * @see #expectFirst(String)
+      */
+     public @Nullable Element selectFirst(String cssQuery) {
+-        return Selector.selectFirst(cssQuery, this);
++        return ElementQuerySupport.selectFirst(this, cssQuery);
+     }
+ 
+     /**
+@@ -585,7 +586,7 @@ public class Element extends Node implements Iterable<Element> {
+      * match.
+      */
+     public @Nullable Element selectFirst(Evaluator evaluator) {
+-        return Collector.findFirst(evaluator, this);
++        return ElementQuerySupport.selectFirst(this, evaluator);
+     }
+ 
+     /**
+@@ -598,7 +599,7 @@ public class Element extends Node implements Iterable<Element> {
+      */
+     public Element expectFirst(String cssQuery) {
+         return Validate.expectNotNull(
+-            Selector.selectFirst(cssQuery, this),
++            ElementQuerySupport.selectFirst(this, cssQuery),
+             parent() != null ?
+                 "No elements matched the query '%s' on element '%s'." :
+                 "No elements matched the query '%s' in the document."
+@@ -615,7 +616,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.21.1
+      */
+     public Nodes<Node> selectNodes(Evaluator evaluator) {
+-        return selectNodes(evaluator, Node.class);
++        return ElementQuerySupport.selectNodes(this, evaluator);
+     }
+ 
+     /**
+@@ -629,7 +630,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.21.1
+      */
+     public Nodes<Node> selectNodes(String cssQuery) {
+-        return selectNodes(cssQuery, Node.class);
++        return ElementQuerySupport.selectNodes(this, cssQuery);
+     }
+ 
+     /**
+@@ -643,8 +644,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.21.1
+      */
+     public <T extends Node> Nodes<T> selectNodes(Evaluator evaluator, Class<T> type) {
+-        Validate.notNull(evaluator);
+-        return Collector.collectNodes(evaluator, this, type);
++        return ElementQuerySupport.selectNodes(this, evaluator, type);
+     }
+ 
+     /**
+@@ -662,7 +662,7 @@ public class Element extends Node implements Iterable<Element> {
+      */
+     public <T extends Node> Nodes<T> selectNodes(String cssQuery, Class<T> type) {
+         Validate.notEmpty(cssQuery);
+-        return selectNodes(evaluatorOf(cssQuery), type);
++        return ElementQuerySupport.selectNodes(this, evaluatorOf(cssQuery), type);
+     }
+ 
+     /**
+@@ -678,7 +678,7 @@ public class Element extends Node implements Iterable<Element> {
+      @see #expectFirst(String)
+      */
+     public @Nullable <T extends Node> T selectFirstNode(String cssQuery, Class<T> type) {
+-        return selectFirstNode(evaluatorOf(cssQuery), type);
++        return ElementQuerySupport.selectFirstNode(this, cssQuery, type);
+     }
+ 
+     /**
+@@ -691,7 +691,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.21.1
+      */
+     public @Nullable <T extends Node> T selectFirstNode(Evaluator evaluator, Class<T> type) {
+-        return Collector.findFirstNode(evaluator, this, type);
++        return ElementQuerySupport.selectFirstNode(this, evaluator, type);
+     }
+ 
+     /**
+@@ -782,7 +782,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.14.3
+      */
+     public Elements selectXpath(String xpath) {
+-        return new Elements(NodeUtils.selectXpath(xpath, this, Element.class));
++        return ElementQuerySupport.selectXpath(this, xpath);
+     }
+ 
+     /**
+diff --git a/src/main/java/org/jsoup/nodes/ElementQuerySupport.java b/src/main/java/org/jsoup/nodes/ElementQuerySupport.java
+new file mode 100644
+index 00000000..a26b98bd
+--- /dev/null
++++ b/src/main/java/org/jsoup/nodes/ElementQuerySupport.java
+@@ -0,0 +1,69 @@
++package org.jsoup.nodes;
++
++import org.jsoup.helper.Validate;
++import org.jsoup.select.Collector;
++import org.jsoup.select.Elements;
++import org.jsoup.select.Evaluator;
++import org.jsoup.select.Selector;
++import org.jsoup.select.Nodes;
++import java.util.List;
++import java.util.stream.Stream;
++import org.jspecify.annotations.Nullable;
++
++/**
++ * Helper class that contains selection/query implementations extracted from Element.
++ * The methods are static and take an Element context, to avoid Element having heavy selector logic directly.
++ */
++public final class ElementQuerySupport {
++    private ElementQuerySupport() {}
++
++    public static Elements select(Element el, String cssQuery) {
++        return Selector.select(cssQuery, el);
++    }
++
++    public static Elements select(Element el, Evaluator evaluator) {
++        return Selector.select(evaluator, el);
++    }
++
++    public static Stream<Element> selectStream(Element el, String cssQuery) {
++        return Selector.selectStream(cssQuery, el);
++    }
++
++    public static Stream<Element> selectStream(Element el, Evaluator evaluator) {
++        return Selector.selectStream(evaluator, el);
++    }
++
++    public static @Nullable Element selectFirst(Element el, String cssQuery) {
++        return Selector.selectFirst(cssQuery, el);
++    }
++
++    public static @Nullable Element selectFirst(Element el, Evaluator evaluator) {
++        return Collector.findFirst(evaluator, el);
++    }
++
++    public static Nodes<Node> selectNodes(Element el, Evaluator evaluator) {
++        return selectNodes(el, evaluator, Node.class);
++    }
++
++    public static Nodes<Node> selectNodes(Element el, String cssQuery) {
++        Validate.notEmpty(cssQuery);
++        return selectNodes(el, Selector.evaluatorOf(cssQuery), Node.class);
++    }
++
++    public static <T extends Node> Nodes<T> selectNodes(Element el, Evaluator evaluator, Class<T> type) {
++        Validate.notNull(evaluator);
++        return Collector.collectNodes(evaluator, el, type);
++    }
++
++    public static @Nullable <T extends Node> T selectFirstNode(Element el, String cssQuery, Class<T> type) {
++        return selectFirstNode(el, Selector.evaluatorOf(cssQuery), type);
++    }
++
++    public static @Nullable <T extends Node> T selectFirstNode(Element el, Evaluator evaluator, Class<T> type) {
++        return Collector.findFirstNode(evaluator, el, type);
++    }
++
++    public static Elements selectXpath(Element el, String xpath) {
++        return new Elements(NodeUtils.selectXpath(xpath, el, Element.class));
++    }
++}

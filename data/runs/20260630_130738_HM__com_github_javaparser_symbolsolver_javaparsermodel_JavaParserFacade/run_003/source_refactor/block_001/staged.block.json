@@ -1,0 +1,48 @@
+{
+  "id": 1,
+  "goal": "Move dependency-heavy argument and lambda-handling logic out of JavaParserFacade into a dedicated helper to reduce fan-out and simplify the facade's responsibilities.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/ArgumentResolver.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver)",
+      "inputs": [
+        "private void solveArguments(Node node, NodeList<Expression> args, boolean solveLambdas, List<ResolvedType> argumentTypes, List<LambdaArgumentTypePlaceholder> placeholders)",
+        "private Optional<ForEachStmt> forEachStmtWithVariableDeclarator(VariableDeclarator variableDeclarator)",
+        "uses: LambdaArgumentTypePlaceholder",
+        "uses: FailureHandler",
+        "uses: TypeSolver",
+        "uses: JavaParserFacade#getType(Node, boolean)"
+      ],
+      "outputs": [
+        "new class com.github.javaparser.symbolsolver.javaparsermodel.ArgumentResolver with methods:",
+        " - public ArgumentResolver(TypeSolver typeSolver, JavaParserFacade facade, FailureHandler failureHandler)",
+        " - public void solveArguments(Node node, NodeList<Expression> args, boolean solveLambdas, List<ResolvedType> argumentTypes, List<LambdaArgumentTypePlaceholder> placeholders)",
+        " - public Optional<ForEachStmt> forEachStmtWithVariableDeclarator(VariableDeclarator variableDeclarator)"
+      ],
+      "details": "Extract private argument and lambda placeholder collection logic and the helper that detects foreach variable declarators into ArgumentResolver. The new class will depend on TypeSolver and will call back to the facade for per-expression type resolution via a JavaParserFacade instance passed in the constructor. Replace the original private methods in JavaParserFacade with thin delegating calls to an ArgumentResolver instance field.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/ArgumentResolver.java)",
+      "inputs": [
+        "com.github.javaparser.ast.Node",
+        "com.github.javaparser.ast.NodeList",
+        "com.github.javaparser.ast.expr.Expression",
+        "com.github.javaparser.ast.stmt.ForEachStmt",
+        "com.github.javaparser.ast.body.VariableDeclarator",
+        "com.github.javaparser.resolution.ResolvedType",
+        "com.github.javaparser.resolution.model.LambdaArgumentTypePlaceholder",
+        "java.util.List",
+        "java.util.Optional"
+      ],
+      "outputs": [
+        "ArgumentResolver.java with necessary imports"
+      ],
+      "details": "Add required imports for the newly extracted ArgumentResolver class.",
+      "risk": "low"
+    }
+  ]
+}
