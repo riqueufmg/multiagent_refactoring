@@ -2,7 +2,8 @@
 
 ## Requirements
 - Apache Maven 3.9.12
-- Java 23.0.2
+- Java 22+ (to run Designite)
+- Java version compatible with the repository to be refactored.
 - Python 3.13
 
 In addition to the requirements listed above, you need to run the command below in the repository root to install the dependencies required to run the scripts.
@@ -46,23 +47,46 @@ The automation of this workflow is implemented in the scripts located in the *or
 ### tools
 The *tools* directory contains third-party tools that are executed by the scripts of the *DesigniteJava* and *RefactoringMiner* modules.
 
-## Run
+## Configuration
 
-### Configuration
+### MVP Planner Configuration (mvp/planner/config.yml)
 
-To run a refactoring, you need to adjust the settings in the *config.yml* file, located inside the *orchestrator* directory.
+First, you need to change all 'absolute_path_to' values ​​to the absolute path to your repository.
+
+The following planner attributes need to be configured:
+- **prompts/smell**: each smell has a distinct prompt, therefore you must choose the absolute path to one of them 'mvp/planner/prompts/planner_(IM|HM|GC).md'.
+- **designite/java_path**: path to your Java +22 installation (e.g., /usr/lib/jvm/jdk-22.0.2-oracle-x64/bin/java).
+- **models/planner (optional)**: by default, 'gpt-5-mini' is being used, but it is possible to change to other models if desired.
+
+*Important: A valid license is required to run DesigniteJava.*
+
+The other attributes do not need to be changed, unless you wish to customize your repository.
+
+### MVP Source Refactor Configuration (mvp/source_refactor/config.yml)
+
+First, you need to change all 'absolute_path_to' values ​​to the absolute path to your repository.
+
+No other configuration attributes of the MVP source refactor need to be changed, unless you wish to customize your scripts. Furthermore, it's possible to define which model to use in both the plan executor and the code repairer via the **models/executor and repair** attributes.
+
+### MVP Quality Checker Configuration (mvp/quality_checker/config.yml)
+
+First, you need to change all 'absolute_path_to' values ​​to the absolute path to your repository.
+
+No other configuration attributes of the MVP source refactor need to be changed, unless you wish to customize your scripts.
+
+### Orquestrator (orchestrator/config.yml)
+The following orchestrator attributes need to be configured:
 
 - **project**: Defines the *name* and *repo_path* of the repository to be refactored.
 - **runs**: Defines the number of refactoring attempts. Each attempt runs the full cycle: planning, execution, and verification.
 - **target**: Defines the smell to be refactored and the refactoring target. The *smell* attribute accepts: `IM`, `HM`, and `GC`. The *smell_name* attribute accepts: `Insufficient Modularization`, `Hub-like Modularization`, and `God Component`. The *target_type* attribute accepts: `class` or `package`. The *target_name* attribute must be written in the FQN format of the package or class to be refactored.
 
-The remaining attributes refer to the default files used by the planner, source_executor, and quality_checker MVPs, as well as the scripts output directory. Only change these values if you are not going to use the default paths.
-
+### OpenAI token (.env)
 You also need to define your OpenAI token in the *.env* file in order to make inferences through the API.
 
-### Execution
+## Run
 
-After configuring the orchestrator, run the following command to start the refactoring:
+After configuring the MVPs and the orchestrator, run the following command to start the refactoring:
 
 ```bash
 python -m orchestrator.run --config orchestrator/config.yml
