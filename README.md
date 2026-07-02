@@ -1,5 +1,7 @@
 # Multi-Agent Refactoring
 
+Multi-Agent Refactoring is a prototype framework for automated Java refactoring using LLM-based agents. It targets design and architecture smells such as Insufficient Modularization, Hub-like Modularization, and God Component by splitting the workflow into planning, code transformation, repair, and quality verification. The system combines OpenAI models with static analysis tools such as DesigniteJava and RefactoringMiner to generate refactoring plans, apply code changes, repair compilation issues, and measure whether each execution improves structural quality while preserving build correctness.
+
 ## Requirements
 - Apache Maven 3.9.12
 - Java 22+ (to run Designite)
