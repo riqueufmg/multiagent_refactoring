@@ -1,0 +1,78 @@
+{
+  "id": 1,
+  "goal": "Move timezone-related classes into a dedicated tz subpackage to isolate timezone logic from the rest of the time package.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/time/AbstractFormatCache.java",
+    "src/main/java/org/apache/commons/lang3/time/DateUtils.java",
+    "src/main/java/org/apache/commons/lang3/time/FastDateParser.java",
+    "src/main/java/org/apache/commons/lang3/time/FastTimeZone.java",
+    "src/main/java/org/apache/commons/lang3/time/GmtTimeZone.java",
+    "src/main/java/org/apache/commons/lang3/time/TimeZones.java",
+    "src/main/java/org/apache/commons/lang3/time/tz/FastTimeZone.java",
+    "src/main/java/org/apache/commons/lang3/time/tz/GmtTimeZone.java",
+    "src/main/java/org/apache/commons/lang3/time/tz/TimeZones.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.lang3.time.tz"
+      ],
+      "details": "Create the destination subpackage org.apache.commons.lang3.time.tz to host timezone-related classes.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.time.TimeZones"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.time.tz.TimeZones"
+      ],
+      "details": "Move the TimeZones utility/registry class into the tz subpackage along with its closely related timezone implementations.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.time.FastTimeZone"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.time.tz.FastTimeZone"
+      ],
+      "details": "Move FastTimeZone (timezone implementation optimized for fast lookups) into the tz subpackage where it uses TimeZones internally.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.time.GmtTimeZone"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.time.tz.GmtTimeZone"
+      ],
+      "details": "Move GmtTimeZone (GMT-specific timezone implementation) into the tz subpackage alongside TimeZones and FastTimeZone.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.lang3.time.AbstractFormatCache",
+        "org.apache.commons.lang3.time.DateUtils",
+        "org.apache.commons.lang3.time.FastDateParser",
+        "org.apache.commons.lang3.time.tz.FastTimeZone",
+        "org.apache.commons.lang3.time.tz.GmtTimeZone",
+        "org.apache.commons.lang3.time.tz.TimeZones"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

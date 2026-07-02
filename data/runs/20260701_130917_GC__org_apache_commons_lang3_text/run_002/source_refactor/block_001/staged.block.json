@@ -1,0 +1,76 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive string-manipulation cluster (StrBuilder, StrTokenizer, StrMatcher) into a new internal subpackage to reduce God Component size.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/text/ExtendedMessageFormat.java",
+    "src/main/java/org/apache/commons/lang3/text/StrBuilder.java",
+    "src/main/java/org/apache/commons/lang3/text/StrMatcher.java",
+    "src/main/java/org/apache/commons/lang3/text/StrSubstitutor.java",
+    "src/main/java/org/apache/commons/lang3/text/StrTokenizer.java",
+    "src/main/java/org/apache/commons/lang3/text/internal/StrBuilder.java",
+    "src/main/java/org/apache/commons/lang3/text/internal/StrMatcher.java",
+    "src/main/java/org/apache/commons/lang3/text/internal/StrTokenizer.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.lang3.text.internal"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrBuilder"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.text.internal.StrBuilder"
+      ],
+      "details": "Move StrBuilder to the internal subpackage alongside its tokenizer and matcher collaborators.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrTokenizer"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.text.internal.StrTokenizer"
+      ],
+      "details": "Move StrTokenizer with its dependent StrMatcher and StrBuilder to preserve package-private interactions.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrMatcher"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.text.internal.StrMatcher"
+      ],
+      "details": "Move StrMatcher together with its primary users to keep internal matching logic co-located.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.lang3.text.ExtendedMessageFormat",
+        "org.apache.commons.lang3.text.StrSubstitutor",
+        "org.apache.commons.lang3.text.internal.StrBuilder",
+        "org.apache.commons.lang3.text.internal.StrMatcher",
+        "org.apache.commons.lang3.text.internal.StrTokenizer"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

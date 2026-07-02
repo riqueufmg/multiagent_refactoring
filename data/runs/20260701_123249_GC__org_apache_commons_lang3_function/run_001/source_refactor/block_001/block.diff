@@ -1,0 +1,483 @@
+commit 27702feaa976b2ecc3d4c510ffdffa8cc6472f6e
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Jul 1 12:41:13 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/ArrayUtils.java b/src/main/java/org/apache/commons/lang3/ArrayUtils.java
+index 3a7dafb80..845308a3e 100644
+--- a/src/main/java/org/apache/commons/lang3/ArrayUtils.java
++++ b/src/main/java/org/apache/commons/lang3/ArrayUtils.java
+@@ -38,7 +38,7 @@
+ import org.apache.commons.lang3.builder.HashCodeBuilder;
+ import org.apache.commons.lang3.builder.ToStringBuilder;
+ import org.apache.commons.lang3.builder.ToStringStyle;
+-import org.apache.commons.lang3.function.FailableFunction;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ import org.apache.commons.lang3.mutable.MutableInt;
+ import org.apache.commons.lang3.stream.IntStreams;
+ import org.apache.commons.lang3.stream.Streams;
+diff --git a/src/main/java/org/apache/commons/lang3/Functions.java b/src/main/java/org/apache/commons/lang3/Functions.java
+index 70f0aaf39..288b2b876 100644
+--- a/src/main/java/org/apache/commons/lang3/Functions.java
++++ b/src/main/java/org/apache/commons/lang3/Functions.java
+@@ -34,8 +34,8 @@
+ 
+ import org.apache.commons.lang3.Streams.FailableStream;
+ import org.apache.commons.lang3.exception.ExceptionUtils;
+-import org.apache.commons.lang3.function.Failable;
+ import org.apache.commons.lang3.function.FailableBooleanSupplier;
++import org.apache.commons.lang3.function.failable.Failable;
+ 
+ /**
+  * This class provides utility functions, and classes for working with the {@code java.util.function} package, or more
+@@ -70,7 +70,7 @@
+  * </p>
+  *
+  * @since 3.9
+- * @deprecated Use {@link org.apache.commons.lang3.function.Failable}.
++ * @deprecated Use {@link org.apache.commons.lang3.function.failable.Failable}.
+  */
+ @Deprecated
+ public class Functions {
+diff --git a/src/main/java/org/apache/commons/lang3/builder/AbstractSupplier.java b/src/main/java/org/apache/commons/lang3/builder/AbstractSupplier.java
+index f8a6d9567..2b03337e2 100644
+--- a/src/main/java/org/apache/commons/lang3/builder/AbstractSupplier.java
++++ b/src/main/java/org/apache/commons/lang3/builder/AbstractSupplier.java
+@@ -17,7 +17,7 @@
+ 
+ package org.apache.commons.lang3.builder;
+ 
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * Abstracts supplying an instance of {@code T}. Use to implement the builder pattern.
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializer.java b/src/main/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializer.java
+index 57e4d915e..c911c0f1e 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializer.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializer.java
+@@ -22,7 +22,7 @@
+ import org.apache.commons.lang3.builder.AbstractSupplier;
+ import org.apache.commons.lang3.exception.ExceptionUtils;
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * Abstracts and defines operations for {@link ConcurrentInitializer} implementations.
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/AtomicInitializer.java b/src/main/java/org/apache/commons/lang3/concurrent/AtomicInitializer.java
+index 649ea161d..56b157eb7 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/AtomicInitializer.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/AtomicInitializer.java
+@@ -19,7 +19,7 @@
+ import java.util.concurrent.atomic.AtomicReference;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * A specialized implementation of the {@link ConcurrentInitializer} interface
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializer.java b/src/main/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializer.java
+index 5b62c5ecd..35c9a58a4 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializer.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializer.java
+@@ -21,7 +21,7 @@
+ 
+ import org.apache.commons.lang3.exception.ExceptionUtils;
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * A specialized {@link ConcurrentInitializer} implementation which is similar
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/BackgroundInitializer.java b/src/main/java/org/apache/commons/lang3/concurrent/BackgroundInitializer.java
+index f1a02695e..a42f0367e 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/BackgroundInitializer.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/BackgroundInitializer.java
+@@ -24,7 +24,7 @@
+ import java.util.concurrent.Future;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * A class that allows complex initialization operations in a background task.
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/Computable.java b/src/main/java/org/apache/commons/lang3/concurrent/Computable.java
+index ac5384191..e58d0d460 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/Computable.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/Computable.java
+@@ -16,7 +16,7 @@
+  */
+ package org.apache.commons.lang3.concurrent;
+ 
+-import org.apache.commons.lang3.function.FailableFunction;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ 
+ /**
+  * Definition of an interface for a wrapper around a calculation that takes a single parameter and returns a result.
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/ConcurrentInitializer.java b/src/main/java/org/apache/commons/lang3/concurrent/ConcurrentInitializer.java
+index d29dca1fe..0c041a67c 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/ConcurrentInitializer.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/ConcurrentInitializer.java
+@@ -16,7 +16,7 @@
+  */
+ package org.apache.commons.lang3.concurrent;
+ 
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * Defines the thread-safe initialization of objects.
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/LazyInitializer.java b/src/main/java/org/apache/commons/lang3/concurrent/LazyInitializer.java
+index a5271eba6..3cc225fd6 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/LazyInitializer.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/LazyInitializer.java
+@@ -17,7 +17,7 @@
+ package org.apache.commons.lang3.concurrent;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * This class provides a generic implementation of the lazy initialization pattern.
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java b/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java
+index ddbdf6bc5..e94bfb3a6 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java
+@@ -25,10 +25,10 @@
+ import java.util.function.Supplier;
+ 
+ import org.apache.commons.lang3.builder.AbstractSupplier;
+-import org.apache.commons.lang3.function.Failable;
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableFunction;
+ import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.failable.Failable;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ 
+ /**
+  * Combines the monitor and visitor pattern to work with {@link Lock}s as an alternative to synchronization.
+diff --git a/src/main/java/org/apache/commons/lang3/function/MethodInvokers.java b/src/main/java/org/apache/commons/lang3/function/MethodInvokers.java
+index c0ed5dd0f..461b91803 100644
+--- a/src/main/java/org/apache/commons/lang3/function/MethodInvokers.java
++++ b/src/main/java/org/apache/commons/lang3/function/MethodInvokers.java
+@@ -28,6 +28,9 @@
+ import java.util.function.Supplier;
+ 
+ import org.apache.commons.lang3.exception.UncheckedIllegalAccessException;
++import org.apache.commons.lang3.function.failable.FailableBiFunction;
++import org.apache.commons.lang3.function.failable.FailableFunction;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * Converts {@link Method} objects to lambdas.
+diff --git a/src/main/java/org/apache/commons/lang3/function/Failable.java b/src/main/java/org/apache/commons/lang3/function/failable/Failable.java
+similarity index 96%
+rename from src/main/java/org/apache/commons/lang3/function/Failable.java
+rename to src/main/java/org/apache/commons/lang3/function/failable/Failable.java
+index cd906cc64..8e73ed012 100644
+--- a/src/main/java/org/apache/commons/lang3/function/Failable.java
++++ b/src/main/java/org/apache/commons/lang3/function/failable/Failable.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.failable;
+ 
+ import java.io.IOException;
+ import java.io.UncheckedIOException;
+@@ -37,6 +37,22 @@
+ import org.apache.commons.lang3.stream.Streams;
+ import org.apache.commons.lang3.stream.Streams.FailableStream;
+ 
++import org.apache.commons.lang3.function.FailableBiConsumer;
++import org.apache.commons.lang3.function.FailableConsumer;
++import org.apache.commons.lang3.function.FailableDoubleBinaryOperator;
++import org.apache.commons.lang3.function.FailableDoubleConsumer;
++import org.apache.commons.lang3.function.FailableDoubleSupplier;
++import org.apache.commons.lang3.function.FailableIntConsumer;
++import org.apache.commons.lang3.function.FailableIntSupplier;
++import org.apache.commons.lang3.function.FailableLongConsumer;
++import org.apache.commons.lang3.function.FailableLongSupplier;
++import org.apache.commons.lang3.function.FailablePredicate;
++import org.apache.commons.lang3.function.FailableBiPredicate;
++import org.apache.commons.lang3.function.FailableCallable;
++import org.apache.commons.lang3.function.FailableRunnable;
++import org.apache.commons.lang3.function.FailableShortSupplier;
++import org.apache.commons.lang3.function.FailableBooleanSupplier;
++
+ /**
+  * This class provides utility functions, and classes for working with the {@code java.util.function} package, or more
+  * generally, with Java 8 lambdas. More specifically, it attempts to address the fact that lambdas are supposed not to
+diff --git a/src/main/java/org/apache/commons/lang3/function/FailableBiFunction.java b/src/main/java/org/apache/commons/lang3/function/failable/FailableBiFunction.java
+similarity index 95%
+rename from src/main/java/org/apache/commons/lang3/function/FailableBiFunction.java
+rename to src/main/java/org/apache/commons/lang3/function/failable/FailableBiFunction.java
+index d0911b3aa..f58fc6b6c 100644
+--- a/src/main/java/org/apache/commons/lang3/function/FailableBiFunction.java
++++ b/src/main/java/org/apache/commons/lang3/function/failable/FailableBiFunction.java
+@@ -15,12 +15,14 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.failable;
+ 
+ import java.util.Objects;
+ import java.util.function.BiFunction;
+ import java.util.function.Function;
+ 
++import org.apache.commons.lang3.function.failable.FailableFunction;
++
+ /**
+  * A functional interface like {@link BiFunction} that declares a {@link Throwable}.
+  *
+diff --git a/src/main/java/org/apache/commons/lang3/function/FailableFunction.java b/src/main/java/org/apache/commons/lang3/function/failable/FailableFunction.java
+similarity index 98%
+rename from src/main/java/org/apache/commons/lang3/function/FailableFunction.java
+rename to src/main/java/org/apache/commons/lang3/function/failable/FailableFunction.java
+index dfb101e23..34322ff90 100644
+--- a/src/main/java/org/apache/commons/lang3/function/FailableFunction.java
++++ b/src/main/java/org/apache/commons/lang3/function/failable/FailableFunction.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.failable;
+ 
+ import java.util.Objects;
+ import java.util.function.Function;
+diff --git a/src/main/java/org/apache/commons/lang3/function/FailableSupplier.java b/src/main/java/org/apache/commons/lang3/function/failable/FailableSupplier.java
+similarity index 97%
+rename from src/main/java/org/apache/commons/lang3/function/FailableSupplier.java
+rename to src/main/java/org/apache/commons/lang3/function/failable/FailableSupplier.java
+index 8531880e2..a924de1a8 100644
+--- a/src/main/java/org/apache/commons/lang3/function/FailableSupplier.java
++++ b/src/main/java/org/apache/commons/lang3/function/failable/FailableSupplier.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.failable;
+ 
+ import java.util.function.Supplier;
+ 
+diff --git a/src/main/java/org/apache/commons/lang3/stream/Streams.java b/src/main/java/org/apache/commons/lang3/stream/Streams.java
+index 1be9b6f8d..06dadfe14 100644
+--- a/src/main/java/org/apache/commons/lang3/stream/Streams.java
++++ b/src/main/java/org/apache/commons/lang3/stream/Streams.java
+@@ -39,10 +39,10 @@
+ import java.util.stream.StreamSupport;
+ 
+ import org.apache.commons.lang3.ArrayUtils;
+-import org.apache.commons.lang3.function.Failable;
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableFunction;
+ import org.apache.commons.lang3.function.FailablePredicate;
++import org.apache.commons.lang3.function.failable.Failable;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ 
+ /**
+  * Provides utility functions, and classes for working with the {@link java.util.stream} package, or more generally, with Java 8 lambdas. More specifically, it
+diff --git a/src/main/java/org/apache/commons/lang3/time/StopWatch.java b/src/main/java/org/apache/commons/lang3/time/StopWatch.java
+index ed6bce31d..ec50fb376 100644
+--- a/src/main/java/org/apache/commons/lang3/time/StopWatch.java
++++ b/src/main/java/org/apache/commons/lang3/time/StopWatch.java
+@@ -29,7 +29,7 @@
+ import org.apache.commons.lang3.StringUtils;
+ import org.apache.commons.lang3.function.FailableConsumer;
+ import org.apache.commons.lang3.function.FailableRunnable;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.apache.commons.lang3.tuple.ImmutablePair;
+ 
+ /**
+diff --git a/src/main/java/org/apache/commons/lang3/tuple/Pair.java b/src/main/java/org/apache/commons/lang3/tuple/Pair.java
+index aff5d9506..476578f62 100644
+--- a/src/main/java/org/apache/commons/lang3/tuple/Pair.java
++++ b/src/main/java/org/apache/commons/lang3/tuple/Pair.java
+@@ -22,7 +22,7 @@
+ 
+ import org.apache.commons.lang3.builder.CompareToBuilder;
+ import org.apache.commons.lang3.function.FailableBiConsumer;
+-import org.apache.commons.lang3.function.FailableBiFunction;
++import org.apache.commons.lang3.function.failable.FailableBiFunction;
+ 
+ /**
+  * A pair consisting of two elements.
+diff --git a/src/test/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializerCloseAndExceptionsTest.java b/src/test/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializerCloseAndExceptionsTest.java
+index e8a7eb36f..e6f2080b5 100644
+--- a/src/test/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializerCloseAndExceptionsTest.java
++++ b/src/test/java/org/apache/commons/lang3/concurrent/AbstractConcurrentInitializerCloseAndExceptionsTest.java
+@@ -28,7 +28,7 @@
+ import java.sql.SQLException;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/concurrent/AtomicInitializerSupplierTest.java b/src/test/java/org/apache/commons/lang3/concurrent/AtomicInitializerSupplierTest.java
+index 9896ab6fe..448f7720b 100644
+--- a/src/test/java/org/apache/commons/lang3/concurrent/AtomicInitializerSupplierTest.java
++++ b/src/test/java/org/apache/commons/lang3/concurrent/AtomicInitializerSupplierTest.java
+@@ -17,7 +17,7 @@
+ package org.apache.commons.lang3.concurrent;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * Test class for {@code AtomicInitializer}.
+diff --git a/src/test/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializerSupplierTest.java b/src/test/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializerSupplierTest.java
+index d20e41707..66d6515d0 100644
+--- a/src/test/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializerSupplierTest.java
++++ b/src/test/java/org/apache/commons/lang3/concurrent/AtomicSafeInitializerSupplierTest.java
+@@ -23,7 +23,7 @@
+ import java.util.concurrent.atomic.AtomicInteger;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ 
+diff --git a/src/test/java/org/apache/commons/lang3/concurrent/BackgroundInitializerSupplierTest.java b/src/test/java/org/apache/commons/lang3/concurrent/BackgroundInitializerSupplierTest.java
+index 2717f239b..963465582 100644
+--- a/src/test/java/org/apache/commons/lang3/concurrent/BackgroundInitializerSupplierTest.java
++++ b/src/test/java/org/apache/commons/lang3/concurrent/BackgroundInitializerSupplierTest.java
+@@ -27,7 +27,7 @@
+ import java.util.concurrent.ExecutorService;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.junit.jupiter.api.Test;
+ 
+ class BackgroundInitializerSupplierTest extends BackgroundInitializerTest {
+diff --git a/src/test/java/org/apache/commons/lang3/concurrent/LazyInitializerSupplierTest.java b/src/test/java/org/apache/commons/lang3/concurrent/LazyInitializerSupplierTest.java
+index 3bc217242..a4fb67b9d 100644
+--- a/src/test/java/org/apache/commons/lang3/concurrent/LazyInitializerSupplierTest.java
++++ b/src/test/java/org/apache/commons/lang3/concurrent/LazyInitializerSupplierTest.java
+@@ -17,7 +17,7 @@
+ package org.apache.commons.lang3.concurrent;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ 
+ /**
+  * Tests {@code LazyInitializer}.
+diff --git a/src/test/java/org/apache/commons/lang3/concurrent/MultiBackgroundInitializerSupplierTest.java b/src/test/java/org/apache/commons/lang3/concurrent/MultiBackgroundInitializerSupplierTest.java
+index 05e743c4b..5f04e9230 100644
+--- a/src/test/java/org/apache/commons/lang3/concurrent/MultiBackgroundInitializerSupplierTest.java
++++ b/src/test/java/org/apache/commons/lang3/concurrent/MultiBackgroundInitializerSupplierTest.java
+@@ -26,7 +26,7 @@
+ import java.lang.reflect.Field;
+ 
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.FailableSupplier;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ 
+diff --git a/src/test/java/org/apache/commons/lang3/function/FailableBiFunctionTest.java b/src/test/java/org/apache/commons/lang3/function/FailableBiFunctionTest.java
+index 80bbf11c7..7cf74377d 100644
+--- a/src/test/java/org/apache/commons/lang3/function/FailableBiFunctionTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/FailableBiFunctionTest.java
+@@ -26,6 +26,8 @@
+ import java.io.IOException;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
++import org.apache.commons.lang3.function.failable.FailableBiFunction;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/FailableFunctionTest.java b/src/test/java/org/apache/commons/lang3/function/FailableFunctionTest.java
+index b3b518098..874031e47 100644
+--- a/src/test/java/org/apache/commons/lang3/function/FailableFunctionTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/FailableFunctionTest.java
+@@ -27,6 +27,7 @@
+ import java.io.IOException;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/FailableSupplierTest.java b/src/test/java/org/apache/commons/lang3/function/FailableSupplierTest.java
+index 157e0cad0..22dee7dee 100644
+--- a/src/test/java/org/apache/commons/lang3/function/FailableSupplierTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/FailableSupplierTest.java
+@@ -24,6 +24,7 @@
+ import java.io.IOException;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/FailableTest.java b/src/test/java/org/apache/commons/lang3/function/FailableTest.java
+index a7a8be196..1b703ee1f 100644
+--- a/src/test/java/org/apache/commons/lang3/function/FailableTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/FailableTest.java
+@@ -40,6 +40,10 @@
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
+ import org.apache.commons.lang3.StringUtils;
++import org.apache.commons.lang3.function.failable.Failable;
++import org.apache.commons.lang3.function.failable.FailableBiFunction;
++import org.apache.commons.lang3.function.failable.FailableFunction;
++import org.apache.commons.lang3.function.failable.FailableSupplier;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ 
+diff --git a/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableBiFunctionTest.java b/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableBiFunctionTest.java
+index c51592a02..0fff6d133 100644
+--- a/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableBiFunctionTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableBiFunctionTest.java
+@@ -26,6 +26,7 @@
+ 
+ import org.apache.commons.lang3.exception.CustomCheckedException;
+ import org.apache.commons.lang3.exception.CustomUncheckedException;
++import org.apache.commons.lang3.function.failable.FailableBiFunction;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableFunctionTest.java b/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableFunctionTest.java
+index dac3a298c..1189392c7 100644
+--- a/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableFunctionTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/MethodInvokersFailableFunctionTest.java
+@@ -31,6 +31,7 @@
+ import java.util.stream.Stream;
+ 
+ import org.apache.commons.lang3.exception.UncheckedException;
++import org.apache.commons.lang3.function.failable.FailableFunction;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/stream/StreamsTest.java b/src/test/java/org/apache/commons/lang3/stream/StreamsTest.java
+index f790a55e0..ec556dcc9 100644
+--- a/src/test/java/org/apache/commons/lang3/stream/StreamsTest.java
++++ b/src/test/java/org/apache/commons/lang3/stream/StreamsTest.java
+@@ -36,9 +36,9 @@
+ import java.util.stream.Stream;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
+-import org.apache.commons.lang3.function.Failable;
+ import org.apache.commons.lang3.function.FailableConsumer;
+ import org.apache.commons.lang3.function.FailablePredicate;
++import org.apache.commons.lang3.function.failable.Failable;
+ import org.apache.commons.lang3.stream.Streams.FailableStream;
+ import org.junit.jupiter.api.DynamicTest;
+ import org.junit.jupiter.api.Test;

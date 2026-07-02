@@ -1,0 +1,80 @@
+{
+  "id": 1,
+  "goal": "Move the iterator-related classes (IOIterator, IOIteratorAdapter, UncheckedIOIterator) into a dedicated subpackage to reduce package bloat and improve cohesion.",
+  "files": [
+    "src/main/java/org/apache/commons/io/function/IOBaseStream.java",
+    "src/main/java/org/apache/commons/io/function/IOConsumer.java",
+    "src/main/java/org/apache/commons/io/function/IOIterable.java",
+    "src/main/java/org/apache/commons/io/function/IOIterator.java",
+    "src/main/java/org/apache/commons/io/function/IOIteratorAdapter.java",
+    "src/main/java/org/apache/commons/io/function/Uncheck.java",
+    "src/main/java/org/apache/commons/io/function/UncheckedIOIterator.java",
+    "src/main/java/org/apache/commons/io/function/iter/IOIterator.java",
+    "src/main/java/org/apache/commons/io/function/iter/IOIteratorAdapter.java",
+    "src/main/java/org/apache/commons/io/function/iter/UncheckedIOIterator.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.io.function.iter"
+      ],
+      "details": "Create the destination subpackage org.apache.commons.io.function.iter to host iterator-related classes.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.function.IOIterator"
+      ],
+      "outputs": [
+        "org.apache.commons.io.function.iter.IOIterator"
+      ],
+      "details": "Move IOIterator to the iterator subpackage to group iterator abstractions separately from other function types.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.function.IOIteratorAdapter"
+      ],
+      "outputs": [
+        "org.apache.commons.io.function.iter.IOIteratorAdapter"
+      ],
+      "details": "Move IOIteratorAdapter alongside IOIterator since it is an adapter implementation tightly coupled to the iterator abstraction.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.function.UncheckedIOIterator"
+      ],
+      "outputs": [
+        "org.apache.commons.io.function.iter.UncheckedIOIterator"
+      ],
+      "details": "Move UncheckedIOIterator with the iterator cluster because it wraps IOIterator behavior for unchecked exception handling.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.io.function.IOBaseStream",
+        "org.apache.commons.io.function.IOConsumer",
+        "org.apache.commons.io.function.IOIterable",
+        "org.apache.commons.io.function.Uncheck",
+        "org.apache.commons.io.function.iter.IOIterator",
+        "org.apache.commons.io.function.iter.IOIteratorAdapter",
+        "org.apache.commons.io.function.iter.UncheckedIOIterator"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

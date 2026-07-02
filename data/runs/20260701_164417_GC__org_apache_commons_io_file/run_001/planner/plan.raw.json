@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.io.file",
+  "selected_cluster": [
+    "org.apache.commons.io.file.CleaningPathVisitor",
+    "org.apache.commons.io.file.DeletingPathVisitor",
+    "org.apache.commons.io.file.StandardDeleteOption"
+  ],
+  "destination_package": "org.apache.commons.io.file.delete",
+  "cluster_reason": "These three classes form a cohesive deletion-focused cluster: CleaningPathVisitor and DeletingPathVisitor implement deletion behaviors and both depend on StandardDeleteOption. They have strong internal relationships with each other (shared logic and options) and moving them together isolates deletion concerns away from the larger file utilities class set, reducing the god component while keeping related package-private interactions local to the moved cluster.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the deletion-related cluster (visitors and option) into a dedicated subpackage to reduce the God Component.",
+      "files": [
+        "src/main/java/org/apache/commons/io/file/CleaningPathVisitor.java",
+        "src/main/java/org/apache/commons/io/file/DeletingPathVisitor.java",
+        "src/main/java/org/apache/commons/io/file/StandardDeleteOption.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.io.file.delete"
+          ],
+          "details": "Create the destination subpackage org.apache.commons.io.file.delete if it does not already exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.file.CleaningPathVisitor"
+          ],
+          "outputs": [
+            "org.apache.commons.io.file.delete.CleaningPathVisitor"
+          ],
+          "details": "Move CleaningPathVisitor to the org.apache.commons.io.file.delete subpackage to colocate deletion logic.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.file.DeletingPathVisitor"
+          ],
+          "outputs": [
+            "org.apache.commons.io.file.delete.DeletingPathVisitor"
+          ],
+          "details": "Move DeletingPathVisitor to the org.apache.commons.io.file.delete subpackage to colocate deletion logic.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.file.StandardDeleteOption"
+          ],
+          "outputs": [
+            "org.apache.commons.io.file.delete.StandardDeleteOption"
+          ],
+          "details": "Move StandardDeleteOption to the org.apache.commons.io.file.delete subpackage so the option type sits with its primary users.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

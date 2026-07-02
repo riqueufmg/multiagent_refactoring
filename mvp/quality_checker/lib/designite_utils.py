@@ -12,6 +12,7 @@ def run_designite(
     repo_path: str | Path,
     output_dir: str | Path,
     timeout: int,
+    java_path: str | Path = "java",
 ) -> dict[str, Any]:
     jar = Path(designite_jar).expanduser().resolve()
     repo = Path(repo_path).expanduser().resolve()
@@ -19,8 +20,13 @@ def run_designite(
 
     out.mkdir(parents=True, exist_ok=True)
 
+    java_bin = str(java_path)
+
+    if java_bin != "java":
+        java_bin = str(Path(java_bin).expanduser().resolve())
+
     command = [
-        "java",
+        java_bin,
         "-jar",
         str(jar),
         "-i",
@@ -47,6 +53,7 @@ def run_designite(
         "ok": return_code == 0,
         "return_code": return_code,
         "command": command,
+        "java_path": java_bin,
         "output_dir": str(out),
         "log_path": str(log_path),
         "csv_files": csv_files,

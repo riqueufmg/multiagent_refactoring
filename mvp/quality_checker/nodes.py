@@ -219,6 +219,7 @@ def run_designite_before_node(state: QualityCheckerState) -> QualityCheckerState
     ensure_file_exists(designite_jar, "tools.designite_jar")
 
     timeout = int(get_config_value(cfg, "designite.timeout", 600))
+    java_path = str(get_config_value(cfg, "designite.java_path", "java"))
 
     before_commit = state["before_commit"]
 
@@ -231,6 +232,7 @@ def run_designite_before_node(state: QualityCheckerState) -> QualityCheckerState
         repo_path=repo_path,
         output_dir=before_dir,
         timeout=timeout,
+        java_path=java_path,
     )
 
     write_json(before_dir / "designite.status.json", result)
@@ -255,6 +257,7 @@ def run_designite_after_node(state: QualityCheckerState) -> QualityCheckerState:
     ensure_file_exists(designite_jar, "tools.designite_jar")
 
     timeout = int(get_config_value(cfg, "designite.timeout", 600))
+    java_path = str(get_config_value(cfg, "designite.java_path", "java"))
 
     after_commit = state["after_commit"]
 
@@ -267,6 +270,7 @@ def run_designite_after_node(state: QualityCheckerState) -> QualityCheckerState:
         repo_path=repo_path,
         output_dir=after_dir,
         timeout=timeout,
+        java_path=java_path,
     )
 
     write_json(after_dir / "designite.status.json", result)

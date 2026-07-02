@@ -1,0 +1,232 @@
+{
+  "id": 2,
+  "goal": "Reduce Element's direct dependencies by removing HTML serialization and printing responsibilities (Printer, QuietAppendable, Normalizer.xmlSafeTagName) into a new helper class. Move five methods responsible for producing HTML/outer HTML and the safe tag name helper into org.jsoup.nodes.ElementHtmlSerializer. After extraction Element will delegate serialization to the helper, removing direct use of Printer, QuietAppendable, and Normalizer.xmlSafeTagName from Element.",
+  "files": [
+    "src/main/java/org/jsoup/nodes/Element.java",
+    "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+    "src/test/java/org/jsoup/helper/W3CDomTest.java",
+    "src/test/java/org/jsoup/integration/ConnectIT.java",
+    "src/test/java/org/jsoup/integration/ConnectTest.java",
+    "src/test/java/org/jsoup/integration/FuzzFixesTest.java",
+    "src/test/java/org/jsoup/integration/ParseTest.java",
+    "src/test/java/org/jsoup/integration/ProxyTest.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/DataNodeTest.java",
+    "src/test/java/org/jsoup/nodes/DocumentTest.java",
+    "src/test/java/org/jsoup/nodes/ElementIT.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/EntitiesTest.java",
+    "src/test/java/org/jsoup/nodes/FormElementTest.java",
+    "src/test/java/org/jsoup/nodes/LeafNodeTest.java",
+    "src/test/java/org/jsoup/nodes/NodeIteratorTest.java",
+    "src/test/java/org/jsoup/nodes/NodeStreamTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/nodes/PrinterTest.java",
+    "src/test/java/org/jsoup/nodes/TextNodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/parser/ParserIT.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/StreamParserTest.java",
+    "src/test/java/org/jsoup/parser/TagSetTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/ElementsTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorDebug.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java",
+    "src/test/java/org/jsoup/select/QueryParserTest.java",
+    "src/test/java/org/jsoup/select/SelectorTest.java",
+    "src/test/java/org/jsoup/select/TraversorTest.java",
+    "src/test/java/org/jsoup/select/XpathTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementHtmlSerializer)",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Create new helper class org.jsoup.nodes.ElementHtmlSerializer. Move the following methods from Element into ElementHtmlSerializer as public static methods that accept an Element context parameter where necessary: html(), html(Appendable), outerHtmlHead(QuietAppendable, Document.OutputSettings), outerHtmlTail(QuietAppendable, Document.OutputSettings), safeTagName(Document.OutputSettings.Syntax). In Element, replace the original methods with delegating wrappers that call ElementHtmlSerializer methods. The helper will import Printer, QuietAppendable, Normalizer and use them as needed.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(file: src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java)",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java"
+      ],
+      "details": "Add imports required by the extracted serialization code: org.jsoup.internal.Normalizer, org.jsoup.internal.QuietAppendable, org.jsoup.nodes.Document, org.jsoup.nodes.Document.OutputSettings, org.jsoup.nodes.Printer (printerFor), and any static imports required. Keep package org.jsoup.nodes.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.html(), org.jsoup.nodes.ElementHtmlSerializer.html(org.jsoup.nodes.Element))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the no-arg html() implementation into the helper as a static method taking Element. The helper will call the internal html(Appendable) variant and then check NodeUtils.outputSettings(this).prettyPrint() as before.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.html(T accum), org.jsoup.nodes.ElementHtmlSerializer.html(org.jsoup.nodes.Element, T))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the generic html(T accum) traversal/Printer usage into the helper as a static generic method that accepts the Element and the Appendable. This method will create the appropriate Printer via Printer.printerFor and traverse children as before.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.outerHtmlHead(QuietAppendable, Document.OutputSettings), org.jsoup.nodes.ElementHtmlSerializer.outerHtmlHead(org.jsoup.nodes.Element, QuietAppendable, Document.OutputSettings))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move outerHtmlHead implementation into the helper as a static method that accepts Element context and the accum/out settings. This method will use QuietAppendable and Normalizer.xmlSafeTagName as before.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.outerHtmlTail(QuietAppendable, Document.OutputSettings), org.jsoup.nodes.ElementHtmlSerializer.outerHtmlTail(org.jsoup.nodes.Element, QuietAppendable, Document.OutputSettings))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move outerHtmlTail into the helper as a static method that accepts Element context and the accum/out settings. Preserve behavior for closing tags.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.safeTagName(Document.OutputSettings.Syntax), org.jsoup.nodes.ElementHtmlSerializer.safeTagName(org.jsoup.nodes.Element, Document.OutputSettings.Syntax))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the small safeTagName helper into the helper class as a static method that accepts Element and the syntax; it will call Normalizer.xmlSafeTagName when syntax==xml.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.*delegating wrappers*, org.jsoup.nodes.ElementHtmlSerializer.*static methods*)",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Replace bodies of the original moved methods in Element with delegating wrappers that call ElementHtmlSerializer methods (for example, return ElementHtmlSerializer.html(this)). Update any internal Element call sites that previously invoked the moved methods to call the helper directly if needed. Keep Element's public signatures so external callers are unaffected.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/helper/W3CDomTest.java",
+        "src/test/java/org/jsoup/integration/ConnectIT.java",
+        "src/test/java/org/jsoup/integration/ConnectTest.java",
+        "src/test/java/org/jsoup/integration/FuzzFixesTest.java",
+        "src/test/java/org/jsoup/integration/ParseTest.java",
+        "src/test/java/org/jsoup/integration/ProxyTest.java",
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/nodes/AttributesTest.java",
+        "src/test/java/org/jsoup/nodes/DataNodeTest.java",
+        "src/test/java/org/jsoup/nodes/DocumentTest.java",
+        "src/test/java/org/jsoup/nodes/ElementIT.java",
+        "src/test/java/org/jsoup/nodes/ElementTest.java",
+        "src/test/java/org/jsoup/nodes/EntitiesTest.java",
+        "src/test/java/org/jsoup/nodes/FormElementTest.java",
+        "src/test/java/org/jsoup/nodes/LeafNodeTest.java",
+        "src/test/java/org/jsoup/nodes/NodeIteratorTest.java",
+        "src/test/java/org/jsoup/nodes/NodeStreamTest.java",
+        "src/test/java/org/jsoup/nodes/NodeTest.java",
+        "src/test/java/org/jsoup/nodes/PrinterTest.java",
+        "src/test/java/org/jsoup/nodes/TextNodeTest.java",
+        "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderTest.java",
+        "src/test/java/org/jsoup/parser/ParserIT.java",
+        "src/test/java/org/jsoup/parser/PositionTest.java",
+        "src/test/java/org/jsoup/parser/StreamParserTest.java",
+        "src/test/java/org/jsoup/parser/TagSetTest.java",
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java",
+        "src/test/java/org/jsoup/parser/TokeniserTest.java",
+        "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java",
+        "src/test/java/org/jsoup/select/ElementsTest.java",
+        "src/test/java/org/jsoup/select/EvaluatorDebug.java",
+        "src/test/java/org/jsoup/select/EvaluatorTest.java",
+        "src/test/java/org/jsoup/select/QueryParserTest.java",
+        "src/test/java/org/jsoup/select/SelectorTest.java",
+        "src/test/java/org/jsoup/select/TraversorTest.java",
+        "src/test/java/org/jsoup/select/XpathTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/helper/W3CDomTest.java",
+    "src/test/java/org/jsoup/integration/ConnectIT.java",
+    "src/test/java/org/jsoup/integration/ConnectTest.java",
+    "src/test/java/org/jsoup/integration/FuzzFixesTest.java",
+    "src/test/java/org/jsoup/integration/ParseTest.java",
+    "src/test/java/org/jsoup/integration/ProxyTest.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/DataNodeTest.java",
+    "src/test/java/org/jsoup/nodes/DocumentTest.java",
+    "src/test/java/org/jsoup/nodes/ElementIT.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/EntitiesTest.java",
+    "src/test/java/org/jsoup/nodes/FormElementTest.java",
+    "src/test/java/org/jsoup/nodes/LeafNodeTest.java",
+    "src/test/java/org/jsoup/nodes/NodeIteratorTest.java",
+    "src/test/java/org/jsoup/nodes/NodeStreamTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/nodes/PrinterTest.java",
+    "src/test/java/org/jsoup/nodes/TextNodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/parser/ParserIT.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/StreamParserTest.java",
+    "src/test/java/org/jsoup/parser/TagSetTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/ElementsTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorDebug.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java",
+    "src/test/java/org/jsoup/select/QueryParserTest.java",
+    "src/test/java/org/jsoup/select/SelectorTest.java",
+    "src/test/java/org/jsoup/select/TraversorTest.java",
+    "src/test/java/org/jsoup/select/XpathTest.java"
+  ]
+}

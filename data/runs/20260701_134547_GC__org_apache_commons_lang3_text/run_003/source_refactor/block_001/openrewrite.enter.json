@@ -1,0 +1,66 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.lang3.text.util"
+      ],
+      "details": "Create the destination subpackage org.apache.commons.lang3.text.util if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrTokenizer"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.text.util.StrTokenizer"
+      ],
+      "details": "Move StrTokenizer to org.apache.commons.lang3.text.util to colocate parsing logic with related helpers.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrMatcher"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.text.util.StrMatcher"
+      ],
+      "details": "Move StrMatcher to org.apache.commons.lang3.text.util to keep token matching implementations alongside the tokenizer.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrBuilder"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.text.util.StrBuilder"
+      ],
+      "details": "Move StrBuilder to org.apache.commons.lang3.text.util to group mutable string building utilities with tokenizer/matcher.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.lang3.text.StrSubstitutor",
+        "org.apache.commons.lang3.text.util.StrBuilder",
+        "org.apache.commons.lang3.text.util.StrMatcher",
+        "org.apache.commons.lang3.text.util.StrTokenizer"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

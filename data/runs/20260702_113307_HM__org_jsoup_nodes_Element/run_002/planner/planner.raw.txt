@@ -1,0 +1,215 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Element",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Element's output coupling by extracting a small cohesive group of Collector/Evaluator-based element-query methods so that Element no longer directly depends on Collector and the Evaluator helper classes for these responsibilities.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementCollector.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementCollector)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Create a new helper class ElementCollector in the same package. This class will host a small set of element-collection query methods moved from Element that directly call Collector.collect / Collector.findFirst with Evaluator instances. The extracted class should be implemented so methods accept an Element context (either instance methods constructed with the Element or static helpers that take an Element parameter) to preserve behavior without leaving Collector/Evaluator references in Element.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java"
+          ],
+          "details": "Add imports required by the new ElementCollector class (org.jsoup.select.Collector and any Evaluator references used by the moved methods, plus org.jspecify.annotations.Nullable and org.jsoup.select.Elements where needed).",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsByTag(String), org.jsoup.nodes.ElementCollector.getElementsByTag(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move getElementsByTag(String) implementation to ElementCollector as a method that uses Collector.collect(new Evaluator.Tag(tagName), element). The Element side will have a small delegating call to the new class.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementById(String), org.jsoup.nodes.ElementCollector.getElementById(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move getElementById(String) to ElementCollector and implement it using Collector.findFirst(new Evaluator.Id(id), element). Update Element to delegate to ElementCollector to preserve API compatibility.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsByClass(String), org.jsoup.nodes.ElementCollector.getElementsByClass(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move getElementsByClass(String) into ElementCollector, implemented by Collector.collect(new Evaluator.Class(className), element). Element will delegate to the collector helper.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsByAttribute(String), org.jsoup.nodes.ElementCollector.getElementsByAttribute(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move getElementsByAttribute(String) to ElementCollector and implement via Collector.collect(new Evaluator.Attribute(key), element). Update Element to call the new helper method.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsByAttributeStarting(String), org.jsoup.nodes.ElementCollector.getElementsByAttributeStarting(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementCollector.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move getElementsByAttributeStarting(String) to ElementCollector implemented by Collector.collect(new Evaluator.AttributeStarting(keyPrefix), element). Element will delegate to the new helper.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.getElementsByTag(String), org.jsoup.nodes.ElementCollector.getElementsByTag(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Replace the body of the moved methods in Element with a thin delegating call to ElementCollector (e.g., new ElementCollector(this).getElementsByTag(tagName) or ElementCollector.getElementsByTag(this, tagName)). Update any internal direct references if necessary so Element no longer imports or references Collector or Evaluator types directly for these moved methods.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Further reduce Element's fan-out by extracting Selector-based CSS query methods and XPath helpers into a small ElementQuery helper so Element no longer directly depends on Selector and ElementQueryHelper for these queries.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementQuery.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementQuery)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Create a new ElementQuery helper class in the same package. It will host a small coherent set of Selector and XPath related APIs moved from Element so that Element stops directly importing Selector and ElementQueryHelper for these methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java"
+          ],
+          "details": "Add imports required by ElementQuery (org.jsoup.select.Selector and org.jsoup.nodes.ElementQueryHelper).",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.select(String), org.jsoup.nodes.ElementQuery.select(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move select(String) into ElementQuery. Implement it using Selector.select(cssQuery, element). Element will delegate to ElementQuery to preserve the public API.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.select(Evaluator), org.jsoup.nodes.ElementQuery.select(Evaluator))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move select(Evaluator) into ElementQuery using Selector.select(evaluator, element). Update Element to delegate.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectStream(String), org.jsoup.nodes.ElementQuery.selectStream(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move selectStream(String) into ElementQuery and implement via Selector.selectStream(cssQuery, element). Element will delegate to the new helper.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectFirst(String), org.jsoup.nodes.ElementQuery.selectFirst(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move selectFirst(String) into ElementQuery implemented using Selector.selectFirst(cssQuery, element). Replace the Element implementation with a delegating call.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectXpath(String), org.jsoup.nodes.ElementQuery.selectXpath(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move selectXpath(String) (and the overload selectXpath(String, Class<T>) if desired in a follow-up small step) to ElementQuery so XPath-based selection is colocated with CSS selection helpers that reference ElementQueryHelper. Update Element to delegate to the new class. This removes the direct dependency on ElementQueryHelper from Element.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.select(String), org.jsoup.nodes.ElementQuery.select(String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Replace bodies of moved methods in Element with thin delegating calls to ElementQuery (for example, new ElementQuery(this).select(cssQuery) or ElementQuery.select(this, cssQuery)), and remove imports for Selector and ElementQueryHelper from Element if they are no longer used elsewhere in the class.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

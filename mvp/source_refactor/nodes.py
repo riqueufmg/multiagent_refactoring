@@ -787,7 +787,7 @@ def openrewrite_node(state: SourceRefactorState) -> SourceRefactorState:
     )
 
     if openrewrite_ok:
-        test_dir = repo_path / "src" / "test"
+        '''test_dir = repo_path / "src" / "test"
 
         checkout_tests = {
             "attempted": False,
@@ -805,7 +805,18 @@ def openrewrite_node(state: SourceRefactorState) -> SourceRefactorState:
             checkout_tests["return_code"] = co_return_code
             checkout_tests["output"] = co_output
 
-        write_json(block_dir / "openrewrite.checkout_tests.json", checkout_tests)
+        write_json(block_dir / "openrewrite.checkout_tests.json", checkout_tests)'''
+
+        write_json(
+            block_dir / "openrewrite.checkout_tests.json",
+            {
+                "attempted": False,
+                "reason": (
+                    "Tests were not reverted. OpenRewrite changes in src/test are kept "
+                    "so MOVE_CLASS can update test imports and references."
+                ),
+            },
+        )
 
         refreshed_files_context = load_files_context(
             repo_path,

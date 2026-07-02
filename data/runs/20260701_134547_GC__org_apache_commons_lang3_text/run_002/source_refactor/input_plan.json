@@ -1,0 +1,73 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.lang3.text",
+  "selected_cluster": [
+    "org.apache.commons.lang3.text.ExtendedMessageFormat",
+    "org.apache.commons.lang3.text.FormatFactory"
+  ],
+  "destination_package": "org.apache.commons.lang3.text.extended",
+  "cluster_reason": "ExtendedMessageFormat and FormatFactory form a cohesive feature pair: ExtendedMessageFormat constructs message formats and delegates creation of nested/extended formats to FormatFactory. They are tightly coupled with each other but have limited package-wide coupling, so moving them together isolates message-format-related code from the larger text package.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move one class from the selected cluster.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/text/ExtendedMessageFormat.java",
+        "src/main/java/org/apache/commons/lang3/text/FormatFactory.java",
+        "src/main/java/org/apache/commons/lang3/text/StrMatcher.java",
+        "src/main/java/org/apache/commons/lang3/text/extended/ExtendedMessageFormat.java",
+        "src/main/java/org/apache/commons/lang3/text/extended/FormatFactory.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.lang3.text.extended"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.text.ExtendedMessageFormat"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.text.extended.ExtendedMessageFormat"
+          ],
+          "details": "Move ExtendedMessageFormat to the new subpackage to isolate extended message-formatting logic.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.text.FormatFactory"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.text.extended.FormatFactory"
+          ],
+          "details": "Move FormatFactory alongside ExtendedMessageFormat because they are tightly coupled and should remain together.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "UPDATE_VISIBILITY",
+          "inputs": [
+            "org.apache.commons.lang3.text.StrMatcher",
+            "org.apache.commons.lang3.text.extended.ExtendedMessageFormat",
+            "org.apache.commons.lang3.text.extended.FormatFactory"
+          ],
+          "outputs": [],
+          "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

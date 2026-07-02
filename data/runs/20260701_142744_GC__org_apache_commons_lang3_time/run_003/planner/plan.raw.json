@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.lang3.time",
+  "selected_cluster": [
+    "org.apache.commons.lang3.time.FastDateFormat",
+    "org.apache.commons.lang3.time.FastDateParser",
+    "org.apache.commons.lang3.time.FastDatePrinter"
+  ],
+  "destination_package": "org.apache.commons.lang3.time.format",
+  "cluster_reason": "FastDateFormat, FastDateParser and FastDatePrinter form a cohesive formatting/parsing cluster: FastDateFormat delegates to both the printer and the parser and the three classes have strong internal interactions. Moving them together isolates date formatting/parsing implementation details into a dedicated subpackage with minimal package-private exposure to the remaining time utilities.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the FastDateFormat cluster (formatting and parsing classes) into a dedicated subpackage.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/time/FastDateFormat.java",
+        "src/main/java/org/apache/commons/lang3/time/FastDateParser.java",
+        "src/main/java/org/apache/commons/lang3/time/FastDatePrinter.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.lang3.time.format"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.time.FastDateFormat"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.time.format.FastDateFormat"
+          ],
+          "details": "Move FastDateFormat to the new format subpackage alongside its printer and parser.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.time.FastDateParser"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.time.format.FastDateParser"
+          ],
+          "details": "Move FastDateParser to the new format subpackage to keep parser implementation colocated with the formatter.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.time.FastDatePrinter"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.time.format.FastDatePrinter"
+          ],
+          "details": "Move FastDatePrinter to the new format subpackage to keep printing logic with the formatter and parser.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

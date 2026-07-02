@@ -1,0 +1,232 @@
+{
+  "id": 1,
+  "goal": "Reduce Element's direct dependencies by removing regex-based and XPath selection helper code (Regex, PatternSyntaxException) into a new helper class so Element no longer directly references Regex-related APIs. The moved methods are cohesive (regex matching and XPath selection) and will be implemented as static helpers that accept an Element as a context parameter. This block moves five methods and introduces one new helper dependency, yielding a net reduction of Element's direct dependencies by removing at least the Regex and PatternSyntaxException usages.",
+  "files": [
+    "src/main/java/org/jsoup/nodes/Element.java",
+    "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+    "src/test/java/org/jsoup/helper/W3CDomTest.java",
+    "src/test/java/org/jsoup/integration/ConnectIT.java",
+    "src/test/java/org/jsoup/integration/ConnectTest.java",
+    "src/test/java/org/jsoup/integration/FuzzFixesTest.java",
+    "src/test/java/org/jsoup/integration/ParseTest.java",
+    "src/test/java/org/jsoup/integration/ProxyTest.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/DataNodeTest.java",
+    "src/test/java/org/jsoup/nodes/DocumentTest.java",
+    "src/test/java/org/jsoup/nodes/ElementIT.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/EntitiesTest.java",
+    "src/test/java/org/jsoup/nodes/FormElementTest.java",
+    "src/test/java/org/jsoup/nodes/LeafNodeTest.java",
+    "src/test/java/org/jsoup/nodes/NodeIteratorTest.java",
+    "src/test/java/org/jsoup/nodes/NodeStreamTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/nodes/PrinterTest.java",
+    "src/test/java/org/jsoup/nodes/TextNodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/parser/ParserIT.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/StreamParserTest.java",
+    "src/test/java/org/jsoup/parser/TagSetTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/ElementsTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorDebug.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java",
+    "src/test/java/org/jsoup/select/QueryParserTest.java",
+    "src/test/java/org/jsoup/select/SelectorTest.java",
+    "src/test/java/org/jsoup/select/TraversorTest.java",
+    "src/test/java/org/jsoup/select/XpathTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementQueryHelper)",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Create new helper class org.jsoup.nodes.ElementQueryHelper. Move the following instance methods from Element into ElementQueryHelper as public static methods that accept an Element context parameter: getElementsByAttributeValueMatching(String key, String regex), getElementsMatchingText(String regex), getElementsMatchingOwnText(String regex), selectXpath(String xpath), selectXpath(String xpath, Class<T> nodeType). The moved implementations keep existing behavior but call Collector / Evaluator / NodeUtils as before from the helper. In Element, replace the original methods with small delegating wrappers that call ElementQueryHelper.method(this, ...). This removes direct use of Regex.compile and PatternSyntaxException from Element source; Element will gain a single dependency on ElementQueryHelper.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(file: src/main/java/org/jsoup/nodes/ElementQueryHelper.java)",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java"
+      ],
+      "details": "Add imports required by the extracted methods into ElementQueryHelper: org.jsoup.helper.Regex, java.util.regex.PatternSyntaxException, org.jsoup.select.Collector, org.jsoup.select.Evaluator, org.jsoup.select.Selector, org.jsoup.nodes.Node (if referenced in generics), and any other imports used by the moved methods. Keep package org.jsoup.nodes.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsByAttributeValueMatching(String, String), org.jsoup.nodes.ElementQueryHelper.getElementsByAttributeValueMatching(org.jsoup.nodes.Element, String, String))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the String-based attribute-value regex overload to the helper as a static method taking Element as first parameter. The method will perform the same Regex.compile handling and then Collector.collect(...) using Evaluator.AttributeWithValueMatching.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsMatchingText(String), org.jsoup.nodes.ElementQueryHelper.getElementsMatchingText(org.jsoup.nodes.Element, String))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the String-based getElementsMatchingText overload to the helper as a static method taking Element as first parameter. Preserve Regex.compile error handling semantics.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsMatchingOwnText(String), org.jsoup.nodes.ElementQueryHelper.getElementsMatchingOwnText(org.jsoup.nodes.Element, String))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the String-based getElementsMatchingOwnText overload to the helper as a static method taking Element as first parameter. Preserve Regex.compile error handling semantics.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectXpath(String), org.jsoup.nodes.ElementQueryHelper.selectXpath(org.jsoup.nodes.Element, String))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move selectXpath(String) to the helper as a static method taking Element as first parameter. Implementation will delegate to NodeUtils.selectXpath(xpath, element, Element.class) and wrap result into new Elements as before.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectXpath(String, Class<T>), org.jsoup.nodes.ElementQueryHelper.selectXpath(org.jsoup.nodes.Element, String, Class<T>))",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Move the generic selectXpath(String, Class<T>) to helper as a static method taking Element as first parameter and delegating to NodeUtils.selectXpath(xpath, element, nodeType).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.*delegating wrappers*, org.jsoup.nodes.ElementQueryHelper.*static methods*)",
+      "inputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/nodes/Element.java"
+      ],
+      "details": "Replace bodies of the original moved methods in Element with small delegating wrappers that call the new static helper methods (for example, return ElementQueryHelper.getElementsMatchingText(this, regex)). Update any internal call sites inside Element that previously called the moved methods to call the helper where necessary. Keep method signatures in Element the same so external callers are unaffected.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/helper/W3CDomTest.java",
+        "src/test/java/org/jsoup/integration/ConnectIT.java",
+        "src/test/java/org/jsoup/integration/ConnectTest.java",
+        "src/test/java/org/jsoup/integration/FuzzFixesTest.java",
+        "src/test/java/org/jsoup/integration/ParseTest.java",
+        "src/test/java/org/jsoup/integration/ProxyTest.java",
+        "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+        "src/test/java/org/jsoup/nodes/AttributesTest.java",
+        "src/test/java/org/jsoup/nodes/DataNodeTest.java",
+        "src/test/java/org/jsoup/nodes/DocumentTest.java",
+        "src/test/java/org/jsoup/nodes/ElementIT.java",
+        "src/test/java/org/jsoup/nodes/ElementTest.java",
+        "src/test/java/org/jsoup/nodes/EntitiesTest.java",
+        "src/test/java/org/jsoup/nodes/FormElementTest.java",
+        "src/test/java/org/jsoup/nodes/LeafNodeTest.java",
+        "src/test/java/org/jsoup/nodes/NodeIteratorTest.java",
+        "src/test/java/org/jsoup/nodes/NodeStreamTest.java",
+        "src/test/java/org/jsoup/nodes/NodeTest.java",
+        "src/test/java/org/jsoup/nodes/PrinterTest.java",
+        "src/test/java/org/jsoup/nodes/TextNodeTest.java",
+        "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+        "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderTest.java",
+        "src/test/java/org/jsoup/parser/ParserIT.java",
+        "src/test/java/org/jsoup/parser/PositionTest.java",
+        "src/test/java/org/jsoup/parser/StreamParserTest.java",
+        "src/test/java/org/jsoup/parser/TagSetTest.java",
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java",
+        "src/test/java/org/jsoup/parser/TokeniserTest.java",
+        "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+        "src/test/java/org/jsoup/safety/CleanerTest.java",
+        "src/test/java/org/jsoup/safety/SafelistTest.java",
+        "src/test/java/org/jsoup/select/ElementsTest.java",
+        "src/test/java/org/jsoup/select/EvaluatorDebug.java",
+        "src/test/java/org/jsoup/select/EvaluatorTest.java",
+        "src/test/java/org/jsoup/select/QueryParserTest.java",
+        "src/test/java/org/jsoup/select/SelectorTest.java",
+        "src/test/java/org/jsoup/select/TraversorTest.java",
+        "src/test/java/org/jsoup/select/XpathTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/helper/W3CDomTest.java",
+    "src/test/java/org/jsoup/integration/ConnectIT.java",
+    "src/test/java/org/jsoup/integration/ConnectTest.java",
+    "src/test/java/org/jsoup/integration/FuzzFixesTest.java",
+    "src/test/java/org/jsoup/integration/ParseTest.java",
+    "src/test/java/org/jsoup/integration/ProxyTest.java",
+    "src/test/java/org/jsoup/integration/SafelistExtensionTest.java",
+    "src/test/java/org/jsoup/nodes/AttributesTest.java",
+    "src/test/java/org/jsoup/nodes/DataNodeTest.java",
+    "src/test/java/org/jsoup/nodes/DocumentTest.java",
+    "src/test/java/org/jsoup/nodes/ElementIT.java",
+    "src/test/java/org/jsoup/nodes/ElementTest.java",
+    "src/test/java/org/jsoup/nodes/EntitiesTest.java",
+    "src/test/java/org/jsoup/nodes/FormElementTest.java",
+    "src/test/java/org/jsoup/nodes/LeafNodeTest.java",
+    "src/test/java/org/jsoup/nodes/NodeIteratorTest.java",
+    "src/test/java/org/jsoup/nodes/NodeStreamTest.java",
+    "src/test/java/org/jsoup/nodes/NodeTest.java",
+    "src/test/java/org/jsoup/nodes/PrinterTest.java",
+    "src/test/java/org/jsoup/nodes/TextNodeTest.java",
+    "src/test/java/org/jsoup/parser/AttributeParseTest.java",
+    "src/test/java/org/jsoup/parser/HtmlParserTest.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/parser/ParserIT.java",
+    "src/test/java/org/jsoup/parser/PositionTest.java",
+    "src/test/java/org/jsoup/parser/StreamParserTest.java",
+    "src/test/java/org/jsoup/parser/TagSetTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java",
+    "src/test/java/org/jsoup/parser/TokeniserTest.java",
+    "src/test/java/org/jsoup/parser/XmlTreeBuilderTest.java",
+    "src/test/java/org/jsoup/safety/CleanerTest.java",
+    "src/test/java/org/jsoup/safety/SafelistTest.java",
+    "src/test/java/org/jsoup/select/ElementsTest.java",
+    "src/test/java/org/jsoup/select/EvaluatorDebug.java",
+    "src/test/java/org/jsoup/select/EvaluatorTest.java",
+    "src/test/java/org/jsoup/select/QueryParserTest.java",
+    "src/test/java/org/jsoup/select/SelectorTest.java",
+    "src/test/java/org/jsoup/select/TraversorTest.java",
+    "src/test/java/org/jsoup/select/XpathTest.java"
+  ]
+}

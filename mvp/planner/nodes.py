@@ -413,21 +413,22 @@ def call_planner_node(state: PlannerState) -> PlannerState:
             )
         
         ## enrich plan with UPDATE_TESTS
-        plan = enrich_plan_with_related_tests(
-            plan,
-            {
-                "repo_path": state.get("repo_path", ""),
-                "target_source_root": planner_input.get(
-                    "target_source_root",
-                    state.get("target_source_root", ""),
-                ),
-            },
-        )
+        if state.get("smell_name") != "God Component":
+            plan = enrich_plan_with_related_tests(
+                plan,
+                {
+                    "repo_path": state.get("repo_path", ""),
+                    "target_source_root": planner_input.get(
+                        "target_source_root",
+                        state.get("target_source_root", ""),
+                    ),
+                },
+            )
 
-        (planner_dir / "plan.enriched.tests.json").write_text(
-            json.dumps(plan, indent=2),
-            encoding="utf-8",
-        )
+            (planner_dir / "plan.enriched.tests.json").write_text(
+                json.dumps(plan, indent=2),
+                encoding="utf-8",
+            )
 
         state["plan"] = plan
         state["plan_ok"] = True

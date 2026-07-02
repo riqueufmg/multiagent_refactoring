@@ -1,0 +1,215 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Element",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Element's direct dependencies by removing regex-based and XPath selection helper code (Regex, PatternSyntaxException) into a new helper class so Element no longer directly references Regex-related APIs. The moved methods are cohesive (regex matching and XPath selection) and will be implemented as static helpers that accept an Element as a context parameter. This block moves five methods and introduces one new helper dependency, yielding a net reduction of Element's direct dependencies by removing at least the Regex and PatternSyntaxException usages.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementQueryHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementQueryHelper)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Create new helper class org.jsoup.nodes.ElementQueryHelper. Move the following instance methods from Element into ElementQueryHelper as public static methods that accept an Element context parameter: getElementsByAttributeValueMatching(String key, String regex), getElementsMatchingText(String regex), getElementsMatchingOwnText(String regex), selectXpath(String xpath), selectXpath(String xpath, Class<T> nodeType). The moved implementations keep existing behavior but call Collector / Evaluator / NodeUtils as before from the helper. In Element, replace the original methods with small delegating wrappers that call ElementQueryHelper.method(this, ...). This removes direct use of Regex.compile and PatternSyntaxException from Element source; Element will gain a single dependency on ElementQueryHelper.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file: src/main/java/org/jsoup/nodes/ElementQueryHelper.java)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java"
+          ],
+          "details": "Add imports required by the extracted methods into ElementQueryHelper: org.jsoup.helper.Regex, java.util.regex.PatternSyntaxException, org.jsoup.select.Collector, org.jsoup.select.Evaluator, org.jsoup.select.Selector, org.jsoup.nodes.Node (if referenced in generics), and any other imports used by the moved methods. Keep package org.jsoup.nodes.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsByAttributeValueMatching(String, String), org.jsoup.nodes.ElementQueryHelper.getElementsByAttributeValueMatching(org.jsoup.nodes.Element, String, String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the String-based attribute-value regex overload to the helper as a static method taking Element as first parameter. The method will perform the same Regex.compile handling and then Collector.collect(...) using Evaluator.AttributeWithValueMatching.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsMatchingText(String), org.jsoup.nodes.ElementQueryHelper.getElementsMatchingText(org.jsoup.nodes.Element, String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the String-based getElementsMatchingText overload to the helper as a static method taking Element as first parameter. Preserve Regex.compile error handling semantics.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.getElementsMatchingOwnText(String), org.jsoup.nodes.ElementQueryHelper.getElementsMatchingOwnText(org.jsoup.nodes.Element, String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the String-based getElementsMatchingOwnText overload to the helper as a static method taking Element as first parameter. Preserve Regex.compile error handling semantics.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectXpath(String), org.jsoup.nodes.ElementQueryHelper.selectXpath(org.jsoup.nodes.Element, String))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move selectXpath(String) to the helper as a static method taking Element as first parameter. Implementation will delegate to NodeUtils.selectXpath(xpath, element, Element.class) and wrap result into new Elements as before.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.selectXpath(String, Class<T>), org.jsoup.nodes.ElementQueryHelper.selectXpath(org.jsoup.nodes.Element, String, Class<T>))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQueryHelper.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the generic selectXpath(String, Class<T>) to helper as a static method taking Element as first parameter and delegating to NodeUtils.selectXpath(xpath, element, nodeType).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.*delegating wrappers*, org.jsoup.nodes.ElementQueryHelper.*static methods*)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Replace bodies of the original moved methods in Element with small delegating wrappers that call the new static helper methods (for example, return ElementQueryHelper.getElementsMatchingText(this, regex)). Update any internal call sites inside Element that previously called the moved methods to call the helper where necessary. Keep method signatures in Element the same so external callers are unaffected.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce Element's direct dependencies by removing HTML serialization and printing responsibilities (Printer, QuietAppendable, Normalizer.xmlSafeTagName) into a new helper class. Move five methods responsible for producing HTML/outer HTML and the safe tag name helper into org.jsoup.nodes.ElementHtmlSerializer. After extraction Element will delegate serialization to the helper, removing direct use of Printer, QuietAppendable, and Normalizer.xmlSafeTagName from Element.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.jsoup.nodes.Element, org.jsoup.nodes.ElementHtmlSerializer)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Create new helper class org.jsoup.nodes.ElementHtmlSerializer. Move the following methods from Element into ElementHtmlSerializer as public static methods that accept an Element context parameter where necessary: html(), html(Appendable), outerHtmlHead(QuietAppendable, Document.OutputSettings), outerHtmlTail(QuietAppendable, Document.OutputSettings), safeTagName(Document.OutputSettings.Syntax). In Element, replace the original methods with delegating wrappers that call ElementHtmlSerializer methods. The helper will import Printer, QuietAppendable, Normalizer and use them as needed.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file: src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java"
+          ],
+          "details": "Add imports required by the extracted serialization code: org.jsoup.internal.Normalizer, org.jsoup.internal.QuietAppendable, org.jsoup.nodes.Document, org.jsoup.nodes.Document.OutputSettings, org.jsoup.nodes.Printer (printerFor), and any static imports required. Keep package org.jsoup.nodes.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.html(), org.jsoup.nodes.ElementHtmlSerializer.html(org.jsoup.nodes.Element))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the no-arg html() implementation into the helper as a static method taking Element. The helper will call the internal html(Appendable) variant and then check NodeUtils.outputSettings(this).prettyPrint() as before.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.html(T accum), org.jsoup.nodes.ElementHtmlSerializer.html(org.jsoup.nodes.Element, T))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the generic html(T accum) traversal/Printer usage into the helper as a static generic method that accepts the Element and the Appendable. This method will create the appropriate Printer via Printer.printerFor and traverse children as before.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.outerHtmlHead(QuietAppendable, Document.OutputSettings), org.jsoup.nodes.ElementHtmlSerializer.outerHtmlHead(org.jsoup.nodes.Element, QuietAppendable, Document.OutputSettings))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move outerHtmlHead implementation into the helper as a static method that accepts Element context and the accum/out settings. This method will use QuietAppendable and Normalizer.xmlSafeTagName as before.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.outerHtmlTail(QuietAppendable, Document.OutputSettings), org.jsoup.nodes.ElementHtmlSerializer.outerHtmlTail(org.jsoup.nodes.Element, QuietAppendable, Document.OutputSettings))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move outerHtmlTail into the helper as a static method that accepts Element context and the accum/out settings. Preserve behavior for closing tags.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(org.jsoup.nodes.Element.safeTagName(Document.OutputSettings.Syntax), org.jsoup.nodes.ElementHtmlSerializer.safeTagName(org.jsoup.nodes.Element, Document.OutputSettings.Syntax))",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementHtmlSerializer.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Move the small safeTagName helper into the helper class as a static method that accepts Element and the syntax; it will call Normalizer.xmlSafeTagName when syntax==xml.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(org.jsoup.nodes.Element.*delegating wrappers*, org.jsoup.nodes.ElementHtmlSerializer.*static methods*)",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Replace bodies of the original moved methods in Element with delegating wrappers that call ElementHtmlSerializer methods (for example, return ElementHtmlSerializer.html(this)). Update any internal Element call sites that previously invoked the moved methods to call the helper directly if needed. Keep Element's public signatures so external callers are unaffected.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

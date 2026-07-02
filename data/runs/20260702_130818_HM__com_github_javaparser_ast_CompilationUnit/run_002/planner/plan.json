@@ -1,0 +1,123 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.ast.CompilationUnit",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce CompilationUnit's fan-out by extracting storage and related responsibilities (storage field and storage-accessing methods) into a new helper class so the CompilationUnit no longer directly depends on Path, Charset and CompilationUnitStorage. The extraction groups methods that use CompilationUnitStorage and the path/charset types together (plus the small utility usage) so more than one dependency-group is moved in one refactoring, ensuring fan-out is decreased by 2 (3 removed, 1 new).",
+      "files": [
+        "javaparser-core/src/main/java/com/github/javaparser/ast/CompilationUnit.java",
+        "javaparser-core/src/main/java/com/github/javaparser/ast/CompilationUnitStorageSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit",
+            "com.github.javaparser.ast.CompilationUnitStorageSupport"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/CompilationUnitStorageSupport.java"
+          ],
+          "details": "Create a new class CompilationUnitStorageSupport in package com.github.javaparser.ast. This class will encapsulate the storage field and all storage-related methods extracted from CompilationUnit: getStorage(), setStorage(Path), setStorage(Path, Charset), and getPrimaryTypeName(). The new class will hold a reference to the CompilationUnit instance it supports (constructor parameter) so it can operate on that instance when needed. Ensure required imports (java.nio.file.Path, java.nio.charset.Charset, java.util.Optional, com.github.javaparser.utils.Utils, and com.github.javaparser.ast.CompilationUnitStorage) are added to the new class.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit.storage"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.storage"
+          ],
+          "details": "Move the private field 'storage' (type CompilationUnitStorage) out of CompilationUnit into the new CompilationUnitStorageSupport class. Update visibility to package-private or private with accessors inside the new class. Remove the field declaration from CompilationUnit so CompilationUnit no longer contains a direct reference to CompilationUnitStorage.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit.getStorage()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.getStorage()"
+          ],
+          "details": "Move the implementation of getStorage() to the new support class. The new method should return Optional.ofNullable(storage) using the storage field now owned by the support class. Update visibility to match original semantics.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit.setStorage(java.nio.file.Path)"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.setStorage(java.nio.file.Path)"
+          ],
+          "details": "Move setStorage(Path) implementation to the support class. In the support class create/overwrite the storage using new CompilationUnitStorage(thisCompilationUnit, path) as appropriate (the support class will need a reference to the enclosing CompilationUnit instance).",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit.setStorage(java.nio.file.Path, java.nio.charset.Charset)"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.setStorage(java.nio.file.Path, java.nio.charset.Charset)"
+          ],
+          "details": "Move setStorage(Path, Charset) to the support class. Implement by creating new CompilationUnitStorage(thisCompilationUnit, path, charset) on the storage field now in the support class.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit.getPrimaryTypeName()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.getPrimaryTypeName()"
+          ],
+          "details": "Move getPrimaryTypeName() to the support class. This method uses getStorage().map(CompilationUnitStorage::getFileName).map(Utils::removeFileExtension). Update the moved method to call the support-class-local getStorage() and preserve the same behavior. Note: Utils is still used elsewhere in CompilationUnit, so Utils remains an external dependency of the original class; moving this method is done to keep cohesive storage responsibilities together.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/CompilationUnitStorageSupport.java"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/CompilationUnitStorageSupport.java"
+          ],
+          "details": "Add necessary imports to the new class: java.nio.file.Path, java.nio.charset.Charset, java.util.Optional, com.github.javaparser.utils.Utils, com.github.javaparser.ast.CompilationUnitStorage, and any other types referenced by the moved methods. Also update the imports in the original CompilationUnit.java to remove imports that become unused after extraction (e.g., java.nio.file.Path and java.nio.charset.Charset if they are no longer used anywhere else in the file).",
+          "risk": "low"
+        },
+        {
+          "op": "REPLACE_DEPENDENCY",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport"
+          ],
+          "details": "Replace direct usages of CompilationUnitStorage, Path, and Charset from CompilationUnit with a single dependency on CompilationUnitStorageSupport. Add a private final field in CompilationUnit: 'private final CompilationUnitStorageSupport storageSupport = new CompilationUnitStorageSupport(this);' (or initialize lazily) and update internal call sites that previously called getStorage(), setStorage(...), and getPrimaryTypeName() to call storageSupport.getStorage(), storageSupport.setStorage(...), and storageSupport.getPrimaryTypeName(). This keeps CompilationUnit compilable while removing the three direct dependencies.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.ast.CompilationUnit.getStorage()",
+            "com.github.javaparser.ast.CompilationUnit.setStorage(java.nio.file.Path)",
+            "com.github.javaparser.ast.CompilationUnit.setStorage(java.nio.file.Path, java.nio.charset.Charset)",
+            "com.github.javaparser.ast.CompilationUnit.getPrimaryTypeName()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.getStorage()",
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.setStorage(java.nio.file.Path)",
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.setStorage(java.nio.file.Path, java.nio.charset.Charset)",
+            "com.github.javaparser.ast.CompilationUnitStorageSupport.getPrimaryTypeName()"
+          ],
+          "details": "Update all internal references inside CompilationUnit to call the corresponding methods on the new storageSupport instance. For example, any code that previously called getStorage() must now call storageSupport.getStorage(). Ensure visibility and any necessary accessors are added to the support class for fields/methods accessed from CompilationUnit.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+commit 889fb659c267847ec70a0917c5a43e6e57e714fd
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 2 12:13:30 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/nodes/Element.java b/src/main/java/org/jsoup/nodes/Element.java
+index ac61f078..308c3477 100644
+--- a/src/main/java/org/jsoup/nodes/Element.java
++++ b/src/main/java/org/jsoup/nodes/Element.java
+@@ -780,7 +780,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.14.3
+      */
+     public Elements selectXpath(String xpath) {
+-        return ElementQueryHelper.selectXpath(this, xpath);
++        return ElementQuerySupport.selectXpath(this, xpath);
+     }
+ 
+     /**
+@@ -797,7 +797,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.14.3
+      */
+     public <T extends Node> List<T> selectXpath(String xpath, Class<T> nodeType) {
+-        return ElementQueryHelper.selectXpath(this, xpath, nodeType);
++        return ElementQuerySupport.selectXpath(this, xpath, nodeType);
+     }
+ 
+     /**
+@@ -1410,7 +1410,7 @@ public class Element extends Node implements Iterable<Element> {
+      * @return elements matching the supplied regular expression
+      */
+     public Elements getElementsByAttributeValueMatching(String key, String regex) {
+-        return ElementQueryHelper.getElementsByAttributeValueMatching(this, key, regex);
++        return ElementQuerySupport.getElementsByAttributeValueMatching(this, key, regex);
+     }
+ 
+     /**
+@@ -1479,7 +1479,7 @@ public class Element extends Node implements Iterable<Element> {
+      * @see Element#text()
+      */
+     public Elements getElementsMatchingText(String regex) {
+-        return ElementQueryHelper.getElementsMatchingText(this, regex);
++        return ElementQuerySupport.getElementsMatchingText(this, regex);
+     }
+ 
+     /**
+@@ -1973,7 +1973,7 @@ public class Element extends Node implements Iterable<Element> {
+      @since 1.15.2
+      */
+     public Range endSourceRange() {
+-        return Range.ofEnd(this);
++        return ElementQuerySupport.endSourceRange(this);
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/jsoup/nodes/ElementQuerySupport.java b/src/main/java/org/jsoup/nodes/ElementQuerySupport.java
+new file mode 100644
+index 00000000..c0990978
+--- /dev/null
++++ b/src/main/java/org/jsoup/nodes/ElementQuerySupport.java
+@@ -0,0 +1,37 @@
++package org.jsoup.nodes;
++
++import org.jsoup.select.Elements;
++
++import java.util.List;
++
++/**
++ * Package-private helper to host a small set of Element instance helper methods that wrap
++ * XPath/regex query helpers and the endSourceRange utility. This centralises the external
++ * dependencies so Element no longer directly references ElementQueryHelper or Range.
++ */
++final class ElementQuerySupport {
++
++    private ElementQuerySupport() {
++        // no instantiation
++    }
++
++    public static Elements selectXpath(Element el, String xpath) {
++        return ElementQueryHelper.selectXpath(el, xpath);
++    }
++
++    public static <T extends Node> List<T> selectXpath(Element el, String xpath, Class<T> nodeType) {
++        return ElementQueryHelper.selectXpath(el, xpath, nodeType);
++    }
++
++    public static Elements getElementsByAttributeValueMatching(Element el, String key, String regex) {
++        return ElementQueryHelper.getElementsByAttributeValueMatching(el, key, regex);
++    }
++
++    public static Elements getElementsMatchingText(Element el, String regex) {
++        return ElementQueryHelper.getElementsMatchingText(el, regex);
++    }
++
++    public static Range endSourceRange(Element el) {
++        return Range.ofEnd(el);
++    }
++}

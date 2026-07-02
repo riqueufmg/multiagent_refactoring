@@ -1,0 +1,66 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.lang3.reflect.type"
+      ],
+      "details": "Create the destination subpackage org.apache.commons.lang3.reflect.type if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.reflect.TypeUtils"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.reflect.type.TypeUtils"
+      ],
+      "details": "Move TypeUtils to the destination package to group type utilities with related classes.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.reflect.TypeLiteral"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.reflect.type.TypeLiteral"
+      ],
+      "details": "Move TypeLiteral to the destination package so its implementation sits alongside TypeUtils.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.reflect.Typed"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.reflect.type.Typed"
+      ],
+      "details": "Move Typed to the destination package to keep the type representation interfaces with their utilities.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.lang3.reflect.MethodUtils",
+        "org.apache.commons.lang3.reflect.type.TypeLiteral",
+        "org.apache.commons.lang3.reflect.type.TypeUtils",
+        "org.apache.commons.lang3.reflect.type.Typed"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

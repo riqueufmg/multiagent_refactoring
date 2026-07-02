@@ -1,0 +1,72 @@
+mvp:
+  name: source_refactor
+  run_id: run_003
+input:
+  planner_contract: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text/run_003/planner/contract.json
+  planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text/run_003/planner/contract.json
+models:
+  executor: gpt-5-mini
+  repair: gpt-5-mini
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/system.md
+  execute_plan: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/execute_plan.md
+  repair_compile: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/repair_compile.md
+executor:
+  temperature: 0.0
+  timeout: 600
+  max_retries: 3
+  max_block_attempts: 3
+repair:
+  enabled: true
+  max_attempts: 3
+compile:
+  timeout: 900
+  command:
+  - mvn
+  - -q
+  - -Djapicmp.skip=true
+  - -Drat.skip=true
+  - -Dcheckstyle.skip=true
+  - -Dspotbugs.skip=true
+  - -Dpmd.skip=true
+  - -DskipITs
+  - clean
+  - test
+mechanical_tools:
+  openrewrite_enabled: true
+  openrewrite_timeout: 600
+  openrewrite_command:
+  - mvn
+  - -U
+  - -Dmaven.test.skip=true
+  - -DskipTests
+  - -DskipITs
+  - -Djapicmp.skip=true
+  - -Drat.skip=true
+  - -Dcheckstyle.skip=true
+  - -Dspotbugs.skip=true
+  - -Dpmd.skip=true
+  - -Danimal.sniffer.skip=true
+  - -Dforbiddenapis.skip=true
+  - -Denforcer.skip=true
+  - -Dlicense.skip=true
+  - -Dskip.npm=true
+  - -Dskip.yarn=true
+  - org.openrewrite.maven:rewrite-maven-plugin:runNoFork
+tests:
+  update_tests: true
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text
+project:
+  name: commons-lang
+  repo_path: /data/henrique/multiagent_refactoring/data/repositories/commons-lang
+target:
+  smell: GC
+  smell_name: God Component
+  target_type: package
+  target_name: org.apache.commons.lang3.text
+planner_contract: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text/run_003/planner/contract.json
+planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text/run_003/planner/contract.json
+planner:
+  contract: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text/run_003/planner/contract.json
+  contract_path: /data/henrique/multiagent_refactoring/data/runs/20260701_134547_GC__org_apache_commons_lang3_text/run_003/planner/contract.json

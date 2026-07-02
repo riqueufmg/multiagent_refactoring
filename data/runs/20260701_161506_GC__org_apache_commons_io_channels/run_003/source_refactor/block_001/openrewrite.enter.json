@@ -1,0 +1,79 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.io.channels.filter"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterChannel"
+      ],
+      "details": "Move the FilterChannel base class to the filter subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterByteChannel"
+      ],
+      "details": "Move the byte-channel filter implementation alongside the base FilterChannel.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterSeekableByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterSeekableByteChannel"
+      ],
+      "details": "Move the seekable byte-channel filter which depends on FilterByteChannel.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterReadableByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterReadableByteChannel"
+      ],
+      "details": "Move the readable-byte-channel filter to keep all channel filters together.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterWritableByteChannel",
+        "org.apache.commons.io.channels.filter.FilterByteChannel",
+        "org.apache.commons.io.channels.filter.FilterChannel",
+        "org.apache.commons.io.channels.filter.FilterReadableByteChannel",
+        "org.apache.commons.io.channels.filter.FilterSeekableByteChannel"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "id": 1,
+  "goal": "Move the selected cluster of filter channel implementations into a dedicated subpackage to reduce package responsibility.",
+  "files": [
+    "src/main/java/org/apache/commons/io/channels/FilterByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterReadableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterSeekableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterWritableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filters/FilterByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filters/FilterReadableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filters/FilterWritableByteChannel.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.io.channels.filters"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filters.FilterByteChannel"
+      ],
+      "details": "Move FilterByteChannel to the filters subpackage to group concrete filter implementations together.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterReadableByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filters.FilterReadableByteChannel"
+      ],
+      "details": "Move FilterReadableByteChannel to the filters subpackage to colocate readable filter implementations.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterWritableByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filters.FilterWritableByteChannel"
+      ],
+      "details": "Move FilterWritableByteChannel to the filters subpackage to colocate writable filter implementations.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterChannel",
+        "org.apache.commons.io.channels.FilterSeekableByteChannel",
+        "org.apache.commons.io.channels.filters.FilterByteChannel",
+        "org.apache.commons.io.channels.filters.FilterReadableByteChannel",
+        "org.apache.commons.io.channels.filters.FilterWritableByteChannel"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

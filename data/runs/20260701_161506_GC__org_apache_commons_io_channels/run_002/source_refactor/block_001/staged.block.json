@@ -1,0 +1,89 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive FilterChannel family into a dedicated subpackage to reduce package-level complexity.",
+  "files": [
+    "src/main/java/org/apache/commons/io/channels/FilterByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterReadableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterSeekableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/FilterWritableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filter/FilterByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filter/FilterChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filter/FilterReadableByteChannel.java",
+    "src/main/java/org/apache/commons/io/channels/filter/FilterWritableByteChannel.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.io.channels.filter"
+      ],
+      "details": "Create the destination subpackage for filter-related channel classes.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterChannel"
+      ],
+      "details": "Move the FilterChannel base class to the filter subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterByteChannel"
+      ],
+      "details": "Move the FilterByteChannel implementation to the filter subpackage alongside its base.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterReadableByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterReadableByteChannel"
+      ],
+      "details": "Move the FilterReadableByteChannel to co-locate with other filter variants.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterWritableByteChannel"
+      ],
+      "outputs": [
+        "org.apache.commons.io.channels.filter.FilterWritableByteChannel"
+      ],
+      "details": "Move the FilterWritableByteChannel to the filter subpackage to keep the filter family together.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.io.channels.FilterSeekableByteChannel",
+        "org.apache.commons.io.channels.filter.FilterByteChannel",
+        "org.apache.commons.io.channels.filter.FilterChannel",
+        "org.apache.commons.io.channels.filter.FilterReadableByteChannel",
+        "org.apache.commons.io.channels.filter.FilterWritableByteChannel"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}
