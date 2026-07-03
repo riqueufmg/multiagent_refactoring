@@ -47,7 +47,9 @@ class Fqn:
         wants_type = bool(pkg and cls)
 
         for path in repo.rglob("*.java"):
-            if any(p in self.IGNORED_DIRS for p in path.parts):
+            rel_parts = path.relative_to(repo).parts
+
+            if any(p in self.IGNORED_DIRS for p in rel_parts):
                 continue
 
             text = self._read(path)
@@ -78,13 +80,3 @@ class Fqn:
             for p in rel_paths
             if p.endswith(".java") and not p.endswith("package-info.java")
         }
-
-# How to use:
-
-#fqn = Fqn("data/repositories/jsoup")
-
-# path = fqn.find_in_repo("org.foo.bar.Classe")
-# print(path) >> /repo/.../Classe.java
-
-#path = fqn.find_in_repo("org.jsoup.nodes")
-#print(path) #>> /repo/.../org/foo/bar/

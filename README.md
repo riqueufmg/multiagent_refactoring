@@ -86,7 +86,7 @@ First, you need to change all 'absolute_path_to' values ​​to the absolute pa
 No other configuration attributes of the MVP source refactor need to be changed, unless you wish to customize your scripts.
 
 ### OpenAI token (.env)
-You also need to define your OpenAI token in the *.env* file in order to make inferences through the API.
+In the project root, duplicate the .env.example file to .env. You also need to define your OpenAI token in the *.env* file in order to make inferences through the API.
 
 ## Run
 
@@ -95,3 +95,29 @@ After configuring the MVPs and the orchestrator, run the following command to st
 ```bash
 python -m orchestrator.run --config orchestrator/config.yml
 ```
+
+## Results
+
+Each script execution generates a log directory inside *data/runs* following the pattern timestamp + FQN of the element to be refactored. Inside this directory, sequential runs are created (e.g., run_001, run_002...).
+
+Inside each sequential run directory, subdirectories are generated for the execution of the planner, source_refactor, and quality_checker. Many files are generated inside each of these subdirectories to facilitate code debugging and understanding the LLM traces. However, it is worth highlighting some of them to support the analysis of the refactoring results:
+
+- Root directory files:
+	- *\*.stderr.txt*: Lists execution errors from the planner, source_refactor, or quality_checker.
+- Planner files:
+	- *contract.json*: Final file used as input for source_refactor.
+	- *planner.rendered.md*: Instance of the prompt delivered to the agent.
+	- *plan.json*: The suggested refactoring plan.
+	- *status.json*: Indicates whether the target has the smell to be refactored and whether the plan was successfully generated.
+- Source refactor files:
+	- *block_000 directories*: Concentrate the logs for each block of the plan.
+		- *block.diff*: If the build succeeds after the code change, shows the changes from the executed commit.
+		- *compile.log*: Shows build errors. If it is empty, the build was successful.
+		- *execute_plan.attempt_0.rendered.md*: Instance of the prompt delivered to the agent.
+		- *execute_plan.result.json*: Shows what was changed in the repository.
+	- *contract.json*: Final file used as input for quality_checker.
+	- *status.json*: Indicates how many plan blocks were successfully applied and how many failed, as well as which files were affected.
+- Quality checker files:
+	- *status.json*: Indicates the final execution result, such as which smells were added/removed, metric variation, and the list of refactorings identified by RefactoringMiner.
+
+These are the most important files, but if you have any questions, they can be clarified with the project creator by email at henrique.mg.bh@gmail.com.
