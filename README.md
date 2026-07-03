@@ -51,6 +51,15 @@ The *tools* directory contains third-party tools that are executed by the script
 
 ## Configuration
 
+**Before starting the configuration, it is desirable to already have the repository to be refactored located in the path *data/repositories*.**
+
+### Orquestrator (orchestrator/config.yml)
+The following orchestrator attributes need to be configured:
+
+- **project**: Defines the *name* and *repo_path* of the repository to be refactored.
+- **runs**: Defines the number of refactoring attempts. Each attempt runs the full cycle: planning, execution, and verification.
+- **target**: Defines the smell to be refactored and the refactoring target. The *smell* attribute accepts: `IM`, `HM`, and `GC`. The *smell_name* attribute accepts: `Insufficient Modularization`, `Hub-like Modularization`, and `God Component`. The *target_type* attribute accepts: `class` or `package`. The *target_name* attribute must be written in the FQN format of the package or class to be refactored.
+
 ### MVP Planner Configuration (mvp/planner/config.yml)
 
 First, you need to change all 'absolute_path_to' values ​​to the absolute path to your repository.
@@ -75,13 +84,6 @@ No other configuration attributes of the MVP source refactor need to be changed,
 First, you need to change all 'absolute_path_to' values ​​to the absolute path to your repository.
 
 No other configuration attributes of the MVP source refactor need to be changed, unless you wish to customize your scripts.
-
-### Orquestrator (orchestrator/config.yml)
-The following orchestrator attributes need to be configured:
-
-- **project**: Defines the *name* and *repo_path* of the repository to be refactored.
-- **runs**: Defines the number of refactoring attempts. Each attempt runs the full cycle: planning, execution, and verification.
-- **target**: Defines the smell to be refactored and the refactoring target. The *smell* attribute accepts: `IM`, `HM`, and `GC`. The *smell_name* attribute accepts: `Insufficient Modularization`, `Hub-like Modularization`, and `God Component`. The *target_type* attribute accepts: `class` or `package`. The *target_name* attribute must be written in the FQN format of the package or class to be refactored.
 
 ### OpenAI token (.env)
 You also need to define your OpenAI token in the *.env* file in order to make inferences through the API.
