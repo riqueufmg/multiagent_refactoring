@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.lang3.time",
+  "selected_cluster": [
+    "org.apache.commons.lang3.time.DurationUtils",
+    "org.apache.commons.lang3.time.DurationFormatUtils",
+    "org.apache.commons.lang3.time.StopWatch"
+  ],
+  "destination_package": "org.apache.commons.lang3.time.duration",
+  "cluster_reason": "These three classes form a cohesive duration-related subdomain: StopWatch relies on DurationUtils and DurationFormatUtils for measuring and formatting elapsed time. They have strong internal interactions and can be isolated together into a dedicated subpackage with minimal changes to unrelated formatting/parsing classes. Moving them groups duration responsibilities and reduces the size and responsibility of the original package.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the duration-related cluster to a new subpackage.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/time/DurationUtils.java",
+        "src/main/java/org/apache/commons/lang3/time/DurationFormatUtils.java",
+        "src/main/java/org/apache/commons/lang3/time/StopWatch.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.lang3.time.duration"
+          ],
+          "details": "Create the destination subpackage for duration-related classes if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.time.DurationUtils"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.time.duration.DurationUtils"
+          ],
+          "details": "Move DurationUtils into the duration subpackage to colocate duration logic with related classes.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.time.DurationFormatUtils"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.time.duration.DurationFormatUtils"
+          ],
+          "details": "Move DurationFormatUtils into the duration subpackage so formatting utilities remain with duration logic.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.time.StopWatch"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.time.duration.StopWatch"
+          ],
+          "details": "Move StopWatch into the duration subpackage so it depends on the moved duration utilities internally.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

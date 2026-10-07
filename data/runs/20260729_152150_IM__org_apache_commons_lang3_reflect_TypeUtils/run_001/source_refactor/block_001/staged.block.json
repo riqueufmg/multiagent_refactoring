@@ -1,0 +1,127 @@
+{
+  "id": 1,
+  "goal": "Extract string-formatting and textual-representation responsibilities from TypeUtils into a dedicated helper class to reduce class size and isolate formatting logic.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java",
+    "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java"
+      ],
+      "details": "Create new package-level class org.apache.commons.lang3.reflect.TypeStringUtils containing the implementations of textual formatting and representation methods previously in TypeUtils. This new class will contain the moved methods and associated joiner fields as package-private or public static helpers.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:AMP_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:CTJ_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:GT_JOINER"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:AMP_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:CTJ_JOINER",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:GT_JOINER"
+      ],
+      "details": "Move the AppendableJoiner helper fields AMP_JOINER, CTJ_JOINER and GT_JOINER from TypeUtils to TypeStringUtils. These fields are only used by formatting methods and belong with them.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:anyToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:appendRecursiveTypes",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:classToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:genericArrayTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:parameterizedTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:wildcardTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:typeVariableToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:toLongString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java:toString"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:anyToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:appendRecursiveTypes",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:classToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:genericArrayTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:parameterizedTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:wildcardTypeToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:typeVariableToString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:toLongString",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java:toString"
+      ],
+      "details": "Move all formatting and string-construction methods to TypeStringUtils. The existing public TypeUtils.toString(Type) will be left as a small facade delegating to TypeStringUtils.toString(Type) so external callers continue to work unchanged.",
+      "risk": "medium"
+    },
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "details": "Replace bodies of public formatting entry points in TypeUtils (notably public static String toString(Type) and public static String toLongString(TypeVariable<?>)) with one-line delegations to TypeStringUtils.toString(...) and TypeStringUtils.toLongString(...). This keeps the TypeUtils public API stable while implementation is relocated.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/GenericArrayTypeImpl.java",
+        "src/main/java/org/apache/commons/lang3/reflect/ParameterizedTypeImpl.java",
+        "src/main/java/org/apache/commons/lang3/reflect/WildcardTypeImpl.java"
+      ],
+      "details": "Within TypeUtils and relocated inner-class files (when present), update internal calls that previously referenced the moved methods/fields to call TypeStringUtils.*. For example, calls to toString(...) within moved/remaining code should be routed to TypeStringUtils.toString(...), except public TypeUtils API methods which will remain facades.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/reflect/TypeStringUtils.java",
+        "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java"
+      ],
+      "details": "Add or update imports in both TypeStringUtils and TypeUtils to include any types referenced by the moved methods (e.g., java.lang.reflect.Type, java.lang.reflect.WildcardType, AppendableJoiner, ArrayUtils, Objects).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+        "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+        "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java",
+    "src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java",
+    "src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java"
+  ]
+}

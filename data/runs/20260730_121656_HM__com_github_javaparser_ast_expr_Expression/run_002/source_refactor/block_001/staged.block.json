@@ -1,0 +1,220 @@
+{
+  "id": 1,
+  "goal": "Reduce Expression's direct dependencies on annotation-specific expression types by extracting all annotation-related type-check, cast, optional-conversion and if-visitor methods into a new helper class. This will remove direct coupling to AnnotationExpr, NormalAnnotationExpr, MarkerAnnotationExpr and SingleMemberAnnotationExpr from Expression (net reduction: remove 4 deps, add 1 new helper dep => net -3).",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/ast/expr/Expression.java",
+    "javaparser-core/src/main/java/com/github/javaparser/ast/expr/ExpressionAnnotationsHelper.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.ast.expr.Expression, com.github.javaparser.ast.expr.ExpressionAnnotationsHelper)",
+      "inputs": [
+        "com.github.javaparser.ast.expr.Expression"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.expr.ExpressionAnnotationsHelper"
+      ],
+      "details": "Create a new class ExpressionAnnotationsHelper in the same package and move annotation-related methods (isX/asX/toX/ifX for AnnotationExpr, NormalAnnotationExpr, MarkerAnnotationExpr, SingleMemberAnnotationExpr) into it. The helper will expose equivalent instance methods that operate on an Expression instance (or static utility methods taking Expression). Expression will be updated to delegate those calls to the helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.isAnnotationExpr())",
+      "inputs": [
+        "isAnnotationExpr()"
+      ],
+      "outputs": [
+        "isAnnotationExpr()"
+      ],
+      "details": "Move isAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.asAnnotationExpr())",
+      "inputs": [
+        "asAnnotationExpr()"
+      ],
+      "outputs": [
+        "asAnnotationExpr()"
+      ],
+      "details": "Move asAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.toAnnotationExpr())",
+      "inputs": [
+        "toAnnotationExpr()"
+      ],
+      "outputs": [
+        "toAnnotationExpr()"
+      ],
+      "details": "Move toAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.ifAnnotationExpr())",
+      "inputs": [
+        "ifAnnotationExpr(Consumer<AnnotationExpr>)"
+      ],
+      "outputs": [
+        "ifAnnotationExpr(Consumer<AnnotationExpr>)"
+      ],
+      "details": "Move ifAnnotationExpr(Consumer<AnnotationExpr>) to helper; add necessary import for Consumer in helper if needed.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isNormalAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.isNormalAnnotationExpr())",
+      "inputs": [
+        "isNormalAnnotationExpr()"
+      ],
+      "outputs": [
+        "isNormalAnnotationExpr()"
+      ],
+      "details": "Move normal annotation type helpers to the new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asNormalAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.asNormalAnnotationExpr())",
+      "inputs": [
+        "asNormalAnnotationExpr()"
+      ],
+      "outputs": [
+        "asNormalAnnotationExpr()"
+      ],
+      "details": "Move asNormalAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toNormalAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.toNormalAnnotationExpr())",
+      "inputs": [
+        "toNormalAnnotationExpr()"
+      ],
+      "outputs": [
+        "toNormalAnnotationExpr()"
+      ],
+      "details": "Move toNormalAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifNormalAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.ifNormalAnnotationExpr())",
+      "inputs": [
+        "ifNormalAnnotationExpr(Consumer<NormalAnnotationExpr>)"
+      ],
+      "outputs": [
+        "ifNormalAnnotationExpr(Consumer<NormalAnnotationExpr>)"
+      ],
+      "details": "Move ifNormalAnnotationExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isMarkerAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.isMarkerAnnotationExpr())",
+      "inputs": [
+        "isMarkerAnnotationExpr()"
+      ],
+      "outputs": [
+        "isMarkerAnnotationExpr()"
+      ],
+      "details": "Move marker annotation helpers to new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asMarkerAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.asMarkerAnnotationExpr())",
+      "inputs": [
+        "asMarkerAnnotationExpr()"
+      ],
+      "outputs": [
+        "asMarkerAnnotationExpr()"
+      ],
+      "details": "Move asMarkerAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toMarkerAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.toMarkerAnnotationExpr())",
+      "inputs": [
+        "toMarkerAnnotationExpr()"
+      ],
+      "outputs": [
+        "toMarkerAnnotationExpr()"
+      ],
+      "details": "Move toMarkerAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifMarkerAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.ifMarkerAnnotationExpr())",
+      "inputs": [
+        "ifMarkerAnnotationExpr(Consumer<MarkerAnnotationExpr>)"
+      ],
+      "outputs": [
+        "ifMarkerAnnotationExpr(Consumer<MarkerAnnotationExpr>)"
+      ],
+      "details": "Move ifMarkerAnnotationExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isSingleMemberAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.isSingleMemberAnnotationExpr())",
+      "inputs": [
+        "isSingleMemberAnnotationExpr()"
+      ],
+      "outputs": [
+        "isSingleMemberAnnotationExpr()"
+      ],
+      "details": "Move single-member annotation helpers to the new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asSingleMemberAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.asSingleMemberAnnotationExpr())",
+      "inputs": [
+        "asSingleMemberAnnotationExpr()"
+      ],
+      "outputs": [
+        "asSingleMemberAnnotationExpr()"
+      ],
+      "details": "Move asSingleMemberAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toSingleMemberAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.toSingleMemberAnnotationExpr())",
+      "inputs": [
+        "toSingleMemberAnnotationExpr()"
+      ],
+      "outputs": [
+        "toSingleMemberAnnotationExpr()"
+      ],
+      "details": "Move toSingleMemberAnnotationExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifSingleMemberAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.ifSingleMemberAnnotationExpr())",
+      "inputs": [
+        "ifSingleMemberAnnotationExpr(Consumer<SingleMemberAnnotationExpr>)"
+      ],
+      "outputs": [
+        "ifSingleMemberAnnotationExpr(Consumer<SingleMemberAnnotationExpr>)"
+      ],
+      "details": "Move ifSingleMemberAnnotationExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(com.github.javaparser.ast.expr.ExpressionAnnotationsHelper)",
+      "inputs": [
+        "java.util.function.Consumer",
+        "java.util.Optional"
+      ],
+      "outputs": [
+        "imports updated in ExpressionAnnotationsHelper"
+      ],
+      "details": "Add required imports (Consumer, Optional) to the newly created helper class. The annotation expression types are in the same package and do not need external imports.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(com.github.javaparser.ast.expr.Expression.isAnnotationExpr(), com.github.javaparser.ast.expr.ExpressionAnnotationsHelper.isAnnotationExpr())",
+      "inputs": [
+        "call sites inside Expression that invoked isAnnotationExpr()/asAnnotationExpr()/toAnnotationExpr()/ifAnnotationExpr()"
+      ],
+      "outputs": [
+        "call sites updated to delegate to ExpressionAnnotationsHelper"
+      ],
+      "details": "Update internal calls in Expression (if any) to delegate to the helper. External callers of Expression's public API should continue to see the same behavior; Expression will forward calls to the helper or expose delegating methods.",
+      "risk": "medium"
+    }
+  ]
+}

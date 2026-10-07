@@ -1,0 +1,82 @@
+{
+  "id": 1,
+  "goal": "Reduce the size and complexity of DiffBuilder by extracting the many append(...) overloads into a dedicated helper class and delegate from DiffBuilder. This groups cohesive API methods and reduces the public surface and implementation size of the target class.",
+  "files": [
+    "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+    "src/main/java/org/apache/commons/lang3/builder/DiffBuilderAppenders.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final boolean lhs, final boolean rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final boolean[] lhs, final boolean[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final byte lhs, final byte rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final byte[] lhs, final byte[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final char lhs, final char rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final char[] lhs, final char[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final DiffResult<?> diffResult)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final double lhs, final double rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final double[] lhs, final double[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final float lhs, final float rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final float[] lhs, final float[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final int lhs, final int rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final int[] lhs, final int[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final long lhs, final long rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final long[] lhs, final long[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final Object lhs, final Object rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final Object[] lhs, final Object[] rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final short lhs, final short rhs)",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java::public DiffBuilder<T> append(final String fieldName, final short[] lhs, final short[] rhs)"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilderAppenders.java",
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "details": "Create a new top-level helper class DiffBuilderAppenders in package org.apache.commons.lang3.builder. Move the implementation of the append(...) overloads into DiffBuilderAppenders as public static generic methods that operate on the data needed to create diffs (accepting the List<Diff<?>> diffs and the equals flag, the fieldName and the left/right values or suppliers). In DiffBuilder replace the bodies of the moved append(...) methods with delegating calls to the new DiffBuilderAppenders methods, keeping the original signatures so callers are unaffected. The helper methods will use standard APIs present in the project (Arrays, ArrayUtils, ObjectUtils, Objects) and will create Diff instances (anonymous subclass) to add to the passed diffs list. Do not change method signatures of DiffBuilder; only replace implementations to delegate. Keep SDiff and SerializableSupplier in DiffBuilder unchanged (they remain available for other internal constructs).",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilderAppenders.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilderAppenders.java"
+      ],
+      "details": "Add required imports in the new DiffBuilderAppenders.java file: java.io.Serializable, java.util.Arrays, java.util.List, java.util.Objects, java.util.function.Supplier and org.apache.commons.lang3.ArrayUtils, org.apache.commons.lang3.ObjectUtils, and any other package-level types referenced (Diff, DiffResult) from org.apache.commons.lang3.builder. Keep the new class in the same package so package-private access is usable when needed.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "details": "Update the bodies of the original append(...) methods in DiffBuilder to delegate to DiffBuilderAppenders, passing the current instance state needed (this.diffs and this.equals) and the original parameters. Example delegation pattern: return DiffBuilderAppenders.append(this.diffs, this.equals, fieldName, lhs, rhs); This preserves DiffBuilder's API while reducing its implementation size.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+    "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+  ]
+}

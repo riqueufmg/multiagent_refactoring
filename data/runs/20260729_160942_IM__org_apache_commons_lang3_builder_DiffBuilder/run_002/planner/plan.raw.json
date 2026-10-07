@@ -1,0 +1,72 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.lang3.builder.DiffBuilder",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the private SerializableSupplier interface from DiffBuilder into a small package-level interface to reduce nested complexity and make it reusable by other helper classes.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+        "src/main/java/org/apache/commons/lang3/builder/SerializableSupplier.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/builder/SerializableSupplier.java"
+          ],
+          "details": "Move the nested private interface 'SerializableSupplier<T>' out of DiffBuilder into a package-level interface SerializableSupplier<T> in org.apache.commons.lang3.builder. The new top-level interface will preserve the same contract: it extends java.util.function.Supplier<T> and java.io.Serializable. Make it package-private (no explicit modifier) so it does not broaden the public API beyond the package.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the nested SDiff class to a package-level class to shrink DiffBuilder and isolate diff representation logic.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+        "src/main/java/org/apache/commons/lang3/builder/SDiff.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+            "src/main/java/org/apache/commons/lang3/builder/SerializableSupplier.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/builder/SDiff.java"
+          ],
+          "details": "Move the nested private static final class 'SDiff<T>' out of DiffBuilder into a package-level class SDiff<T> that extends Diff<T>. SDiff will depend on the package-level SerializableSupplier<T> extracted in block 1. Preserve SDiff's behavior: store the left and right SerializableSupplier instances, require non-null suppliers, and implement getLeft() and getRight(). Add necessary imports (e.g. java.util.Objects and java.io.Serializable if needed). Make SDiff package-private (no explicit modifier) to keep it internal to the package.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Update DiffBuilder to remove the now-extracted nested types and adjust imports/usages so the file is smaller and focused on builder responsibilities.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java",
+            "src/main/java/org/apache/commons/lang3/builder/SDiff.java",
+            "src/main/java/org/apache/commons/lang3/builder/SerializableSupplier.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+          ],
+          "details": "Remove the nested declarations of SerializableSupplier and SDiff from DiffBuilder.java (they have been moved to top-level files). Update DiffBuilder.java to reference the package-level SDiff and SerializableSupplier classes. Ensure imports and package declarations are consistent (both new types are in the same package so explicit imports are optional). Leave DiffBuilder's API (constructors, builder(), append(...) overloads, build(), getLeft/getRight) unchanged so external callers are not impacted. This reduces DiffBuilder's file size and implementation complexity by delegating the serialized-diff representation to SDiff and the supplier contract to SerializableSupplier.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

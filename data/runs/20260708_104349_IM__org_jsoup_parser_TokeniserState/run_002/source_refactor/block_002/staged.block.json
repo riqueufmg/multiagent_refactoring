@@ -1,0 +1,35 @@
+{
+  "id": 2,
+  "goal": "Update TokeniserState to delegate to the extracted helper and remove the copied static helper implementations from the enum to reduce its length and group responsibilities.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserState.java",
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "details": "Replace direct references to the extracted static fields and methods inside TokeniserState with references to the helper class. Specifically:\n- Replace uses of nullChar, attributeNameCharsSorted, attributeValueUnquoted, replacementChar, replacementStr, and eof with TokeniserStateHelper.nullChar, TokeniserStateHelper.attributeNameCharsSorted, TokeniserStateHelper.attributeValueUnquoted, TokeniserStateHelper.replacementChar, TokeniserStateHelper.replacementStr, TokeniserStateHelper.eof respectively (match visibility chosen in extraction).\n- Replace calls to handleDataEndTag(...), readRawData(...), readCharRef(...), readEndTag(...), handleDataDoubleEscapeTag(...), readDoctypeInternalSubset(...) with TokeniserStateHelper.handleDataEndTag(...), TokeniserStateHelper.readRawData(...), TokeniserStateHelper.readCharRef(...), TokeniserStateHelper.readEndTag(...), TokeniserStateHelper.handleDataDoubleEscapeTag(...), TokeniserStateHelper.readDoctypeInternalSubset(...).\n- Remove the original static method and field definitions from TokeniserState after delegation (so only enum cases and abstract read remain). Ensure method visibility and package placement allow access (package-private or public as appropriate).\nNo changes to public API of Tokeniser or CharacterReader are introduced. Update only internal references within TokeniserState. Because the helper is in the same package, no additional imports are required.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+  ]
+}

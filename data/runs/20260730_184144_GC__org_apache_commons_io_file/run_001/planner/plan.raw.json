@@ -1,0 +1,58 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.io.file",
+  "selected_cluster": [
+    "org.apache.commons.io.file.CountingPathVisitor",
+    "org.apache.commons.io.file.SimplePathVisitor"
+  ],
+  "destination_package": "org.apache.commons.io.file.visitor",
+  "cluster_reason": "CountingPathVisitor has a direct implementation/usage relationship with SimplePathVisitor (internal dependency present). Both are concrete path visitor implementations and form a cohesive visitor subdomain; they have limited direct external dependents compared with core utilities like PathUtils or Counters, so moving them together into a visitor subpackage groups related behavior while minimizing widespread API surface changes.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the selected cluster of path visitor classes to a new subpackage.",
+      "files": [
+        "src/main/java/org/apache/commons/io/file/CountingPathVisitor.java",
+        "src/main/java/org/apache/commons/io/file/SimplePathVisitor.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.io.file.visitor"
+          ],
+          "details": "Create the destination subpackage org.apache.commons.io.file.visitor if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.file.CountingPathVisitor"
+          ],
+          "outputs": [
+            "org.apache.commons.io.file.visitor.CountingPathVisitor"
+          ],
+          "details": "Move CountingPathVisitor to the visitor subpackage to group visitor implementations.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.file.SimplePathVisitor"
+          ],
+          "outputs": [
+            "org.apache.commons.io.file.visitor.SimplePathVisitor"
+          ],
+          "details": "Move SimplePathVisitor to the visitor subpackage alongside CountingPathVisitor.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

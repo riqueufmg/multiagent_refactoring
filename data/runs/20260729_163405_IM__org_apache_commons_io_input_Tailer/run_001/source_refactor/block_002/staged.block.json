@@ -1,0 +1,50 @@
+{
+  "id": 2,
+  "goal": "Extract the nested class RandomAccessFileBridge into a top-level class that implements RandomAccessResourceBridge to separate implementation details.",
+  "files": [
+    "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java",
+    "src/main/java/org/apache/commons/io/input/Tailer.java",
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java:RandomAccessFileBridge"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java",
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "details": "Move the RandomAccessFileBridge nested class to a new top-level class RandomAccessFileBridge in org.apache.commons.io.input that implements the already-extracted RandomAccessResourceBridge. Remove the nested class declaration from Tailer.java. Preserve constructor semantics (taking File and mode) and method implementations (close, getPointer, read, seek).",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/RandomAccessFileBridge.java"
+      ],
+      "details": "Add necessary imports (java.io.RandomAccessFile, java.io.File, java.io.FileNotFoundException, java.io.IOException) to the new top-level class so it compiles independently and references RandomAccessResourceBridge in the same package.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.lang3.function",
+  "selected_cluster": [
+    "org.apache.commons.lang3.function.FailableFunction",
+    "org.apache.commons.lang3.function.FailableBiFunction",
+    "org.apache.commons.lang3.function.FailableSupplier"
+  ],
+  "destination_package": "org.apache.commons.lang3.function.failable",
+  "cluster_reason": "These three types form a cohesive subgroup of the 'Failable' family: FailableBiFunction and FailableFunction are directly related (one is a binary variant), and FailableSupplier is used in the same utility flows (MethodInvokers references these kinds). Moving this small family to a dedicated subpackage isolates failure-capable functional interfaces while keeping closely related types together, minimizing cross-package package-private exposure.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move one class from the selected cluster.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/function/FailableFunction.java",
+        "src/main/java/org/apache/commons/lang3/function/FailableBiFunction.java",
+        "src/main/java/org/apache/commons/lang3/function/FailableSupplier.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.lang3.function.failable"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.function.FailableFunction"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.function.failable.FailableFunction"
+          ],
+          "details": "Move this functional interface to the failable subpackage to group related failable function types.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.function.FailableBiFunction"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.function.failable.FailableBiFunction"
+          ],
+          "details": "Move the binary variant alongside FailableFunction to keep closely related interfaces together.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.function.FailableSupplier"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.function.failable.FailableSupplier"
+          ],
+          "details": "Move the supplier variant to the same subpackage to consolidate failable suppliers/functions.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

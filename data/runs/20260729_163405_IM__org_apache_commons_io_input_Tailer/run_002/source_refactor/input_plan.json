@@ -1,0 +1,182 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.apache.commons.io.input.Tailer",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a focused helper class to encapsulate the line-reading logic currently implemented inside Tailer.readLines(...) so that parsing/reading concerns are separated from control/loop logic.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/TailerLinesReader.java",
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:private long readLines(RandomAccessResourceBridge reader) throws IOException"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerLinesReader.java:public final class TailerLinesReader { public static long readLines(RandomAccessResourceBridge reader, byte[] inbuf, java.nio.charset.Charset charset, TailerListener listener, Tailer tailer) throws IOException { ... } }"
+          ],
+          "details": "Create a new final helper class TailerLinesReader in package org.apache.commons.io.input containing a public static method readLines(RandomAccessResourceBridge reader, byte[] inbuf, Charset charset, TailerListener listener, Tailer tailer) that encapsulates the entire body of the existing private Tailer.readLines method. The method will use tailer.getRun() to check the run flag (protected access is allowed from same package). The method returns the rePos long value and throws IOException. This step only adds the new class and leaves the original Tailer.readLines unchanged (duplication).",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/TailerLinesReader.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerLinesReader.java"
+          ],
+          "details": "Add necessary imports to TailerLinesReader: import java.io.ByteArrayOutputStream; import java.io.IOException; import java.nio.charset.Charset; and imports for classes used from the same package (RandomAccessResourceBridge, TailerListener, Tailer). Use fully qualified references where necessary or add imports for readability.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+            "src/test/java/org/apache/commons/io/input/TailerTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move the readLines implementation out of Tailer and update all internal call sites so Tailer uses TailerLinesReader. This reduces Tailer's size and isolates parsing behavior.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/TailerLinesReader.java",
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:private long readLines(RandomAccessResourceBridge reader) throws IOException"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerLinesReader.java:public static long readLines(RandomAccessResourceBridge reader, byte[] inbuf, java.nio.charset.Charset charset, TailerListener listener, Tailer tailer) throws IOException"
+          ],
+          "details": "Remove the private readLines method from Tailer and keep its behavior in TailerLinesReader.readLines. The new method signature accepts the inbuf, charset, listener and the owning Tailer instance (to call tailer.getRun()). Keep exception behavior identical and preserve the call to listener.endOfFileReached() when appropriate. Ensure TailerLinesReader is placed in the same package so protected access to tailer.getRun() works.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:run()"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:run()"
+          ],
+          "details": "Replace internal calls to readLines(reader) and readLines(save) inside Tailer.run() with calls to TailerLinesReader.readLines(reader, inbuf, charset, listener, this) and TailerLinesReader.readLines(save, inbuf, charset, listener, this) respectively. Adjust any exception handling to remain identical. Add an import for TailerLinesReader if necessary or reference the class by its simple name since it's in the same package.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java"
+          ],
+          "details": "Add or update imports in Tailer if necessary to reference TailerLinesReader and any other new static references used. (Because the new class is in the same package, an import is optional; adding it for clarity is acceptable.)",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+            "src/test/java/org/apache/commons/io/input/TailerTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Reduce Tailer's public surface by extracting the numerous deprecated static factory convenience methods into a dedicated factory/helper class. This groups deprecated API and keeps Tailer focused on runtime behavior.",
+      "files": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java",
+        "src/main/java/org/apache/commons/io/input/TailerFactory.java",
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, Charset charset, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen, int bufferSize)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, TailerListener tailerListener)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, TailerListener tailerListener, long delayMillis)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, boolean reOpen, int bufferSize)",
+            "src/main/java/org/apache/commons/io/input/Tailer.java:public static Tailer create(File file, TailerListener tailerListener, long delayMillis, boolean end, int bufferSize)"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerFactory.java:public final class TailerFactory { @Deprecated public static Tailer create(...) { return Tailer.builder()....get(); } ... }"
+          ],
+          "details": "Create a new final helper class TailerFactory in the same package containing the deprecated static create(...) overloads copied from Tailer. Each method should retain the @Deprecated annotation and delegate to Tailer.builder() with the same parameters to preserve behavior. This groups the (deprecated) convenience factory methods in one place instead of keeping them on Tailer.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/input/Tailer.java:the same deprecated create(...) static methods listed above"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/input/TailerFactory.java:the same deprecated create(...) static methods"
+          ],
+          "details": "After creating TailerFactory, remove the deprecated create(...) static methods from Tailer. Because TailerFactory methods delegate back to Tailer.builder(), behavior is preserved. This reduces the public method count on Tailer while retaining the deprecated convenience methods for callers that still use them (they will need to switch to TailerFactory.create(...) if external callers are updated later).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "project-wide references to Tailer.create(...) (internal codebase search)"
+          ],
+          "outputs": [
+            "updated internal references to use TailerFactory.create(...) where applicable"
+          ],
+          "details": "Update any internal call sites within the repository that referenced Tailer.create(...) to instead reference TailerFactory.create(...). There are few (if any) internal references in this module; external callers will continue to work if codebase maintainers update them later. This keeps the repository compilable and consistent.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+            "src/test/java/org/apache/commons/io/input/TailerTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ]
+    }
+  ]
+}

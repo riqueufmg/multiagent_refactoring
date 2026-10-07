@@ -1,0 +1,58 @@
+{
+  "id": 1,
+  "goal": "Reduce JavaParserMetaModel's direct output coupling by extracting initialization logic that heavily references PropertyMetaModel and many com.github.javaparser.ast.* class literals into a dedicated helper class. Move two cohesive method groups (property meta-model creation and constructor-parameter wiring) out so the target no longer directly mentions PropertyMetaModel and several AST types; introduce a single new helper class in the same package and update call sites.",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModel.java",
+    "javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModelPropertyInitializer.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.metamodel.JavaParserMetaModel, com.github.javaparser.metamodel.JavaParserMetaModelPropertyInitializer)",
+      "inputs": [
+        "initializePropertyMetaModels()",
+        "initializeConstructorParameters()"
+      ],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModelPropertyInitializer.java",
+        "com.github.javaparser.metamodel.JavaParserMetaModelPropertyInitializer.initializePropertyMetaModels()",
+        "com.github.javaparser.metamodel.JavaParserMetaModelPropertyInitializer.initializeConstructorParameters()"
+      ],
+      "details": "Extract the two private static initialization methods initializePropertyMetaModels() and initializeConstructorParameters() from JavaParserMetaModel into a new helper class JavaParserMetaModelPropertyInitializer in package com.github.javaparser.metamodel. The new class will contain equivalent static methods and will reference the same public static meta-model fields (e.g., nodeMetaModel, bodyDeclarationMetaModel, etc.). The extracted methods must keep or be given package-private or public static visibility so the original static initializer in JavaParserMetaModel can invoke them. Ensure the new class file is placed under the same package (same source root).",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(com.github.javaparser.metamodel.JavaParserMetaModel.initializePropertyMetaModels(), com.github.javaparser.metamodel.JavaParserMetaModelPropertyInitializer.initializePropertyMetaModels())",
+      "inputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModel.java: static initializer calls initializePropertyMetaModels() and initializeConstructorParameters()"
+      ],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModel.java: static initializer now calls JavaParserMetaModelPropertyInitializer.initializePropertyMetaModels() and JavaParserMetaModelPropertyInitializer.initializeConstructorParameters()"
+      ],
+      "details": "Replace calls to the moved methods in the static initializer of JavaParserMetaModel with calls to the corresponding static methods on the new helper class. Adjust visibility of the extracted methods if necessary (package-private or public) and remove the original method bodies from JavaParserMetaModel.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModel.java)",
+      "inputs": [
+        "remove references to com.github.javaparser.metamodel.PropertyMetaModel and to several com.github.javaparser.ast.* class literals from JavaParserMetaModel"
+      ],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/metamodel/JavaParserMetaModel.java: updated imports (no new imports required for the helper since it is in the same package)"
+      ],
+      "details": "Update imports in the original file if any imports become unused after extraction. No import is required to reference the helper class because it shares the same package; ensure the file compiles without unused imports.",
+      "risk": "low"
+    }
+  ],
+  "expected_dependency_changes": {
+    "removed_dependencies": [
+      "com.github.javaparser.metamodel.PropertyMetaModel",
+      "com.github.javaparser.ast.expr.AnnotationExpr",
+      "com.github.javaparser.ast.Modifier",
+      "com.github.javaparser.ast.expr.SimpleName"
+    ],
+    "added_dependencies": [
+      "com.github.javaparser.metamodel.JavaParserMetaModelPropertyInitializer"
+    ],
+    "net_removal": 3
+  }
+}

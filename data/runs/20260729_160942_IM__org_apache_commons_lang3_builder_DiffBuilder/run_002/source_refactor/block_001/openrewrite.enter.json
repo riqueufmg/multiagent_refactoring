@@ -1,0 +1,31 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/lang3/builder/DiffBuilder.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/lang3/builder/SerializableSupplier.java"
+      ],
+      "details": "Move the nested private interface 'SerializableSupplier<T>' out of DiffBuilder into a package-level interface SerializableSupplier<T> in org.apache.commons.lang3.builder. The new top-level interface will preserve the same contract: it extends java.util.function.Supplier<T> and java.io.Serializable. Make it package-private (no explicit modifier) so it does not broaden the public API beyond the package.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/lang3/SerializationUtilsTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/DiffBuilderTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/DiffResultTest.java",
+        "src/test/java/org/apache/commons/lang3/builder/ReflectionDiffBuilderTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ]
+}

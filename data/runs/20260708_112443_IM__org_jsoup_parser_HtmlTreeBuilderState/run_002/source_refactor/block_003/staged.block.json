@@ -1,0 +1,46 @@
+{
+  "id": 3,
+  "goal": "Reduce enum size by moving the InTable.anythingElse helper into HtmlTreeBuilderStateUtil to centralize table-foster-insert logic.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InTable.anythingElse(Token t, HtmlTreeBuilder tb)"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::public static boolean inTableAnythingElse(Token t, HtmlTreeBuilder tb)"
+      ],
+      "details": "Move the InTable.anythingElse implementation into HtmlTreeBuilderStateUtil as a public static method named inTableAnythingElse(Token, HtmlTreeBuilder). Preserve logic that sets foster inserts, calls tb.process(t, InBody), and resets foster inserts, and tb.error(this) behavior. Ensure the method does not depend on enum-private state.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InTable.process(Token t, HtmlTreeBuilder tb)"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InTable.process(Token t, HtmlTreeBuilder tb)"
+      ],
+      "details": "Replace calls to anythingElse(t, tb) inside InTable.process(...) with HtmlTreeBuilderStateUtil.inTableAnythingElse(t, tb). Keep behavior identical. Perform update with the move so code remains compilable.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

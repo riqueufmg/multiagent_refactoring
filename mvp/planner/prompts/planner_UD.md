@@ -92,7 +92,17 @@ Return ONLY valid JSON in the following format:
   ]
 }
 
-## CONTRAINTS
-- Reference only packages, classes, methods, and fields present in the input.
+## CONSTRAINTS
+
+- Return only valid JSON.
+- Reference only packages, classes, methods, fields, and calls present in the input.
+- Select exactly one unstable package.
+- Each block must address only one source class from the target package and one target class from the selected unstable package.
 - Each block must be small and independently compilable.
-- New classes must be placed in the target package or in an existing package referenced in the input, unless the input clearly justifies otherwise.
+- Each block must have an immediate expected effect on reducing dependencies from the target package to the selected unstable package.
+- Do not introduce a facade, interface, wrapper, or helper if it only forwards calls to the unstable package.
+- Avoid creating new packages/classes unless necessary.
+- If a new class is necessary, place it in an existing package present in the input.
+- Do not include optional, preparatory, future, or follow-up blocks.
+- The plan must contain at least one block and at most five blocks.
+- If no safe block can reduce the dependency under these constraints, return an empty "blocks" list and explain why in "notes".

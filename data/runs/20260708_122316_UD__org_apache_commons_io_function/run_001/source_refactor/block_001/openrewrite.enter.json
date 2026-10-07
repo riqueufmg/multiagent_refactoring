@@ -1,0 +1,58 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/IOExceptionList.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/function/IOExceptionList.java"
+      ],
+      "details": "Move the class org.apache.commons.io.IOExceptionList into the existing package org.apache.commons.io.function. Update the moved file's package declaration to 'org.apache.commons.io.function' and adjust visibility if necessary so usages from IOStream remain valid.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(file)",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "details": "Replace imports or fully-qualified references of org.apache.commons.io.IOExceptionList in IOStream (and any other files in the target package that reference it) to refer to org.apache.commons.io.function.IOExceptionList. Ensure no stale imports remain.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "details": "Update call sites in IOStream that invoke IOExceptionList.checkEmpty() so they reference the moved class in org.apache.commons.io.function (adjust imports or fully-qualified names). This removes the direct compile-time dependency on org.apache.commons.io from IOStream.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/FileUtilsDeleteDirectoryLinuxTest.java",
+        "src/test/java/org/apache/commons/io/IOExceptionListTest.java",
+        "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+        "src/test/java/org/apache/commons/io/function/IOConsumerTest.java",
+        "src/test/java/org/apache/commons/io/function/IOStreamTest.java",
+        "src/test/java/org/apache/commons/io/input/MessageDigestCalculatingInputStreamTest.java",
+        "src/test/java/org/apache/commons/io/input/MessageDigestInputStreamTest.java",
+        "src/test/java/org/apache/commons/io/output/ProxyCollectionWriterTest.java",
+        "src/test/java/org/apache/commons/io/output/TeeWriterTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ]
+}

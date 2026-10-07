@@ -52,6 +52,11 @@ from mvp.source_refactor.lib.repair_utils import (
     tail_text,
 )
 from mvp.source_refactor.lib.file_ops import apply_llm_file_changes
+from mvp.source_refactor.lib.llm_usage import (
+    append_llm_usage,
+    build_llm_usage_entry,
+    start_llm_timer,
+)
 
 def load_config_node(state: SourceRefactorState) -> SourceRefactorState:
     config_path = require_absolute_path(state["config_path"], "config_path")
@@ -925,11 +930,33 @@ def execute_plan_node(state: SourceRefactorState) -> SourceRefactorState:
     )
 
     try:
+        timer = start_llm_timer()
+
         res = llm.invoke(
             [
                 SystemMessage(content=system_prompt),
                 HumanMessage(content=rendered),
             ]
+        )
+
+        source_refactor_dir = block_dir.parent
+
+        append_llm_usage(
+            usage_file=source_refactor_dir / "llm_usage.json",
+            entry=build_llm_usage_entry(
+                timer=timer,
+                agent="executor",
+                model=model,
+                response=res,
+                metadata={
+                    "node": "execute_plan",
+                    "block_id": state.get("current_block", {}).get("id", ""),
+                    "attempt": attempt,
+                    "target_type": state.get("target_type", ""),
+                    "target_name": state.get("target_name", ""),
+                    "smell": state.get("smell", ""),
+                },
+            ),
         )
 
         raw = (res.content or "").strip()
@@ -1390,14 +1417,36 @@ def repair_compile_node(state: SourceRefactorState) -> SourceRefactorState:
     )
 
     try:
-        response = llm.invoke(
+        timer = start_llm_timer()
+
+        res = llm.invoke(
             [
                 SystemMessage(content=system_prompt),
                 HumanMessage(content=rendered),
             ]
         )
 
-        raw = (response.content or "").strip()
+        source_refactor_dir = block_dir.parent
+
+        append_llm_usage(
+            usage_file=source_refactor_dir / "llm_usage.json",
+            entry=build_llm_usage_entry(
+                timer=timer,
+                agent="repair_compile",
+                model=model,
+                response=res,
+                metadata={
+                    "node": "repair_compile",
+                    "block_id": state.get("current_block", {}).get("id", ""),
+                    "attempt": state.get("repair_attempt", ""),
+                    "target_type": state.get("target_type", ""),
+                    "target_name": state.get("target_name", ""),
+                    "smell": state.get("smell", ""),
+                },
+            ),
+        )
+
+        raw = (res.content or "").strip()
 
         (block_dir / f"{artifact_prefix}.raw.txt").write_text(
             raw,

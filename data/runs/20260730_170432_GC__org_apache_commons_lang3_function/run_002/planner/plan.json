@@ -1,0 +1,87 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.lang3.function",
+  "selected_cluster": [
+    "org.apache.commons.lang3.function.Functions",
+    "org.apache.commons.lang3.function.Predicates",
+    "org.apache.commons.lang3.function.Suppliers"
+  ],
+  "destination_package": "org.apache.commons.lang3.function.util",
+  "cluster_reason": "Functions, Predicates and Suppliers are cohesive utility classes providing complementary functional helpers (function composition/adapters, predicate helpers, and supplier helpers). They have mostly public, stateless APIs and few package-private ties to other classes in the package, so moving them together groups related utilities and minimizes required visibility changes.",
+  "risk": "low",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the selected cluster of utility classes into a new subpackage to reduce package bloat.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/function/Functions.java",
+        "src/main/java/org/apache/commons/lang3/function/Predicates.java",
+        "src/main/java/org/apache/commons/lang3/function/Suppliers.java",
+        "src/main/java/org/apache/commons/lang3/function/util/Functions.java",
+        "src/main/java/org/apache/commons/lang3/function/util/Predicates.java",
+        "src/main/java/org/apache/commons/lang3/function/util/Suppliers.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.lang3.function.util"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.function.Functions"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.function.util.Functions"
+          ],
+          "details": "Move Functions to the destination package.",
+          "risk": "low",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.function.Predicates"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.function.util.Predicates"
+          ],
+          "details": "Move Predicates to the destination package.",
+          "risk": "low",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.function.Suppliers"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.function.util.Suppliers"
+          ],
+          "details": "Move Suppliers to the destination package.",
+          "risk": "low",
+          "api_change": true
+        },
+        {
+          "op": "UPDATE_VISIBILITY",
+          "inputs": [
+            "org.apache.commons.lang3.function.util.Functions",
+            "org.apache.commons.lang3.function.util.Predicates",
+            "org.apache.commons.lang3.function.util.Suppliers"
+          ],
+          "outputs": [],
+          "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

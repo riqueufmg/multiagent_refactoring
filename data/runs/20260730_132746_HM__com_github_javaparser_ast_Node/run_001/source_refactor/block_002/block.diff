@@ -1,0 +1,495 @@
+commit dfd45f8804400e492634be46a259edda7afe4086
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 30 13:39:59 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/Node.java b/javaparser-core/src/main/java/com/github/javaparser/ast/Node.java
+index 19b6f0167..ba7543b95 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/ast/Node.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/Node.java
+@@ -24,8 +24,6 @@ import static com.github.javaparser.ast.Node.Parsedness.PARSED;
+ import static com.github.javaparser.ast.Node.TreeTraversal.PREORDER;
+ import static java.util.Collections.emptySet;
+ import static java.util.Collections.unmodifiableList;
+-import static java.util.Spliterator.DISTINCT;
+-import static java.util.Spliterator.NONNULL;
+ 
+ import com.github.javaparser.HasParentNode;
+ import com.github.javaparser.Position;
+@@ -67,13 +65,13 @@ import java.util.List;
+ import java.util.Optional;
+ import java.util.Queue;
+ import java.util.Set;
+-import java.util.Spliterators;
+ import java.util.Stack;
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
+ import java.util.stream.Stream;
+-import java.util.stream.StreamSupport;
++
++import com.github.javaparser.ast.NodeTraversals;
+ 
+ /**
+  * Base class for all nodes of the abstract syntax tree.
+@@ -867,41 +865,18 @@ public abstract class Node
+         DIRECT_CHILDREN
+     }
+ 
+-    private Iterator<Node> treeIterator(TreeTraversal traversal) {
+-        switch (traversal) {
+-            case BREADTHFIRST:
+-                return new BreadthFirstIterator(this);
+-            case POSTORDER:
+-                return new PostOrderIterator(this);
+-            case PREORDER:
+-                return new PreOrderIterator(this);
+-            case DIRECT_CHILDREN:
+-                return new DirectChildrenIterator(this);
+-            case PARENTS:
+-                return new ParentsVisitor(this);
+-            default:
+-                throw new IllegalArgumentException("Unknown traversal choice.");
+-        }
+-    }
+-
+-    private Iterable<Node> treeIterable(TreeTraversal traversal) {
+-        return () -> treeIterator(traversal);
+-    }
+-
+     /**
+      * Make a stream of nodes using traversal algorithm "traversal".
+      */
+     public Stream<Node> stream(TreeTraversal traversal) {
+-        return StreamSupport.stream(
+-                Spliterators.spliteratorUnknownSize(treeIterator(traversal), NONNULL | DISTINCT), false);
++        return NodeTraversals.stream(this, traversal);
+     }
+ 
+     /**
+      * Make a stream of nodes using pre-order traversal.
+      */
+     public Stream<Node> stream() {
+-        return StreamSupport.stream(
+-                Spliterators.spliteratorUnknownSize(treeIterator(PREORDER), NONNULL | DISTINCT), false);
++        return NodeTraversals.stream(this);
+     }
+ 
+     /**
+@@ -909,61 +884,42 @@ public abstract class Node
+      * <br>This is the most general walk method. All other walk and findAll methods are based on this.
+      */
+     public void walk(TreeTraversal traversal, Consumer<Node> consumer) {
+-        // Could be implemented as a call to the above walk method, but this is a little more efficient.
+-        for (Node node : treeIterable(traversal)) {
+-            consumer.accept(node);
+-        }
++        NodeTraversals.walk(this, traversal, consumer);
+     }
+ 
+     /**
+      * Walks the AST, calling the consumer for every node with pre-order traversal.
+      */
+     public void walk(Consumer<Node> consumer) {
+-        walk(PREORDER, consumer);
++        NodeTraversals.walk(this, consumer);
+     }
+ 
+     /**
+      * Walks the AST with pre-order traversal, calling the consumer for every node of type "nodeType".
+      */
+     public <T extends Node> void walk(Class<T> nodeType, Consumer<T> consumer) {
+-        walk(TreeTraversal.PREORDER, node -> {
+-            if (nodeType.isAssignableFrom(node.getClass())) {
+-                consumer.accept(nodeType.cast(node));
+-            }
+-        });
++        NodeTraversals.walk(this, nodeType, consumer);
+     }
+ 
+     /**
+      * Walks the AST with pre-order traversal, returning all nodes of type "nodeType".
+      */
+     public <T extends Node> List<T> findAll(Class<T> nodeType) {
+-        final List<T> found = new ArrayList<>();
+-        walk(nodeType, found::add);
+-        return found;
++        return NodeTraversals.findAll(this, nodeType);
+     }
+ 
+     /**
+      * Walks the AST with specified traversal order, returning all nodes of type "nodeType".
+      */
+     public <T extends Node> List<T> findAll(Class<T> nodeType, TreeTraversal traversal) {
+-        final List<T> found = new ArrayList<>();
+-        walk(traversal, node -> {
+-            if (nodeType.isAssignableFrom(node.getClass())) {
+-                found.add(nodeType.cast(node));
+-            }
+-        });
+-        return found;
++        return NodeTraversals.findAll(this, nodeType, traversal);
+     }
+ 
+     /**
+      * Walks the AST with pre-order traversal, returning all nodes of type "nodeType" that match the predicate.
+      */
+     public <T extends Node> List<T> findAll(Class<T> nodeType, Predicate<T> predicate) {
+-        final List<T> found = new ArrayList<>();
+-        walk(nodeType, n -> {
+-            if (predicate.test(n)) found.add(n);
+-        });
+-        return found;
++        return NodeTraversals.findAll(this, nodeType, predicate);
+     }
+ 
+     /**
+@@ -972,25 +928,14 @@ public abstract class Node
+      * most general findFirst method. All other findFirst methods are based on this.
+      */
+     public <T> Optional<T> findFirst(TreeTraversal traversal, Function<Node, Optional<T>> consumer) {
+-        for (Node node : treeIterable(traversal)) {
+-            final Optional<T> result = consumer.apply(node);
+-            if (result.isPresent()) {
+-                return result;
+-            }
+-        }
+-        return Optional.empty();
++        return NodeTraversals.findFirst(this, traversal, consumer);
+     }
+ 
+     /**
+      * Walks the AST with pre-order traversal, returning the first node of type "nodeType" or empty() if none is found.
+      */
+     public <N extends Node> Optional<N> findFirst(Class<N> nodeType) {
+-        return findFirst(TreeTraversal.PREORDER, node -> {
+-            if (nodeType.isAssignableFrom(node.getClass())) {
+-                return Optional.of(nodeType.cast(node));
+-            }
+-            return Optional.empty();
+-        });
++        return NodeTraversals.findFirst(this, nodeType);
+     }
+ 
+     /**
+@@ -998,15 +943,7 @@ public abstract class Node
+      * found.
+      */
+     public <N extends Node> Optional<N> findFirst(Class<N> nodeType, Predicate<N> predicate) {
+-        return findFirst(TreeTraversal.PREORDER, node -> {
+-            if (nodeType.isAssignableFrom(node.getClass())) {
+-                final N castNode = nodeType.cast(node);
+-                if (predicate.test(castNode)) {
+-                    return Optional.of(castNode);
+-                }
+-            }
+-            return Optional.empty();
+-        });
++        return NodeTraversals.findFirst(this, nodeType, predicate);
+     }
+ 
+     /*
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java b/javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java
+new file mode 100644
+index 000000000..b46b1e0cb
+--- /dev/null
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java
+@@ -0,0 +1,297 @@
++/*
++ * Helper class extracted from Node to centralize traversal, streaming and walk/find utilities.
++ */
++package com.github.javaparser.ast;
++
++import static java.util.Spliterator.DISTINCT;
++import static java.util.Spliterator.NONNULL;
++
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.Iterator;
++import java.util.LinkedList;
++import java.util.List;
++import java.util.Queue;
++import java.util.Stack;
++import java.util.function.Consumer;
++import java.util.function.Function;
++import java.util.function.Predicate;
++import java.util.Optional;
++import java.util.Spliterators;
++import java.util.stream.Stream;
++import java.util.stream.StreamSupport;
++
++public final class NodeTraversals {
++
++    private NodeTraversals() {}
++
++    public static Iterator<Node> treeIterator(Node node, Node.TreeTraversal traversal) {
++        switch (traversal) {
++            case BREADTHFIRST:
++                return new BreadthFirstIterator(node);
++            case POSTORDER:
++                return new PostOrderIterator(node);
++            case PREORDER:
++                return new PreOrderIterator(node);
++            case DIRECT_CHILDREN:
++                return new DirectChildrenIterator(node);
++            case PARENTS:
++                return new ParentsVisitor(node);
++            default:
++                throw new IllegalArgumentException("Unknown traversal choice.");
++        }
++    }
++
++    public static Iterable<Node> treeIterable(Node node, Node.TreeTraversal traversal) {
++        return () -> treeIterator(node, traversal);
++    }
++
++    public static Stream<Node> stream(Node node, Node.TreeTraversal traversal) {
++        return StreamSupport.stream(
++                Spliterators.spliteratorUnknownSize(treeIterator(node, traversal), NONNULL | DISTINCT), false);
++    }
++
++    public static Stream<Node> stream(Node node) {
++        return stream(node, Node.TreeTraversal.PREORDER);
++    }
++
++    public static void walk(Node node, Node.TreeTraversal traversal, Consumer<Node> consumer) {
++        for (Node n : treeIterable(node, traversal)) {
++            consumer.accept(n);
++        }
++    }
++
++    public static void walk(Node node, Consumer<Node> consumer) {
++        walk(node, Node.TreeTraversal.PREORDER, consumer);
++    }
++
++    public static <T> void walk(Node node, Class<T> nodeType, Consumer<T> consumer) {
++        walk(node, Node.TreeTraversal.PREORDER, n -> {
++            if (nodeType.isAssignableFrom(n.getClass())) {
++                consumer.accept(nodeType.cast(n));
++            }
++        });
++    }
++
++    public static <T extends Node> List<T> findAll(Node node, Class<T> nodeType) {
++        final List<T> found = new ArrayList<>();
++        walk(node, nodeType, found::add);
++        return found;
++    }
++
++    public static <T extends Node> List<T> findAll(Node node, Class<T> nodeType, Node.TreeTraversal traversal) {
++        final List<T> found = new ArrayList<>();
++        walk(node, traversal, n -> {
++            if (nodeType.isAssignableFrom(n.getClass())) {
++                found.add(nodeType.cast(n));
++            }
++        });
++        return found;
++    }
++
++    public static <T extends Node> List<T> findAll(Node node, Class<T> nodeType, Predicate<T> predicate) {
++        final List<T> found = new ArrayList<>();
++        walk(node, nodeType, n -> {
++            if (predicate.test(n)) found.add(n);
++        });
++        return found;
++    }
++
++    public static <T> Optional<T> findFirst(Node node, Node.TreeTraversal traversal, Function<Node, Optional<T>> consumer) {
++        for (Node n : treeIterable(node, traversal)) {
++            final Optional<T> result = consumer.apply(n);
++            if (result.isPresent()) {
++                return result;
++            }
++        }
++        return Optional.empty();
++    }
++
++    public static <N extends Node> Optional<N> findFirst(Node node, Class<N> nodeType) {
++        return findFirst(node, Node.TreeTraversal.PREORDER, n -> {
++            if (nodeType.isAssignableFrom(n.getClass())) {
++                return Optional.of(nodeType.cast(n));
++            }
++            return Optional.empty();
++        });
++    }
++
++    public static <N extends Node> Optional<N> findFirst(Node node, Class<N> nodeType, Predicate<N> predicate) {
++        return findFirst(node, Node.TreeTraversal.PREORDER, n -> {
++            if (nodeType.isAssignableFrom(n.getClass())) {
++                final N castNode = nodeType.cast(n);
++                if (predicate.test(castNode)) {
++                    return Optional.of(castNode);
++                }
++            }
++            return Optional.empty();
++        });
++    }
++
++    /*
++     * Iterator classes moved here
++     */
++    static class BreadthFirstIterator implements Iterator<Node> {
++
++        private final Queue<Node> queue = new LinkedList<>();
++
++        public BreadthFirstIterator(Node node) {
++            queue.add(node);
++        }
++
++        @Override
++        public boolean hasNext() {
++            return !queue.isEmpty();
++        }
++
++        @Override
++        public Node next() {
++            Node next = queue.remove();
++            queue.addAll(next.getChildNodes());
++            return next;
++        }
++    }
++
++    static class DirectChildrenIterator implements Iterator<Node> {
++
++        private final Iterator<Node> childrenIterator;
++
++        public DirectChildrenIterator(Node node) {
++            childrenIterator = node.getChildNodes().iterator();
++        }
++
++        @Override
++        public boolean hasNext() {
++            return childrenIterator.hasNext();
++        }
++
++        @Override
++        public Node next() {
++            return childrenIterator.next();
++        }
++    }
++
++    static class ParentsVisitor implements Iterator<Node> {
++
++        private Node node;
++
++        public ParentsVisitor(Node node) {
++            this.node = node;
++        }
++
++        @Override
++        public boolean hasNext() {
++            return node.getParentNode().isPresent();
++        }
++
++        @Override
++        public Node next() {
++            node = node.getParentNode().orElse(null);
++            return node;
++        }
++    }
++
++    static class PreOrderIterator implements Iterator<Node> {
++
++        private final Stack<Node> stack = new Stack<>();
++
++        public PreOrderIterator(Node node) {
++            stack.add(node);
++        }
++
++        @Override
++        public boolean hasNext() {
++            return !stack.isEmpty();
++        }
++
++        @Override
++        public Node next() {
++            Node next = stack.pop();
++            List<Node> children = next.getChildNodes();
++            for (int i = children.size() - 1; i >= 0; i--) {
++                stack.add(children.get(i));
++            }
++            return next;
++        }
++    }
++
++    static class PostOrderIterator implements Iterator<Node> {
++
++        private final Stack<Level> stack = new Stack<>();
++
++        public PostOrderIterator(Node root) {
++            stack.push(new Level(Collections.singletonList(root)));
++        }
++
++        @Override
++        public boolean hasNext() {
++            return !stack.empty();
++        }
++
++        @Override
++        public Node next() {
++            while (true) {
++                Level state = stack.peek();
++                if (state.isCurrentExpanded()) {
++                    return getNextAndCleanupStack(state);
++                }
++                expand(state);
++            }
++        }
++
++        private Node getNextAndCleanupStack(Level state) {
++            Node result = state.getCurrent();
++            state.goToNext();
++            cleanupStack(state);
++            return result;
++        }
++
++        private void cleanupStack(Level state) {
++            if (!state.done()) {
++                stack.pop();
++            }
++        }
++
++        private void expand(Level state) {
++            List<Node> children = state.getCurrent().getChildNodes();
++            if (!children.isEmpty()) {
++                stack.push(new Level(children));
++            }
++            state.setCurrentExpanded();
++        }
++
++        private static class Level {
++
++            private final List<Node> nodes;
++
++            private int index = 0;
++
++            private boolean expanded = false;
++
++            public Level(List<Node> nodes) {
++                this.nodes = nodes;
++            }
++
++            public boolean done() {
++                return index < nodes.size();
++            }
++
++            public Node getCurrent() {
++                return nodes.get(index);
++            }
++
++            public void goToNext() {
++                index++;
++                expanded = false;
++            }
++
++            public void setCurrentExpanded() {
++                expanded = true;
++            }
++
++            public boolean isCurrentExpanded() {
++                return expanded;
++            }
++        }
++    }
++}

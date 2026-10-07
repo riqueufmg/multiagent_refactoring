@@ -1,0 +1,100 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.ast.stmt.Statement",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Statement's direct outgoing dependencies by extracting type-checking, casting, consumer and optional helper methods for four specific statement subclasses (AssertStmt, BlockStmt, BreakStmt, ContinueStmt) into a new helper class, thereby removing those four direct dependencies from Statement while introducing a single dependency on the new helper (net reduction: 3).",
+      "files": [
+        "javaparser-core/src/main/java/com/github/javaparser/ast/stmt/Statement.java",
+        "javaparser-core/src/main/java/com/github/javaparser/ast/stmt/StatementTypeCasting.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(com.github.javaparser.ast.stmt.Statement, com.github.javaparser.ast.stmt.StatementTypeCasting)",
+          "inputs": [
+            "com.github.javaparser.ast.stmt.Statement"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.stmt.StatementTypeCasting"
+          ],
+          "details": "Create a new class StatementTypeCasting in package com.github.javaparser.ast.stmt and place the type-related helper methods extracted from Statement into it. The extracted methods are grouped by the concrete statement subclass they reference: AssertStmt, BlockStmt, BreakStmt, ContinueStmt. The new class will provide instance methods that operate on a Statement instance (e.g. as static helpers accepting Statement or as instance helpers with a backing Statement reference) so that behavior is preserved and compilation is maintained.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD(com.github.javaparser.ast.stmt.Statement.isAssertStmt(), com.github.javaparser.ast.stmt.StatementTypeCasting.isAssertStmt())",
+          "inputs": [
+            "com.github.javaparser.ast.stmt.Statement.isAssertStmt()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.stmt.StatementTypeCasting.isAssertStmt()"
+          ],
+          "details": "Move isAssertStmt(), asAssertStmt(), ifAssertStmt(Consumer<AssertStmt>), toAssertStmt() from Statement into StatementTypeCasting.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(com.github.javaparser.ast.stmt.Statement.isBlockStmt(), com.github.javaparser.ast.stmt.StatementTypeCasting.isBlockStmt())",
+          "inputs": [
+            "com.github.javaparser.ast.stmt.Statement.isBlockStmt()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.stmt.StatementTypeCasting.isBlockStmt()"
+          ],
+          "details": "Move isBlockStmt(), asBlockStmt(), ifBlockStmt(Consumer<BlockStmt>), toBlockStmt() from Statement into StatementTypeCasting.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(com.github.javaparser.ast.stmt.Statement.isBreakStmt(), com.github.javaparser.ast.stmt.StatementTypeCasting.isBreakStmt())",
+          "inputs": [
+            "com.github.javaparser.ast.stmt.Statement.isBreakStmt()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.stmt.StatementTypeCasting.isBreakStmt()"
+          ],
+          "details": "Move isBreakStmt(), asBreakStmt(), ifBreakStmt(Consumer<BreakStmt>), toBreakStmt() from Statement into StatementTypeCasting.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_METHOD(com.github.javaparser.ast.stmt.Statement.isContinueStmt(), com.github.javaparser.ast.stmt.StatementTypeCasting.isContinueStmt())",
+          "inputs": [
+            "com.github.javaparser.ast.stmt.Statement.isContinueStmt()"
+          ],
+          "outputs": [
+            "com.github.javaparser.ast.stmt.StatementTypeCasting.isContinueStmt()"
+          ],
+          "details": "Move isContinueStmt(), asContinueStmt(), ifContinueStmt(Consumer<ContinueStmt>), toContinueStmt() from Statement into StatementTypeCasting.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(javaparser-core/src/main/java/com/github/javaparser/ast/stmt/StatementTypeCasting.java)",
+          "inputs": [
+            "com.github.javaparser.ast.stmt.AssertStmt",
+            "com.github.javaparser.ast.stmt.BlockStmt",
+            "com.github.javaparser.ast.stmt.BreakStmt",
+            "com.github.javaparser.ast.stmt.ContinueStmt",
+            "java.util.Optional",
+            "java.util.function.Consumer",
+            "com.github.javaparser.utils.CodeGenerationUtils"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/stmt/StatementTypeCasting.java (imports updated)"
+          ],
+          "details": "Add necessary imports to the newly created StatementTypeCasting class for the concrete statement subclasses (AssertStmt, BlockStmt, BreakStmt, ContinueStmt), Optional, Consumer, and any utilities used (e.g. static import of f if used).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(com.github.javaparser.ast.stmt.Statement.isAssertStmt(), com.github.javaparser.ast.stmt.StatementTypeCasting.isAssertStmt())",
+          "inputs": [
+            "usages of moved methods inside Statement and other classes within the same package"
+          ],
+          "outputs": [
+            "updated call sites to delegate to StatementTypeCasting where appropriate"
+          ],
+          "details": "Replace the moved methods in Statement with delegating calls to the new StatementTypeCasting implementation (or keep thin stubs in Statement delegating to StatementTypeCasting). Update any internal or external call sites that might reference the moved methods so compilation is preserved.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

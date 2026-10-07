@@ -1,0 +1,57 @@
+{
+  "id": 1,
+  "goal": "Extract the large nested Constants holder out of the enum to reduce HtmlTreeBuilderState size and to make the tag-lists reusable.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.Constants"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java::org.jsoup.parser.HtmlTreeBuilderStateConstants"
+      ],
+      "details": "Create a new top-level final class HtmlTreeBuilderStateConstants in package org.jsoup.parser. Move all static final String[] fields from the nested Constants class into this new class as public static final fields with identical names and values. Keep semantics unchanged (same array contents and ordering).",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Replace usages of nested reference Constants.* with references to HtmlTreeBuilderStateConstants.*. Update or add static imports where appropriate (e.g. previously used static import of HtmlTreeBuilderState.Constants.* should be replaced with static import of org.jsoup.parser.HtmlTreeBuilderStateConstants.* or fully qualified references).",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "Update all references inside HtmlTreeBuilderState that referenced Constants.* to reference HtmlTreeBuilderStateConstants.* (or rely on the new static import). This maintains existing names (InHeadEmpty, InHeadRaw, etc.) but from the new top-level class.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

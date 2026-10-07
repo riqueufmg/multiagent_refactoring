@@ -1,0 +1,99 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "net.bytebuddy.dynamic.DynamicType",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce DynamicType's outgoing coupling by extracting small builder-related responsibilities (hash/equality/toString helpers and bean property wiring) into a helper class. This removes direct references to HashCodeMethod, EqualsMethod, ToStringMethod, FieldAccessor and Character from the nested Builder.AbstractBase implementation and centralizes them in one new helper.",
+      "files": [
+        "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java",
+        "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "net.bytebuddy.dynamic.DynamicType.Builder.AbstractBase",
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java"
+          ],
+          "outputs": [
+            "net.bytebuddy.dynamic.DynamicTypeHelper",
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeHelper.java",
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java (updated)"
+          ],
+          "details": "Extract the builder convenience methods from DynamicType.Builder.AbstractBase into a new top-level helper class net.bytebuddy.dynamic.DynamicTypeHelper. Methods to move: withHashCodeEquals(), withToString(), defineProperty(String, TypeDefinition, boolean) and their small inline helpers (the char upper-casing and FieldAccessor.ofField usage). The new DynamicTypeHelper will expose static methods used by the builder, e.g. DynamicTypeHelper.withHashCodeEquals(Builder.AbstractBase) and DynamicTypeHelper.defineProperty(Builder.AbstractBase, String, TypeDefinition, boolean). Update the call sites inside DynamicType.Builder.AbstractBase to delegate to DynamicTypeHelper. Add imports required by the new helper (HashCodeMethod, EqualsMethod, ToStringMethod, FieldAccessor, Character) only in DynamicTypeHelper, removing those imports and direct static calls from the nested Builder.AbstractBase class in DynamicType.java.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeHelper.java"
+          ],
+          "outputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeHelper.java (with imports)"
+          ],
+          "details": "Add imports required by the extracted helper class: net.bytebuddy.implementation.HashCodeMethod, net.bytebuddy.implementation.EqualsMethod, net.bytebuddy.implementation.ToStringMethod, net.bytebuddy.implementation.FieldAccessor, and java.lang.Character. Remove these imports from DynamicType.java's Builder.AbstractBase where they are no longer used.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java"
+          ],
+          "outputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java (updated)"
+          ],
+          "details": "Update builder methods to delegate to the new helper. Replace the bodies of Builder.AbstractBase.withHashCodeEquals() and withToString() with return DynamicTypeHelper.withHashCodeEquals(this); and return DynamicTypeHelper.withToString(this); respectively. Replace the defineProperty(...) body to call DynamicTypeHelper.defineProperty(this, name, type, readOnly). Ensure method visibility and generics are preserved. This keeps public signatures in DynamicType unchanged while moving external dependencies into the helper.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Remove I/O and jar manipulation dependencies from DynamicType by extracting all file/jar persistence and injection responsibilities into a new helper class. This reduces direct coupling to IO-specific classes (JarInputStream, JarOutputStream, JarEntry, FileInputStream, FileOutputStream, Manifest, FileSystem) in DynamicType, leaving only the public API signatures (File, Manifest, IOException) on the DynamicType types.",
+      "files": [
+        "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java",
+        "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeIO.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "net.bytebuddy.dynamic.DynamicType.AbstractBase",
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java"
+          ],
+          "outputs": [
+            "net.bytebuddy.dynamic.DynamicTypeIO",
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeIO.java",
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java (updated)"
+          ],
+          "details": "Extract all jar and file persistence methods from DynamicType.AbstractBase into a new helper class net.bytebuddy.dynamic.DynamicTypeIO. Methods moved: saveIn(File), inject(File, File), inject(File), toJar(File), toJar(File, Manifest), and the private helper doInject(File, File) along with the temporary-file logic and manifest handling. The new helper will implement the concrete I/O logic and will reference FileInputStream, FileOutputStream, JarInputStream, JarOutputStream, JarEntry, Manifest and net.bytebuddy.utility.FileSystem. Update DynamicType.AbstractBase to delegate to DynamicTypeIO for these operations, e.g. return DynamicTypeIO.saveIn(this, folder) and similar. Keep public method signatures on DynamicType unchanged so that external callers are unaffected.",
+          "risk": "high"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeIO.java"
+          ],
+          "outputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicTypeIO.java (with imports)"
+          ],
+          "details": "Add imports required by the extracted I/O helper: java.io.FileInputStream, java.io.FileOutputStream, java.util.jar.JarInputStream, java.util.jar.JarOutputStream, java.util.jar.JarEntry, java.util.jar.Manifest, net.bytebuddy.utility.FileSystem and any other I/O classes used in the moved implementations. Remove those imports from DynamicType.java where no longer used in method bodies.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java"
+          ],
+          "outputs": [
+            "byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/DynamicType.java (updated)"
+          ],
+          "details": "Replace the bodies of the moved methods in DynamicType.AbstractBase with delegations to the new helper, e.g. saveIn(folder) -> return DynamicTypeIO.saveIn(this, folder); inject(sourceJar, targetJar) -> return DynamicTypeIO.inject(this, sourceJar, targetJar); toJar(file, manifest) -> return DynamicTypeIO.toJar(this, file, manifest). Ensure checked exceptions (IOException) remain declared on the DynamicType API methods and are propagated from the helper.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

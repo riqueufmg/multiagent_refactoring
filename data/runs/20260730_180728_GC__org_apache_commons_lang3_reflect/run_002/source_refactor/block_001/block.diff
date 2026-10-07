@@ -1,0 +1,141 @@
+commit 20d27a6d27ced2ac33ab0a0d36acb40e5abf4a3c
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 30 18:23:32 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/builder/Diff.java b/src/main/java/org/apache/commons/lang3/builder/Diff.java
+index d88f6af71..c4676ba68 100644
+--- a/src/main/java/org/apache/commons/lang3/builder/Diff.java
++++ b/src/main/java/org/apache/commons/lang3/builder/Diff.java
+@@ -20,7 +20,7 @@
+ import java.util.Objects;
+ 
+ import org.apache.commons.lang3.ObjectUtils;
+-import org.apache.commons.lang3.reflect.TypeUtils;
++import org.apache.commons.lang3.reflect.types.TypeUtils;
+ import org.apache.commons.lang3.tuple.Pair;
+ 
+ /**
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java b/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
+index 03fa977ec..bdcf01dc1 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java
+@@ -41,6 +41,7 @@
+ import org.apache.commons.lang3.ClassUtils;
+ import org.apache.commons.lang3.ClassUtils.Interfaces;
+ import org.apache.commons.lang3.Validate;
++import org.apache.commons.lang3.reflect.types.TypeUtils;
+ import org.apache.commons.lang3.stream.LangCollectors;
+ import org.apache.commons.lang3.stream.Streams;
+ 
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/TypeLiteral.java b/src/main/java/org/apache/commons/lang3/reflect/types/TypeLiteral.java
+similarity index 98%
+rename from src/main/java/org/apache/commons/lang3/reflect/TypeLiteral.java
+rename to src/main/java/org/apache/commons/lang3/reflect/types/TypeLiteral.java
+index a7059ba16..96f516653 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/TypeLiteral.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/types/TypeLiteral.java
+@@ -14,7 +14,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-package org.apache.commons.lang3.reflect;
++package org.apache.commons.lang3.reflect.types;
+ 
+ import java.lang.reflect.Type;
+ import java.lang.reflect.TypeVariable;
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java b/src/main/java/org/apache/commons/lang3/reflect/types/TypeUtils.java
+similarity index 99%
+rename from src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java
+rename to src/main/java/org/apache/commons/lang3/reflect/types/TypeUtils.java
+index 20017a86d..27f39a559 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/types/TypeUtils.java
+@@ -14,7 +14,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-package org.apache.commons.lang3.reflect;
++package org.apache.commons.lang3.reflect.types;
+ 
+ import java.lang.reflect.Array;
+ import java.lang.reflect.GenericArrayType;
+diff --git a/src/main/java/org/apache/commons/lang3/reflect/Typed.java b/src/main/java/org/apache/commons/lang3/reflect/types/Typed.java
+similarity index 95%
+rename from src/main/java/org/apache/commons/lang3/reflect/Typed.java
+rename to src/main/java/org/apache/commons/lang3/reflect/types/Typed.java
+index b28d90748..b4c55c3da 100644
+--- a/src/main/java/org/apache/commons/lang3/reflect/Typed.java
++++ b/src/main/java/org/apache/commons/lang3/reflect/types/Typed.java
+@@ -14,7 +14,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-package org.apache.commons.lang3.reflect;
++package org.apache.commons.lang3.reflect.types;
+ 
+ import java.lang.reflect.Type;
+ 
+diff --git a/src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java b/src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java
+index 27a519b87..4cd027bdd 100644
+--- a/src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java
++++ b/src/test/java/org/apache/commons/lang3/reflect/Lang1703Test.java
+@@ -17,6 +17,7 @@
+ 
+ package org.apache.commons.lang3.reflect;
+ 
++import org.apache.commons.lang3.reflect.types.TypeUtils;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java b/src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java
+index fa37d5c91..e85d2e9bb 100644
+--- a/src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java
++++ b/src/test/java/org/apache/commons/lang3/reflect/Lang1792Test.java
+@@ -19,6 +19,7 @@
+ 
+ import static org.junit.jupiter.api.Assertions.assertEquals;
+ 
++import org.apache.commons.lang3.reflect.types.TypeUtils;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java b/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java
+index 111054ed3..77e8abd8b 100644
+--- a/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/reflect/MethodUtilsTest.java
+@@ -54,6 +54,7 @@
+ import org.apache.commons.lang3.reflect.testbed.PublicChild;
+ import org.apache.commons.lang3.reflect.testbed.PublicSubBeanOtherPackage;
+ import org.apache.commons.lang3.reflect.testbed.StringParameterizedChild;
++import org.apache.commons.lang3.reflect.types.TypeUtils;
+ import org.apache.commons.lang3.tuple.ImmutablePair;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+diff --git a/src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java b/src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java
+index 6fec1d6c5..97d038989 100644
+--- a/src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java
++++ b/src/test/java/org/apache/commons/lang3/reflect/TypeLiteralTest.java
+@@ -24,6 +24,9 @@
+ import java.util.List;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
++import org.apache.commons.lang3.reflect.types.TypeLiteral;
++import org.apache.commons.lang3.reflect.types.TypeUtils;
++import org.apache.commons.lang3.reflect.types.Typed;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java b/src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java
+index e25095194..2af78a158 100644
+--- a/src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/reflect/TypeUtilsTest.java
+@@ -55,6 +55,7 @@
+ import org.apache.commons.lang3.reflect.testbed.GenericParent;
+ import org.apache.commons.lang3.reflect.testbed.GenericTypeHolder;
+ import org.apache.commons.lang3.reflect.testbed.StringParameterizedChild;
++import org.apache.commons.lang3.reflect.types.TypeUtils;
+ import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.params.ParameterizedTest;

@@ -1,0 +1,163 @@
+commit af9f4a3d0a8099066d8389c299080a4aa4fddbf1
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Jul 29 17:19:01 2026 -0300
+
+    source_refactor: apply block 4
+
+diff --git a/src/main/java/org/apache/commons/io/input/TailablePath.java b/src/main/java/org/apache/commons/io/input/TailablePath.java
+new file mode 100644
+index 000000000..45480255c
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/input/TailablePath.java
+@@ -0,0 +1,71 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.io.input;
++
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.nio.file.Files;
++import java.nio.file.LinkOption;
++import java.nio.file.Path;
++import java.nio.file.attribute.FileTime;
++import java.util.Arrays;
++import java.util.Objects;
++
++import org.apache.commons.io.file.PathUtils;
++
++/**
++ * A tailable for a file {@link Path}.
++ */
++final class TailablePath implements Tailable {
++
++    private final Path path;
++    private final LinkOption[] linkOptions;
++
++    TailablePath(final Path path, final LinkOption... linkOptions) {
++        this.path = Objects.requireNonNull(path, "path");
++        this.linkOptions = linkOptions;
++    }
++
++    Path getPath() {
++        return path;
++    }
++
++    @Override
++    public RandomAccessResourceBridge getRandomAccess(final String mode) throws FileNotFoundException {
++        return new RandomAccessFileBridge(path.toFile(), mode);
++    }
++
++    @Override
++    public boolean isNewer(final FileTime fileTime) throws IOException {
++        return PathUtils.isNewer(path, fileTime, linkOptions);
++    }
++
++    @Override
++    public FileTime lastModifiedFileTime() throws IOException {
++        return Files.getLastModifiedTime(path, linkOptions);
++    }
++
++    @Override
++    public long size() throws IOException {
++        return Files.size(path);
++    }
++
++    @Override
++    public String toString() {
++        return "TailablePath [file=" + path + ", linkOptions=" + Arrays.toString(linkOptions) + "]";
++    }
++}
+diff --git a/src/main/java/org/apache/commons/io/input/Tailer.java b/src/main/java/org/apache/commons/io/input/Tailer.java
+index 4ac0f6639..48babb51a 100644
+--- a/src/main/java/org/apache/commons/io/input/Tailer.java
++++ b/src/main/java/org/apache/commons/io/input/Tailer.java
+@@ -21,17 +21,12 @@
+ import static org.apache.commons.io.IOUtils.LF;
+ 
+ import java.io.ByteArrayOutputStream;
+-import java.io.Closeable;
+ import java.io.File;
+ import java.io.FileNotFoundException;
+ import java.io.IOException;
+ import java.nio.charset.Charset;
+-import java.nio.file.Files;
+-import java.nio.file.LinkOption;
+-import java.nio.file.Path;
+ import java.nio.file.attribute.FileTime;
+ import java.time.Duration;
+-import java.util.Arrays;
+ import java.util.Objects;
+ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
+@@ -40,7 +35,6 @@
+ import org.apache.commons.io.ThreadUtils;
+ import org.apache.commons.io.build.AbstractOrigin;
+ import org.apache.commons.io.build.AbstractStreamBuilder;
+-import org.apache.commons.io.file.PathUtils;
+ import org.apache.commons.io.file.attribute.FileTimes;
+ 
+ /**
+@@ -291,49 +285,6 @@ public Builder setTailFromEnd(final boolean end) {
+         }
+     }
+ 
+-    /**
+-     * A tailable for a file {@link Path}.
+-     */
+-    private static final class TailablePath implements Tailable {
+-
+-        private final Path path;
+-        private final LinkOption[] linkOptions;
+-
+-        private TailablePath(final Path path, final LinkOption... linkOptions) {
+-            this.path = Objects.requireNonNull(path, "path");
+-            this.linkOptions = linkOptions;
+-        }
+-
+-        Path getPath() {
+-            return path;
+-        }
+-
+-        @Override
+-        public RandomAccessResourceBridge getRandomAccess(final String mode) throws FileNotFoundException {
+-            return new RandomAccessFileBridge(path.toFile(), mode);
+-        }
+-
+-        @Override
+-        public boolean isNewer(final FileTime fileTime) throws IOException {
+-            return PathUtils.isNewer(path, fileTime, linkOptions);
+-        }
+-
+-        @Override
+-        public FileTime lastModifiedFileTime() throws IOException {
+-            return Files.getLastModifiedTime(path, linkOptions);
+-        }
+-
+-        @Override
+-        public long size() throws IOException {
+-            return Files.size(path);
+-        }
+-
+-        @Override
+-        public String toString() {
+-            return "TailablePath [file=" + path + ", linkOptions=" + Arrays.toString(linkOptions) + "]";
+-        }
+-    }
+-
+     private static final boolean DEFAULT_IGNORE_TOUCH = false;
+ 
+     private static final int DEFAULT_DELAY_MILLIS = 1000;

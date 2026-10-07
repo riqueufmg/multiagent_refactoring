@@ -1,0 +1,72 @@
+{
+  "id": 1,
+  "goal": "Move the name-based file filter cluster (NameFileFilter, PrefixFileFilter, SuffixFileFilter) into a dedicated subpackage to reduce the god component size.",
+  "files": [
+    "src/main/java/org/apache/commons/io/filefilter/NameFileFilter.java",
+    "src/main/java/org/apache/commons/io/filefilter/PrefixFileFilter.java",
+    "src/main/java/org/apache/commons/io/filefilter/SuffixFileFilter.java",
+    "src/main/java/org/apache/commons/io/filefilter/name/NameFileFilter.java",
+    "src/main/java/org/apache/commons/io/filefilter/name/PrefixFileFilter.java",
+    "src/main/java/org/apache/commons/io/filefilter/name/SuffixFileFilter.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.io.filefilter.name"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.filefilter.NameFileFilter"
+      ],
+      "outputs": [
+        "org.apache.commons.io.filefilter.name.NameFileFilter"
+      ],
+      "details": "Move NameFileFilter to the name subpackage.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.filefilter.PrefixFileFilter"
+      ],
+      "outputs": [
+        "org.apache.commons.io.filefilter.name.PrefixFileFilter"
+      ],
+      "details": "Move PrefixFileFilter to the name subpackage.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.io.filefilter.SuffixFileFilter"
+      ],
+      "outputs": [
+        "org.apache.commons.io.filefilter.name.SuffixFileFilter"
+      ],
+      "details": "Move SuffixFileFilter to the name subpackage.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.io.filefilter.name.NameFileFilter",
+        "org.apache.commons.io.filefilter.name.PrefixFileFilter",
+        "org.apache.commons.io.filefilter.name.SuffixFileFilter"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": 1,
+  "goal": "Reduce JavaParserFacade's output coupling by extracting method-resolution responsibilities (the inner MethodResolutionFacade and its methods) into a new top-level class, removing direct dependencies on MethodResolutionLogic and java.util.stream.Collectors from JavaParserFacade.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/MethodResolutionFacade.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade, com.github.javaparser.symbolsolver.javaparsermodel.MethodResolutionFacade)",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.MethodResolutionFacade"
+      ],
+      "details": "Extract the private inner class MethodResolutionFacade from JavaParserFacade into a new top-level class com.github.javaparser.symbolsolver.javaparsermodel.MethodResolutionFacade. Move the following members into the new class: the constructor MethodResolutionFacade(TypeSolver), solve(MethodCallExpr, boolean), solve(MethodReferenceExpr, boolean), and toMethodUsage(MethodReferenceExpr, List<ResolvedType>). Adapt the extracted class to accept a reference to helpers it uses from the facade: add a constructor MethodResolutionFacade(TypeSolver typeSolver, JavaParserFacade facade) and replace uses of JavaParserFacade.this.getType(...) and JavaParserFacade.this.solveArguments(...) with calls on the passed 'facade' reference. Keep the implementation semantics unchanged. Place the new file in the same package: com.github.javaparser.symbolsolver.javaparsermodel.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java)",
+      "inputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java"
+      ],
+      "outputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java"
+      ],
+      "details": "Remove imports that are only used by the extracted inner class from JavaParserFacade: remove import for com.github.javaparser.resolution.logic.MethodResolutionLogic and import for java.util.stream.Collectors if no other methods in JavaParserFacade use them. Add or ensure import for com.github.javaparser.symbolsolver.javaparsermodel.MethodResolutionFacade (the new top-level class). Update wildcard or other imports as needed so the remaining JavaParserFacade compiles.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade.MethodResolutionFacade -> com.github.javaparser.symbolsolver.javaparsermodel.MethodResolutionFacade)",
+      "inputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java"
+      ],
+      "outputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/JavaParserFacade.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/MethodResolutionFacade.java"
+      ],
+      "details": "Update JavaParserFacade to use the new top-level MethodResolutionFacade: change field initialization in JavaParserFacade's constructor from 'this.methodResolutionFacade = new MethodResolutionFacade(this.typeSolver);' to 'this.methodResolutionFacade = new MethodResolutionFacade(this.typeSolver, this);'. Ensure the field declaration type remains 'MethodResolutionFacade' (now resolved to the top-level class). Update any direct references that relied on the inner-class access to call through the new instance. Update any callers within the repository (if present) that instantiate the inner class to use the new top-level class and its constructor signature. Ensure the new top-level class has the necessary imports and a constructor accepting (TypeSolver, JavaParserFacade).",
+      "risk": "medium"
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+commit e7075e3497c97ff35482de4ed063ba980971744b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 30 17:17:22 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/ObjectUtils.java b/src/main/java/org/apache/commons/lang3/ObjectUtils.java
+index f3f78b0ba..9797d180f 100644
+--- a/src/main/java/org/apache/commons/lang3/ObjectUtils.java
++++ b/src/main/java/org/apache/commons/lang3/ObjectUtils.java
+@@ -35,7 +35,7 @@
+ 
+ import org.apache.commons.lang3.exception.CloneFailedException;
+ import org.apache.commons.lang3.function.Consumers;
+-import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.util.Suppliers;
+ import org.apache.commons.lang3.mutable.MutableInt;
+ import org.apache.commons.lang3.stream.Streams;
+ import org.apache.commons.lang3.text.StrBuilder;
+diff --git a/src/main/java/org/apache/commons/lang3/StringUtils.java b/src/main/java/org/apache/commons/lang3/StringUtils.java
+index 7d40648c0..970c170f6 100644
+--- a/src/main/java/org/apache/commons/lang3/StringUtils.java
++++ b/src/main/java/org/apache/commons/lang3/StringUtils.java
+@@ -31,7 +31,7 @@
+ import java.util.regex.Pattern;
+ import java.util.stream.Collectors;
+ 
+-import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.util.Suppliers;
+ import org.apache.commons.lang3.stream.LangCollectors;
+ import org.apache.commons.lang3.stream.Streams;
+ 
+diff --git a/src/main/java/org/apache/commons/lang3/SystemProperties.java b/src/main/java/org/apache/commons/lang3/SystemProperties.java
+index 40f3621f7..302540696 100644
+--- a/src/main/java/org/apache/commons/lang3/SystemProperties.java
++++ b/src/main/java/org/apache/commons/lang3/SystemProperties.java
+@@ -24,7 +24,7 @@
+ import java.util.function.LongSupplier;
+ import java.util.function.Supplier;
+ 
+-import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.util.Suppliers;
+ 
+ /**
+  * Accesses current <a href="https://docs.oracle.com/en/java/javase/25/docs/api/system-properties.html">System Property</a> names and values.
+diff --git a/src/main/java/org/apache/commons/lang3/ThreadUtils.java b/src/main/java/org/apache/commons/lang3/ThreadUtils.java
+index d9ab9962b..4a4f2766d 100644
+--- a/src/main/java/org/apache/commons/lang3/ThreadUtils.java
++++ b/src/main/java/org/apache/commons/lang3/ThreadUtils.java
+@@ -25,7 +25,7 @@
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+-import org.apache.commons.lang3.function.Predicates;
++import org.apache.commons.lang3.function.util.Predicates;
+ import org.apache.commons.lang3.time.DurationUtils;
+ 
+ /**
+diff --git a/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java b/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java
+index 3636bc5a0..f7e545f1c 100644
+--- a/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java
++++ b/src/main/java/org/apache/commons/lang3/concurrent/locks/LockingVisitors.java
+@@ -27,8 +27,8 @@
+ import org.apache.commons.lang3.builder.AbstractSupplier;
+ import org.apache.commons.lang3.function.Failable;
+ import org.apache.commons.lang3.function.FailableConsumer;
+-import org.apache.commons.lang3.function.Suppliers;
+ import org.apache.commons.lang3.function.failable.FailableFunction;
++import org.apache.commons.lang3.function.util.Suppliers;
+ 
+ /**
+  * Combines the monitor and visitor pattern to work with {@link Lock}s as an alternative to synchronization.
+diff --git a/src/main/java/org/apache/commons/lang3/function/Functions.java b/src/main/java/org/apache/commons/lang3/function/util/Functions.java
+similarity index 99%
+rename from src/main/java/org/apache/commons/lang3/function/Functions.java
+rename to src/main/java/org/apache/commons/lang3/function/util/Functions.java
+index 71d4e9484..7ab8a0e87 100644
+--- a/src/main/java/org/apache/commons/lang3/function/Functions.java
++++ b/src/main/java/org/apache/commons/lang3/function/util/Functions.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.util;
+ 
+ import java.util.Objects;
+ import java.util.Optional;
+diff --git a/src/main/java/org/apache/commons/lang3/function/Predicates.java b/src/main/java/org/apache/commons/lang3/function/util/Predicates.java
+similarity index 95%
+rename from src/main/java/org/apache/commons/lang3/function/Predicates.java
+rename to src/main/java/org/apache/commons/lang3/function/util/Predicates.java
+index 1c178ee60..b902d5927 100644
+--- a/src/main/java/org/apache/commons/lang3/function/Predicates.java
++++ b/src/main/java/org/apache/commons/lang3/function/util/Predicates.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.util;
+ 
+ import java.util.function.Predicate;
+ 
+@@ -24,7 +24,7 @@
+  *
+  * @since 3.18.0
+  */
+-public class Predicates {
++public final class Predicates {
+ 
+     private static final Predicate<?> TRUE = t -> true;
+     private static final Predicate<?> FALSE = t -> false;
+diff --git a/src/main/java/org/apache/commons/lang3/function/Suppliers.java b/src/main/java/org/apache/commons/lang3/function/util/Suppliers.java
+similarity index 91%
+rename from src/main/java/org/apache/commons/lang3/function/Suppliers.java
+rename to src/main/java/org/apache/commons/lang3/function/util/Suppliers.java
+index 3b19aded4..dd8d68cf1 100644
+--- a/src/main/java/org/apache/commons/lang3/function/Suppliers.java
++++ b/src/main/java/org/apache/commons/lang3/function/util/Suppliers.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.lang3.function;
++package org.apache.commons.lang3.function.util;
+ 
+ import java.util.function.Supplier;
+ 
+@@ -24,7 +24,7 @@
+  *
+  * @since 3.13.0
+  */
+-public class Suppliers {
++public final class Suppliers {
+ 
+     /**
+      * Returns the singleton supplier that always returns null.
+@@ -32,8 +32,7 @@ public class Suppliers {
+      * This supplier never throws an exception.
+      * </p>
+      */
+-    @SuppressWarnings("rawtypes")
+-    private static Supplier NUL = () -> null;
++    private static final Supplier<?> NUL = () -> null;
+ 
+     /**
+      * Null-safe call to {@link Supplier#get()}.
+@@ -58,7 +57,7 @@ public static <T> T get(final Supplier<T> supplier) {
+      */
+     @SuppressWarnings("unchecked")
+     public static <T> Supplier<T> nul() {
+-        return NUL;
++        return (Supplier<T>) NUL;
+     }
+ 
+     /**
+diff --git a/src/test/java/org/apache/commons/lang3/ArrayUtilsTest.java b/src/test/java/org/apache/commons/lang3/ArrayUtilsTest.java
+index 61a4bf874..7fa399d14 100644
+--- a/src/test/java/org/apache/commons/lang3/ArrayUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/ArrayUtilsTest.java
+@@ -46,7 +46,7 @@
+ import java.util.function.Function;
+ import java.util.function.Supplier;
+ 
+-import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.util.Suppliers;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/ObjectUtilsTest.java b/src/test/java/org/apache/commons/lang3/ObjectUtilsTest.java
+index a58b1dbec..95604d32b 100644
+--- a/src/test/java/org/apache/commons/lang3/ObjectUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/ObjectUtilsTest.java
+@@ -53,7 +53,7 @@
+ import java.util.function.Supplier;
+ 
+ import org.apache.commons.lang3.exception.CloneFailedException;
+-import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.util.Suppliers;
+ import org.apache.commons.lang3.mutable.MutableInt;
+ import org.apache.commons.lang3.mutable.MutableObject;
+ import org.apache.commons.lang3.text.StrBuilder;
+diff --git a/src/test/java/org/apache/commons/lang3/StringUtilsTest.java b/src/test/java/org/apache/commons/lang3/StringUtilsTest.java
+index 9bccaaf92..42dd2bb04 100644
+--- a/src/test/java/org/apache/commons/lang3/StringUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/StringUtilsTest.java
+@@ -42,7 +42,7 @@
+ import java.util.function.Supplier;
+ import java.util.regex.PatternSyntaxException;
+ 
+-import org.apache.commons.lang3.function.Suppliers;
++import org.apache.commons.lang3.function.util.Suppliers;
+ import org.apache.commons.lang3.mutable.MutableInt;
+ import org.apache.commons.lang3.text.WordUtils;
+ import org.junit.jupiter.api.Disabled;
+diff --git a/src/test/java/org/apache/commons/lang3/ThreadUtilsTest.java b/src/test/java/org/apache/commons/lang3/ThreadUtilsTest.java
+index e9bd002e7..aa46e520a 100644
+--- a/src/test/java/org/apache/commons/lang3/ThreadUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/ThreadUtilsTest.java
+@@ -41,7 +41,7 @@
+ 
+ import org.apache.commons.lang3.ThreadUtils.ThreadGroupPredicate;
+ import org.apache.commons.lang3.ThreadUtils.ThreadPredicate;
+-import org.apache.commons.lang3.function.Predicates;
++import org.apache.commons.lang3.function.util.Predicates;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/FunctionsTest.java b/src/test/java/org/apache/commons/lang3/function/FunctionsTest.java
+index c943a8c7b..f560f607e 100644
+--- a/src/test/java/org/apache/commons/lang3/function/FunctionsTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/FunctionsTest.java
+@@ -28,6 +28,7 @@
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
+ import org.apache.commons.lang3.StringUtils;
++import org.apache.commons.lang3.function.util.Functions;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/PredicatesTest.java b/src/test/java/org/apache/commons/lang3/function/PredicatesTest.java
+index 0eff24735..457888e47 100644
+--- a/src/test/java/org/apache/commons/lang3/function/PredicatesTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/PredicatesTest.java
+@@ -23,6 +23,7 @@
+ import java.util.function.Predicate;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
++import org.apache.commons.lang3.function.util.Predicates;
+ import org.junit.jupiter.api.Test;
+ 
+ /**
+diff --git a/src/test/java/org/apache/commons/lang3/function/SuppliersTest.java b/src/test/java/org/apache/commons/lang3/function/SuppliersTest.java
+index d200bc663..fbed9c612 100644
+--- a/src/test/java/org/apache/commons/lang3/function/SuppliersTest.java
++++ b/src/test/java/org/apache/commons/lang3/function/SuppliersTest.java
+@@ -23,6 +23,7 @@
+ import java.util.function.Supplier;
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
++import org.apache.commons.lang3.function.util.Suppliers;
+ import org.junit.jupiter.api.Test;
+ 
+ /**

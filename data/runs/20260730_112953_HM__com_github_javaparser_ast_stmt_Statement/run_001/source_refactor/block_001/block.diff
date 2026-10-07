@@ -1,0 +1,221 @@
+commit 2042363f5a938c314e26f842b09044893a0b1002
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 30 11:34:47 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/Statement.java b/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/Statement.java
+index a1a291d8d..bb882e4e6 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/Statement.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/Statement.java
+@@ -67,46 +67,42 @@ public abstract class Statement extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public boolean isAssertStmt() {
+-        return false;
++        return StatementTypeCasting.isAssertStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public AssertStmt asAssertStmt() {
+-        throw new IllegalStateException(
+-                f("%s is not AssertStmt, it is %s", this, this.getClass().getSimpleName()));
++        return StatementTypeCasting.asAssertStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public boolean isBlockStmt() {
+-        return false;
++        return StatementTypeCasting.isBlockStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public BlockStmt asBlockStmt() {
+-        throw new IllegalStateException(
+-                f("%s is not BlockStmt, it is %s", this, this.getClass().getSimpleName()));
++        return StatementTypeCasting.asBlockStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public boolean isBreakStmt() {
+-        return false;
++        return StatementTypeCasting.isBreakStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public BreakStmt asBreakStmt() {
+-        throw new IllegalStateException(
+-                f("%s is not BreakStmt, it is %s", this, this.getClass().getSimpleName()));
++        return StatementTypeCasting.asBreakStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public boolean isContinueStmt() {
+-        return false;
++        return StatementTypeCasting.isContinueStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public ContinueStmt asContinueStmt() {
+-        throw new IllegalStateException(
+-                f("%s is not ContinueStmt, it is %s", this, this.getClass().getSimpleName()));
++        return StatementTypeCasting.asContinueStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+@@ -289,16 +285,16 @@ public abstract class Statement extends Node {
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifAssertStmt(Consumer<AssertStmt> action) {}
++    public void ifAssertStmt(Consumer<AssertStmt> action) { StatementTypeCasting.ifAssertStmt(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifBlockStmt(Consumer<BlockStmt> action) {}
++    public void ifBlockStmt(Consumer<BlockStmt> action) { StatementTypeCasting.ifBlockStmt(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifBreakStmt(Consumer<BreakStmt> action) {}
++    public void ifBreakStmt(Consumer<BreakStmt> action) { StatementTypeCasting.ifBreakStmt(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifContinueStmt(Consumer<ContinueStmt> action) {}
++    public void ifContinueStmt(Consumer<ContinueStmt> action) { StatementTypeCasting.ifContinueStmt(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public void ifDoStmt(Consumer<DoStmt> action) {}
+@@ -350,22 +346,22 @@ public abstract class Statement extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<AssertStmt> toAssertStmt() {
+-        return Optional.empty();
++        return StatementTypeCasting.toAssertStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<BlockStmt> toBlockStmt() {
+-        return Optional.empty();
++        return StatementTypeCasting.toBlockStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<BreakStmt> toBreakStmt() {
+-        return Optional.empty();
++        return StatementTypeCasting.toBreakStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<ContinueStmt> toContinueStmt() {
+-        return Optional.empty();
++        return StatementTypeCasting.toContinueStmt(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/StatementTypeCasting.java b/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/StatementTypeCasting.java
+new file mode 100644
+index 000000000..babc1e2f2
+--- /dev/null
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/stmt/StatementTypeCasting.java
+@@ -0,0 +1,102 @@
++/*
++ * Helper class extracted from Statement for type-checking / casting / optional / consumer helpers
++ */
++package com.github.javaparser.ast.stmt;
++
++import static com.github.javaparser.utils.CodeGenerationUtils.f;
++
++import java.util.Optional;
++import java.util.function.Consumer;
++
++public final class StatementTypeCasting {
++
++    private StatementTypeCasting() {}
++
++    // AssertStmt helpers
++    public static boolean isAssertStmt(Statement stmt) {
++        return stmt instanceof AssertStmt;
++    }
++
++    public static AssertStmt asAssertStmt(Statement stmt) {
++        if (stmt instanceof AssertStmt) {
++            return (AssertStmt) stmt;
++        }
++        throw new IllegalStateException(f("%s is not AssertStmt, it is %s", stmt, stmt.getClass().getSimpleName()));
++    }
++
++    public static void ifAssertStmt(Statement stmt, Consumer<AssertStmt> action) {
++        if (stmt instanceof AssertStmt) {
++            action.accept((AssertStmt) stmt);
++        }
++    }
++
++    public static Optional<AssertStmt> toAssertStmt(Statement stmt) {
++        return stmt instanceof AssertStmt ? Optional.of((AssertStmt) stmt) : Optional.empty();
++    }
++
++    // BlockStmt helpers
++    public static boolean isBlockStmt(Statement stmt) {
++        return stmt instanceof BlockStmt;
++    }
++
++    public static BlockStmt asBlockStmt(Statement stmt) {
++        if (stmt instanceof BlockStmt) {
++            return (BlockStmt) stmt;
++        }
++        throw new IllegalStateException(f("%s is not BlockStmt, it is %s", stmt, stmt.getClass().getSimpleName()));
++    }
++
++    public static void ifBlockStmt(Statement stmt, Consumer<BlockStmt> action) {
++        if (stmt instanceof BlockStmt) {
++            action.accept((BlockStmt) stmt);
++        }
++    }
++
++    public static Optional<BlockStmt> toBlockStmt(Statement stmt) {
++        return stmt instanceof BlockStmt ? Optional.of((BlockStmt) stmt) : Optional.empty();
++    }
++
++    // BreakStmt helpers
++    public static boolean isBreakStmt(Statement stmt) {
++        return stmt instanceof BreakStmt;
++    }
++
++    public static BreakStmt asBreakStmt(Statement stmt) {
++        if (stmt instanceof BreakStmt) {
++            return (BreakStmt) stmt;
++        }
++        throw new IllegalStateException(f("%s is not BreakStmt, it is %s", stmt, stmt.getClass().getSimpleName()));
++    }
++
++    public static void ifBreakStmt(Statement stmt, Consumer<BreakStmt> action) {
++        if (stmt instanceof BreakStmt) {
++            action.accept((BreakStmt) stmt);
++        }
++    }
++
++    public static Optional<BreakStmt> toBreakStmt(Statement stmt) {
++        return stmt instanceof BreakStmt ? Optional.of((BreakStmt) stmt) : Optional.empty();
++    }
++
++    // ContinueStmt helpers
++    public static boolean isContinueStmt(Statement stmt) {
++        return stmt instanceof ContinueStmt;
++    }
++
++    public static ContinueStmt asContinueStmt(Statement stmt) {
++        if (stmt instanceof ContinueStmt) {
++            return (ContinueStmt) stmt;
++        }
++        throw new IllegalStateException(f("%s is not ContinueStmt, it is %s", stmt, stmt.getClass().getSimpleName()));
++    }
++
++    public static void ifContinueStmt(Statement stmt, Consumer<ContinueStmt> action) {
++        if (stmt instanceof ContinueStmt) {
++            action.accept((ContinueStmt) stmt);
++        }
++    }
++
++    public static Optional<ContinueStmt> toContinueStmt(Statement stmt) {
++        return stmt instanceof ContinueStmt ? Optional.of((ContinueStmt) stmt) : Optional.empty();
++    }
++}

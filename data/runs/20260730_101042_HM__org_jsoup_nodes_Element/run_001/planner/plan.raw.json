@@ -1,0 +1,53 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Element",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Element's output coupling by extracting all selection- and query-related responsibilities (CSS selectors, Collector-based element searches, XPath helpers, and regex-backed matching) into a new helper class, so Element no longer directly depends on Collector, Selector, NodeUtils (XPath), and Regex/Pattern. The new org.jsoup.nodes.ElementQuery will take the Element as context and provide the moved APIs; Element will delegate to it, gaining one new dependency (ElementQuery) while removing 4 existing direct dependencies (net -3).",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Element.java",
+        "src/main/java/org/jsoup/nodes/ElementQuery.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java",
+            "src/main/java/org/jsoup/nodes/ElementQuery.java"
+          ],
+          "details": "Extract selection/query-related methods from Element into a new helper class org.jsoup.nodes.ElementQuery. Methods to be moved (all signatures copied verbatim into ElementQuery and implemented to use the Element instance passed in): select(String), select(Evaluator), selectStream(String), selectStream(Evaluator), selectFirst(String), selectFirst(Evaluator), expectFirst(String), selectNodes(Evaluator), selectNodes(String), selectNodes(Evaluator, Class<T>), selectNodes(String, Class<T>), selectFirstNode(String, Class<T>), selectFirstNode(Evaluator, Class<T>), expectFirstNode(String, Class<T>), selectXpath(String), selectXpath(String, Class<T>), getElementsByTag(String), getElementById(String), getElementsByClass(String), getElementsByAttribute(String), getElementsByAttributeStarting(String), getElementsByAttributeValue(String, String), getElementsByAttributeValueNot(String, String), getElementsByAttributeValueStarting(String, String), getElementsByAttributeValueEnding(String, String), getElementsByAttributeValueContaining(String, String), getElementsByAttributeValueMatching(String, String) (the overload that compiles Regex), getElementsByAttributeValueMatching(String, Pattern) (Pattern overload), getElementsByIndexLessThan(int), getElementsByIndexGreaterThan(int), getElementsByIndexEquals(int), getElementsContainingText(String), getElementsContainingOwnText(String), getElementsMatchingText(Pattern), getElementsMatchingText(String) (the overload that compiles Regex), getElementsMatchingOwnText(Pattern), getElementsMatchingOwnText(String) (the overload that compiles Regex), getAllElements(), selectNodes(...) variants that call Collector.collectNodes, and selectFirst/selectNode finder methods that call Collector.findFirst / Collector.findFirstNode. The extracted class will be placed in package org.jsoup.nodes as ElementQuery and will accept an Element instance in its constructor (or use static helper methods accepting an Element) so behavior is preserved. The extraction moves all direct calls to Collector, Selector (including static evaluatorOf usages), NodeUtils.selectXpath, Regex.compile and Pattern construction into ElementQuery. Element's original methods become simple delegating wrappers to ElementQuery methods to preserve public API and binary compatibility.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/ElementQuery.java",
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Add imports required by the new ElementQuery: org.jsoup.select.Selector, org.jsoup.select.Collector, org.jsoup.select.Evaluator, org.jsoup.select.Nodes, org.jsoup.select.NodeVisitor (if used), org.jsoup.internal.NodeUtils (for XPath delegation), org.jsoup.helper.Regex, java.util.regex.Pattern, java.util.regex.PatternSyntaxException, org.jsoup.select.Selector (for evaluatorOf static use) and keep Elements/Nodes imports used by moved methods. Update Element.java imports to include org.jsoup.nodes.ElementQuery and remove imports that become unused in Element (Collector, Selector, Regex, Pattern, NodeUtils) where they are no longer referenced directly. Do not remove imports still referenced by fields or other unextracted methods.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Element.java"
+          ],
+          "details": "Replace the bodies of the moved methods in Element with delegating calls to the new ElementQuery instance. Example: public Elements select(String cssQuery) { return new ElementQuery(this).select(cssQuery); } (or use a cached ElementQuery instance if desired). Update all internal calls in Element that previously called the moved methods directly to call the new delegating methods (the public signatures on Element remain identical). Update any places in Element that used static Selector.evaluatorOf(...) which were moved to ElementQuery to now delegate; where Element still needs evaluatorOf for remaining methods (e.g., is(Evaluator) or closest(Evaluator)), keep those usages in Element. Ensure Selector, Collector, NodeUtils, and Regex are no longer referenced directly from Element.java (imports removed) except via ElementQuery.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

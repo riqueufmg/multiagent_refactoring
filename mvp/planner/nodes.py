@@ -29,7 +29,12 @@ from mvp.planner.lib.plan_utils import (
     enrich_plan_with_related_tests,
 )
 from mvp.planner.state import PlannerState
-
+from mvp.planner.lib.ud_context import build_ud_planner_input
+from mvp.planner.lib.llm_usage import (
+    append_llm_usage,
+    build_llm_usage_entry,
+    start_llm_timer,
+)
 
 def _cfg(state: PlannerState, dotted_key: str, default: Any = None) -> Any:
     current: Any = state.get("config") or {}
@@ -323,6 +328,21 @@ def build_planner_context_node(state: PlannerState) -> PlannerState:
             planner_input["internal_deps"] = internal_deps
             planner_input["incoming_deps"] = incoming_deps
             planner_input["outgoing_deps"] = outgoing_deps
+        
+        elif smell == "UD":
+            architecture_smells_path = (
+                Path(state["designite_dir"]) / "ArchitectureSmells.csv"
+            )
+            graphml_path = Path(state["designite_dir"]) / "DependencyGraph.graphml"
+
+            ud_input = build_ud_planner_input(
+                repo_path=state["repo_path"],
+                architecture_smells_csv=architecture_smells_path,
+                dependency_graphml=graphml_path,
+                target_package=state["target_name"],
+            )
+
+            planner_input.update(ud_input)
 
     else:
         raise RuntimeError(f"Unsupported target_type: {target_type}")
@@ -369,11 +389,30 @@ def call_planner_node(state: PlannerState) -> PlannerState:
     )
 
     ## model's inference
+    timer = start_llm_timer()
+
     res = llm.invoke(
         [
             SystemMessage(content=system_prompt),
             HumanMessage(content=rendered),
         ]
+    )
+
+    append_llm_usage(
+        usage_file=planner_dir / "llm_usage.json",
+        entry=build_llm_usage_entry(
+            timer=timer,
+            agent="planner",
+            model=model,
+            response=res,
+            metadata={
+                "node": "call_planner",
+                "smell": state.get("smell", ""),
+                "smell_name": state.get("smell_name", ""),
+                "target_type": state.get("target_type", ""),
+                "target_name": state.get("target_name", ""),
+            },
+        ),
     )
 
     raw = (res.content or "").strip()

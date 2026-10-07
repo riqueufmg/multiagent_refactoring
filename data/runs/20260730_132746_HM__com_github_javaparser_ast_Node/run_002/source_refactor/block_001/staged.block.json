@@ -1,0 +1,204 @@
+{
+  "id": 1,
+  "goal": "Reduce Node's output coupling by removing direct dependencies on NodeTraversals, NodeEquality and Collections by extracting related functionality (traversals, equality, and the post-order iterator) into a new helper class. After extraction, Node will delegate these responsibilities to the new class, losing the direct imports/usages of the three external dependencies and gaining a single dependency on the helper class (net reduction: 3 removed - 1 added = 2).",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java",
+    "javaparser-core/src/main/java/com/github/javaparser/ast/NodeUtilities.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.ast.Node, com.github.javaparser.ast.NodeUtilities)",
+      "inputs": [
+        "com.github.javaparser.ast.Node"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities"
+      ],
+      "details": "Create a new top-level helper class com.github.javaparser.ast.NodeUtilities in the same package. Move cohesive groups of methods that use the external dependencies NodeTraversals, NodeEquality and Collections into NodeUtilities. Specifically move: 1) traversal-related methods that delegate to NodeTraversals: stream(TreeTraversal), stream(), walk(TreeTraversal, Consumer<Node>), walk(Consumer<Node>), walk(Class<T>, Consumer<T>), findAll(Class<T>), findAll(Class<T>, TreeTraversal), findAll(Class<T>, Predicate<T>), findFirst(TreeTraversal, Function<Node, Optional<T>>), findFirst(Class<N>), findFirst(Class<N>, Predicate<N>); 2) equality methods that delegate to NodeEquality: hashCode() and equals(Object); 3) the entire PostOrderIterator static nested class (and its nested Level class) which uses Collections.singletonList, moving it as a static nested class inside NodeUtilities or as a private static helper class there. The extraction will leave small delegating stubs in Node that forward calls to NodeUtilities (for example Node.stream() will call NodeUtilities.stream(this)). NodeUtilities will contain the moved implementations and necessary imports (NodeTraversals, NodeEquality, Collections).",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.hashCode(), com.github.javaparser.ast.NodeUtilities.hashCode(com.github.javaparser.ast.Node))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.hashCode()"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.hashCode(com.github.javaparser.ast.Node)"
+      ],
+      "details": "Move the implementation of hashCode() to a static helper method NodeUtilities.hashCode(Node n). Leave in Node a delegating override that calls NodeUtilities.hashCode(this). This removes the direct dependency on NodeEquality from Node (NodeEquality will be imported/used only in NodeUtilities).",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.equals(java.lang.Object), com.github.javaparser.ast.NodeUtilities.equals(com.github.javaparser.ast.Node,java.lang.Object))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.equals(java.lang.Object)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.equals(com.github.javaparser.ast.Node,java.lang.Object)"
+      ],
+      "details": "Move the implementation of equals(Object) to a static helper method NodeUtilities.equals(Node n, Object obj). Leave in Node a delegating override that calls NodeUtilities.equals(this, obj).",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.stream(com.github.javaparser.ast.Node.TreeTraversal), com.github.javaparser.ast.NodeUtilities.stream(com.github.javaparser.ast.Node,com.github.javaparser.ast.Node.TreeTraversal))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.stream(com.github.javaparser.ast.Node.TreeTraversal)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.stream(com.github.javaparser.ast.Node,com.github.javaparser.ast.Node.TreeTraversal)"
+      ],
+      "details": "Move the implementation of stream(TreeTraversal) into NodeUtilities as a static method taking the source Node as first parameter. Leave in Node a delegating method that calls NodeUtilities.stream(this, traversal). This removes the direct dependency on NodeTraversals from Node.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.stream(), com.github.javaparser.ast.NodeUtilities.stream(com.github.javaparser.ast.Node))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.stream()"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.stream(com.github.javaparser.ast.Node)"
+      ],
+      "details": "Move no-arg stream() implementation into NodeUtilities and leave a delegating stub in Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.walk(com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Consumer), com.github.javaparser.ast.NodeUtilities.walk(com.github.javaparser.ast.Node,com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Consumer))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.walk(com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Consumer)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.walk(com.github.javaparser.ast.Node,com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Consumer)"
+      ],
+      "details": "Move traversal walk(TreeTraversal, Consumer<Node>) into NodeUtilities and delegate from Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.walk(java.util.function.Consumer), com.github.javaparser.ast.NodeUtilities.walk(com.github.javaparser.ast.Node,java.util.function.Consumer))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.walk(java.util.function.Consumer)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.walk(com.github.javaparser.ast.Node,java.util.function.Consumer)"
+      ],
+      "details": "Move pre-order walk(Consumer<Node>) into NodeUtilities and leave delegating stub in Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.walk(java.lang.Class,java.util.function.Consumer), com.github.javaparser.ast.NodeUtilities.walk(com.github.javaparser.ast.Node,java.lang.Class,java.util.function.Consumer))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.walk(java.lang.Class,java.util.function.Consumer)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.walk(com.github.javaparser.ast.Node,java.lang.Class,java.util.function.Consumer)"
+      ],
+      "details": "Move generic walk(Class<T>, Consumer<T>) into NodeUtilities and delegate from Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.findAll(java.lang.Class), com.github.javaparser.ast.NodeUtilities.findAll(com.github.javaparser.ast.Node,java.lang.Class))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.findAll(java.lang.Class)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.findAll(com.github.javaparser.ast.Node,java.lang.Class)"
+      ],
+      "details": "Move findAll(Class<T>) to NodeUtilities and leave delegating stub in Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.findAll(java.lang.Class,com.github.javaparser.ast.Node.TreeTraversal), com.github.javaparser.ast.NodeUtilities.findAll(com.github.javaparser.ast.Node,java.lang.Class,com.github.javaparser.ast.Node.TreeTraversal))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.findAll(java.lang.Class,com.github.javaparser.ast.Node.TreeTraversal)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.findAll(com.github.javaparser.ast.Node,java.lang.Class,com.github.javaparser.ast.Node.TreeTraversal)"
+      ],
+      "details": "Move overloaded findAll(Class, TreeTraversal) to NodeUtilities and delegate from Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.findAll(java.lang.Class,java.util.function.Predicate), com.github.javaparser.ast.NodeUtilities.findAll(com.github.javaparser.ast.Node,java.lang.Class,java.util.function.Predicate))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.findAll(java.lang.Class,java.util.function.Predicate)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.findAll(com.github.javaparser.ast.Node,java.lang.Class,java.util.function.Predicate)"
+      ],
+      "details": "Move predicate-based findAll to NodeUtilities and delegate from Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.findFirst(com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Function), com.github.javaparser.ast.NodeUtilities.findFirst(com.github.javaparser.ast.Node,com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Function))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.findFirst(com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Function)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.findFirst(com.github.javaparser.ast.Node,com.github.javaparser.ast.Node.TreeTraversal,java.util.function.Function)"
+      ],
+      "details": "Move the general findFirst(TreeTraversal, Function<Node, Optional<T>>) into NodeUtilities and leave a delegating stub in Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.findFirst(java.lang.Class), com.github.javaparser.ast.NodeUtilities.findFirst(com.github.javaparser.ast.Node,java.lang.Class))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.findFirst(java.lang.Class)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.findFirst(com.github.javaparser.ast.Node,java.lang.Class)"
+      ],
+      "details": "Move findFirst(Class<N>) into NodeUtilities and delegate from Node.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.Node.findFirst(java.lang.Class,java.util.function.Predicate), com.github.javaparser.ast.NodeUtilities.findFirst(com.github.javaparser.ast.Node,java.lang.Class,java.util.function.Predicate))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.findFirst(java.lang.Class,java.util.function.Predicate)"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.findFirst(com.github.javaparser.ast.Node,java.lang.Class,java.util.function.Predicate)"
+      ],
+      "details": "Move predicate-based findFirst into NodeUtilities and leave a delegating stub in Node.",
+      "risk": "low"
+    },
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.ast.Node.PostOrderIterator, com.github.javaparser.ast.NodeUtilities.PostOrderIterator)",
+      "inputs": [
+        "com.github.javaparser.ast.Node.PostOrderIterator"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.NodeUtilities.PostOrderIterator"
+      ],
+      "details": "Move the PostOrderIterator static nested class (and its nested Level helper class) into NodeUtilities as a private static nested class (or top-level static helper) so that its usage of Collections.singletonList remains localized to NodeUtilities. Update any references in the moved traversal implementations accordingly.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(javaparser-core/src/main/java/com/github/javaparser/ast/NodeUtilities.java)",
+      "inputs": [],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/ast/NodeUtilities.java"
+      ],
+      "details": "Add required imports to NodeUtilities: com.github.javaparser.ast.NodeTraversals, com.github.javaparser.metamodel.PropertyMetaModel (if needed by moved traversal implementations), java.util.Collections, java.util.stream.Stream, java.util.function.Consumer, java.util.function.Function, java.util.function.Predicate, java.util.List, java.util.Optional, and com.github.javaparser.ast.Node. Keep imports minimal and only those required by the moved code.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(javaparser-core/src/main/java/com/github/javaparser/ast/Node.java)",
+      "inputs": [],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java"
+      ],
+      "details": "Update Node imports to remove NodeTraversals, NodeEquality and java.util.Collections if they are no longer referenced directly. Add import for com.github.javaparser.ast.NodeUtilities so Node can delegate to the helper.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(com.github.javaparser.ast.Node.stream(), com.github.javaparser.ast.NodeUtilities.stream(com.github.javaparser.ast.Node))",
+      "inputs": [
+        "com.github.javaparser.ast.Node.stream()"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.Node.stream()"
+      ],
+      "details": "Ensure all internal call sites (within Node) that used the original implementations now call the delegating stubs in Node which forward to NodeUtilities. External callers of Node's public API remain unchanged because Node preserves the same public signatures; implementations are delegated internally.",
+      "risk": "low"
+    }
+  ]
+}

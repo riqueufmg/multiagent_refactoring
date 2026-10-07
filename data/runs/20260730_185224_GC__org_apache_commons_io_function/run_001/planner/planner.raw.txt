@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.io.function",
+  "selected_cluster": [
+    "org.apache.commons.io.function.IOIterator",
+    "org.apache.commons.io.function.IOIteratorAdapter",
+    "org.apache.commons.io.function.UncheckedIOIterator"
+  ],
+  "destination_package": "org.apache.commons.io.function.iterator",
+  "cluster_reason": "These three classes form the iterator/adaptor cluster: IOIterator is implemented with IOIteratorAdapter and has an unchecked wrapper UncheckedIOIterator. They are strongly internally related (adapter + iterator + unchecked wrapper) and have limited external coupling compared with stream/core functional types, so moving them together groups iterator-specific concerns without touching many other package classes.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the iterator-related cluster (IOIterator, IOIteratorAdapter, UncheckedIOIterator) to a dedicated subpackage to reduce package-level cohesion.",
+      "files": [
+        "src/main/java/org/apache/commons/io/function/IOIterator.java",
+        "src/main/java/org/apache/commons/io/function/IOIteratorAdapter.java",
+        "src/main/java/org/apache/commons/io/function/UncheckedIOIterator.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.io.function.iterator"
+          ],
+          "details": "Create the destination subpackage org.apache.commons.io.function.iterator if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.function.IOIterator"
+          ],
+          "outputs": [
+            "org.apache.commons.io.function.iterator.IOIterator"
+          ],
+          "details": "Move IOIterator to the iterator subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.function.IOIteratorAdapter"
+          ],
+          "outputs": [
+            "org.apache.commons.io.function.iterator.IOIteratorAdapter"
+          ],
+          "details": "Move IOIteratorAdapter to the iterator subpackage alongside IOIterator.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.function.UncheckedIOIterator"
+          ],
+          "outputs": [
+            "org.apache.commons.io.function.iterator.UncheckedIOIterator"
+          ],
+          "details": "Move UncheckedIOIterator (the unchecked wrapper) to the iterator subpackage with its iterator types.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

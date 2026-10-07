@@ -1,0 +1,207 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.HtmlTreeBuilderState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the large nested Constants holder out of the enum to reduce HtmlTreeBuilderState size and to make the tag-lists reusable.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.Constants"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateConstants.java::org.jsoup.parser.HtmlTreeBuilderStateConstants"
+          ],
+          "details": "Create a new top-level final class HtmlTreeBuilderStateConstants in package org.jsoup.parser. Move all static final String[] fields from the nested Constants class into this new class as public static final fields with identical names and values. Keep semantics unchanged (same array contents and ordering).",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Replace usages of nested reference Constants.* with references to HtmlTreeBuilderStateConstants.*. Update or add static imports where appropriate (e.g. previously used static import of HtmlTreeBuilderState.Constants.* should be replaced with static import of org.jsoup.parser.HtmlTreeBuilderStateConstants.* or fully qualified references).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Update all references inside HtmlTreeBuilderState that referenced Constants.* to reference HtmlTreeBuilderStateConstants.* (or rely on the new static import). This maintains existing names (InHeadEmpty, InHeadRaw, etc.) but from the new top-level class.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move small, reusable static helpers out of the enum (mergeAttributes, isWhitespace, HandleTextState, and nullString) into a focused utility class to reduce the enum's method footprint and improve cohesion.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::org.jsoup.parser.HtmlTreeBuilderStateUtil"
+          ],
+          "details": "Create a new utility class HtmlTreeBuilderStateUtil in org.jsoup.parser. This class will host static helper methods and constants moved from the enum: mergeAttributes(Token.StartTag, Element), isWhitespace(Token), HandleTextState(Token.StartTag, HtmlTreeBuilder, TokeniserState), and the nullString constant. Preserve signatures and visibility appropriate for calls from HtmlTreeBuilderState (use public static methods).",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::mergeAttributes(org.jsoup.parser.Token$StartTag, org.jsoup.nodes.Element)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::isWhitespace(org.jsoup.parser.Token)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HandleTextState(org.jsoup.parser.Token$StartTag, org.jsoup.parser.HtmlTreeBuilder, org.jsoup.parser.TokeniserState)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::nullString"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::mergeAttributes(org.jsoup.parser.Token$StartTag, org.jsoup.nodes.Element)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::isWhitespace(org.jsoup.parser.Token)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::HandleTextState(org.jsoup.parser.Token$StartTag, org.jsoup.parser.HtmlTreeBuilder, org.jsoup.parser.TokeniserState)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::nullString"
+          ],
+          "details": "Move the implementations verbatim to HtmlTreeBuilderStateUtil as public static methods/fields. Adjust any references inside moved methods to other types to be fully qualified or imported in the new class. Ensure Token.StartTag, Element, TokeniserState and other types used are imported. Preserve behavior exactly.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Replace internal calls to mergeAttributes(...), isWhitespace(...), HandleTextState(...) and references to nullString in HtmlTreeBuilderState with calls to HtmlTreeBuilderStateUtil.mergeAttributes(...), HtmlTreeBuilderStateUtil.isWhitespace(...), HtmlTreeBuilderStateUtil.HandleTextState(...), and HtmlTreeBuilderStateUtil.nullString respectively (or add a static import if preferred).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract the complex 'adoption agency' algorithm from InBody into a named helper method to reduce the cognitive size of the enum and isolate complex logic for focused testing and maintenance.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::inBodyEndTagAdoption(org.jsoup.parser.Token, org.jsoup.parser.HtmlTreeBuilder)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::inBodyEndTagAdoption(org.jsoup.parser.Token, org.jsoup.parser.HtmlTreeBuilder)"
+          ],
+          "details": "Move the private method inBodyEndTagAdoption(Token, HtmlTreeBuilder) into HtmlTreeBuilderStateUtil as a public static boolean inBodyEndTagAdoption(Token t, HtmlTreeBuilder tb). Update the implementation so that any references to tb.formattingElements, tb.stack operations, or other protected internals continue to use the existing HtmlTreeBuilder API (callers already pass tb). Preserve algorithm exactly.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "Update the call site in InBody.inBodyEndTag to call HtmlTreeBuilderStateUtil.inBodyEndTagAdoption(t, tb) instead of the moved private method. Ensure imports are updated (or use fully qualified name).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Introduce a small facade on the enum if needed by callers to keep external call sites stable while internal refactoring occurs.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+          ],
+          "details": "If any external code invokes moved helper methods via reflection or expects them as members, provide small delegating methods on HtmlTreeBuilderState that forward to HtmlTreeBuilderStateUtil. For example, keep signatures of any public methods called externally (none were evident in the input), but add delegating public static methods if necessary. This step is low-impact and optional; perform only if compilation or runtime checks indicate external dependencies.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ]
+    }
+  ]
+}

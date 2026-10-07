@@ -1,0 +1,130 @@
+commit d8b5e4fa749bc32d4bae8c88b6835df2d0c872f1
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Jul 29 16:01:54 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/lang3/BitFieldLong.java b/src/main/java/org/apache/commons/lang3/BitFieldLong.java
+new file mode 100644
+index 000000000..df7daa265
+--- /dev/null
++++ b/src/main/java/org/apache/commons/lang3/BitFieldLong.java
+@@ -0,0 +1,118 @@
++package org.apache.commons.lang3;
++
++/**
++ * A helper class to manipulate long-based bit fields.
++ *
++ * This class encapsulates a long mask and the corresponding shift count and
++ * provides operations to query and modify the bits within a long value.
++ */
++public final class BitFieldLong {
++
++    private final long mask;
++    private final int shiftCount;
++
++    /**
++     * Create a BitFieldLong using the given mask.
++     *
++     * @param mask the bit mask for this field
++     */
++    public BitFieldLong(long mask) {
++        this.mask = mask;
++        if (mask == 0L) {
++            this.shiftCount = 0;
++        } else {
++            this.shiftCount = Long.numberOfTrailingZeros(mask);
++        }
++    }
++
++    /**
++     * Clear the bits defined by this field from the provided holder value.
++     *
++     * @param holder the long value whose bits are to be cleared
++     * @return the value with the field bits cleared
++     */
++    public long clear(long holder) {
++        return holder & ~mask;
++    }
++
++    /**
++     * Return the raw (masked) bits of this field from the holder.
++     * This does not shift the bits down.
++     *
++     * @param holder the long value to extract from
++     * @return the masked bits (still positioned at their original bit offsets)
++     */
++    public long getRawValue(long holder) {
++        return holder & mask;
++    }
++
++    /**
++     * Return the value of this field from the holder, shifted down to start at bit 0.
++     *
++     * @param holder the long value to extract from
++     * @return the field value (shifted right by the field's shift count)
++     */
++    public long getValue(long holder) {
++        return (getRawValue(holder)) >>> shiftCount;
++    }
++
++    /**
++     * Return true if all bits in this field are set in the holder.
++     *
++     * @param holder the long value to test
++     * @return true if all field bits are set
++     */
++    public boolean isAllSet(long holder) {
++        return (holder & mask) == mask;
++    }
++
++    /**
++     * Return true if any bit in this field is set in the holder.
++     *
++     * @param holder the long value to test
++     * @return true if any field bit is set
++     */
++    public boolean isSet(long holder) {
++        return (holder & mask) != 0L;
++    }
++
++    /**
++     * Set all bits defined by this field in the holder.
++     *
++     * @param holder the long value to modify
++     * @return the value with the field bits set
++     */
++    public long set(long holder) {
++        return holder | mask;
++    }
++
++    /**
++     * Set or clear the bits defined by this field according to the boolean flag.
++     *
++     * @param holder the long value to modify
++     * @param flag if true set the field bits, if false clear them
++     * @return the modified value
++     */
++    public long setBoolean(long holder, boolean flag) {
++        return flag ? set(holder) : clear(holder);
++    }
++
++    /**
++     * Set the field's bits in the holder to the provided value.
++     * Only the bits within the mask are affected; the provided value is shifted
++     * into position and masked.
++     *
++     * @param holder the long value to modify
++     * @param value the field value to set (unshifted)
++     * @return the modified holder with the field set to value
++     */
++    public long setValue(long holder, long value) {
++        long v = (value << shiftCount) & mask;
++        return (holder & ~mask) | v;
++    }
++
++    @Override
++    public String toString() {
++        return "BitFieldLong(mask=0x" + Long.toHexString(mask) + ", shift=" + shiftCount + ")";
++    }
++}

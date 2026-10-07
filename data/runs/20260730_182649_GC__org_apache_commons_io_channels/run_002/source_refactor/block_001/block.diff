@@ -1,0 +1,62 @@
+commit 1bd3adb3cb57b5aa456ef6f38d0763866d4698f7
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 30 18:38:39 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/channels/CloseShieldChannel.java b/src/main/java/org/apache/commons/io/channels/internal/CloseShieldChannel.java
+similarity index 98%
+rename from src/main/java/org/apache/commons/io/channels/CloseShieldChannel.java
+rename to src/main/java/org/apache/commons/io/channels/internal/CloseShieldChannel.java
+index 987e8427c..295663349 100644
+--- a/src/main/java/org/apache/commons/io/channels/CloseShieldChannel.java
++++ b/src/main/java/org/apache/commons/io/channels/internal/CloseShieldChannel.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.io.channels;
++package org.apache.commons.io.channels.internal;
+ 
+ import java.io.Closeable;
+ import java.lang.reflect.Proxy;
+diff --git a/src/main/java/org/apache/commons/io/channels/CloseShieldChannelHandler.java b/src/main/java/org/apache/commons/io/channels/internal/CloseShieldChannelHandler.java
+similarity index 99%
+rename from src/main/java/org/apache/commons/io/channels/CloseShieldChannelHandler.java
+rename to src/main/java/org/apache/commons/io/channels/internal/CloseShieldChannelHandler.java
+index 822c6b618..237a69dde 100644
+--- a/src/main/java/org/apache/commons/io/channels/CloseShieldChannelHandler.java
++++ b/src/main/java/org/apache/commons/io/channels/internal/CloseShieldChannelHandler.java
+@@ -15,7 +15,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.apache.commons.io.channels;
++package org.apache.commons.io.channels.internal;
+ 
+ import java.lang.reflect.InvocationHandler;
+ import java.lang.reflect.InvocationTargetException;
+diff --git a/src/test/java/org/apache/commons/io/channels/CloseShieldChannelFilterByteChannelTest.java b/src/test/java/org/apache/commons/io/channels/CloseShieldChannelFilterByteChannelTest.java
+index fb73a11dc..ae5579f07 100644
+--- a/src/test/java/org/apache/commons/io/channels/CloseShieldChannelFilterByteChannelTest.java
++++ b/src/test/java/org/apache/commons/io/channels/CloseShieldChannelFilterByteChannelTest.java
+@@ -34,6 +34,7 @@
+ import java.nio.channels.ByteChannel;
+ import java.nio.channels.ClosedChannelException;
+ 
++import org.apache.commons.io.channels.internal.CloseShieldChannel;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.mockito.ArgumentMatchers;
+diff --git a/src/test/java/org/apache/commons/io/channels/CloseShieldChannelTest.java b/src/test/java/org/apache/commons/io/channels/CloseShieldChannelTest.java
+index 4676e64c0..e588fbd78 100644
+--- a/src/test/java/org/apache/commons/io/channels/CloseShieldChannelTest.java
++++ b/src/test/java/org/apache/commons/io/channels/CloseShieldChannelTest.java
+@@ -51,6 +51,7 @@
+ import java.util.stream.Stream;
+ 
+ import org.apache.commons.io.FileUtils;
++import org.apache.commons.io.channels.internal.CloseShieldChannel;
+ import org.apache.commons.lang3.ClassUtils;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.io.TempDir;

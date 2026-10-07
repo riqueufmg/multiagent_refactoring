@@ -1,0 +1,34 @@
+{
+  "id": 4,
+  "goal": "Introduce a small facade on the enum if needed by callers to keep external call sites stable while internal refactoring occurs.",
+  "files": [
+    "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ],
+  "ops": [
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java"
+      ],
+      "details": "If any external code invokes moved helper methods via reflection or expects them as members, provide small delegating methods on HtmlTreeBuilderState that forward to HtmlTreeBuilderStateUtil. For example, keep signatures of any public methods called externally (none were evident in the input), but add delegating public static methods if necessary. This step is low-impact and optional; perform only if compilation or runtime checks indicate external dependencies.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/jsoup/parser/HtmlTreeBuilderStateTest.java"
+  ]
+}

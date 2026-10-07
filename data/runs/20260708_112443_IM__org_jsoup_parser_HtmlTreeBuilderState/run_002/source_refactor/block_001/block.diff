@@ -1,0 +1,699 @@
+commit f3ab2d0a0953ef46a921a492168797cae7091e9a
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Jul 8 12:00:10 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index 14a4f437..1a39cc71 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -306,7 +306,7 @@ enum HtmlTreeBuilderState {
+                     return false;
+                 }
+                 case StartTag:
+-                    return inBodyStartTag(t, tb);
++                    return HtmlTreeBuilderStateUtil.inBodyStartTag(t, tb);
+                 case EndTag:
+                     return inBodyEndTag(t, tb);
+                 case EOF:
+@@ -322,334 +322,6 @@ enum HtmlTreeBuilderState {
+             return true;
+         }
+ 
+-        private boolean inBodyStartTag(Token t, HtmlTreeBuilder tb) {
+-            final Token.StartTag startTag = t.asStartTag();
+-            final String name = startTag.normalName();
+-            final ArrayList<Element> stack;
+-            Element el;
+-
+-            switch (name) {
+-                case "a":
+-                    if (tb.getActiveFormattingElement("a") != null) {
+-                        tb.error(this);
+-                        tb.processEndTag("a");
+-
+-                        // still on stack?
+-                        Element remainingA = tb.getFromStack("a");
+-                        if (remainingA != null) {
+-                            tb.removeFromActiveFormattingElements(remainingA);
+-                            tb.removeFromStack(remainingA);
+-                        }
+-                    }
+-                    tb.reconstructFormattingElements();
+-                    el = tb.insertElementFor(startTag);
+-                    tb.pushActiveFormattingElements(el);
+-                    break;
+-                case "span":
+-                    // same as final else, but short circuits lots of checks
+-                    tb.reconstructFormattingElements();
+-                    tb.insertElementFor(startTag);
+-                    break;
+-                case "li":
+-                    tb.framesetOk(false);
+-                    stack = tb.getStack();
+-                    for (int i = stack.size() - 1; i > 0; i--) {
+-                        el = stack.get(i);
+-                        if (el.nameIs("li")) {
+-                            tb.processEndTag("li");
+-                            break;
+-                        }
+-                        if (isSpecial(el) && !inSorted(el.normalName(), HtmlTreeBuilderStateConstants.InBodyStartLiBreakers))
+-                            break;
+-                    }
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    break;
+-                case "html":
+-                    tb.error(this);
+-                    if (tb.onStack("template")) return false; // ignore
+-                    // otherwise, merge attributes onto real html (if present)
+-                    stack = tb.getStack();
+-                    if (stack.size() > 0) {
+-                        Element html = tb.getStack().get(0);
+-                        HtmlTreeBuilderStateUtil.mergeAttributes(startTag, html);
+-                    }
+-                    break;
+-                case "body":
+-                    tb.error(this);
+-                    stack = tb.getStack();
+-                    if (stack.size() < 2 || (stack.size() > 2 && !stack.get(1).nameIs("body")) || tb.onStack("template")) {
+-                        // only in fragment case
+-                        return false; // ignore
+-                    } else {
+-                        tb.framesetOk(false);
+-                        // will be on stack if this is a nested body. won't be if closed (which is a variance from spec, which leaves it on)
+-                        Element body = tb.getFromStack("body");
+-                        if (body != null) HtmlTreeBuilderStateUtil.mergeAttributes(startTag, body);
+-                    }
+-                    break;
+-                case "frameset":
+-                    tb.error(this);
+-                    stack = tb.getStack();
+-                    if (stack.size() < 2|| (stack.size() > 2 && !stack.get(1).nameIs("body"))) {
+-                        // only in fragment case
+-                        return false; // ignore
+-                    } else if (!tb.framesetOk()) {
+-                        return false; // ignore frameset
+-                    } else {
+-                        Element second = stack.get(1);
+-                        if (second.parent() != null)
+-                            second.remove();
+-                        // pop up to html element
+-                        while (stack.size() > 1)
+-                            stack.remove(stack.size() - 1);
+-                        tb.insertElementFor(startTag);
+-                        tb.transition(InFrameset);
+-                    }
+-                    break;
+-                case "form":
+-                    if (tb.getFormElement() != null && !tb.onStack("template")) {
+-                        tb.error(this);
+-                        return false;
+-                    }
+-                    if (tb.inButtonScope("p")) {
+-                        tb.closeElement("p");
+-                    }
+-                    tb.insertFormElement(startTag, true, true); // won't associate to any template
+-                    break;
+-                case "plaintext":
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    tb.tokeniser.transition(TokeniserState.PLAINTEXT); // once in, never gets out
+-                    break;
+-                case "button":
+-                    if (tb.inButtonScope("button")) {
+-                        // close and reprocess
+-                        tb.error(this);
+-                        tb.processEndTag("button");
+-                        tb.process(startTag);
+-                    } else {
+-                        tb.reconstructFormattingElements();
+-                        tb.insertElementFor(startTag);
+-                        tb.framesetOk(false);
+-                    }
+-                    break;
+-                case "nobr":
+-                    tb.reconstructFormattingElements();
+-                    if (tb.inScope("nobr")) {
+-                        tb.error(this);
+-                        tb.processEndTag("nobr");
+-                        tb.reconstructFormattingElements();
+-                    }
+-                    el = tb.insertElementFor(startTag);
+-                    tb.pushActiveFormattingElements(el);
+-                    break;
+-                case "table":
+-                    if (tb.getDocument().quirksMode() != Document.QuirksMode.quirks && tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    tb.framesetOk(false);
+-                    tb.transition(InTable);
+-                    break;
+-                case "input":
+-                    tb.reconstructFormattingElements();
+-                    el = tb.insertEmptyElementFor(startTag);
+-                    if (!el.attr("type").equalsIgnoreCase("hidden"))
+-                        tb.framesetOk(false);
+-                    break;
+-                case "hr":
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.insertEmptyElementFor(startTag);
+-                    tb.framesetOk(false);
+-                    break;
+-                case "image":
+-                    if (tb.getFromStack("svg") == null)
+-                        return tb.process(startTag.name("img")); // change <image> to <img>, unless in svg
+-                    else
+-                        tb.insertElementFor(startTag);
+-                    break;
+-                case "textarea":
+-                    tb.framesetOk(false);
+-                    HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+-                    break;
+-                case "xmp":
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.reconstructFormattingElements();
+-                    tb.framesetOk(false);
+-                    HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+-                    break;
+-                case "iframe":
+-                    tb.framesetOk(false);
+-                    HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+-                    break;
+-                case "noembed":
+-                    // also handle noscript if script enabled
+-                    HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
+-                    break;
+-                case "select":
+-                    tb.reconstructFormattingElements();
+-                    tb.insertElementFor(startTag);
+-                    tb.framesetOk(false);
+-                    if (startTag.selfClosing) break; // don't change states if not added to the stack
+-
+-                    HtmlTreeBuilderState state = tb.state();
+-                    if (state.equals(InTable) || state.equals(InCaption) || state.equals(InTableBody) || state.equals(InRow) || state.equals(InCell))
+-                        tb.transition(InSelectInTable);
+-                    else
+-                        tb.transition(InSelect);
+-                    break;
+-                case "math":
+-                    tb.reconstructFormattingElements();
+-                    tb.insertForeignElementFor(startTag, Parser.NamespaceMathml);
+-                    break;
+-                case "svg":
+-                    tb.reconstructFormattingElements();
+-                    tb.insertForeignElementFor(startTag, Parser.NamespaceSvg);
+-                    break;
+-                // static final String[] Headings = new String[]{"h1", "h2", "h3", "h4", "h5", "h6"};
+-                case "h1":
+-                case "h2":
+-                case "h3":
+-                case "h4":
+-                case "h5":
+-                case "h6":
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    if (inSorted(tb.currentElement().normalName(), HtmlTreeBuilderStateConstants.Headings)) {
+-                        tb.error(this);
+-                        tb.pop();
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    break;
+-                // static final String[] InBodyStartPreListing = new String[]{"listing", "pre"};
+-                case "pre":
+-                case "listing":
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    tb.reader.matchConsume("\n"); // ignore LF if next token
+-                    tb.framesetOk(false);
+-                    break;
+-                // static final String[] DdDt = new String[]{"dd", "dt"};
+-                case "dd":
+-                case "dt":
+-                    tb.framesetOk(false);
+-                    stack = tb.getStack();
+-                    final int bottom = stack.size() - 1;
+-                    final int upper = bottom >= MaxStackScan ? bottom - MaxStackScan : 0;
+-                    for (int i = bottom; i >= upper; i--) {
+-                        el = stack.get(i);
+-                        if (inSorted(el.normalName(), HtmlTreeBuilderStateConstants.DdDt)) {
+-                            tb.processEndTag(el.normalName());
+-                            break;
+-                        }
+-                        if (isSpecial(el) && !inSorted(el.normalName(), HtmlTreeBuilderStateConstants.InBodyStartLiBreakers))
+-                            break;
+-                    }
+-                    if (tb.inButtonScope("p")) {
+-                        tb.processEndTag("p");
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    break;
+-
+-                case "optgroup":
+-                case "option":
+-                    if (tb.currentElementIs("option"))
+-                        tb.processEndTag("option");
+-                    tb.reconstructFormattingElements();
+-                    tb.insertElementFor(startTag);
+-                    break;
+-
+-                case "rb":
+-                case "rtc":
+-                    if (tb.inScope("ruby")) {
+-                        tb.generateImpliedEndTags();
+-                        if (!tb.currentElementIs("ruby"))
+-                            tb.error(this);
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    break;
+-
+-                case "rp":
+-                case "rt":
+-                    if (tb.inScope("ruby")) {
+-                        tb.generateImpliedEndTags("rtc");
+-                        if (!tb.currentElementIs("rtc") && !tb.currentElementIs("ruby"))
+-                            tb.error(this);
+-                    }
+-                    tb.insertElementFor(startTag);
+-                    break;
+-
+-                // InBodyStartEmptyFormatters:
+-                case "area":
+-                case "br":
+-                case "embed":
+-                case "img":
+-                case "keygen":
+-                case "wbr":
+-                    tb.reconstructFormattingElements();
+-                    tb.insertEmptyElementFor(startTag);
+-                    tb.framesetOk(false);
+-                    break;
+-                // Formatters:
+-                case "b":
+-                case "big":
+-                case "code":
+-                case "em":
+-                case "font":
+-                case "i":
+-                case "s":
+-                case "small":
+-                case "strike":
+-                case "strong":
+-                case "tt":
+-                case "u":
+-                    tb.reconstructFormattingElements();
+-                    el = tb.insertElementFor(startTag);
+-                    tb.pushActiveFormattingElements(el);
+-                    break;
+-                default:
+-                    Tag tag = tb.tagFor(startTag);
+-                    TokeniserState textState = tag.textState();
+-                    if (textState != null) { // custom rcdata or rawtext (if we were in head, will have auto-transitioned here)
+-                        HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, textState);
+-                    } else if (!tag.isKnownTag()) { // no other special rules for custom tags
+-                        tb.insertElementFor(startTag);
+-                    } else if (inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartPClosers)) {
+-                        if (tb.inButtonScope("p")) tb.processEndTag("p");
+-                        tb.insertElementFor(startTag);
+-                    } else if (inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartToHead)) {
+-                        return tb.process(t, InHead);
+-                    } else if (inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartApplets)) {
+-                        tb.reconstructFormattingElements();
+-                        tb.insertElementFor(startTag);
+-                        tb.insertMarkerToFormattingElements();
+-                        tb.framesetOk(false);
+-                    } else if (inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartMedia)) {
+-                        tb.insertEmptyElementFor(startTag);
+-                    } else if (inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartDrop)) {
+-                        tb.error(this);
+-                        return false;
+-                    } else {
+-                        tb.reconstructFormattingElements();
+-                        tb.insertElementFor(startTag);
+-                    }
+-            }
+-            return true;
+-        }
+-        private static final int MaxStackScan = 24; // used for DD / DT scan, prevents runaway
+-
+         private boolean inBodyEndTag(Token t, HtmlTreeBuilder tb) {
+             final Token.EndTag endTag = t.asEndTag();
+             final String name = endTag.normalName();
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java
+index cc83e049..75cab0af 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java
+@@ -3,6 +3,7 @@ package org.jsoup.parser;
+ import org.jsoup.internal.StringUtil;
+ import org.jsoup.nodes.Attribute;
+ import org.jsoup.nodes.Attributes;
++import org.jsoup.nodes.Document;
+ import org.jsoup.nodes.Element;
+ import org.jsoup.nodes.Node;
+ import org.jsoup.nodes.NodeInternals;
+@@ -232,4 +233,332 @@ public class HtmlTreeBuilderStateUtil {
+             tb.insertOnStackAfter(furthestBlock, adoptor);
+         } // end of outer loop # 4
+     }
++
++    public static boolean inBodyStartTag(Token t, HtmlTreeBuilder tb) {
++        final Token.StartTag startTag = t.asStartTag();
++        final String name = startTag.normalName();
++        final ArrayList<Element> stack;
++        Element el;
++
++        switch (name) {
++            case "a":
++                if (tb.getActiveFormattingElement("a") != null) {
++                    tb.error(HtmlTreeBuilderState.InBody);
++                    tb.processEndTag("a");
++
++                    // still on stack?
++                    Element remainingA = tb.getFromStack("a");
++                    if (remainingA != null) {
++                        tb.removeFromActiveFormattingElements(remainingA);
++                        tb.removeFromStack(remainingA);
++                    }
++                }
++                tb.reconstructFormattingElements();
++                el = tb.insertElementFor(startTag);
++                tb.pushActiveFormattingElements(el);
++                break;
++            case "span":
++                // same as final else, but short circuits lots of checks
++                tb.reconstructFormattingElements();
++                tb.insertElementFor(startTag);
++                break;
++            case "li":
++                tb.framesetOk(false);
++                stack = tb.getStack();
++                for (int i = stack.size() - 1; i > 0; i--) {
++                    el = stack.get(i);
++                    if (el.nameIs("li")) {
++                        tb.processEndTag("li");
++                        break;
++                    }
++                    if (isSpecial(el) && !StringUtil.inSorted(el.normalName(), HtmlTreeBuilderStateConstants.InBodyStartLiBreakers))
++                        break;
++                }
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.insertElementFor(startTag);
++                break;
++            case "html":
++                tb.error(HtmlTreeBuilderState.InBody);
++                if (tb.onStack("template")) return false; // ignore
++                // otherwise, merge attributes onto real html (if present)
++                stack = tb.getStack();
++                if (stack.size() > 0) {
++                    Element html = tb.getStack().get(0);
++                    HtmlTreeBuilderStateUtil.mergeAttributes(startTag, html);
++                }
++                break;
++            case "body":
++                tb.error(HtmlTreeBuilderState.InBody);
++                stack = tb.getStack();
++                if (stack.size() < 2 || (stack.size() > 2 && !stack.get(1).nameIs("body")) || tb.onStack("template")) {
++                    // only in fragment case
++                    return false; // ignore
++                } else {
++                    tb.framesetOk(false);
++                    // will be on stack if this is a nested body. won't be if closed (which is a variance from spec, which leaves it on)
++                    Element body = tb.getFromStack("body");
++                    if (body != null) HtmlTreeBuilderStateUtil.mergeAttributes(startTag, body);
++                }
++                break;
++            case "frameset":
++                tb.error(HtmlTreeBuilderState.InBody);
++                stack = tb.getStack();
++                if (stack.size() < 2|| (stack.size() > 2 && !stack.get(1).nameIs("body"))) {
++                    // only in fragment case
++                    return false; // ignore
++                } else if (!tb.framesetOk()) {
++                    return false; // ignore frameset
++                } else {
++                    Element second = stack.get(1);
++                    if (second.parent() != null)
++                        second.remove();
++                    // pop up to html element
++                    while (stack.size() > 1)
++                        stack.remove(stack.size() - 1);
++                    tb.insertElementFor(startTag);
++                    tb.transition(HtmlTreeBuilderState.InFrameset);
++                }
++                break;
++            case "form":
++                if (tb.getFormElement() != null && !tb.onStack("template")) {
++                    tb.error(HtmlTreeBuilderState.InBody);
++                    return false;
++                }
++                if (tb.inButtonScope("p")) {
++                    tb.closeElement("p");
++                }
++                tb.insertFormElement(startTag, true, true); // won't associate to any template
++                break;
++            case "plaintext":
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.insertElementFor(startTag);
++                tb.tokeniser.transition(TokeniserState.PLAINTEXT); // once in, never gets out
++                break;
++            case "button":
++                if (tb.inButtonScope("button")) {
++                    // close and reprocess
++                    tb.error(HtmlTreeBuilderState.InBody);
++                    tb.processEndTag("button");
++                    tb.process(startTag);
++                } else {
++                    tb.reconstructFormattingElements();
++                    tb.insertElementFor(startTag);
++                    tb.framesetOk(false);
++                }
++                break;
++            case "nobr":
++                tb.reconstructFormattingElements();
++                if (tb.inScope("nobr")) {
++                    tb.error(HtmlTreeBuilderState.InBody);
++                    tb.processEndTag("nobr");
++                    tb.reconstructFormattingElements();
++                }
++                el = tb.insertElementFor(startTag);
++                tb.pushActiveFormattingElements(el);
++                break;
++            case "table":
++                if (tb.getDocument().quirksMode() != Document.QuirksMode.quirks && tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.insertElementFor(startTag);
++                tb.framesetOk(false);
++                tb.transition(HtmlTreeBuilderState.InTable);
++                break;
++            case "input":
++                tb.reconstructFormattingElements();
++                el = tb.insertEmptyElementFor(startTag);
++                if (!el.attr("type").equalsIgnoreCase("hidden"))
++                    tb.framesetOk(false);
++                break;
++            case "hr":
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.insertEmptyElementFor(startTag);
++                tb.framesetOk(false);
++                break;
++            case "image":
++                if (tb.getFromStack("svg") == null)
++                    return tb.process(startTag.name("img")); // change <image> to <img>, unless in svg
++                else
++                    tb.insertElementFor(startTag);
++                break;
++            case "textarea":
++                tb.framesetOk(false);
++                HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                break;
++            case "xmp":
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.reconstructFormattingElements();
++                tb.framesetOk(false);
++                HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                break;
++            case "iframe":
++                tb.framesetOk(false);
++                HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                break;
++            case "noembed":
++                // also handle noscript if script enabled
++                HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, tb.tagFor(startTag).textState());
++                break;
++            case "select":
++                tb.reconstructFormattingElements();
++                tb.insertElementFor(startTag);
++                tb.framesetOk(false);
++                if (startTag.selfClosing) break; // don't change states if not added to the stack
++
++                HtmlTreeBuilderState state = tb.state();
++                if (state.equals(HtmlTreeBuilderState.InTable) || state.equals(HtmlTreeBuilderState.InCaption) || state.equals(HtmlTreeBuilderState.InTableBody) || state.equals(HtmlTreeBuilderState.InRow) || state.equals(HtmlTreeBuilderState.InCell))
++                    tb.transition(HtmlTreeBuilderState.InSelectInTable);
++                else
++                    tb.transition(HtmlTreeBuilderState.InSelect);
++                break;
++            case "math":
++                tb.reconstructFormattingElements();
++                tb.insertForeignElementFor(startTag, Parser.NamespaceMathml);
++                break;
++            case "svg":
++                tb.reconstructFormattingElements();
++                tb.insertForeignElementFor(startTag, Parser.NamespaceSvg);
++                break;
++            // static final String[] Headings = new String[]{"h1", "h2", "h3", "h4", "h5", "h6"};
++            case "h1":
++            case "h2":
++            case "h3":
++            case "h4":
++            case "h5":
++            case "h6":
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                if (StringUtil.inSorted(tb.currentElement().normalName(), HtmlTreeBuilderStateConstants.Headings)) {
++                    tb.error(HtmlTreeBuilderState.InBody);
++                    tb.pop();
++                }
++                tb.insertElementFor(startTag);
++                break;
++            // static final String[] InBodyStartPreListing = new String[]{"listing", "pre"};
++            case "pre":
++            case "listing":
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.insertElementFor(startTag);
++                tb.reader.matchConsume("\n"); // ignore LF if next token
++                tb.framesetOk(false);
++                break;
++            // static final String[] DdDt = new String[]{"dd", "dt"};
++            case "dd":
++            case "dt":
++                tb.framesetOk(false);
++                stack = tb.getStack();
++                final int bottom = stack.size() - 1;
++                final int upper = bottom >= 24 ? bottom - 24 : 0;
++                for (int i = bottom; i >= upper; i--) {
++                    el = stack.get(i);
++                    if (StringUtil.inSorted(el.normalName(), HtmlTreeBuilderStateConstants.DdDt)) {
++                        tb.processEndTag(el.normalName());
++                        break;
++                    }
++                    if (isSpecial(el) && !StringUtil.inSorted(el.normalName(), HtmlTreeBuilderStateConstants.InBodyStartLiBreakers))
++                        break;
++                }
++                if (tb.inButtonScope("p")) {
++                    tb.processEndTag("p");
++                }
++                tb.insertElementFor(startTag);
++                break;
++
++            case "optgroup":
++            case "option":
++                if (tb.currentElementIs("option"))
++                    tb.processEndTag("option");
++                tb.reconstructFormattingElements();
++                tb.insertElementFor(startTag);
++                break;
++
++            case "rb":
++            case "rtc":
++                if (tb.inScope("ruby")) {
++                    tb.generateImpliedEndTags();
++                    if (!tb.currentElementIs("ruby"))
++                        tb.error(HtmlTreeBuilderState.InBody);
++                }
++                tb.insertElementFor(startTag);
++                break;
++
++            case "rp":
++            case "rt":
++                if (tb.inScope("ruby")) {
++                    tb.generateImpliedEndTags("rtc");
++                    if (!tb.currentElementIs("rtc") && !tb.currentElementIs("ruby"))
++                        tb.error(HtmlTreeBuilderState.InBody);
++                }
++                tb.insertElementFor(startTag);
++                break;
++
++            // InBodyStartEmptyFormatters:
++            case "area":
++            case "br":
++            case "embed":
++            case "img":
++            case "keygen":
++            case "wbr":
++                tb.reconstructFormattingElements();
++                tb.insertEmptyElementFor(startTag);
++                tb.framesetOk(false);
++                break;
++            // Formatters:
++            case "b":
++            case "big":
++            case "code":
++            case "em":
++            case "font":
++            case "i":
++            case "s":
++            case "small":
++            case "strike":
++            case "strong":
++            case "tt":
++            case "u":
++                tb.reconstructFormattingElements();
++                el = tb.insertElementFor(startTag);
++                tb.pushActiveFormattingElements(el);
++                break;
++            default:
++                Tag tag = tb.tagFor(startTag);
++                TokeniserState textState = tag.textState();
++                if (textState != null) { // custom rcdata or rawtext (if we were in head, will have auto-transitioned here)
++                    HtmlTreeBuilderStateUtil.HandleTextState(startTag, tb, textState);
++                } else if (!tag.isKnownTag()) { // no other special rules for custom tags
++                    tb.insertElementFor(startTag);
++                } else if (StringUtil.inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartPClosers)) {
++                    if (tb.inButtonScope("p")) tb.processEndTag("p");
++                    tb.insertElementFor(startTag);
++                } else if (StringUtil.inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartToHead)) {
++                    return tb.process(t, HtmlTreeBuilderState.InHead);
++                } else if (StringUtil.inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartApplets)) {
++                    tb.reconstructFormattingElements();
++                    tb.insertElementFor(startTag);
++                    tb.insertMarkerToFormattingElements();
++                    tb.framesetOk(false);
++                } else if (StringUtil.inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartMedia)) {
++                    tb.insertEmptyElementFor(startTag);
++                } else if (StringUtil.inSorted(name, HtmlTreeBuilderStateConstants.InBodyStartDrop)) {
++                    tb.error(HtmlTreeBuilderState.InBody);
++                    return false;
++                } else {
++                    tb.reconstructFormattingElements();
++                    tb.insertElementFor(startTag);
++                }
++        }
++        return true;
++    }
++
+ }

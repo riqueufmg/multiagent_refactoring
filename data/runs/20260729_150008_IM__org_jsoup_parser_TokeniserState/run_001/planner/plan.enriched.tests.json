@@ -1,0 +1,83 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.TokeniserState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a helper class to host the large, cohesive private static helper routines from TokeniserState to reduce the size and complexity of the enum.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java::handleDataEndTag",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readRawData",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readCharRef",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readEndTag",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::handleDataDoubleEscapeTag",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readDoctypeInternalSubset"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+          ],
+          "details": "Create a new class org.jsoup.parser.TokeniserStateHelper in the same package and copy the six private static methods from TokeniserState into it as public static methods with identical signatures: handleDataEndTag(Tokeniser, CharacterReader, TokeniserState), readRawData(Tokeniser, CharacterReader, TokeniserState, TokeniserState), readCharRef(Tokeniser, TokeniserState), readEndTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState), handleDataDoubleEscapeTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState), readDoctypeInternalSubset(Tokeniser, CharacterReader, TokeniserState). Add the necessary imports used by these methods (org.jsoup.internal.StringUtil and org.jsoup.nodes.DocumentType as in the original file). The implementations should reference Tokeniser.replacementChar and CharacterReader.EOF directly where needed (instead of relying on TokeniserState's private constants).",
+          "risk": "medium"
+        }
+      ],
+      "test_files": []
+    },
+    {
+      "id": 2,
+      "goal": "Remove the moved helper method implementations from the TokeniserState enum and update internal call sites to use the new helper class, completing the extraction and reducing the enum size.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java",
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java::handleDataEndTag",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readRawData",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readCharRef",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readEndTag",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::handleDataDoubleEscapeTag",
+            "src/main/java/org/jsoup/parser/TokeniserState.java::readDoctypeInternalSubset"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+          ],
+          "details": "Remove the bodies / declarations of the listed private static methods from TokeniserState (they have been copied into TokeniserStateHelper). Keep any constants in TokeniserState that are still referenced by the enum states (attributeNameCharsSorted, attributeValueUnquoted, nullChar, eof) to avoid disrupting state code. The moved implementations already exist in TokeniserStateHelper from block 1.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Replace internal references/calls in TokeniserState that previously invoked the private static helpers with static calls to TokeniserStateHelper, e.g. handleDataEndTag(t, r, Rawtext) -> TokeniserStateHelper.handleDataEndTag(t, r, Rawtext), readRawData(t, r, this, RawtextLessthanSign) -> TokeniserStateHelper.readRawData(t, r, this, RawtextLessthanSign), readCharRef(t, Data) -> TokeniserStateHelper.readCharRef(t, Data), readEndTag(...)->TokeniserStateHelper.readEndTag(...), handleDataDoubleEscapeTag(...)->TokeniserStateHelper.handleDataDoubleEscapeTag(...), readDoctypeInternalSubset(...)->TokeniserStateHelper.readDoctypeInternalSubset(...). Ensure imports remain consistent; since helper is in same package, no new import is required.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/jsoup/parser/TokeniserStateTest.java"
+      ]
+    }
+  ]
+}

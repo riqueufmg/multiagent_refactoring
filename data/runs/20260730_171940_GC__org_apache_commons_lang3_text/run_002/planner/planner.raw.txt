@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.lang3.text",
+  "selected_cluster": [
+    "org.apache.commons.lang3.text.StrBuilder",
+    "org.apache.commons.lang3.text.StrMatcher",
+    "org.apache.commons.lang3.text.StrTokenizer"
+  ],
+  "destination_package": "org.apache.commons.lang3.text.internal",
+  "cluster_reason": "StrBuilder, StrMatcher and StrTokenizer form a tight cohesive group: StrTokenizer relies on StrMatcher for parsing and StrBuilder is used by both for constructing results. They have many internal interactions and likely package-private accesses, so moving them together preserves internal coupling while reducing the size of the top-level text package.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the selected cohesive cluster into a new subpackage to reduce God Component responsibilities.",
+      "files": [
+        "src/main/java/org/apache/commons/lang3/text/StrBuilder.java",
+        "src/main/java/org/apache/commons/lang3/text/StrMatcher.java",
+        "src/main/java/org/apache/commons/lang3/text/StrTokenizer.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.lang3.text.internal"
+          ],
+          "details": "Create the destination subpackage org.apache.commons.lang3.text.internal if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.text.StrBuilder"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.text.internal.StrBuilder"
+          ],
+          "details": "Move StrBuilder to org.apache.commons.lang3.text.internal to co-locate it with related tokenizer/matcher classes.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.text.StrMatcher"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.text.internal.StrMatcher"
+          ],
+          "details": "Move StrMatcher to org.apache.commons.lang3.text.internal to keep parsing helpers together.",
+          "risk": "low",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.lang3.text.StrTokenizer"
+          ],
+          "outputs": [
+            "org.apache.commons.lang3.text.internal.StrTokenizer"
+          ],
+          "details": "Move StrTokenizer to org.apache.commons.lang3.text.internal so tokenizer, matcher and builder are colocated.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

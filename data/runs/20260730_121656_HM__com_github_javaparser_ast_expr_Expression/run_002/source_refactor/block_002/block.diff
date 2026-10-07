@@ -1,0 +1,209 @@
+commit 3d4e2c7620b4c7772d891ba19623480972806817
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Jul 30 12:36:23 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/expr/Expression.java b/javaparser-core/src/main/java/com/github/javaparser/ast/expr/Expression.java
+index d489892f1..690d24fd6 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/ast/expr/Expression.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/expr/Expression.java
+@@ -397,13 +397,12 @@ public abstract class Expression extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public boolean isStringLiteralExpr() {
+-        return false;
++        return ExpressionLiteralHelper.isStringLiteralExpr(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public StringLiteralExpr asStringLiteralExpr() {
+-        throw new IllegalStateException(
+-                f("%s is not StringLiteralExpr, it is %s", this, this.getClass().getSimpleName()));
++        return ExpressionLiteralHelper.asStringLiteralExpr(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+@@ -496,7 +495,7 @@ public abstract class Expression extends Node {
+     public void ifConditionalExpr(Consumer<ConditionalExpr> action) {}
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifDoubleLiteralExpr(Consumer<DoubleLiteralExpr> action) {}
++    public void ifDoubleLiteralExpr(Consumer<DoubleLiteralExpr> action) { ExpressionLiteralHelper.ifDoubleLiteralExpr(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public void ifEnclosedExpr(Consumer<EnclosedExpr> action) {}
+@@ -508,7 +507,7 @@ public abstract class Expression extends Node {
+     public void ifInstanceOfExpr(Consumer<InstanceOfExpr> action) {}
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifIntegerLiteralExpr(Consumer<IntegerLiteralExpr> action) {}
++    public void ifIntegerLiteralExpr(Consumer<IntegerLiteralExpr> action) { ExpressionLiteralHelper.ifIntegerLiteralExpr(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public void ifLambdaExpr(Consumer<LambdaExpr> action) {}
+@@ -520,7 +519,7 @@ public abstract class Expression extends Node {
+     public void ifLiteralStringValueExpr(Consumer<LiteralStringValueExpr> action) {}
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifLongLiteralExpr(Consumer<LongLiteralExpr> action) {}
++    public void ifLongLiteralExpr(Consumer<LongLiteralExpr> action) { ExpressionLiteralHelper.ifLongLiteralExpr(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public void ifMarkerAnnotationExpr(Consumer<MarkerAnnotationExpr> action) { ExpressionAnnotationsHelper.ifMarkerAnnotationExpr(this, action); }
+@@ -547,7 +546,7 @@ public abstract class Expression extends Node {
+     public void ifSingleMemberAnnotationExpr(Consumer<SingleMemberAnnotationExpr> action) { ExpressionAnnotationsHelper.ifSingleMemberAnnotationExpr(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+-    public void ifStringLiteralExpr(Consumer<StringLiteralExpr> action) {}
++    public void ifStringLiteralExpr(Consumer<StringLiteralExpr> action) { ExpressionLiteralHelper.ifStringLiteralExpr(this, action); }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public void ifSuperExpr(Consumer<SuperExpr> action) {}
+@@ -628,7 +627,7 @@ public abstract class Expression extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<DoubleLiteralExpr> toDoubleLiteralExpr() {
+-        return Optional.empty();
++        return ExpressionLiteralHelper.toDoubleLiteralExpr(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+@@ -648,7 +647,7 @@ public abstract class Expression extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<IntegerLiteralExpr> toIntegerLiteralExpr() {
+-        return Optional.empty();
++        return ExpressionLiteralHelper.toIntegerLiteralExpr(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+@@ -668,7 +667,7 @@ public abstract class Expression extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<LongLiteralExpr> toLongLiteralExpr() {
+-        return Optional.empty();
++        return ExpressionLiteralHelper.toLongLiteralExpr(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+@@ -713,7 +712,7 @@ public abstract class Expression extends Node {
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+     public Optional<StringLiteralExpr> toStringLiteralExpr() {
+-        return Optional.empty();
++        return ExpressionLiteralHelper.toStringLiteralExpr(this);
+     }
+ 
+     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/expr/ExpressionLiteralHelper.java b/javaparser-core/src/main/java/com/github/javaparser/ast/expr/ExpressionLiteralHelper.java
+new file mode 100644
+index 000000000..7d737bd92
+--- /dev/null
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/expr/ExpressionLiteralHelper.java
+@@ -0,0 +1,105 @@
++/*
++ * Helper for literal-related checks and casts extracted from Expression to
++ * reduce direct dependencies on literal classes inside Expression.
++ */
++package com.github.javaparser.ast.expr;
++
++import static com.github.javaparser.utils.CodeGenerationUtils.f;
++
++import java.util.Optional;
++import java.util.function.Consumer;
++
++public final class ExpressionLiteralHelper {
++
++    private ExpressionLiteralHelper() {
++        // utility
++    }
++
++    // String literal helpers
++    public static boolean isStringLiteralExpr(Expression expr) {
++        return expr instanceof StringLiteralExpr;
++    }
++
++    public static StringLiteralExpr asStringLiteralExpr(Expression expr) {
++        if (expr instanceof StringLiteralExpr) {
++            return (StringLiteralExpr) expr;
++        }
++        throw new IllegalStateException(f("%s is not StringLiteralExpr, it is %s", expr, expr.getClass().getSimpleName()));
++    }
++
++    public static Optional<StringLiteralExpr> toStringLiteralExpr(Expression expr) {
++        return expr instanceof StringLiteralExpr ? Optional.of((StringLiteralExpr) expr) : Optional.empty();
++    }
++
++    public static void ifStringLiteralExpr(Expression expr, Consumer<StringLiteralExpr> action) {
++        if (expr instanceof StringLiteralExpr) {
++            action.accept((StringLiteralExpr) expr);
++        }
++    }
++
++    // Integer literal helpers
++    public static boolean isIntegerLiteralExpr(Expression expr) {
++        return expr instanceof IntegerLiteralExpr;
++    }
++
++    public static IntegerLiteralExpr asIntegerLiteralExpr(Expression expr) {
++        if (expr instanceof IntegerLiteralExpr) {
++            return (IntegerLiteralExpr) expr;
++        }
++        throw new IllegalStateException(f("%s is not IntegerLiteralExpr, it is %s", expr, expr.getClass().getSimpleName()));
++    }
++
++    public static Optional<IntegerLiteralExpr> toIntegerLiteralExpr(Expression expr) {
++        return expr instanceof IntegerLiteralExpr ? Optional.of((IntegerLiteralExpr) expr) : Optional.empty();
++    }
++
++    public static void ifIntegerLiteralExpr(Expression expr, Consumer<IntegerLiteralExpr> action) {
++        if (expr instanceof IntegerLiteralExpr) {
++            action.accept((IntegerLiteralExpr) expr);
++        }
++    }
++
++    // Double literal helpers
++    public static boolean isDoubleLiteralExpr(Expression expr) {
++        return expr instanceof DoubleLiteralExpr;
++    }
++
++    public static DoubleLiteralExpr asDoubleLiteralExpr(Expression expr) {
++        if (expr instanceof DoubleLiteralExpr) {
++            return (DoubleLiteralExpr) expr;
++        }
++        throw new IllegalStateException(f("%s is not DoubleLiteralExpr, it is %s", expr, expr.getClass().getSimpleName()));
++    }
++
++    public static Optional<DoubleLiteralExpr> toDoubleLiteralExpr(Expression expr) {
++        return expr instanceof DoubleLiteralExpr ? Optional.of((DoubleLiteralExpr) expr) : Optional.empty();
++    }
++
++    public static void ifDoubleLiteralExpr(Expression expr, Consumer<DoubleLiteralExpr> action) {
++        if (expr instanceof DoubleLiteralExpr) {
++            action.accept((DoubleLiteralExpr) expr);
++        }
++    }
++
++    // Long literal helpers
++    public static boolean isLongLiteralExpr(Expression expr) {
++        return expr instanceof LongLiteralExpr;
++    }
++
++    public static LongLiteralExpr asLongLiteralExpr(Expression expr) {
++        if (expr instanceof LongLiteralExpr) {
++            return (LongLiteralExpr) expr;
++        }
++        throw new IllegalStateException(f("%s is not LongLiteralExpr, it is %s", expr, expr.getClass().getSimpleName()));
++    }
++
++    public static Optional<LongLiteralExpr> toLongLiteralExpr(Expression expr) {
++        return expr instanceof LongLiteralExpr ? Optional.of((LongLiteralExpr) expr) : Optional.empty();
++    }
++
++    public static void ifLongLiteralExpr(Expression expr, Consumer<LongLiteralExpr> action) {
++        if (expr instanceof LongLiteralExpr) {
++            action.accept((LongLiteralExpr) expr);
++        }
++    }
++}

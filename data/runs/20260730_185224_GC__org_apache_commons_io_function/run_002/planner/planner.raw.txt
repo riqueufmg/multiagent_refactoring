@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.commons.io.function",
+  "selected_cluster": [
+    "org.apache.commons.io.function.IOStream",
+    "org.apache.commons.io.function.IOStreams",
+    "org.apache.commons.io.function.IOStreamAdapter"
+  ],
+  "destination_package": "org.apache.commons.io.function.stream",
+  "cluster_reason": "These three classes form a cohesive stream-related subcomponent: IOStream is the core stream abstraction, IOStreams provides utilities that work directly with IOStream, and IOStreamAdapter is an adapter tightly coupled to IOStream. Internal dependencies show bidirectional usage among them (IOStream <-> IOStreams and IOStreamAdapter -> IOStream), so moving them together preserves package-private interactions and minimizes visibility changes.",
+  "risk": "low",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the selected stream-related cluster to a new subpackage.",
+      "files": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java",
+        "src/main/java/org/apache/commons/io/function/IOStreams.java",
+        "src/main/java/org/apache/commons/io/function/IOStreamAdapter.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.commons.io.function.stream"
+          ],
+          "details": "Create the destination subpackage org.apache.commons.io.function.stream to hold the stream-related classes.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.function.IOStream"
+          ],
+          "outputs": [
+            "org.apache.commons.io.function.stream.IOStream"
+          ],
+          "details": "Move IOStream to the new stream subpackage so it and its utilities/adapters live together.",
+          "risk": "low",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.function.IOStreams"
+          ],
+          "outputs": [
+            "org.apache.commons.io.function.stream.IOStreams"
+          ],
+          "details": "Move IOStreams (utilities that operate on IOStream) to the stream subpackage alongside IOStream.",
+          "risk": "low",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.commons.io.function.IOStreamAdapter"
+          ],
+          "outputs": [
+            "org.apache.commons.io.function.stream.IOStreamAdapter"
+          ],
+          "details": "Move IOStreamAdapter to the stream subpackage to keep adapter implementation adjacent to IOStream.",
+          "risk": "low",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

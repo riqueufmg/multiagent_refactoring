@@ -1,0 +1,80 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.TokeniserState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Introduce a new helper class to hold TokeniserState's static helper methods and related constants/arrays so the enum can be reduced in size and complexity.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelpers.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserStateHelpers.java"
+          ],
+          "details": "Create a new class org.jsoup.parser.TokeniserStateHelpers with the following static members copied from TokeniserState: nullChar, attributeNameCharsSorted, attributeValueUnquoted, replacementChar, replacementStr, eof, and the private static methods handleDataEndTag, readRawData, readCharRef, readEndTag, handleDataDoubleEscapeTag, readDoctypeInternalSubset. Place the new class in the same package (org.jsoup.parser). The implementations are identical copies so the project compiles after adding the helper class.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move references in the TokeniserState enum to the new helper class and remove the duplicated static members from the enum to reduce its size and improve modularity.",
+      "files": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Remove the following private/static fields from TokeniserState (they were copied to TokeniserStateHelpers in block 1) and update all references inside TokeniserState to refer to TokeniserStateHelpers.<nullChar, attributeNameCharsSorted, attributeValueUnquoted, replacementChar, replacementStr, eof>",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Remove the following private/static helper methods from TokeniserState (they were copied to TokeniserStateHelpers in block 1) and update all references inside TokeniserState to delegate to TokeniserStateHelpers: handleDataEndTag(Tokeniser, CharacterReader, TokeniserState), readRawData(Tokeniser, CharacterReader, TokeniserState, TokeniserState), readCharRef(Tokeniser, TokeniserState), readEndTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState), handleDataDoubleEscapeTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState), readDoctypeInternalSubset(Tokeniser, CharacterReader, TokeniserState). Replace internal calls to these methods with calls to TokeniserStateHelpers.methodName(...).",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "No package change (helpers are in same package); ensure TokeniserState compiles after replacement (no new imports are required because TokeniserStateHelpers is in the same package). If any import updates are needed for other referenced types when delegating, add them.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/TokeniserState.java"
+          ],
+          "details": "Update all internal usages inside TokeniserState that previously invoked the moved fields/methods directly to instead reference TokeniserStateHelpers. Examples: handleDataEndTag(t, r, X) -> TokeniserStateHelpers.handleDataEndTag(t, r, X); readRawData(t, r, this, RawtextLessthanSign) -> TokeniserStateHelpers.readRawData(t, r, this, TokeniserStateHelpers.RawtextLessthanSign) if necessary, or maintain enum state references where appropriate. Replace direct references to nullChar, attributeNameCharsSorted, attributeValueUnquoted, replacementChar, replacementStr, eof with TokeniserStateHelpers.nullChar, TokeniserStateHelpers.attributeNameCharsSorted, etc.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

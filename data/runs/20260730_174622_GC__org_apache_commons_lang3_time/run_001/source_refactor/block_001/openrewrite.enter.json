@@ -1,0 +1,67 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.commons.lang3.time.duration"
+      ],
+      "details": "Create the destination subpackage for duration-related classes if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.time.DurationUtils"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.time.duration.DurationUtils"
+      ],
+      "details": "Move DurationUtils into the duration subpackage to colocate duration logic with related classes.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.time.DurationFormatUtils"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.time.duration.DurationFormatUtils"
+      ],
+      "details": "Move DurationFormatUtils into the duration subpackage so formatting utilities remain with duration logic.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.commons.lang3.time.StopWatch"
+      ],
+      "outputs": [
+        "org.apache.commons.lang3.time.duration.StopWatch"
+      ],
+      "details": "Move StopWatch into the duration subpackage so it depends on the moved duration utilities internally.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.commons.lang3.time.DateUtils",
+        "org.apache.commons.lang3.time.Instants",
+        "org.apache.commons.lang3.time.duration.DurationFormatUtils",
+        "org.apache.commons.lang3.time.duration.DurationUtils",
+        "org.apache.commons.lang3.time.duration.StopWatch"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

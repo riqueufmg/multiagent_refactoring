@@ -1,0 +1,26 @@
+{
+  "id": 1,
+  "goal": "Introduce a helper class to host the large, cohesive private static helper routines from TokeniserState to reduce the size and complexity of the enum.",
+  "files": [
+    "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/jsoup/parser/TokeniserState.java::handleDataEndTag",
+        "src/main/java/org/jsoup/parser/TokeniserState.java::readRawData",
+        "src/main/java/org/jsoup/parser/TokeniserState.java::readCharRef",
+        "src/main/java/org/jsoup/parser/TokeniserState.java::readEndTag",
+        "src/main/java/org/jsoup/parser/TokeniserState.java::handleDataDoubleEscapeTag",
+        "src/main/java/org/jsoup/parser/TokeniserState.java::readDoctypeInternalSubset"
+      ],
+      "outputs": [
+        "src/main/java/org/jsoup/parser/TokeniserStateHelper.java"
+      ],
+      "details": "Create a new class org.jsoup.parser.TokeniserStateHelper in the same package and copy the six private static methods from TokeniserState into it as public static methods with identical signatures: handleDataEndTag(Tokeniser, CharacterReader, TokeniserState), readRawData(Tokeniser, CharacterReader, TokeniserState, TokeniserState), readCharRef(Tokeniser, TokeniserState), readEndTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState), handleDataDoubleEscapeTag(Tokeniser, CharacterReader, TokeniserState, TokeniserState), readDoctypeInternalSubset(Tokeniser, CharacterReader, TokeniserState). Add the necessary imports used by these methods (org.jsoup.internal.StringUtil and org.jsoup.nodes.DocumentType as in the original file). The implementations should reference Tokeniser.replacementChar and CharacterReader.EOF directly where needed (instead of relying on TokeniserState's private constants).",
+      "risk": "medium"
+    }
+  ],
+  "test_files": []
+}

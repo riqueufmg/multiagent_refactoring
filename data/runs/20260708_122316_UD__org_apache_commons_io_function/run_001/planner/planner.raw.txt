@@ -1,0 +1,56 @@
+{
+  "smell_type": "Unstable Dependency",
+  "target_level": "package",
+  "target": "org.apache.commons.io.function",
+  "selected_unstable_package": "org.apache.commons.io",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Remove the dependency from org.apache.commons.io.function.IOStream to org.apache.commons.io.IOExceptionList by relocating IOExceptionList into the target package so IOStream no longer depends on the external unstable package.",
+      "dependency_pair": {
+        "source": "org.apache.commons.io.function.IOStream",
+        "target": "org.apache.commons.io.IOExceptionList"
+      },
+      "files": [
+        "src/main/java/org/apache/commons/io/IOExceptionList.java",
+        "src/main/java/org/apache/commons/io/function/IOStream.java",
+        "src/main/java/org/apache/commons/io/function/IOExceptionList.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/IOExceptionList.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/function/IOExceptionList.java"
+          ],
+          "details": "Move the class org.apache.commons.io.IOExceptionList into the existing package org.apache.commons.io.function. Update the moved file's package declaration to 'org.apache.commons.io.function' and adjust visibility if necessary so usages from IOStream remain valid.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file)",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/function/IOStream.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/function/IOStream.java"
+          ],
+          "details": "Replace imports or fully-qualified references of org.apache.commons.io.IOExceptionList in IOStream (and any other files in the target package that reference it) to refer to org.apache.commons.io.function.IOExceptionList. Ensure no stale imports remain.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/apache/commons/io/function/IOStream.java"
+          ],
+          "outputs": [
+            "src/main/java/org/apache/commons/io/function/IOStream.java"
+          ],
+          "details": "Update call sites in IOStream that invoke IOExceptionList.checkEmpty() so they reference the moved class in org.apache.commons.io.function (adjust imports or fully-qualified names). This removes the direct compile-time dependency on org.apache.commons.io from IOStream.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.ast.Node",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce Node's direct dependencies on EqualsVisitor and HashCodeVisitor by extracting equality/hashCode logic into a helper class, keeping Node.equals(...) and Node.hashCode() as delegating methods.",
+      "files": [
+        "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java",
+        "javaparser-core/src/main/java/com/github/javaparser/ast/NodeEquality.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(com.github.javaparser.ast.Node, com.github.javaparser.ast.NodeEquality)",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public final int hashCode()",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public boolean equals(final Object obj)"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/NodeEquality.java: public final class NodeEquality { public static int hashCode(Node); public static boolean equals(Node, Object); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public final int hashCode() { return NodeEquality.hashCode(this); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public boolean equals(final Object obj) { return NodeEquality.equals(this, obj); }"
+          ],
+          "details": "Move the implementation bodies of Node.hashCode() and Node.equals(Object) into a new helper class NodeEquality in the same package. The new class will import and call HashCodeVisitor.hashCode(...) and EqualsVisitor.equals(...). In Node, replace the bodies of hashCode() and equals(Object) with delegating calls to NodeEquality.hashCode(this) and NodeEquality.equals(this, obj). Update imports in Node to remove EqualsVisitor and HashCodeVisitor, and add an import for com.github.javaparser.ast.NodeEquality.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file)",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java (updated imports: removed EqualsVisitor, HashCodeVisitor; added com.github.javaparser.ast.NodeEquality)"
+          ],
+          "details": "Update Node imports: remove direct imports of EqualsVisitor and HashCodeVisitor; add import for com.github.javaparser.ast.NodeEquality. New NodeEquality.java will import EqualsVisitor and HashCodeVisitor.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(com.github.javaparser.ast.Node.hashCode(), com.github.javaparser.ast.NodeEquality.hashCode())",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java (hashCode delegates to NodeEquality)"
+          ],
+          "details": "Ensure the moved implementations are called via NodeEquality and that any internal usage within Node that previously relied on the old private implementation continues to compile by delegating to the helper.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce Node's direct dependencies on Spliterators, StreamSupport and Collections by extracting traversal, streaming and walk/find utilities (including tree iterator implementations) into a dedicated helper, keeping Node's public API delegating to the helper.",
+      "files": [
+        "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java",
+        "javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(com.github.javaparser.ast.Node, com.github.javaparser.ast.NodeTraversals)",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: private Iterator<Node> treeIterator(TreeTraversal)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: private Iterable<Node> treeIterable(TreeTraversal)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public Stream<Node> stream(TreeTraversal)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public Stream<Node> stream()",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public void walk(TreeTraversal, Consumer<Node>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public void walk(Consumer<Node>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T> void walk(Class<T>, Consumer<T>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T extends Node> List<T> findAll(Class<T>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T extends Node> List<T> findAll(Class<T>, TreeTraversal)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T extends Node> List<T> findAll(Class<T>, Predicate<T>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T> Optional<T> findFirst(TreeTraversal, Function<Node, Optional<T>>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <N extends Node> Optional<N> findFirst(Class<N>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <N extends Node> Optional<N> findFirst(Class<N>, Predicate<N>)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public static class BreadthFirstIterator",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public static class DirectChildrenIterator",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public static class ParentsVisitor",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public static class PreOrderIterator",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public static class PostOrderIterator"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java: public final class NodeTraversals { public static Iterator<Node> treeIterator(Node, TreeTraversal); public static Iterable<Node> treeIterable(Node, TreeTraversal); public static Stream<Node> stream(Node, TreeTraversal); public static Stream<Node> stream(Node); public static void walk(Node, TreeTraversal, Consumer<Node>); public static void walk(Node, Consumer<Node>); public static <T> void walk(Node, Class<T>, Consumer<T>); public static <T extends Node> List<T> findAll(Node, Class<T>); public static <T extends Node> List<T> findAll(Node, Class<T>, TreeTraversal); public static <T extends Node> List<T> findAll(Node, Class<T>, Predicate<T>); public static <T> Optional<T> findFirst(Node, TreeTraversal, Function<Node, Optional<T>>); public static <N extends Node> Optional<N> findFirst(Node, Class<N>); public static <N extends Node> Optional<N> findFirst(Node, Class<N>, Predicate<N>); static nested iterator classes (BreadthFirstIterator, DirectChildrenIterator, ParentsVisitor, PreOrderIterator, PostOrderIterator) }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public Stream<Node> stream(TreeTraversal) { return NodeTraversals.stream(this, traversal); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public Stream<Node> stream() { return NodeTraversals.stream(this); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public void walk(TreeTraversal traversal, Consumer<Node> consumer) { NodeTraversals.walk(this, traversal, consumer); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public void walk(Consumer<Node> consumer) { NodeTraversals.walk(this, consumer); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T> void walk(Class<T> nodeType, Consumer<T> consumer) { NodeTraversals.walk(this, nodeType, consumer); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T extends Node> List<T> findAll(Class<T> nodeType) { return NodeTraversals.findAll(this, nodeType); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T extends Node> List<T> findAll(Class<T> nodeType, TreeTraversal traversal) { return NodeTraversals.findAll(this, nodeType, traversal); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T extends Node> List<T> findAll(Class<T> nodeType, Predicate<T> predicate) { return NodeTraversals.findAll(this, nodeType, predicate); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <T> Optional<T> findFirst(TreeTraversal traversal, Function<Node, Optional<T>> consumer) { return NodeTraversals.findFirst(this, traversal, consumer); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <N extends Node> Optional<N> findFirst(Class<N> nodeType) { return NodeTraversals.findFirst(this, nodeType); }",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java: public <N extends Node> Optional<N> findFirst(Class<N> nodeType, Predicate<N> predicate) { return NodeTraversals.findFirst(this, nodeType, predicate); }"
+          ],
+          "details": "Extract all traversal- and stream-related methods and the nested iterator classes into a new helper class NodeTraversals. Implement the moved methods as static methods that accept a Node instance (the 'this' target) and any original parameters. Move the nested iterator classes into NodeTraversals as package-private static classes. Update Node to keep the public API but replace implementations with delegating calls to NodeTraversals. Update Node imports to remove Spliterators, StreamSupport and Collections where they were used only by the moved code; add those imports to NodeTraversals instead.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(file)",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java (updated imports: removed Spliterators, StreamSupport, Collections; added com.github.javaparser.ast.NodeTraversals)",
+            "javaparser-core/src/main/java/com/github/javaparser/ast/NodeTraversals.java (imports: java.util.Collections, java.util.Spliterators, java.util.stream.StreamSupport, java.util.stream.Stream, java.util.Spliterator flags as needed, plus existing imports required by moved code)"
+          ],
+          "details": "Adjust imports so that Node no longer imports Spliterators, StreamSupport or Collections for the moved code; NodeTraversals will import and use them.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES(com.github.javaparser.ast.Node.stream(...), com.github.javaparser.ast.NodeTraversals.stream(...))",
+          "inputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java"
+          ],
+          "outputs": [
+            "javaparser-core/src/main/java/com/github/javaparser/ast/Node.java (stream/walk/findAll/findFirst now delegate to NodeTraversals)"
+          ],
+          "details": "Replace direct implementations in Node with delegating calls to NodeTraversals. Ensure any internal calls that previously used the private treeIterator/treeIterable are updated to call NodeTraversals equivalents.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

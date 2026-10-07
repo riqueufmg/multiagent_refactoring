@@ -1,0 +1,50 @@
+{
+  "id": 4,
+  "goal": "Extract the nested class TailablePath into a top-level class to isolate path-based tailable logic.",
+  "files": [
+    "src/main/java/org/apache/commons/io/input/TailablePath.java",
+    "src/main/java/org/apache/commons/io/input/Tailer.java",
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java:TailablePath"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/TailablePath.java",
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "details": "Move the nested TailablePath implementation to a new top-level class TailablePath in org.apache.commons.io.input. Preserve constructor (Path, LinkOption...) and methods (getPath, getRandomAccess, isNewer, lastModifiedFileTime, size, toString). Remove the nested TailablePath from Tailer.java. The new class will implement/extend the already-extracted Tailable interface implicitly by keeping method signatures compatible.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/TailablePath.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/TailablePath.java"
+      ],
+      "details": "Add the necessary imports used by TailablePath (java.nio.file.Path, java.nio.file.Files, java.nio.file.LinkOption, java.nio.file.attribute.FileTime, java.util.Objects, java.util.Arrays and java.io.FileNotFoundException, java.io.IOException, and org.apache.commons.io.file.PathUtils) so the class is independently compilable and references RandomAccessFileBridge and RandomAccessResourceBridge from the same package.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ]
+}

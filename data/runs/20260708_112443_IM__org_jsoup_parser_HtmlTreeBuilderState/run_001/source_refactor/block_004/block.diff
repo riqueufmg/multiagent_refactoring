@@ -1,0 +1,35 @@
+commit a3429281e528a92c93209451c1c295b7f1b0132a
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Jul 8 11:53:26 2026 -0300
+
+    source_refactor: apply block 4
+
+diff --git a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+index 9ac3e42b..14a4f437 100644
+--- a/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
++++ b/src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java
+@@ -1705,6 +1705,24 @@ enum HtmlTreeBuilderState {
+         }
+     };
+ 
++    // Facade / delegating methods to preserve external call sites that may expect these on HtmlTreeBuilderState
++    // These forward to HtmlTreeBuilderStateUtil which contains the actual moved implementations.
++    public static boolean isWhitespace(Token t) {
++        return HtmlTreeBuilderStateUtil.isWhitespace(t);
++    }
++
++    public static void HandleTextState(Token.StartTag start, HtmlTreeBuilder tb, TokeniserState state) {
++        HtmlTreeBuilderStateUtil.HandleTextState(start, tb, state);
++    }
++
++    public static void mergeAttributes(Token.StartTag startTag, Element html) {
++        HtmlTreeBuilderStateUtil.mergeAttributes(startTag, html);
++    }
++
++    public static boolean inBodyEndTagAdoption(Token t, HtmlTreeBuilder tb) {
++        return HtmlTreeBuilderStateUtil.inBodyEndTagAdoption(t, tb);
++    }
++
+     abstract boolean process(Token t, HtmlTreeBuilder tb);
+ 
+ }

@@ -1,0 +1,220 @@
+{
+  "id": 2,
+  "goal": "Reduce Expression's direct dependencies on several literal expression types by extracting string/number literal type-check, cast, optional-conversion and if-visitor methods into a new helper class. This will remove direct coupling to StringLiteralExpr, IntegerLiteralExpr, DoubleLiteralExpr and LongLiteralExpr from Expression (net reduction: remove 4 deps, add 1 helper dep => net -3).",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/ast/expr/Expression.java",
+    "javaparser-core/src/main/java/com/github/javaparser/ast/expr/ExpressionLiteralHelper.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS(com.github.javaparser.ast.expr.Expression, com.github.javaparser.ast.expr.ExpressionLiteralHelper)",
+      "inputs": [
+        "com.github.javaparser.ast.expr.Expression"
+      ],
+      "outputs": [
+        "com.github.javaparser.ast.expr.ExpressionLiteralHelper"
+      ],
+      "details": "Create a new class ExpressionLiteralHelper in the same package and move literal-related methods (isX/asX/toX/ifX for StringLiteralExpr, IntegerLiteralExpr, DoubleLiteralExpr, LongLiteralExpr) into it. Expression will be updated to delegate those calls to the helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isStringLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.isStringLiteralExpr())",
+      "inputs": [
+        "isStringLiteralExpr()"
+      ],
+      "outputs": [
+        "isStringLiteralExpr()"
+      ],
+      "details": "Move string-literal helper methods to the new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asStringLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.asStringLiteralExpr())",
+      "inputs": [
+        "asStringLiteralExpr()"
+      ],
+      "outputs": [
+        "asStringLiteralExpr()"
+      ],
+      "details": "Move asStringLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toStringLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.toStringLiteralExpr())",
+      "inputs": [
+        "toStringLiteralExpr()"
+      ],
+      "outputs": [
+        "toStringLiteralExpr()"
+      ],
+      "details": "Move toStringLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifStringLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.ifStringLiteralExpr())",
+      "inputs": [
+        "ifStringLiteralExpr(Consumer<StringLiteralExpr>)"
+      ],
+      "outputs": [
+        "ifStringLiteralExpr(Consumer<StringLiteralExpr>)"
+      ],
+      "details": "Move ifStringLiteralExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isIntegerLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.isIntegerLiteralExpr())",
+      "inputs": [
+        "isIntegerLiteralExpr()"
+      ],
+      "outputs": [
+        "isIntegerLiteralExpr()"
+      ],
+      "details": "Move integer-literal helper methods to the new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asIntegerLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.asIntegerLiteralExpr())",
+      "inputs": [
+        "asIntegerLiteralExpr()"
+      ],
+      "outputs": [
+        "asIntegerLiteralExpr()"
+      ],
+      "details": "Move asIntegerLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toIntegerLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.toIntegerLiteralExpr())",
+      "inputs": [
+        "toIntegerLiteralExpr()"
+      ],
+      "outputs": [
+        "toIntegerLiteralExpr()"
+      ],
+      "details": "Move toIntegerLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifIntegerLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.ifIntegerLiteralExpr())",
+      "inputs": [
+        "ifIntegerLiteralExpr(Consumer<IntegerLiteralExpr>)"
+      ],
+      "outputs": [
+        "ifIntegerLiteralExpr(Consumer<IntegerLiteralExpr>)"
+      ],
+      "details": "Move ifIntegerLiteralExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isDoubleLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.isDoubleLiteralExpr())",
+      "inputs": [
+        "isDoubleLiteralExpr()"
+      ],
+      "outputs": [
+        "isDoubleLiteralExpr()"
+      ],
+      "details": "Move double-literal helper methods to the new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asDoubleLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.asDoubleLiteralExpr())",
+      "inputs": [
+        "asDoubleLiteralExpr()"
+      ],
+      "outputs": [
+        "asDoubleLiteralExpr()"
+      ],
+      "details": "Move asDoubleLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toDoubleLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.toDoubleLiteralExpr())",
+      "inputs": [
+        "toDoubleLiteralExpr()"
+      ],
+      "outputs": [
+        "toDoubleLiteralExpr()"
+      ],
+      "details": "Move toDoubleLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifDoubleLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.ifDoubleLiteralExpr())",
+      "inputs": [
+        "ifDoubleLiteralExpr(Consumer<DoubleLiteralExpr>)"
+      ],
+      "outputs": [
+        "ifDoubleLiteralExpr(Consumer<DoubleLiteralExpr>)"
+      ],
+      "details": "Move ifDoubleLiteralExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.isLongLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.isLongLiteralExpr())",
+      "inputs": [
+        "isLongLiteralExpr()"
+      ],
+      "outputs": [
+        "isLongLiteralExpr()"
+      ],
+      "details": "Move long-literal helper methods to the new class.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.asLongLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.asLongLiteralExpr())",
+      "inputs": [
+        "asLongLiteralExpr()"
+      ],
+      "outputs": [
+        "asLongLiteralExpr()"
+      ],
+      "details": "Move asLongLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.toLongLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.toLongLiteralExpr())",
+      "inputs": [
+        "toLongLiteralExpr()"
+      ],
+      "outputs": [
+        "toLongLiteralExpr()"
+      ],
+      "details": "Move toLongLiteralExpr() to helper.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD(com.github.javaparser.ast.expr.Expression.ifLongLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.ifLongLiteralExpr())",
+      "inputs": [
+        "ifLongLiteralExpr(Consumer<LongLiteralExpr>)"
+      ],
+      "outputs": [
+        "ifLongLiteralExpr(Consumer<LongLiteralExpr>)"
+      ],
+      "details": "Move ifLongLiteralExpr to helper.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(com.github.javaparser.ast.expr.ExpressionLiteralHelper)",
+      "inputs": [
+        "java.util.function.Consumer",
+        "java.util.Optional"
+      ],
+      "outputs": [
+        "imports updated in ExpressionLiteralHelper"
+      ],
+      "details": "Add required imports for the helper. The literal expression types are in the same package.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(com.github.javaparser.ast.expr.Expression.isStringLiteralExpr(), com.github.javaparser.ast.expr.ExpressionLiteralHelper.isStringLiteralExpr())",
+      "inputs": [
+        "call sites inside Expression that invoked isX()/asX()/toX()/ifX() for moved literal types"
+      ],
+      "outputs": [
+        "call sites updated to delegate to ExpressionLiteralHelper"
+      ],
+      "details": "Update internal Expression call sites to delegate to the literal helper. External behavior and public API will be preserved via delegating methods in Expression.",
+      "risk": "medium"
+    }
+  ]
+}

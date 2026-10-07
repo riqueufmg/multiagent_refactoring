@@ -1,0 +1,573 @@
+commit 7a99ba9d863729639f3155b97f4a29a2445602e8
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Jul 29 18:30:28 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/apache/commons/io/EndianUtils.java b/src/main/java/org/apache/commons/io/EndianUtils.java
+index 9765c490e..c87d89b55 100644
+--- a/src/main/java/org/apache/commons/io/EndianUtils.java
++++ b/src/main/java/org/apache/commons/io/EndianUtils.java
+@@ -63,18 +63,6 @@ private static int read(final InputStream input) throws IOException {
+         return value;
+     }
+ 
+-    /**
+-     * Reads a little-endian {@code double} value from a byte array at a given offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+-     */
+-    public static double readSwappedDouble(final byte[] data, final int offset) {
+-        return Double.longBitsToDouble(readSwappedLong(data, offset));
+-    }
+-
+     /**
+      * Reads a little-endian {@code double} value from an InputStream.
+      *
+@@ -86,18 +74,6 @@ public static double readSwappedDouble(final InputStream input) throws IOExcepti
+         return Double.longBitsToDouble(readSwappedLong(input));
+     }
+ 
+-    /**
+-     * Reads a little-endian {@code float} value from a byte array at a given offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+-     */
+-    public static float readSwappedFloat(final byte[] data, final int offset) {
+-        return Float.intBitsToFloat(readSwappedInteger(data, offset));
+-    }
+-
+     /**
+      * Reads a little-endian {@code float} value from an InputStream.
+      *
+@@ -109,23 +85,6 @@ public static float readSwappedFloat(final InputStream input) throws IOException
+         return Float.intBitsToFloat(readSwappedInteger(input));
+     }
+ 
+-    /**
+-     * Reads a little-endian {@code int} value from a byte array at a given offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+-     */
+-    public static int readSwappedInteger(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
+-        return
+-            ((data[offset + 0] & 0xff) << 0) +
+-            ((data[offset + 1] & 0xff) << 8) +
+-            ((data[offset + 2] & 0xff) << 16) +
+-            ((data[offset + 3] & 0xff) << 24);
+-    }
+-
+     /**
+      * Reads a little-endian {@code int} value from an InputStream.
+      *
+@@ -145,21 +104,6 @@ public static int readSwappedInteger(final InputStream input) throws IOException
+             ((value4 & 0xff) << 24);
+     }
+ 
+-    /**
+-     * Reads a little-endian {@code long} value from a byte array at a given offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+-     */
+-    public static long readSwappedLong(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Long.SIZE / Byte.SIZE);
+-        final long low = readSwappedInteger(data, offset);
+-        final long high = readSwappedInteger(data, offset + 4);
+-        return (high << 32) + (0xffffffffL & low);
+-    }
+-
+     /**
+      * Reads a little-endian {@code long} value from an InputStream.
+      *
+@@ -172,23 +116,7 @@ public static long readSwappedLong(final InputStream input) throws IOException {
+         for (int i = 0; i < 8; i++) {
+             bytes[i] = (byte) read(input);
+         }
+-        return readSwappedLong(bytes, 0);
+-    }
+-
+-    /**
+-     * Reads a little-endian {@code short} value from a byte array at a given offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 2 bytes.
+-     */
+-    public static short readSwappedShort(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
+-        return (short) (
+-            ((data[offset + 0] & 0xff) << 0) +
+-            ((data[offset + 1] & 0xff) << 8)
+-        );
++        return EndianUtilsByteArray.readSwappedLong(bytes, 0);
+     }
+ 
+     /**
+@@ -205,24 +133,6 @@ public static short readSwappedShort(final InputStream input) throws IOException
+         );
+     }
+ 
+-    /**
+-     * Reads a little-endian unsigned integer (32-bit) value from a byte array at a given
+-     * offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+-    */
+-    public static long readSwappedUnsignedInteger(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
+-        final long low = ((data[offset + 0] & 0xff) << 0) +
+-                         ((data[offset + 1] & 0xff) << 8) +
+-                         ((data[offset + 2] & 0xff) << 16);
+-        final long high = data[offset + 3] & 0xff;
+-        return (high << 24) + (0xffffffffL & low);
+-    }
+-
+     /**
+      * Reads a little-endian unsigned integer (32-bit) from an InputStream.
+      *
+@@ -242,21 +152,6 @@ public static long readSwappedUnsignedInteger(final InputStream input) throws IO
+         return (high << 24) + (0xffffffffL & low);
+     }
+ 
+-    /**
+-     * Reads an unsigned short (16-bit) value from a byte array in little-endian order at a given
+-     * offset.
+-     *
+-     * @param data source byte array.
+-     * @param offset starting offset in the byte array.
+-     * @return The value read.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 2 bytes.
+-     */
+-    public static int readSwappedUnsignedShort(final byte[] data, final int offset) {
+-        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
+-        return ((data[offset + 0] & 0xff) << 0) +
+-               ((data[offset + 1] & 0xff) << 8);
+-    }
+-
+     /**
+      * Reads an unsigned short (16-bit) from an InputStream in little-endian order.
+      *
+@@ -341,32 +236,6 @@ public static short swapShort(final short value) {
+         );
+     }
+ 
+-    /**
+-     * Validates if the provided byte array has enough data.
+-     *
+-     * @param data The input byte array.
+-     * @param offset The input offset.
+-     * @param byteNeeded The needed number of bytes.
+-     * @throws IllegalArgumentException if the byte array does not have enough data.
+-     */
+-    private static void validateByteArrayOffset(final byte[] data, final int offset, final int byteNeeded) {
+-        if (data.length < offset + byteNeeded) {
+-            throw new IllegalArgumentException("Data only has " + data.length + "bytes, needed " + (offset + byteNeeded) + "bytes.");
+-        }
+-    }
+-
+-    /**
+-     * Writes the 8 bytes of a {@code double} to a byte array at a given offset in little-endian order.
+-     *
+-     * @param data target byte array.
+-     * @param offset starting offset in the byte array.
+-     * @param value value to write.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+-     */
+-    public static void writeSwappedDouble(final byte[] data, final int offset, final double value) {
+-        writeSwappedLong(data, offset, Double.doubleToLongBits(value));
+-    }
+-
+     /**
+      * Writes the 8 bytes of a {@code double} to an output stream in little-endian order.
+      *
+@@ -378,18 +247,6 @@ public static void writeSwappedDouble(final OutputStream output, final double va
+         writeSwappedLong(output, Double.doubleToLongBits(value));
+     }
+ 
+-    /**
+-     * Writes the 4 bytes of a {@code float} to a byte array at a given offset in little-endian order.
+-     *
+-     * @param data target byte array.
+-     * @param offset starting offset in the byte array.
+-     * @param value value to write.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+-     */
+-    public static void writeSwappedFloat(final byte[] data, final int offset, final float value) {
+-        writeSwappedInteger(data, offset, Float.floatToIntBits(value));
+-    }
+-
+     /**
+      * Writes the 4 bytes of a {@code float} to an output stream in little-endian order.
+      *
+@@ -401,22 +258,6 @@ public static void writeSwappedFloat(final OutputStream output, final float valu
+         writeSwappedInteger(output, Float.floatToIntBits(value));
+     }
+ 
+-    /**
+-     * Writes the 4 bytes of an {@code int} to a byte array at a given offset in little-endian order.
+-     *
+-     * @param data target byte array.
+-     * @param offset starting offset in the byte array.
+-     * @param value value to write.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 4 bytes.
+-     */
+-    public static void writeSwappedInteger(final byte[] data, final int offset, final int value) {
+-        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
+-        data[offset + 0] = (byte) (value >> 0 & 0xff);
+-        data[offset + 1] = (byte) (value >> 8 & 0xff);
+-        data[offset + 2] = (byte) (value >> 16 & 0xff);
+-        data[offset + 3] = (byte) (value >> 24 & 0xff);
+-    }
+-
+     /**
+      * Writes the 4 bytes of an {@code int} to an output stream in little-endian order.
+      *
+@@ -431,26 +272,6 @@ public static void writeSwappedInteger(final OutputStream output, final int valu
+         output.write((byte) (value >> 24 & 0xff));
+     }
+ 
+-    /**
+-     * Writes the 8 bytes of a {@code long} to a byte array at a given offset in little-endian order.
+-     *
+-     * @param data target byte array.
+-     * @param offset starting offset in the byte array.
+-     * @param value value to write.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 8 bytes.
+-     */
+-    public static void writeSwappedLong(final byte[] data, final int offset, final long value) {
+-        validateByteArrayOffset(data, offset, Long.SIZE / Byte.SIZE);
+-        data[offset + 0] = (byte) (value >> 0 & 0xff);
+-        data[offset + 1] = (byte) (value >> 8 & 0xff);
+-        data[offset + 2] = (byte) (value >> 16 & 0xff);
+-        data[offset + 3] = (byte) (value >> 24 & 0xff);
+-        data[offset + 4] = (byte) (value >> 32 & 0xff);
+-        data[offset + 5] = (byte) (value >> 40 & 0xff);
+-        data[offset + 6] = (byte) (value >> 48 & 0xff);
+-        data[offset + 7] = (byte) (value >> 56 & 0xff);
+-    }
+-
+     /**
+      * Writes the 8 bytes of a {@code long} to an output stream in little-endian order.
+      *
+@@ -469,20 +290,6 @@ public static void writeSwappedLong(final OutputStream output, final long value)
+         output.write((byte) (value >> 56 & 0xff));
+     }
+ 
+-    /**
+-     * Writes the 2 bytes of a {@code short} to a byte array at a given offset in little-endian order.
+-     *
+-     * @param data target byte array.
+-     * @param offset starting offset in the byte array.
+-     * @param value value to write.
+-     * @throws IllegalArgumentException if the part of the byte array starting at offset does not have at least 2 bytes.
+-     */
+-    public static void writeSwappedShort(final byte[] data, final int offset, final short value) {
+-        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
+-        data[offset + 0] = (byte) (value >> 0 & 0xff);
+-        data[offset + 1] = (byte) (value >> 8 & 0xff);
+-    }
+-
+     /**
+      * Writes the 2 bytes of a {@code short} to an output stream using little-endian encoding.
+      *
+diff --git a/src/main/java/org/apache/commons/io/EndianUtilsByteArray.java b/src/main/java/org/apache/commons/io/EndianUtilsByteArray.java
+new file mode 100644
+index 000000000..e2635c099
+--- /dev/null
++++ b/src/main/java/org/apache/commons/io/EndianUtilsByteArray.java
+@@ -0,0 +1,116 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.io;
++
++/**
++ * Helper utility for byte-array based little-endian read/write operations.
++ * This class contains the byte-array variants of methods previously located
++ * in {@link EndianUtils}.
++ */
++public final class EndianUtilsByteArray {
++
++    private EndianUtilsByteArray() {
++        // utility class
++    }
++
++    public static double readSwappedDouble(final byte[] data, final int offset) {
++        return Double.longBitsToDouble(readSwappedLong(data, offset));
++    }
++
++    public static float readSwappedFloat(final byte[] data, final int offset) {
++        return Float.intBitsToFloat(readSwappedInteger(data, offset));
++    }
++
++    public static int readSwappedInteger(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
++        return
++            ((data[offset + 0] & 0xff) << 0) +
++            ((data[offset + 1] & 0xff) << 8) +
++            ((data[offset + 2] & 0xff) << 16) +
++            ((data[offset + 3] & 0xff) << 24);
++    }
++
++    public static long readSwappedLong(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, Long.SIZE / Byte.SIZE);
++        final long low = readSwappedInteger(data, offset);
++        final long high = readSwappedInteger(data, offset + 4);
++        return (high << 32) + (0xffffffffL & low);
++    }
++
++    public static short readSwappedShort(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
++        return (short) (
++            ((data[offset + 0] & 0xff) << 0) +
++            ((data[offset + 1] & 0xff) << 8)
++        );
++    }
++
++    public static long readSwappedUnsignedInteger(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
++        final long low = ((data[offset + 0] & 0xff) << 0) +
++                         ((data[offset + 1] & 0xff) << 8) +
++                         ((data[offset + 2] & 0xff) << 16);
++        final long high = data[offset + 3] & 0xff;
++        return (high << 24) + (0xffffffffL & low);
++    }
++
++    public static int readSwappedUnsignedShort(final byte[] data, final int offset) {
++        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
++        return ((data[offset + 0] & 0xff) << 0) +
++               ((data[offset + 1] & 0xff) << 8);
++    }
++
++    public static void writeSwappedDouble(final byte[] data, final int offset, final double value) {
++        writeSwappedLong(data, offset, Double.doubleToLongBits(value));
++    }
++
++    public static void writeSwappedFloat(final byte[] data, final int offset, final float value) {
++        writeSwappedInteger(data, offset, Float.floatToIntBits(value));
++    }
++
++    public static void writeSwappedInteger(final byte[] data, final int offset, final int value) {
++        validateByteArrayOffset(data, offset, Integer.SIZE / Byte.SIZE);
++        data[offset + 0] = (byte) (value >> 0 & 0xff);
++        data[offset + 1] = (byte) (value >> 8 & 0xff);
++        data[offset + 2] = (byte) (value >> 16 & 0xff);
++        data[offset + 3] = (byte) (value >> 24 & 0xff);
++    }
++
++    public static void writeSwappedLong(final byte[] data, final int offset, final long value) {
++        validateByteArrayOffset(data, offset, Long.SIZE / Byte.SIZE);
++        data[offset + 0] = (byte) (value >> 0 & 0xff);
++        data[offset + 1] = (byte) (value >> 8 & 0xff);
++        data[offset + 2] = (byte) (value >> 16 & 0xff);
++        data[offset + 3] = (byte) (value >> 24 & 0xff);
++        data[offset + 4] = (byte) (value >> 32 & 0xff);
++        data[offset + 5] = (byte) (value >> 40 & 0xff);
++        data[offset + 6] = (byte) (value >> 48 & 0xff);
++        data[offset + 7] = (byte) (value >> 56 & 0xff);
++    }
++
++    public static void writeSwappedShort(final byte[] data, final int offset, final short value) {
++        validateByteArrayOffset(data, offset, Short.SIZE / Byte.SIZE);
++        data[offset + 0] = (byte) (value >> 0 & 0xff);
++        data[offset + 1] = (byte) (value >> 8 & 0xff);
++    }
++
++    public static void validateByteArrayOffset(final byte[] data, final int offset, final int byteNeeded) {
++        if (data.length < offset + byteNeeded) {
++            throw new IllegalArgumentException("Data only has " + data.length + "bytes, needed " + (offset + byteNeeded) + "bytes.");
++        }
++    }
++}
+diff --git a/src/test/java/org/apache/commons/io/EndianUtilsTest.java b/src/test/java/org/apache/commons/io/EndianUtilsTest.java
+index b7cd538e4..8936fe4c2 100644
+--- a/src/test/java/org/apache/commons/io/EndianUtilsTest.java
++++ b/src/test/java/org/apache/commons/io/EndianUtilsTest.java
+@@ -47,21 +47,21 @@ void testEOFException() {
+     void testInvalidOffset() {
+         final byte[] bytes = {};
+ 
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.readSwappedInteger(bytes, 0));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.readSwappedLong(bytes, 0));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.readSwappedShort(bytes, 0));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.readSwappedUnsignedInteger(bytes, 0));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.readSwappedUnsignedShort(bytes, 0));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.writeSwappedInteger(bytes, 0, 0));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.writeSwappedLong(bytes, 0, 0L));
+-        assertThrows(IllegalArgumentException.class, () -> EndianUtils.writeSwappedShort(bytes, 0, (short) 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.readSwappedInteger(bytes, 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.readSwappedLong(bytes, 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.readSwappedShort(bytes, 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.readSwappedUnsignedInteger(bytes, 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.readSwappedUnsignedShort(bytes, 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.writeSwappedInteger(bytes, 0, 0));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.writeSwappedLong(bytes, 0, 0L));
++        assertThrows(IllegalArgumentException.class, () -> EndianUtilsByteArray.writeSwappedShort(bytes, 0, (short) 0));
+     }
+ 
+     @Test
+     void testReadSwappedDouble() throws IOException {
+         final byte[] bytes = { 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
+         final double d1 = Double.longBitsToDouble(0x0102030405060708L);
+-        final double d2 = EndianUtils.readSwappedDouble(bytes, 0);
++        final double d2 = EndianUtilsByteArray.readSwappedDouble(bytes, 0);
+         assertEquals(d1, d2, 0.0);
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+@@ -72,7 +72,7 @@ void testReadSwappedDouble() throws IOException {
+     void testReadSwappedFloat() throws IOException {
+         final byte[] bytes = { 0x04, 0x03, 0x02, 0x01 };
+         final float f1 = Float.intBitsToFloat(0x01020304);
+-        final float f2 = EndianUtils.readSwappedFloat(bytes, 0);
++        final float f2 = EndianUtilsByteArray.readSwappedFloat(bytes, 0);
+         assertEquals(f1, f2, 0.0);
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+@@ -82,7 +82,7 @@ void testReadSwappedFloat() throws IOException {
+     @Test
+     void testReadSwappedInteger() throws IOException {
+         final byte[] bytes = { 0x04, 0x03, 0x02, 0x01 };
+-        assertEquals(0x01020304, EndianUtils.readSwappedInteger(bytes, 0));
++        assertEquals(0x01020304, EndianUtilsByteArray.readSwappedInteger(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+         assertEquals(0x01020304, EndianUtils.readSwappedInteger(input));
+@@ -91,7 +91,7 @@ void testReadSwappedInteger() throws IOException {
+     @Test
+     void testReadSwappedLong() throws IOException {
+         final byte[] bytes = { 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
+-        assertEquals(0x0102030405060708L, EndianUtils.readSwappedLong(bytes, 0));
++        assertEquals(0x0102030405060708L, EndianUtilsByteArray.readSwappedLong(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+         assertEquals(0x0102030405060708L, EndianUtils.readSwappedLong(input));
+@@ -100,7 +100,7 @@ void testReadSwappedLong() throws IOException {
+     @Test
+     void testReadSwappedShort() throws IOException {
+         final byte[] bytes = { 0x02, 0x01 };
+-        assertEquals(0x0102, EndianUtils.readSwappedShort(bytes, 0));
++        assertEquals(0x0102, EndianUtilsByteArray.readSwappedShort(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+         assertEquals(0x0102, EndianUtils.readSwappedShort(input));
+@@ -109,7 +109,7 @@ void testReadSwappedShort() throws IOException {
+     @Test
+     void testReadSwappedUnsignedInteger() throws IOException {
+         final byte[] bytes = { 0x04, 0x03, 0x02, 0x01 };
+-        assertEquals(0x0000000001020304L, EndianUtils.readSwappedUnsignedInteger(bytes, 0));
++        assertEquals(0x0000000001020304L, EndianUtilsByteArray.readSwappedUnsignedInteger(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+         assertEquals(0x0000000001020304L, EndianUtils.readSwappedUnsignedInteger(input));
+@@ -118,7 +118,7 @@ void testReadSwappedUnsignedInteger() throws IOException {
+     @Test
+     void testReadSwappedUnsignedShort() throws IOException {
+         final byte[] bytes = { 0x02, 0x01 };
+-        assertEquals(0x00000102, EndianUtils.readSwappedUnsignedShort(bytes, 0));
++        assertEquals(0x00000102, EndianUtilsByteArray.readSwappedUnsignedShort(bytes, 0));
+ 
+         final ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+         assertEquals(0x00000102, EndianUtils.readSwappedUnsignedShort(input));
+@@ -191,14 +191,14 @@ void testSymmetryOfLong() {
+             // testing the real problem
+             byte[] buffer = new byte[8];
+             final long ln1 = Double.doubleToLongBits(test);
+-            EndianUtils.writeSwappedLong(buffer, 0, ln1);
+-            final long ln2 = EndianUtils.readSwappedLong(buffer, 0);
++            EndianUtilsByteArray.writeSwappedLong(buffer, 0, ln1);
++            final long ln2 = EndianUtilsByteArray.readSwappedLong(buffer, 0);
+             assertEquals(ln1, ln2);
+ 
+             // testing the bug report
+             buffer = new byte[8];
+-            EndianUtils.writeSwappedDouble(buffer, 0, test);
+-            final double val = EndianUtils.readSwappedDouble(buffer, 0);
++            EndianUtilsByteArray.writeSwappedDouble(buffer, 0, test);
++            final double val = EndianUtilsByteArray.readSwappedDouble(buffer, 0);
+             assertEquals(test, val, 0);
+         }
+     }
+@@ -209,7 +209,7 @@ void testUnsignedOverrun() throws Exception {
+         final byte[] target = { 0, 0, 0, (byte) 0x80 };
+         final long expected = 0x80000000L;
+ 
+-        long actual = EndianUtils.readSwappedUnsignedInteger(target, 0);
++        long actual = EndianUtilsByteArray.readSwappedUnsignedInteger(target, 0);
+         assertEquals(expected, actual, "readSwappedUnsignedInteger(byte[], int) was incorrect");
+ 
+         final ByteArrayInputStream in = new ByteArrayInputStream(target);
+@@ -221,7 +221,7 @@ void testUnsignedOverrun() throws Exception {
+     void testWriteSwappedDouble() throws IOException {
+         byte[] bytes = new byte[8];
+         final double d1 = Double.longBitsToDouble(0x0102030405060708L);
+-        EndianUtils.writeSwappedDouble(bytes, 0, d1);
++        EndianUtilsByteArray.writeSwappedDouble(bytes, 0, d1);
+         assertEquals(0x08, bytes[0]);
+         assertEquals(0x07, bytes[1]);
+         assertEquals(0x06, bytes[2]);
+@@ -248,7 +248,7 @@ void testWriteSwappedDouble() throws IOException {
+     void testWriteSwappedFloat() throws IOException {
+         byte[] bytes = new byte[4];
+         final float f1 = Float.intBitsToFloat(0x01020304);
+-        EndianUtils.writeSwappedFloat(bytes, 0, f1);
++        EndianUtilsByteArray.writeSwappedFloat(bytes, 0, f1);
+         assertEquals(0x04, bytes[0]);
+         assertEquals(0x03, bytes[1]);
+         assertEquals(0x02, bytes[2]);
+@@ -266,7 +266,7 @@ void testWriteSwappedFloat() throws IOException {
+     @Test
+     void testWriteSwappedInteger() throws IOException {
+         byte[] bytes = new byte[4];
+-        EndianUtils.writeSwappedInteger(bytes, 0, 0x01020304);
++        EndianUtilsByteArray.writeSwappedInteger(bytes, 0, 0x01020304);
+         assertEquals(0x04, bytes[0]);
+         assertEquals(0x03, bytes[1]);
+         assertEquals(0x02, bytes[2]);
+@@ -284,7 +284,7 @@ void testWriteSwappedInteger() throws IOException {
+     @Test
+     void testWriteSwappedLong() throws IOException {
+         byte[] bytes = new byte[8];
+-        EndianUtils.writeSwappedLong(bytes, 0, 0x0102030405060708L);
++        EndianUtilsByteArray.writeSwappedLong(bytes, 0, 0x0102030405060708L);
+         assertEquals(0x08, bytes[0]);
+         assertEquals(0x07, bytes[1]);
+         assertEquals(0x06, bytes[2]);
+@@ -310,7 +310,7 @@ void testWriteSwappedLong() throws IOException {
+     @Test
+     void testWriteSwappedShort() throws IOException {
+         byte[] bytes = new byte[2];
+-        EndianUtils.writeSwappedShort(bytes, 0, (short) 0x0102);
++        EndianUtilsByteArray.writeSwappedShort(bytes, 0, (short) 0x0102);
+         assertEquals(0x02, bytes[0]);
+         assertEquals(0x01, bytes[1]);
+ 

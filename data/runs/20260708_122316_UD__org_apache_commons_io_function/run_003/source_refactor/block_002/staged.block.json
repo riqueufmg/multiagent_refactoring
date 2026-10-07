@@ -1,0 +1,109 @@
+{
+  "id": 2,
+  "goal": "Remove compile-time dependency from org.apache.commons.io.function.IOStream to org.apache.commons.io.IOExceptionList by depending on a stable abstraction placed in the target package.",
+  "dependency_pair": {
+    "source": "org.apache.commons.io.function.IOStream",
+    "target": "org.apache.commons.io.IOExceptionList"
+  },
+  "files": [
+    "src/main/java/org/apache/commons/io/IOExceptionList.java",
+    "src/main/java/org/apache/commons/io/function/IOExceptionListApi.java",
+    "src/main/java/org/apache/commons/io/function/IOStream.java",
+    "src/test/java/org/apache/commons/io/FileUtilsDeleteDirectoryLinuxTest.java",
+    "src/test/java/org/apache/commons/io/IOExceptionListTest.java",
+    "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+    "src/test/java/org/apache/commons/io/function/IOConsumerTest.java",
+    "src/test/java/org/apache/commons/io/function/IOStreamTest.java",
+    "src/test/java/org/apache/commons/io/input/MessageDigestCalculatingInputStreamTest.java",
+    "src/test/java/org/apache/commons/io/input/MessageDigestInputStreamTest.java",
+    "src/test/java/org/apache/commons/io/output/ProxyCollectionWriterTest.java",
+    "src/test/java/org/apache/commons/io/output/TeeWriterTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "org.apache.commons.io.IOExceptionList"
+      ],
+      "outputs": [
+        "org.apache.commons.io.function.IOExceptionListApi"
+      ],
+      "details": "Extract a small interface named IOExceptionListApi into org.apache.commons.io.function declaring only the members of IOExceptionList used by IOStream.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(file)",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "details": "Update imports in IOStream to reference the new interface org.apache.commons.io.function.IOExceptionListApi and adjust type annotations/usages accordingly.",
+      "risk": "low"
+    },
+    {
+      "op": "REPLACE_DEPENDENCY",
+      "inputs": [
+        "org.apache.commons.io.function.IOStream",
+        "org.apache.commons.io.IOExceptionList"
+      ],
+      "outputs": [
+        "org.apache.commons.io.function.IOStream -> org.apache.commons.io.function.IOExceptionListApi"
+      ],
+      "details": "Replace direct references to the concrete IOExceptionList with the new interface type in IOStream.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES(file)",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/function/IOStream.java"
+      ],
+      "details": "Adjust any method calls or casts in IOStream to compile against the interface (ensure used methods are present in the extracted interface).",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS(file)",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/IOExceptionList.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/IOExceptionList.java"
+      ],
+      "details": "Update the original IOExceptionList to implement the newly extracted org.apache.commons.io.function.IOExceptionListApi so the implementation remains in the unstable package.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/FileUtilsDeleteDirectoryLinuxTest.java",
+        "src/test/java/org/apache/commons/io/IOExceptionListTest.java",
+        "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+        "src/test/java/org/apache/commons/io/function/IOConsumerTest.java",
+        "src/test/java/org/apache/commons/io/function/IOStreamTest.java",
+        "src/test/java/org/apache/commons/io/input/MessageDigestCalculatingInputStreamTest.java",
+        "src/test/java/org/apache/commons/io/input/MessageDigestInputStreamTest.java",
+        "src/test/java/org/apache/commons/io/output/ProxyCollectionWriterTest.java",
+        "src/test/java/org/apache/commons/io/output/TeeWriterTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/FileUtilsDeleteDirectoryLinuxTest.java",
+    "src/test/java/org/apache/commons/io/IOExceptionListTest.java",
+    "src/test/java/org/apache/commons/io/function/IOBaseStreamTest.java",
+    "src/test/java/org/apache/commons/io/function/IOConsumerTest.java",
+    "src/test/java/org/apache/commons/io/function/IOStreamTest.java",
+    "src/test/java/org/apache/commons/io/input/MessageDigestCalculatingInputStreamTest.java",
+    "src/test/java/org/apache/commons/io/input/MessageDigestInputStreamTest.java",
+    "src/test/java/org/apache/commons/io/output/ProxyCollectionWriterTest.java",
+    "src/test/java/org/apache/commons/io/output/TeeWriterTest.java"
+  ]
+}

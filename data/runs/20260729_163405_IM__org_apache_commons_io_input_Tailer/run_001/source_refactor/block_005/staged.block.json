@@ -1,0 +1,48 @@
+{
+  "id": 5,
+  "goal": "Update Tailer.java call sites and remove the now-extracted nested declarations; ensure Tailer compiles against the new top-level types.",
+  "files": [
+    "src/main/java/org/apache/commons/io/input/Tailer.java",
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "details": "Remove the nested interface/class declarations (RandomAccessResourceBridge, RandomAccessFileBridge, Tailable, TailablePath) from Tailer.java. Ensure references to these types compile by relying on the new top-level types in the same package (no import required). Keep all logic in Tailer unchanged other than removing the nested type bodies. Preserve behavior: constructor usage, instanceof checks (e.g., TailablePath), and all method calls should continue to work.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "outputs": [
+        "src/main/java/org/apache/commons/io/input/Tailer.java"
+      ],
+      "details": "If any fully-qualified references are needed after extraction (none expected because new types are in the same package), add imports. This operation verifies and adjusts imports in Tailer.java to ensure no unused or missing imports remain after removal of nested declarations.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+        "src/test/java/org/apache/commons/io/input/TailerTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/apache/commons/io/input/TailerCloseTest.java",
+    "src/test/java/org/apache/commons/io/input/TailerTest.java"
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.nodes.Attribute",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract attribute key validation and key-normalization utilities out of Attribute into a dedicated helper class to reduce Attribute class size and group cohesive static validation logic.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Attribute.java",
+        "src/main/java/org/jsoup/nodes/AttributeKey.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "private static final Pattern xmlKeyReplace",
+            "private static final Pattern htmlKeyReplace",
+            "public static String getValidKey(String key, Document.OutputSettings.Syntax syntax)",
+            "private static boolean isValidXmlKey(String key)",
+            "private static boolean isValidHtmlKey(String key)"
+          ],
+          "outputs": [
+            "public final class AttributeKey {",
+            "  private static final Pattern xmlKeyReplace = Pattern.compile(\"[^-a-zA-Z0-9_:.]+\");",
+            "  private static final Pattern htmlKeyReplace = Pattern.compile(\"[\\\\x00-\\\\x1f\\\\x7f-\\\\x9f \\\"'/=]+\");",
+            "  public static String getValidKey(String key, Document.OutputSettings.Syntax syntax) { ... }",
+            "  private static boolean isValidXmlKey(String key) { ... }",
+            "  private static boolean isValidHtmlKey(String key) { ... }",
+            "}"
+          ],
+          "details": "Move all static patterns and methods that validate or coerce attribute keys from Attribute into a new final helper class AttributeKey in the same package (org.jsoup.nodes). Keep semantics identical. Make getValidKey public in AttributeKey. Update Attribute to delegate calls to AttributeKey.getValidKey(...) and remove the moved fields/methods from Attribute.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Attribute.getValidKey(...) references inside Attribute.java and any other internal references"
+          ],
+          "outputs": [
+            "AttributeKey.getValidKey(...)",
+            "AttributeKey.isValidXmlKey(...)",
+            "AttributeKey.isValidHtmlKey(...)"
+          ],
+          "details": "Replace direct calls to the moved validation methods with calls to AttributeKey. Update imports in files that referenced moved symbols if needed. Ensure call sites that relied on package-private visibility are adjusted (moved methods in AttributeKey keep appropriate visibility).",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Attribute.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Attribute.java (updated to reference org.jsoup.nodes.AttributeKey where needed)"
+          ],
+          "details": "Add or update imports in Attribute.java to reference AttributeKey if fully-qualified names are not used.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract HTML rendering and attribute-to-markup logic into a dedicated helper class to separate presentation concerns from Attribute's data responsibilities.",
+      "files": [
+        "src/main/java/org/jsoup/nodes/Attribute.java",
+        "src/main/java/org/jsoup/nodes/AttributeHtml.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "void html(QuietAppendable accum, Document.OutputSettings out) [instance method delegating to static html]",
+            "static void html(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out)",
+            "static void htmlNoValidate(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out)",
+            "protected @Deprecated void html(Appendable accum, Document.OutputSettings out) throws IOException",
+            "protected @Deprecated static void html(String key, @Nullable String val, Appendable accum, Document.OutputSettings out) throws IOException"
+          ],
+          "outputs": [
+            "public final class AttributeHtml {",
+            "  public static void html(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) { ... }",
+            "  public static void htmlNoValidate(String key, @Nullable String val, QuietAppendable accum, Document.OutputSettings out) { ... }",
+            "  @Deprecated public static void html(Appendable accum, Document.OutputSettings out) throws IOException { ... }",
+            "  @Deprecated public static void html(String key, @Nullable String val, Appendable accum, Document.OutputSettings out) throws IOException { ... }",
+            "}"
+          ],
+          "details": "Move static HTML emission logic (html(...), htmlNoValidate(...), and deprecated Appendable overloads) into a new helper class AttributeHtml in org.jsoup.nodes. Change the instance method Attribute.html(QuietAppendable accum, Document.OutputSettings out) to delegate to AttributeHtml.html(key, val, accum, out). Ensure Entities.escape(...) and shouldCollapseAttribute(...) calls continue to work (they remain accessible). Preserve visibility and deprecation on the moved overloads.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Internal calls within Attribute.java to the moved static html/htmlNoValidate methods"
+          ],
+          "outputs": [
+            "AttributeHtml.html(...) and AttributeHtml.htmlNoValidate(...) usage"
+          ],
+          "details": "Update Attribute.java to call into AttributeHtml for HTML serialization. Update any other internal call sites that previously referenced the static html methods in Attribute to reference AttributeHtml.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/jsoup/nodes/Attribute.java"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/nodes/Attribute.java (imports updated to reference AttributeHtml and AttributeKey if needed)"
+          ],
+          "details": "Add imports for the new helper classes where appropriate or use fully-qualified names. Keep package org.jsoup.nodes for all new classes.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

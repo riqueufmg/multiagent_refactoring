@@ -1,0 +1,116 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.jsoup.parser.HtmlTreeBuilderState",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce size and complexity of the InBody state by moving the large start-tag handling helper out of the enum into the existing HtmlTreeBuilderStateUtil helper class.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.inBodyStartTag(Token t, HtmlTreeBuilder tb)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::public static boolean inBodyStartTag(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Move the private helper boolean inBodyStartTag(Token, HtmlTreeBuilder) from the InBody enum-state anonymous class into HtmlTreeBuilderStateUtil as a public static method. Preserve the implementation logic but make it a static utility method. Ensure references to local constants or fields are replaced by tb / Token API calls only (no access to enum internals).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.process(Token t, HtmlTreeBuilder tb)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.process(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Update the call inside InBody.process(...) that previously invoked inBodyStartTag(t, tb) to call HtmlTreeBuilderStateUtil.inBodyStartTag(t, tb). Keep imports unchanged (same package). This update is included in the same block so the code remains compilable after the move.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Further modularize the InBody state by moving end-tag handling helpers out of the enum to HtmlTreeBuilderStateUtil.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.inBodyEndTag(Token t, HtmlTreeBuilder tb)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::public static boolean inBodyEndTag(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Move the private helper boolean inBodyEndTag(Token, HtmlTreeBuilder) from the InBody enum-state into HtmlTreeBuilderStateUtil as a public static method. Preserve behavior and ensure method only uses tb and Token APIs.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.anyOtherEndTag(Token t, HtmlTreeBuilder tb)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::public static boolean anyOtherEndTag(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Move the anyOtherEndTag(...) helper from the InBody enum-state into HtmlTreeBuilderStateUtil as a public static helper. Keep semantics identical (uses tb.getStack(), tb.getFromStack, tb.generateImpliedEndTags, etc.).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.process(Token t, HtmlTreeBuilder tb)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.inBodyEndTag(...)",
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.anyOtherEndTag(...)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InBody.process(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Replace all internal calls and references to the moved methods so that InBody.process and any remaining enum code call HtmlTreeBuilderStateUtil.inBodyEndTag(...) and HtmlTreeBuilderStateUtil.anyOtherEndTag(...). Perform these updates alongside the move so compilation succeeds.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Reduce enum size by moving the InTable.anythingElse helper into HtmlTreeBuilderStateUtil to centralize table-foster-insert logic.",
+      "files": [
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java",
+        "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InTable.anythingElse(Token t, HtmlTreeBuilder tb)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderStateUtil.java::public static boolean inTableAnythingElse(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Move the InTable.anythingElse implementation into HtmlTreeBuilderStateUtil as a public static method named inTableAnythingElse(Token, HtmlTreeBuilder). Preserve logic that sets foster inserts, calls tb.process(t, InBody), and resets foster inserts, and tb.error(this) behavior. Ensure the method does not depend on enum-private state.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InTable.process(Token t, HtmlTreeBuilder tb)"
+          ],
+          "outputs": [
+            "src/main/java/org/jsoup/parser/HtmlTreeBuilderState.java::HtmlTreeBuilderState.InTable.process(Token t, HtmlTreeBuilder tb)"
+          ],
+          "details": "Replace calls to anythingElse(t, tb) inside InTable.process(...) with HtmlTreeBuilderStateUtil.inTableAnythingElse(t, tb). Keep behavior identical. Perform update with the move so code remains compilable.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}
