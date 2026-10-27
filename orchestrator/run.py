@@ -86,6 +86,29 @@ def instance_dir_name(smell: str, target_name: str) -> str:
     target_slug = sanitize_target_name(target_name)
     return f"{timestamp}_{smell}__{target_slug}"
 
+def replace_config_placeholders(
+    value: Any,
+    replacements: dict[str, str],
+) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: replace_config_placeholders(item, replacements)
+            for key, item in value.items()
+        }
+
+    if isinstance(value, list):
+        return [
+            replace_config_placeholders(item, replacements)
+            for item in value
+        ]
+
+    if isinstance(value, str):
+        result = value
+        for old, new in replacements.items():
+            result = result.replace(old, new)
+        return result
+
+    return value
 
 def set_common_mvp_config(
     base_cfg: dict[str, Any],
@@ -159,6 +182,44 @@ def set_source_refactor_contract_path(
 
     return cfg
 
+def deep_update(
+    base: dict[str, Any],
+    updates: dict[str, Any],
+) -> dict[str, Any]:
+    result = deepcopy(base)
+
+    for key, value in updates.items():
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
+            result[key] = deep_update(result[key], value)
+        else:
+            result[key] = deepcopy(value)
+
+    return result
+
+
+def apply_mvp_overrides(
+    mvp_cfg: dict[str, Any],
+    orchestrator_cfg: dict[str, Any],
+    section_name: str,
+    ignored_keys: set[str] | None = None,
+) -> dict[str, Any]:
+    section = orchestrator_cfg.get(section_name, {})
+
+    if not isinstance(section, dict):
+        return mvp_cfg
+
+    ignored = ignored_keys or set()
+
+    overrides = {
+        key: value
+        for key, value in section.items()
+        if key not in ignored
+    }
+
+    if not overrides:
+        return mvp_cfg
+
+    return deep_update(mvp_cfg, overrides)
 
 def run_command(
     cmd: list[str],
@@ -512,6 +573,26 @@ def main() -> int:
     source_base_cfg = load_yaml(source_base_config_path)
     quality_checker_base_cfg = load_yaml(quality_checker_base_config_path)
 
+    path_replacements = {
+        "${MARS_ROOT}": str(project_root),
+        "/absolute_path_to/multiagent_refactoring": str(project_root),
+    }
+
+    planner_base_cfg = replace_config_placeholders(
+        planner_base_cfg,
+        path_replacements,
+    )
+
+    source_base_cfg = replace_config_placeholders(
+        source_base_cfg,
+        path_replacements,
+    )
+
+    quality_checker_base_cfg = replace_config_placeholders(
+        quality_checker_base_cfg,
+        path_replacements,
+    )
+
     print(f"Instance dir: {instance_dir}")
     print(f"Target: {target_name}")
     print(f"Smell: {smell}")
@@ -605,6 +686,13 @@ def main() -> int:
             orchestrator_cfg=orchestrator_cfg,
             instance_dir=instance_dir,
             run_id=run_id,
+        )
+
+        source_cfg_base = apply_mvp_overrides(
+            mvp_cfg=source_cfg_base,
+            orchestrator_cfg=orchestrator_cfg,
+            section_name="source_refactor",
+            ignored_keys={"base_config"},
         )
 
         source_cfg = set_planner_contract_path(

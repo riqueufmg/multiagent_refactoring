@@ -1,0 +1,39 @@
+{
+  "id": 1,
+  "goal": "Reduce the public API size of Navigator by migrating callers from deprecated declaration lookup methods to the existing NavigatorDeclarationLookup API.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "Navigator.demandConstructor(TypeDeclaration, int)",
+        "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "Navigator.demandMethod(TypeDeclaration, String)"
+      ],
+      "outputs": [
+        "NavigatorDeclarationLookup.demandConstructor(TypeDeclaration, int)",
+        "NavigatorDeclarationLookup.demandField(ClassOrInterfaceDeclaration, String)",
+        "NavigatorDeclarationLookup.demandMethod(TypeDeclaration, String)"
+      ],
+      "details": "Replace calls to the deprecated Navigator declaration lookup methods with calls to the corresponding existing NavigatorDeclarationLookup methods before removing the forwarding methods.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "Navigator.demandConstructor(TypeDeclaration, int)",
+        "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "Navigator.demandMethod(TypeDeclaration, String)"
+      ],
+      "outputs": [
+        "NavigatorDeclarationLookup.demandConstructor(TypeDeclaration, int)",
+        "NavigatorDeclarationLookup.demandField(ClassOrInterfaceDeclaration, String)",
+        "NavigatorDeclarationLookup.demandMethod(TypeDeclaration, String)"
+      ],
+      "details": "Consolidate the deprecated declaration lookup forwarding methods into NavigatorDeclarationLookup and remove the redundant methods from Navigator. The destination methods already exist and must remain the single implementation.",
+      "risk": "medium"
+    }
+  ]
+}

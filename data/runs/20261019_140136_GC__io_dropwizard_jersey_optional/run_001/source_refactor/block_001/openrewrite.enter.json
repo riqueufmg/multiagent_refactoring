@@ -1,0 +1,69 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "io.dropwizard.jersey.optional.exception"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.EmptyOptionalException"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.exception.EmptyOptionalException"
+      ],
+      "details": "Move the exception class to the dedicated optional exception subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.EmptyOptionalExceptionMapper"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.exception.EmptyOptionalExceptionMapper"
+      ],
+      "details": "Move the exception mapper alongside the exception it handles.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.EmptyOptionalNoContentExceptionMapper"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.exception.EmptyOptionalNoContentExceptionMapper"
+      ],
+      "details": "Move the no-content exception mapper alongside the exception it handles.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "io.dropwizard.jersey.optional.OptionalDoubleMessageBodyWriter",
+        "io.dropwizard.jersey.optional.OptionalIntMessageBodyWriter",
+        "io.dropwizard.jersey.optional.OptionalLongMessageBodyWriter",
+        "io.dropwizard.jersey.optional.OptionalMessageBodyWriter",
+        "io.dropwizard.jersey.optional.exception.EmptyOptionalException",
+        "io.dropwizard.jersey.optional.exception.EmptyOptionalExceptionMapper",
+        "io.dropwizard.jersey.optional.exception.EmptyOptionalNoContentExceptionMapper"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

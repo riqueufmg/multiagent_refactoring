@@ -1,0 +1,40 @@
+{
+  "id": 1,
+  "goal": "Reduce the number of public methods and fields in CasConfiguration by extracting the cohesive CAS protocol, proxy, and validation policy settings while preserving the existing CasConfiguration API through delegation.",
+  "files": [
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasProtocolConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.protocol",
+        "org.pac4j.cas.config.CasConfiguration.timeTolerance",
+        "org.pac4j.cas.config.CasConfiguration.renew",
+        "org.pac4j.cas.config.CasConfiguration.gateway",
+        "org.pac4j.cas.config.CasConfiguration.acceptAnyProxy",
+        "org.pac4j.cas.config.CasConfiguration.allowedProxyChains",
+        "org.pac4j.cas.config.CasConfiguration.getTimeTolerance()",
+        "org.pac4j.cas.config.CasConfiguration.setTimeTolerance(long)",
+        "org.pac4j.cas.config.CasConfiguration.getProtocol()",
+        "org.pac4j.cas.config.CasConfiguration.setProtocol(CasProtocol)",
+        "org.pac4j.cas.config.CasConfiguration.isRenew()",
+        "org.pac4j.cas.config.CasConfiguration.setRenew(boolean)",
+        "org.pac4j.cas.config.CasConfiguration.isGateway()",
+        "org.pac4j.cas.config.CasConfiguration.setGateway(boolean)",
+        "org.pac4j.cas.config.CasConfiguration.isAcceptAnyProxy()",
+        "org.pac4j.cas.config.CasConfiguration.setAcceptAnyProxy(boolean)",
+        "org.pac4j.cas.config.CasConfiguration.getAllowedProxyChains()",
+        "org.pac4j.cas.config.CasConfiguration.setAllowedProxyChains(ProxyList)",
+        "org.pac4j.cas.config.CasConfiguration.setAllowedProxies(List<String>)"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasProtocolConfiguration",
+        "org.pac4j.cas.config.CasConfiguration"
+      ],
+      "details": "Create CasProtocolConfiguration in the same package and move the listed fields and methods into it. Preserve the existing public methods on CasConfiguration as delegating methods backed by a private CasProtocolConfiguration field, so existing callers and CasTicketValidatorFactory interactions remain source-compatible. Preserve the existing default values: timeTolerance=1000L, protocol=CasProtocol.CAS30, renew=false, gateway=false, acceptAnyProxy=false, and allowedProxyChains=new ProxyList(). Keep setAllowedProxies(List<String>) conversion behavior unchanged.",
+      "risk": "medium"
+    }
+  ]
+}

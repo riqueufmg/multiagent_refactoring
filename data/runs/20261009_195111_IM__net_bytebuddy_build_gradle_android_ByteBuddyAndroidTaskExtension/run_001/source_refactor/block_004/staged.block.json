@@ -1,0 +1,55 @@
+{
+  "id": 4,
+  "goal": "Replace the original adjustment-related fields and their getters/setters in ByteBuddyAndroidTaskExtension with a single delegate and façade methods delegating to ByteBuddyAndroidAdjustment.",
+  "files": [
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::adjustment",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::adjustmentErrorHandler",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::adjustmentPostProcessor",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::threads",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::lazy"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidAdjustment.java"
+      ],
+      "details": "Move the adjustment related fields into ByteBuddyAndroidAdjustment. Replace them in ByteBuddyAndroidTaskExtension by a single private final ByteBuddyAndroidAdjustment adjustmentSettings field, initialized in the constructor: this.adjustmentSettings = new ByteBuddyAndroidAdjustment();",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::getAdjustment",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::setAdjustment",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::getAdjustmentErrorHandler",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::setAdjustmentErrorHandler",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::getAdjustmentPostProcessor",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::setAdjustmentPostProcessor",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::getThreads",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::setThreads",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::isLazy",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::setLazy"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidAdjustment.java"
+      ],
+      "details": "Move implementations of the adjustment-related getters and setters into ByteBuddyAndroidAdjustment. In ByteBuddyAndroidTaskExtension keep façade methods delegating to adjustmentSettings (for example getAdjustment() -> adjustmentSettings.getAdjustment()).",
+      "risk": "medium"
+    },
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Maintain the original public/ protected API on ByteBuddyAndroidTaskExtension by providing delegate façade methods that forward to the adjustmentSettings instance. This avoids breaking callers while removing many fields and methods from the primary class body.",
+      "risk": "low"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 3,
+  "goal": "Remove declaration-oriented delegation methods from Navigator and use the existing NavigatorDeclarationLookup component as their owner.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandConstructor(TypeDeclaration, int)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandMethod(TypeDeclaration, String)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup"
+      ],
+      "details": "Move constructor, field, and method lookup operations to the existing NavigatorDeclarationLookup component, preserving their current signatures and behavior.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandConstructor(TypeDeclaration, int)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandMethod(TypeDeclaration, String)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup"
+      ],
+      "details": "Update all callers to use NavigatorDeclarationLookup directly and remove the corresponding delegation methods from Navigator.",
+      "risk": "high"
+    }
+  ]
+}

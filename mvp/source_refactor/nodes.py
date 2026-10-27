@@ -1299,6 +1299,7 @@ def compile_source_node(state: SourceRefactorState) -> SourceRefactorState:
             "ok": compile_ok,
             "return_code": return_code,
             "command": compile_command,
+            "timeout": timeout,
             "compile_log": str(compile_log_path),
         },
     )

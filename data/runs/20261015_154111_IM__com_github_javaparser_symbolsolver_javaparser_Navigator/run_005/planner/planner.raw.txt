@@ -1,0 +1,73 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract type and declaration lookup responsibilities from Navigator into a cohesive utility class.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator"
+          ],
+          "details": "Extract demandClass(CompilationUnit, String), demandClassOrInterface(CompilationUnit, String), demandConstructor(TypeDeclaration<?>, int), demandEnum(CompilationUnit, String), demandField(ClassOrInterfaceDeclaration, String), demandInterface(CompilationUnit, String), demandMethod(TypeDeclaration<?>, String), findType(CompilationUnit, String), findType(TypeDeclaration<?>, String), getInnerTypeName(String), and getOuterTypeName(String). Preserve the existing static utility behavior and required imports in the extracted class.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass()",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.demandClass()"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.demandClass()"
+          ],
+          "details": "Update calls to the extracted type and declaration lookup methods, including internal calls from demandClass, demandClassOrInterface, demandInterface, and the extracted findType overloads, to use TypeNavigator.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract generic AST node search and demand responsibilities from Navigator into a cohesive utility class.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "details": "Extract demandNodeOfGivenClass(Node, Class<N>), demandParentNode(Node), demandReturnStmt(MethodDeclaration), demandSwitch(Node), demandVariableDeclaration(Node, String), findMethodCall(Node, String), findNameExpression(Node, String), findNodeOfGivenClass(Node, Class<N>), findReturnStmt(MethodDeclaration), findSimpleName(Node, String), findSwitch(Node), requireParentNode(Node), and findSwitchHelper(Node). Preserve the deprecated methods as compatibility delegates where necessary and preserve the existing static utility behavior and required imports in the extracted class.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass()",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandNodeOfGivenClass()"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandNodeOfGivenClass()"
+          ],
+          "details": "Update calls to the extracted node-search methods, including internal calls from demandReturnStmt, demandSwitch, findNodeOfGivenClass, findReturnStmt, findSwitch, and requireParentNode, to use NodeNavigator.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

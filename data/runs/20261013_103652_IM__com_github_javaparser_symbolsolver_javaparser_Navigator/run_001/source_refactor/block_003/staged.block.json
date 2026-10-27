@@ -1,0 +1,53 @@
+{
+  "id": 3,
+  "goal": "Extract declaration-member lookup operations from Navigator and retain Navigator as the stable public facade.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+        "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "Navigator.demandMethod(TypeDeclaration<?>, String)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup"
+      ],
+      "details": "Create NavigatorDeclarationLookup in the same package and move constructor, field, and method member lookup responsibilities into it. Keep the existing Navigator methods as delegating facade methods.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+        "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "Navigator.demandMethod(TypeDeclaration<?>, String)"
+      ],
+      "outputs": [
+        "NavigatorDeclarationLookup.demandConstructor(TypeDeclaration<?>, int)",
+        "NavigatorDeclarationLookup.demandField(ClassOrInterfaceDeclaration, String)",
+        "NavigatorDeclarationLookup.demandMethod(TypeDeclaration<?>, String)"
+      ],
+      "details": "Move the existing member iteration and ambiguity/error handling unchanged. Preserve the constructor index semantics and the existing exception messages.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+        "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "Navigator.demandMethod(TypeDeclaration<?>, String)"
+      ],
+      "outputs": [
+        "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+        "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+        "Navigator.demandMethod(TypeDeclaration<?>, String)"
+      ],
+      "details": "Replace the method bodies in Navigator with delegation to NavigatorDeclarationLookup while retaining the original public signatures.",
+      "risk": "low"
+    }
+  ]
+}

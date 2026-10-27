@@ -1,0 +1,44 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive table-range operation cluster to the new subpackage.",
+  "files": [
+    "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java",
+    "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/TableRangeOp.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.accumulo.manager.tableOps.range"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.manager.tableOps.Utils"
+      ],
+      "outputs": [
+        "org.apache.accumulo.manager.tableOps.range.Utils"
+      ],
+      "details": "Move Utils to the destination package.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.manager.tableOps.TableRangeOp"
+      ],
+      "outputs": [
+        "org.apache.accumulo.manager.tableOps.range.TableRangeOp"
+      ],
+      "details": "Move TableRangeOp to the same destination package as the related range and locking utilities.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

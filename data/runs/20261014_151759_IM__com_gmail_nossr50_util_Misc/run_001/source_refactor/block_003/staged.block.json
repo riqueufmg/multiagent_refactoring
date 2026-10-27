@@ -1,0 +1,67 @@
+{
+  "id": 3,
+  "goal": "Extract cohesive location, random-offset, and experience-orb utilities from Misc to reduce unrelated general methods and isolate world-related behavior.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/LocationUtil.java",
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+        "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+        "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+        "com.gmail.nossr50.util.Misc.getRandom()",
+        "com.gmail.nossr50.util.Misc.spawnExperienceOrb(Location, int)",
+        "com.gmail.nossr50.util.Misc.random"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.LocationUtil"
+      ],
+      "details": "Create LocationUtil in com.gmail.nossr50.util and move the listed location and world utility methods and the random field into it. Preserve static access, random behavior, null/world checks, distance semantics, and experience-orb spawning behavior. Include the required Bukkit, annotation, and java.util.Random imports.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear",
+        "com.gmail.nossr50.util.Misc.getBlockCenter",
+        "com.gmail.nossr50.util.Misc.getLocationOffset",
+        "com.gmail.nossr50.util.Misc.getRandom",
+        "com.gmail.nossr50.util.Misc.spawnExperienceOrb"
+      ],
+      "outputs": [
+        "All source call sites of the moved location and world utility methods"
+      ],
+      "details": "Replace calls to the moved methods with calls to the corresponding static methods on LocationUtil. Update direct references to Misc.random only if such references exist.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/LocationUtil.java",
+        "All files updated by the location utility call-site migration"
+      ],
+      "outputs": [
+        "Compilation-valid imports for LocationUtil and its Bukkit, annotation, and random dependencies"
+      ],
+      "details": "Remove no-longer-used location, entity, and Random imports from Misc and add LocationUtil imports to migrated callers where required.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

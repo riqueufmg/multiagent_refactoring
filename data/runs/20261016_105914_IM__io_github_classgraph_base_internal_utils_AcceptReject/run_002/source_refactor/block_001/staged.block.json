@@ -1,0 +1,33 @@
+{
+  "id": 1,
+  "goal": "Extract the prefix-based acceptance and rejection implementation from AcceptReject so that its cohesive state and behavior are maintained in a separate class.",
+  "files": [
+    "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.github.classgraph.base.internal.utils.AcceptReject",
+        "io.github.classgraph.base.internal.utils.AcceptReject.AcceptRejectPrefix"
+      ],
+      "outputs": [
+        "io.github.classgraph.base.internal.utils.AcceptRejectPrefix"
+      ],
+      "details": "Extract the AcceptRejectPrefix subclass, including its addToAccept, addToReject, isAcceptedAndNotRejected, isAccepted, acceptHasPrefix, and isRejected methods and the protected state they require. Keep it in the same package and preserve its inheritance from AcceptReject.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "io.github.classgraph.base.internal.utils.AcceptReject.AcceptRejectPrefix",
+        "io.github.classgraph.base.internal.utils.AcceptRejectPrefix"
+      ],
+      "outputs": [
+        "io.github.classgraph.base.internal.utils.AcceptRejectPrefix"
+      ],
+      "details": "Update references to the nested AcceptRejectPrefix class to use the extracted class while preserving constructor arguments and behavior.",
+      "risk": "medium"
+    }
+  ]
+}

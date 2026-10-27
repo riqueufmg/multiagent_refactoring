@@ -1,0 +1,179 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.gmail.nossr50.util.Misc",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive item-spawning API from Misc into a dedicated utility class, reducing the number of public methods and preserving behavior through updated callers.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscItemSpawner.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.Misc.spawnItem",
+            "com.gmail.nossr50.util.Misc.spawnItems",
+            "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+            "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscItemSpawner"
+          ],
+          "details": "Create com.gmail.nossr50.util.MiscItemSpawner with the extracted static methods and their existing signatures. Preserve each method's delegation to ItemSpawnUtil. Remove the extracted methods from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.Misc.spawnItem",
+            "com.gmail.nossr50.util.Misc.spawnItems",
+            "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+            "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscItemSpawner.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.MiscItemSpawner.spawnItem",
+            "com.gmail.nossr50.util.MiscItemSpawner.spawnItems",
+            "com.gmail.nossr50.util.MiscItemSpawner.spawnItemNaturally",
+            "com.gmail.nossr50.util.MiscItemSpawner.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.MiscItemSpawner.spawnItemTowardsLocation"
+          ],
+          "details": "Update references to the extracted item-spawning methods to use MiscItemSpawner and add imports where callers are outside com.gmail.nossr50.util.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the cohesive location and randomization functionality from Misc into a dedicated utility class.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNear",
+            "com.gmail.nossr50.util.Misc.getBlockCenter",
+            "com.gmail.nossr50.util.Misc.getLocationOffset",
+            "com.gmail.nossr50.util.Misc.getRandom",
+            "com.gmail.nossr50.util.Misc.random"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscLocationUtil"
+          ],
+          "details": "Create com.gmail.nossr50.util.MiscLocationUtil with the extracted static methods, move the random field into the new class, and preserve the existing randomization and Bukkit Location behavior. Remove the extracted methods and field from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNear",
+            "com.gmail.nossr50.util.Misc.getBlockCenter",
+            "com.gmail.nossr50.util.Misc.getLocationOffset",
+            "com.gmail.nossr50.util.Misc.getRandom"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscLocationUtil.isNear",
+            "com.gmail.nossr50.util.MiscLocationUtil.getBlockCenter",
+            "com.gmail.nossr50.util.MiscLocationUtil.getLocationOffset",
+            "com.gmail.nossr50.util.MiscLocationUtil.getRandom"
+          ],
+          "details": "Update all references to the extracted location and randomization methods to use MiscLocationUtil.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract conversion reporting and material-mod name resolution from Misc into a cohesive utility class.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscConversionUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.printProgress",
+            "com.gmail.nossr50.util.Misc.getModName",
+            "com.gmail.nossr50.util.Misc.modNames",
+            "com.gmail.nossr50.util.Misc.TIME_CONVERSION_FACTOR"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscConversionUtil"
+          ],
+          "details": "Create com.gmail.nossr50.util.MiscConversionUtil with printProgress, getModName, modNames, and TIME_CONVERSION_FACTOR. Preserve the existing logging, formatting, locale, and mod-name matching behavior. Remove the extracted members from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.printProgress",
+            "com.gmail.nossr50.util.Misc.getModName",
+            "com.gmail.nossr50.util.Misc.modNames",
+            "com.gmail.nossr50.util.Misc.TIME_CONVERSION_FACTOR"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscConversionUtil.printProgress",
+            "com.gmail.nossr50.util.MiscConversionUtil.getModName",
+            "com.gmail.nossr50.util.MiscConversionUtil.modNames",
+            "com.gmail.nossr50.util.MiscConversionUtil.TIME_CONVERSION_FACTOR"
+          ],
+          "details": "Update all references to the extracted conversion-related members to use MiscConversionUtil.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive authorization-generator API out of BaseClient into the existing BaseClientAuthorization component, reducing the number of public methods in BaseClient.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+      ],
+      "details": "Move the authorization-generator accessor to BaseClientAuthorization, which already owns the authorization generator state.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "details": "Move the list-based authorization-generator setter to BaseClientAuthorization.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])"
+      ],
+      "details": "Move the varargs authorization-generator setter to BaseClientAuthorization.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+      ],
+      "details": "Move the single authorization-generator setter to BaseClientAuthorization.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+      ],
+      "details": "Move the single authorization-generator addition method to BaseClientAuthorization.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "details": "Move the list-based authorization-generator addition method to BaseClientAuthorization.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "details": "Update callers to access the authorization-generator operations through BaseClientAuthorization after the methods are moved.",
+      "risk": "high"
+    }
+  ]
+}

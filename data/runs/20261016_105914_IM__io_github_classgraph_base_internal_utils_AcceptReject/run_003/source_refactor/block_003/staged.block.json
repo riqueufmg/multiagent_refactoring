@@ -1,0 +1,22 @@
+{
+  "id": 3,
+  "goal": "Remove leaf-name-specific behavior from the large target class by extracting it into a focused class.",
+  "files": [
+    "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+    "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectWholeString.java",
+    "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectLeafname.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.github.classgraph.base.internal.utils.AcceptReject.AcceptRejectLeafname"
+      ],
+      "outputs": [
+        "io.github.classgraph.base.internal.utils.AcceptRejectLeafname"
+      ],
+      "details": "Extract the leaf-name-specific overrides of addToAccept, addToReject, isAcceptedAndNotRejected, isAccepted, acceptHasPrefix, and isRejected into a top-level AcceptRejectLeafname class in the same package, extending the extracted AcceptRejectWholeString implementation. Keep the existing nested AcceptReject.AcceptRejectLeafname as a compatibility adapter with the same constructor and public API.",
+      "risk": "medium"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": 2,
+  "goal": "Remove node-navigation delegation methods from Navigator and use the existing NavigatorNodeLookup component as their owner.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node, Class)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findNodeOfGivenClass(Node, Class)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findReturnStmt(MethodDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findSwitch(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.requireParentNode(Node)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+      ],
+      "details": "Transfer the node-oriented public operations to the existing NavigatorNodeLookup component. Preserve the deprecated status and documentation of findNodeOfGivenClass, findReturnStmt, findSwitch, and requireParentNode.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node, Class)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findNodeOfGivenClass(Node, Class)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findReturnStmt(MethodDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findSwitch(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.requireParentNode(Node)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+      ],
+      "details": "Update all callers to use NavigatorNodeLookup after the methods are removed from Navigator. Retain equivalent generic signatures and Optional return types.",
+      "risk": "high"
+    }
+  ]
+}

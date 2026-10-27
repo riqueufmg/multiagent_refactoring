@@ -1,0 +1,106 @@
+commit 7bc301411e41444984785a430a68527af391fc5c
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 15:21:15 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/Misc.java
+index c653d0854..f6593bd93 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/Misc.java
+@@ -32,27 +32,6 @@ public final class Misc {
+ 
+     private Misc() {}
+ 
+-    public static boolean isNPCEntityExcludingVillagers(@NotNull Entity entity) {
+-        return (!isVillager(entity) && isNPCIncludingVillagers(entity));
+-    }
+-
+-    public static boolean isNPCClassType(Entity entity) {
+-        return entity instanceof NPC;
+-    }
+-
+-    public static boolean hasNPCMetadataTag(Entity entity) {
+-        return entity.hasMetadata("NPC");
+-    }
+-
+-    public static boolean isVillager(Entity entity) {
+-        String entityType = entity.getType().toString();
+-        return entityType.equalsIgnoreCase("wandering_trader") || entity instanceof Villager;
+-    }
+-
+-    public static boolean isNPCIncludingVillagers(@Nullable Entity entity) {
+-        return (entity == null || hasNPCMetadataTag(entity) || isNPCClassType(entity) || entity.getClass().getName().equalsIgnoreCase("cofh.entity.PlayerFake"));
+-    }
+-
+     public static boolean isNear(@NotNull Location first, @NotNull Location second, double maxDistance) {
+         return (first.getWorld() == second.getWorld()) && (first.distanceSquared(second) < (maxDistance * maxDistance) || maxDistance == 0);
+     }
+@@ -156,6 +135,29 @@ public final class Misc {
+         return ItemSpawnUtil.spawnItemTowardsLocation(player, fromLocation, toLocation, itemStack, speed, itemSpawnReason);
+     }
+ 
++    /**
++     * Compatibility delegates for callers not migrated in this refactoring block.
++     */
++    public static boolean isNPCEntityExcludingVillagers(Entity entity) {
++        return NPCUtil.isNPCEntityExcludingVillagers(entity);
++    }
++
++    public static boolean isNPCClassType(Entity entity) {
++        return NPCUtil.isNPCClassType(entity);
++    }
++
++    public static boolean hasNPCMetadataTag(Entity entity) {
++        return NPCUtil.hasNPCMetadataTag(entity);
++    }
++
++    public static boolean isVillager(Entity entity) {
++        return NPCUtil.isVillager(entity);
++    }
++
++    public static boolean isNPCIncludingVillagers(@Nullable Entity entity) {
++        return NPCUtil.isNPCIncludingVillagers(entity);
++    }
++
+     private static class SpawnOrbTask implements Runnable {
+         private final Location location;
+         private int orbExpValue;
+diff --git a/src/main/java/com/gmail/nossr50/util/NPCUtil.java b/src/main/java/com/gmail/nossr50/util/NPCUtil.java
+new file mode 100644
+index 000000000..d99e52ddb
+--- /dev/null
++++ b/src/main/java/com/gmail/nossr50/util/NPCUtil.java
+@@ -0,0 +1,32 @@
++package com.gmail.nossr50.util;
++
++import org.bukkit.entity.Entity;
++import org.bukkit.entity.NPC;
++import org.bukkit.entity.Villager;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++public final class NPCUtil {
++    private NPCUtil() {}
++
++    public static boolean isNPCEntityExcludingVillagers(@NotNull Entity entity) {
++        return (!isVillager(entity) && isNPCIncludingVillagers(entity));
++    }
++
++    public static boolean isNPCClassType(Entity entity) {
++        return entity instanceof NPC;
++    }
++
++    public static boolean hasNPCMetadataTag(Entity entity) {
++        return entity.hasMetadata("NPC");
++    }
++
++    public static boolean isVillager(Entity entity) {
++        String entityType = entity.getType().toString();
++        return entityType.equalsIgnoreCase("wandering_trader") || entity instanceof Villager;
++    }
++
++    public static boolean isNPCIncludingVillagers(@Nullable Entity entity) {
++        return (entity == null || hasNPCMetadataTag(entity) || isNPCClassType(entity) || entity.getClass().getName().equalsIgnoreCase("cofh.entity.PlayerFake"));
++    }
++}

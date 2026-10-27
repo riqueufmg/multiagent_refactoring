@@ -1,0 +1,34 @@
+{
+  "id": 2,
+  "goal": "Extract credential and profile component configuration from BaseClient to reduce its implementation size and group related state and configuration methods.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient",
+        "org.pac4j.core.client.BaseClientProfileConfiguration",
+        "org.pac4j.core.client.BaseClient.credentialsExtractor",
+        "org.pac4j.core.client.BaseClient.authenticator",
+        "org.pac4j.core.client.BaseClient.profileCreator",
+        "org.pac4j.core.client.BaseClient.getCredentialsExtractor()",
+        "org.pac4j.core.client.BaseClient.defaultCredentialsExtractor(org.pac4j.core.credentials.extractor.CredentialsExtractor)",
+        "org.pac4j.core.client.BaseClient.getAuthenticator()",
+        "org.pac4j.core.client.BaseClient.defaultAuthenticator(org.pac4j.core.credentials.authenticator.Authenticator)",
+        "org.pac4j.core.client.BaseClient.getProfileCreator()",
+        "org.pac4j.core.client.BaseClient.defaultProfileCreator(org.pac4j.core.profile.creator.ProfileCreator)",
+        "org.pac4j.core.client.BaseClient.setCredentialsExtractor(org.pac4j.core.credentials.extractor.CredentialsExtractor)",
+        "org.pac4j.core.client.BaseClient.setAuthenticator(org.pac4j.core.credentials.authenticator.Authenticator)",
+        "org.pac4j.core.client.BaseClient.setProfileCreator(org.pac4j.core.profile.creator.ProfileCreator)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientProfileConfiguration"
+      ],
+      "details": "Move the credentialsExtractor, authenticator, and profileCreator fields and their related getter, setter, and default-initialization methods into BaseClientProfileConfiguration. Keep compatible forwarding methods in BaseClient for existing callers. Update retrieveCredentials(org.pac4j.core.context.WebContext, org.pac4j.core.context.session.SessionStore, org.pac4j.core.profile.factory.ProfileManagerFactory), retrieveUserProfile(org.pac4j.core.credentials.Credentials, org.pac4j.core.context.WebContext, org.pac4j.core.context.session.SessionStore), getUserProfile(org.pac4j.core.credentials.Credentials, org.pac4j.core.context.WebContext, org.pac4j.core.context.session.SessionStore), and toString() to access the extracted configuration.",
+      "risk": "medium"
+    }
+  ]
+}

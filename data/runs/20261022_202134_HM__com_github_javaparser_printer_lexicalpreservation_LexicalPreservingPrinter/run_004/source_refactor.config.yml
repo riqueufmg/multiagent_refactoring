@@ -1,0 +1,47 @@
+mvp:
+  name: source_refactor
+  run_id: run_004
+input:
+  planner_contract: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter/run_004/planner/contract.json
+  planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter/run_004/planner/contract.json
+models:
+  executor: gpt-5.6-luna
+  repair: gpt-5.6-luna
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/system.md
+  execute_plan: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/execute_plan.md
+  repair_compile: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/repair_compile.md
+executor:
+  temperature: 0.0
+  timeout: 600
+  max_retries: 5
+  max_block_attempts: 5
+repair:
+  enabled: true
+  max_attempts: 5
+compile:
+  timeout: 900
+  command:
+  - /data/henrique/historical-java-repro/benchmark/repositories/javaparser/commits/2a156ba2f477/build_mars.sh
+mechanical_tools:
+  openrewrite_enabled: true
+  openrewrite_timeout: 900
+  openrewrite_command:
+  - /data/henrique/historical-java-repro/benchmark/repositories/javaparser/commits/2a156ba2f477/openrewrite_mars_online.sh
+tests:
+  update_tests: true
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter
+project:
+  name: javaparser
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/javaparser/repository
+target:
+  smell: HM
+  smell_name: Hub-like Modularization
+  target_type: class
+  target_name: com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter
+planner_contract: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter/run_004/planner/contract.json
+planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter/run_004/planner/contract.json
+planner:
+  contract: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter/run_004/planner/contract.json
+  contract_path: /data/henrique/multiagent_refactoring/data/runs/20261022_202134_HM__com_github_javaparser_printer_lexicalpreservation_LexicalPreservingPrinter/run_004/planner/contract.json

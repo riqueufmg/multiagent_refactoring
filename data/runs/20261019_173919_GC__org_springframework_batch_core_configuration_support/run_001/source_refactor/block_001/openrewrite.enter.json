@@ -1,0 +1,81 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.springframework.batch.core.configuration.support.context"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.springframework.batch.core.configuration.support.ApplicationContextFactory"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.configuration.support.context.ApplicationContextFactory"
+      ],
+      "details": "Move the application-context factory contract to the dedicated context subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.springframework.batch.core.configuration.support.ApplicationContextJobFactory"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.configuration.support.context.ApplicationContextJobFactory"
+      ],
+      "details": "Move the job factory implementation that creates jobs from application contexts to the dedicated context subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.springframework.batch.core.configuration.support.GenericApplicationContextFactory"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory"
+      ],
+      "details": "Move the generic application-context factory implementation to the dedicated context subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.configuration.support.context.ClasspathXmlApplicationContextsFactoryBean"
+      ],
+      "details": "Move the classpath XML application-context factory bean specialization alongside its generic factory base.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.springframework.batch.core.configuration.support.AutomaticJobRegistrar",
+        "org.springframework.batch.core.configuration.support.DefaultJobLoader",
+        "org.springframework.batch.core.configuration.support.JobLoader",
+        "org.springframework.batch.core.configuration.support.context.ApplicationContextFactory",
+        "org.springframework.batch.core.configuration.support.context.ApplicationContextJobFactory",
+        "org.springframework.batch.core.configuration.support.context.ClasspathXmlApplicationContextsFactoryBean",
+        "org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

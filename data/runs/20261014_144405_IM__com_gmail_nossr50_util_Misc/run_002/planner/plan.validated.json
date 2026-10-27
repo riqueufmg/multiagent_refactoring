@@ -1,0 +1,231 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.gmail.nossr50.util.Misc",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract general location, entity, randomization, and mod-name utilities from Misc to reduce its public API and implementation scope.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers",
+            "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers",
+            "com.gmail.nossr50.util.Misc.isNear",
+            "com.gmail.nossr50.util.Misc.getBlockCenter",
+            "com.gmail.nossr50.util.Misc.getModName",
+            "com.gmail.nossr50.util.Misc.getLocationOffset",
+            "com.gmail.nossr50.util.Misc.getRandom",
+            "com.gmail.nossr50.util.Misc.isPartyLeader",
+            "com.gmail.nossr50.util.Misc.spawnExperienceOrb",
+            "com.gmail.nossr50.util.Misc.random",
+            "com.gmail.nossr50.util.Misc.modNames",
+            "com.gmail.nossr50.util.Misc.SpawnOrbTask"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscGeneralUtil",
+            "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java"
+          ],
+          "details": "Create MiscGeneralUtil in the same package and move the listed cohesive methods, fields, and the private SpawnOrbTask implementation into it. Preserve the existing static signatures and annotations. Remove the moved members from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java"
+          ],
+          "outputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java"
+          ],
+          "details": "Add the imports already required by the moved methods and fields, including Location, BlockState, EntityType, ExperienceOrb, McMMOPlayer, ImmutableSet, Random, Locale, NotNull, and Nullable.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers",
+            "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers",
+            "com.gmail.nossr50.util.Misc.isNear",
+            "com.gmail.nossr50.util.Misc.getBlockCenter",
+            "com.gmail.nossr50.util.Misc.getModName",
+            "com.gmail.nossr50.util.Misc.getLocationOffset",
+            "com.gmail.nossr50.util.Misc.getRandom",
+            "com.gmail.nossr50.util.Misc.isPartyLeader",
+            "com.gmail.nossr50.util.Misc.spawnExperienceOrb",
+            "com.gmail.nossr50.util.Misc.modNames"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscGeneralUtil.isNPCEntityExcludingVillagers",
+            "com.gmail.nossr50.util.MiscGeneralUtil.isNPCIncludingVillagers",
+            "com.gmail.nossr50.util.MiscGeneralUtil.isNear",
+            "com.gmail.nossr50.util.MiscGeneralUtil.getBlockCenter",
+            "com.gmail.nossr50.util.MiscGeneralUtil.getModName",
+            "com.gmail.nossr50.util.MiscGeneralUtil.getLocationOffset",
+            "com.gmail.nossr50.util.MiscGeneralUtil.getRandom",
+            "com.gmail.nossr50.util.MiscGeneralUtil.isPartyLeader",
+            "com.gmail.nossr50.util.MiscGeneralUtil.spawnExperienceOrb",
+            "com.gmail.nossr50.util.MiscGeneralUtil.modNames"
+          ],
+          "details": "Update all production references from Misc to MiscGeneralUtil for the moved methods and field. Do not retain forwarding methods in Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the cohesive item-spawning API from Misc into a dedicated utility class.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscItemSpawnUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.Misc.spawnItem",
+            "com.gmail.nossr50.util.Misc.spawnItems",
+            "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+            "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscItemSpawnUtil",
+            "src/main/java/com/gmail/nossr50/util/MiscItemSpawnUtil.java"
+          ],
+          "details": "Create MiscItemSpawnUtil in the same package and move all listed overloads, preserving their signatures, annotations, and delegation to ItemSpawnUtil. Remove the moved methods from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscItemSpawnUtil.java"
+          ],
+          "outputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscItemSpawnUtil.java"
+          ],
+          "details": "Add the imports already required by the moved methods, including ItemSpawnReason, Location, Item, Player, ItemStack, Collection, and Predicate.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.Misc.spawnItem",
+            "com.gmail.nossr50.util.Misc.spawnItems",
+            "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+            "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItem",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItems",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemNaturally",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemTowardsLocation"
+          ],
+          "details": "Update all production references from Misc to MiscItemSpawnUtil for the moved item-spawning methods. Do not retain forwarding methods in Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract profile maintenance and conversion-progress responsibilities from Misc.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscMaintenanceUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.profileCleanup",
+            "com.gmail.nossr50.util.Misc.printProgress",
+            "com.gmail.nossr50.util.Misc.TIME_CONVERSION_FACTOR"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscMaintenanceUtil",
+            "src/main/java/com/gmail/nossr50/util/MiscMaintenanceUtil.java"
+          ],
+          "details": "Create MiscMaintenanceUtil in the same package and move the listed methods and TIME_CONVERSION_FACTOR into it. Preserve the existing static signatures and use the existing mcMMO, UserManager, and PlayerProfileLoadingTask dependencies.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscMaintenanceUtil.java"
+          ],
+          "outputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscMaintenanceUtil.java"
+          ],
+          "details": "Add the imports already required by the moved methods, including McMMOPlayer-related project dependencies, Player, mcMMO, PlayerProfileLoadingTask, UserManager, NotNull, and String formatting dependencies.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.profileCleanup",
+            "com.gmail.nossr50.util.Misc.printProgress",
+            "com.gmail.nossr50.util.Misc.TIME_CONVERSION_FACTOR"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscMaintenanceUtil.profileCleanup",
+            "com.gmail.nossr50.util.MiscMaintenanceUtil.printProgress",
+            "com.gmail.nossr50.util.MiscMaintenanceUtil.TIME_CONVERSION_FACTOR"
+          ],
+          "details": "Update all production references from Misc to MiscMaintenanceUtil for profile cleanup, conversion progress, and the moved conversion constant. Do not retain forwarding methods or fields in Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    }
+  ]
+}

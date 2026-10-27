@@ -1,0 +1,25 @@
+project:
+  name: javaparser
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/javaparser/repository
+runs: 5
+target:
+  smell: IM
+  smell_name: Insufficient Modularization
+  target_type: class
+  target_name: com.github.javaparser.symbolsolver.javaparser.Navigator
+planner:
+  base_config: /data/henrique/multiagent_refactoring/mvp/planner/config.yml
+  llm:
+    model: gpt-5.6-luna
+source_refactor:
+  base_config: /data/henrique/multiagent_refactoring/mvp/source_refactor/config.yml
+  llm:
+    model: gpt-5.6-luna
+  compile:
+    timeout: 900
+    command:
+    - /data/henrique/raven-mars-interface/outputs/javaparser/8e616cd8366d/build_mars.sh
+quality_checker:
+  base_config: /data/henrique/multiagent_refactoring/mvp/quality_checker/config.yml
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs

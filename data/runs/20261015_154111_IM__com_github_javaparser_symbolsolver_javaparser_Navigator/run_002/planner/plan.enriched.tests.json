@@ -1,0 +1,241 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract type-declaration lookup and type-demand operations into a cohesive utility class, reducing the number of public methods and implementation responsibilities in Navigator.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/TypeNavigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator"
+          ],
+          "details": "Move the cohesive type-related methods demandClass(CompilationUnit,String), demandClassOrInterface(CompilationUnit,String), demandEnum(CompilationUnit,String), demandInterface(CompilationUnit,String), findType(CompilationUnit,String), findType(TypeDeclaration<?>,String), getInnerTypeName(String), and getOuterTypeName(String) from Navigator to TypeNavigator. Preserve method bodies, visibility, static behavior, and required JavaParser imports.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/TypeNavigator.java"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/TypeNavigator.java"
+          ],
+          "details": "Ensure TypeNavigator contains the imports required by the extracted CompilationUnit, TypeDeclaration, ClassOrInterfaceDeclaration, EnumDeclaration, and Optional usages.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.demandClass(CompilationUnit,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use TypeNavigator.demandClass.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClassOrInterface(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.demandClassOrInterface(CompilationUnit,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use TypeNavigator.demandClassOrInterface.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandEnum(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.demandEnum(CompilationUnit,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use TypeNavigator.demandEnum.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandInterface(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.demandInterface(CompilationUnit,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use TypeNavigator.demandInterface.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findType(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.findType(CompilationUnit,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use TypeNavigator.findType for CompilationUnit-based lookup.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findType(TypeDeclaration<?>,String)",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator.findType(TypeDeclaration<?>,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use TypeNavigator.findType for TypeDeclaration-based lookup.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract generic AST-node search and demand operations into a cohesive utility class, reducing the number of general methods and related implementation complexity in Navigator.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NodeNavigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "details": "Move the cohesive node-search methods demandNodeOfGivenClass(Node,Class<N>), demandParentNode(Node), demandReturnStmt(MethodDeclaration), demandSwitch(Node), demandVariableDeclaration(Node,String), findMethodCall(Node,String), findNameExpression(Node,String), findNodeOfGivenClass(Node,Class<N>), findReturnStmt(MethodDeclaration), findSimpleName(Node,String), findSwitch(Node), requireParentNode(Node), and findSwitchHelper(Node) from Navigator to NodeNavigator. Preserve deprecated annotations and delegation behavior for the deprecated methods, static behavior, and required JavaParser imports.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NodeNavigator.java"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NodeNavigator.java"
+          ],
+          "details": "Ensure NodeNavigator contains the imports required by the extracted Node, MethodDeclaration, ReturnStmt, SwitchStmt, MethodCallExpr, NameExpr, SimpleName, VariableDeclarator, Optional, and generic Class usages.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node,Class<N>)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandNodeOfGivenClass(Node,Class<N>)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.demandNodeOfGivenClass.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandParentNode(Node)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.demandParentNode.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandReturnStmt(MethodDeclaration)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.demandReturnStmt.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandSwitch(Node)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.demandSwitch.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandVariableDeclaration(Node,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.demandVariableDeclaration.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findMethodCall(Node,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.findMethodCall.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findNameExpression(Node,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.findNameExpression.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findSimpleName(Node,String)"
+          ],
+          "outputs": [
+            "project call sites"
+          ],
+          "details": "Update all project call sites to use NodeNavigator.findSimpleName.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

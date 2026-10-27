@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.accumulo.core.fate.zookeeper",
+  "selected_cluster": [
+    "org.apache.accumulo.core.fate.zookeeper.FateLock",
+    "org.apache.accumulo.core.fate.zookeeper.ZooReservation",
+    "org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter"
+  ],
+  "destination_package": "org.apache.accumulo.core.fate.zookeeper.coordination",
+  "cluster_reason": "These classes form a cohesive ZooKeeper coordination cluster: FateLock and ZooReservation both depend directly on ZooReaderWriter, and all three support FATE locking or reservation workflows. Moving them together preserves their central internal relationship and avoids separating the coordination implementation from its primary consumers.",
+  "risk": "high",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive ZooKeeper coordination cluster together into a dedicated subpackage.",
+      "files": [
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/FateLock.java",
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooReservation.java",
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooReaderWriter.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.coordination"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.FateLock"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.coordination.FateLock"
+          ],
+          "details": "Move FateLock to the coordination subpackage with its nested types.",
+          "risk": "high",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.ZooReservation"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.coordination.ZooReservation"
+          ],
+          "details": "Move ZooReservation to the coordination subpackage.",
+          "risk": "high",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.coordination.ZooReaderWriter"
+          ],
+          "details": "Move ZooReaderWriter to the coordination subpackage with its nested types, keeping the directly dependent lock and reservation classes in the same cluster.",
+          "risk": "high",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

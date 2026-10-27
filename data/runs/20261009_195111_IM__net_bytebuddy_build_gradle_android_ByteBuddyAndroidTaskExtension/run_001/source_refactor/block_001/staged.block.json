@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "goal": "Extract transformation management (transformations list and the two transformation(...) configurators) into a dedicated helper class to reduce the number of public methods and group cohesive behavior.",
+  "files": [
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java",
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java"
+      ],
+      "details": "Create a new class net.bytebuddy.build.gradle.android.ByteBuddyAndroidTransformations in the same package. This class encapsulates the List<Transformation> transformations field and the three methods that manage it: getTransformations(), transformation(Closure<Transformation>) and transformation(Action<Transformation>). Provide a constructor ByteBuddyAndroidTransformations(Project project) that initializes its internal list and uses ObjectFactory.newInstance(project, Transformation.class, project) and project.configure(...) as in the original methods.",
+      "risk": "medium"
+    }
+  ]
+}

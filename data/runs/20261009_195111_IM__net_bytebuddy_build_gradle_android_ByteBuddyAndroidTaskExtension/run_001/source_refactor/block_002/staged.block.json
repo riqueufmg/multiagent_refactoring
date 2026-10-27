@@ -1,0 +1,44 @@
+{
+  "id": 2,
+  "goal": "Replace the original transformations fields and methods in ByteBuddyAndroidTaskExtension with a single delegate field and forwarding methods (facade) to preserve the external API while removing members from the target class.",
+  "files": [
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::transformations"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java::transformations"
+      ],
+      "details": "The original private final List<Transformation> transformations field is moved into ByteBuddyAndroidTransformations as a private final List<Transformation> field. The original field is removed from ByteBuddyAndroidTaskExtension and replaced by a private final ByteBuddyAndroidTransformations transformations delegate field.",
+      "risk": "low"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::getTransformations",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::transformation(Closure)",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java::transformation(Action)"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java"
+      ],
+      "details": "Move implementation of getTransformations() and both transformation(...) methods into ByteBuddyAndroidTransformations. In ByteBuddyAndroidTaskExtension, replace the moved methods with façade methods delegating to the delegate field: return transformations.getTransformations(); transformations.transformation(...). Initialize the delegate in the ByteBuddyAndroidTaskExtension constructor: this.transformations = new ByteBuddyAndroidTransformations(project);",
+      "risk": "medium"
+    },
+    {
+      "op": "INTRODUCE_FACADE",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Keep the original public API surface on ByteBuddyAndroidTaskExtension by providing delegating methods that forward calls to the new ByteBuddyAndroidTransformations instance. This preserves backwards compatibility and reduces the number of fields/methods inside the target class body.",
+      "risk": "low"
+    }
+  ]
+}

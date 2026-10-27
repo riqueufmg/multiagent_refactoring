@@ -1,0 +1,197 @@
+commit 811f1aec4eae3de97fd730bc997f7bcc560492d9
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 16 10:46:15 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
+index f64e68073..88d3fc52a 100644
+--- a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
++++ b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
+@@ -7,12 +7,8 @@ import io.cucumber.plugin.event.SnippetsSuggestedEvent.Suggestion;
+ import java.io.PrintStream;
+ import java.net.URI;
+ import java.util.*;
+-import java.util.function.BiFunction;
+-import java.util.function.Function;
+ import java.util.function.Predicate;
+ import java.util.function.Supplier;
+-import java.util.regex.Matcher;
+-import java.util.regex.Pattern;
+ import java.util.stream.Collectors;
+ 
+ import static io.cucumber.core.exception.ExceptionUtils.printStackTrace;
+@@ -27,10 +23,9 @@ import static java.util.stream.Collectors.joining;
+  *      - Service Messages</a>
+  */
+ public class TeamCityPlugin implements EventListener {
+-    private static final Pattern ANNOTATION_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\([^:]*\\)");
+-    private static final Pattern LAMBDA_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\(.*:.*\\)");
+ 
+     private final TeamCityMessageFormatter formatter;
++    private final TeamCityStepFormatter stepFormatter = new TeamCityStepFormatter();
+     private final List<SnippetsSuggestedEvent> suggestions = new ArrayList<>();
+     private final Map<URI, Collection<Node>> parsedTestSources = new HashMap<>();
+     private List<Node> currentStack = new ArrayList<>();
+@@ -126,45 +121,14 @@ public class TeamCityPlugin implements EventListener {
+ 
+     private void printTestStepStarted(TestStepStarted event) {
+         String timestamp = formatter.extractTimeStamp(event);
+-        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_STARTED, timestamp, extractLocation(event),
+-            extractName(event.getTestStep()));
+-    }
+-
+-    private String extractLocation(TestStepStarted event) {
+-        TestStep step = event.getTestStep();
+-        if (step instanceof PickleStepTestStep) {
+-            PickleStepTestStep pickle = (PickleStepTestStep) step;
+-            return pickle.getUri() + ":" + pickle.getStep().getLine();
+-        }
+-        if (step instanceof HookTestStep)
+-            return formatHookStepLocation((HookTestStep) step, javaTestLocationUri(), TestStep::getCodeLocation);
+-        return step.getCodeLocation();
+-    }
+-
+-    private static BiFunction<String, String, String> javaTestLocationUri() {
+-        return (declaringClass, method) -> String.format("java:test://%s/%s", declaringClass, method);
+-    }
+-
+-    private String formatHookStepLocation(
+-            HookTestStep hook, BiFunction<String, String, String> format, Function<HookTestStep, String> fallback
+-    ) {
+-        Matcher matcher = ANNOTATION_GLUE_CODE_LOCATION_PATTERN.matcher(hook.getCodeLocation());
+-        if (matcher.matches())
+-            return format.apply(matcher.group(1), matcher.group(2));
+-        matcher = LAMBDA_GLUE_CODE_LOCATION_PATTERN.matcher(hook.getCodeLocation());
+-        if (matcher.matches()) {
+-            String declaringClass = matcher.group(1);
+-            int separator = declaringClass.lastIndexOf(".");
+-            String simpleName = separator == -1 ? declaringClass : declaringClass.substring(separator + 1);
+-            return format.apply(declaringClass, simpleName);
+-        }
+-        return fallback.apply(hook);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_STARTED, timestamp,
++            stepFormatter.extractLocation(event), stepFormatter.extractName(event.getTestStep()));
+     }
+ 
+     private void printTestStepFinished(TestStepFinished event) {
+         String timestamp = formatter.extractTimeStamp(event);
+         long duration = event.getResult().getDuration().toMillis();
+-        String name = extractName(event.getTestStep());
++        String name = stepFormatter.extractName(event.getTestStep());
+         Throwable error = event.getResult().getError();
+         switch (event.getResult().getStatus()) {
+             case SKIPPED:
+@@ -203,32 +167,6 @@ public class TeamCityPlugin implements EventListener {
+         formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_FINISHED, timestamp, duration, name);
+     }
+ 
+-    private String getHookName(HookTestStep hook) {
+-        switch (hook.getHookType()) {
+-            case BEFORE:
+-                return "Before";
+-            case AFTER:
+-                return "After";
+-            case BEFORE_STEP:
+-                return "BeforeStep";
+-            case AFTER_STEP:
+-                return "AfterStep";
+-            default:
+-                return hook.getHookType().name().toLowerCase(Locale.US);
+-        }
+-    }
+-
+-    private String extractName(TestStep step) {
+-        if (step instanceof PickleStepTestStep)
+-            return ((PickleStepTestStep) step).getStep().getText();
+-        if (step instanceof HookTestStep) {
+-            HookTestStep hook = (HookTestStep) step;
+-            return formatHookStepLocation(hook,
+-                (declaringClass, method) -> String.format("%s(%s)", getHookName(hook), method), this::getHookName);
+-        }
+-        return "Unknown step";
+-    }
+-
+     private String getSnippets(TestCase testCase) {
+         URI uri = testCase.getUri();
+         Location location = testCase.getLocation();
+diff --git a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityStepFormatter.java b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityStepFormatter.java
+new file mode 100644
+index 000000000..0230864ca
+--- /dev/null
++++ b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityStepFormatter.java
+@@ -0,0 +1,74 @@
++package io.cucumber.core.plugin;
++
++import io.cucumber.plugin.event.HookTestStep;
++import io.cucumber.plugin.event.PickleStepTestStep;
++import io.cucumber.plugin.event.TestStep;
++import io.cucumber.plugin.event.TestStepStarted;
++
++import java.util.Locale;
++import java.util.function.BiFunction;
++import java.util.function.Function;
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
++
++final class TeamCityStepFormatter {
++    private static final Pattern ANNOTATION_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\([^:]*\\)");
++    private static final Pattern LAMBDA_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\(.*:.*\\)");
++
++    String extractLocation(TestStepStarted event) {
++        TestStep step = event.getTestStep();
++        if (step instanceof PickleStepTestStep) {
++            PickleStepTestStep pickle = (PickleStepTestStep) step;
++            return pickle.getUri() + ":" + pickle.getStep().getLine();
++        }
++        if (step instanceof HookTestStep)
++            return formatHookStepLocation((HookTestStep) step, javaTestLocationUri(), TestStep::getCodeLocation);
++        return step.getCodeLocation();
++    }
++
++    private static BiFunction<String, String, String> javaTestLocationUri() {
++        return (declaringClass, method) -> String.format("java:test://%s/%s", declaringClass, method);
++    }
++
++    String formatHookStepLocation(
++            HookTestStep hook, BiFunction<String, String, String> format, Function<HookTestStep, String> fallback
++    ) {
++        Matcher matcher = ANNOTATION_GLUE_CODE_LOCATION_PATTERN.matcher(hook.getCodeLocation());
++        if (matcher.matches())
++            return format.apply(matcher.group(1), matcher.group(2));
++        matcher = LAMBDA_GLUE_CODE_LOCATION_PATTERN.matcher(hook.getCodeLocation());
++        if (matcher.matches()) {
++            String declaringClass = matcher.group(1);
++            int separator = declaringClass.lastIndexOf(".");
++            String simpleName = separator == -1 ? declaringClass : declaringClass.substring(separator + 1);
++            return format.apply(declaringClass, simpleName);
++        }
++        return fallback.apply(hook);
++    }
++
++    String getHookName(HookTestStep hook) {
++        switch (hook.getHookType()) {
++            case BEFORE:
++                return "Before";
++            case AFTER:
++                return "After";
++            case BEFORE_STEP:
++                return "BeforeStep";
++            case AFTER_STEP:
++                return "AfterStep";
++            default:
++                return hook.getHookType().name().toLowerCase(Locale.US);
++        }
++    }
++
++    String extractName(TestStep step) {
++        if (step instanceof PickleStepTestStep)
++            return ((PickleStepTestStep) step).getStep().getText();
++        if (step instanceof HookTestStep) {
++            HookTestStep hook = (HookTestStep) step;
++            return formatHookStepLocation(hook,
++                (declaringClass, method) -> String.format("%s(%s)", getHookName(hook), method), this::getHookName);
++        }
++        return "Unknown step";
++    }
++}

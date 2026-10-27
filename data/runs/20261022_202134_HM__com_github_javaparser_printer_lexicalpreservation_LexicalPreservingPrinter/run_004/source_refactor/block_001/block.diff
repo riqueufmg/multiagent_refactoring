@@ -1,0 +1,608 @@
+commit 53b791e2f4ba6e3359135152404212badcfaccd5
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 22 20:51:40 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/javaparser-core-testing/src/test/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinterTest.java b/javaparser-core-testing/src/test/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinterTest.java
+index d120eeb91..da63d08a4 100644
+--- a/javaparser-core-testing/src/test/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinterTest.java
++++ b/javaparser-core-testing/src/test/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinterTest.java
+@@ -36,6 +36,10 @@ import com.github.javaparser.ast.type.UnionType;
+ import com.github.javaparser.ast.type.VoidType;
+ import com.github.javaparser.ast.visitor.ModifierVisitor;
+ import com.github.javaparser.ast.visitor.Visitable;
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.NodeText;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
+ import com.github.javaparser.utils.TestUtils;
+ import org.junit.jupiter.api.Test;
+ 
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Added.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Added.java
+index 8cbe083c0..66721d808 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Added.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Added.java
+@@ -24,6 +24,9 @@ import com.github.javaparser.printer.concretesyntaxmodel.CsmElement;
+ import com.github.javaparser.printer.concretesyntaxmodel.CsmIndent;
+ import com.github.javaparser.printer.concretesyntaxmodel.CsmToken;
+ import com.github.javaparser.printer.concretesyntaxmodel.CsmUnindent;
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
+ 
+ public class Added implements DifferenceElement {
+ 
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Difference.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Difference.java
+index 95f7516a8..19928a425 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Difference.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Difference.java
+@@ -39,6 +39,10 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
+ import com.github.javaparser.ast.type.Type;
+ import com.github.javaparser.printer.concretesyntaxmodel.*;
+ import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CsmChild;
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.NodeText;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
+ 
+ /**
+  * A Difference should give me a sequence of elements I should find (to indicate the context) followed by a list of elements
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/DifferenceElementCalculator.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/DifferenceElementCalculator.java
+index b9481df29..3a3ebbe34 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/DifferenceElementCalculator.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/DifferenceElementCalculator.java
+@@ -26,6 +26,10 @@ import com.github.javaparser.ast.type.Type;
+ import com.github.javaparser.printer.concretesyntaxmodel.*;
+ import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CalculatedSyntaxModel;
+ import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CsmChild;
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.NodeText;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
+ 
+ import java.util.ArrayList;
+ import java.util.Collections;
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalDifferenceCalculator.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalDifferenceCalculator.java
+index cbca1d482..051cb416d 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalDifferenceCalculator.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalDifferenceCalculator.java
+@@ -35,6 +35,7 @@ import com.github.javaparser.printer.SourcePrinter;
+ import com.github.javaparser.printer.Stringable;
+ import com.github.javaparser.printer.concretesyntaxmodel.*;
+ import com.github.javaparser.printer.lexicalpreservation.changes.*;
++import com.github.javaparser.printer.lexicalpreservation.text.NodeText;
+ import com.github.javaparser.utils.LineSeparator;
+ 
+ import java.util.*;
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java
+index 9edf9a9fb..97a222310 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java
+@@ -77,6 +77,10 @@ import com.github.javaparser.printer.concretesyntaxmodel.CsmMix;
+ import com.github.javaparser.printer.concretesyntaxmodel.CsmToken;
+ import com.github.javaparser.printer.concretesyntaxmodel.CsmUnindent;
+ import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CsmChild;
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.NodeText;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
+ import com.github.javaparser.utils.LineSeparator;
+ import com.github.javaparser.utils.Pair;
+ 
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingVisitor.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingVisitor.java
+index 72651f79a..9b8ea8f9c 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingVisitor.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingVisitor.java
+@@ -20,6 +20,9 @@
+ 
+ package com.github.javaparser.printer.lexicalpreservation;
+ 
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
++
+ import java.io.StringWriter;
+ 
+ public class LexicalPreservingVisitor {
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementIteratorsFactory.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementIteratorsFactory.java
+index 1f46839a9..d95544ec4 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementIteratorsFactory.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementIteratorsFactory.java
+@@ -20,6 +20,11 @@
+  */
+ package com.github.javaparser.printer.lexicalpreservation;
+ 
++import com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.NodeText;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++import com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement;
++
+ import java.util.Iterator;
+ import java.util.LinkedList;
+ import java.util.List;
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatcher.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatcher.java
+index 16ea48346..3e42cf2be 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatcher.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatcher.java
+@@ -20,6 +20,8 @@
+  */
+ package com.github.javaparser.printer.lexicalpreservation;
+ 
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
++
+ public interface TextElementMatcher {
+ 
+     boolean match(TextElement textElement);
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatchers.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatchers.java
+index aa0fb2a9f..3fab07544 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatchers.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElementMatchers.java
+@@ -21,6 +21,7 @@
+ package com.github.javaparser.printer.lexicalpreservation;
+ 
+ import com.github.javaparser.ast.Node;
++import com.github.javaparser.printer.lexicalpreservation.text.TextElement;
+ 
+ class TextElementMatchers {
+ 
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/ChildTextElement.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/ChildTextElement.java
+similarity index 63%
+rename from javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/ChildTextElement.java
+rename to javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/ChildTextElement.java
+index 390a0a913..58644ae50 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/ChildTextElement.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/ChildTextElement.java
+@@ -18,45 +18,65 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+  */
+-package com.github.javaparser.printer.lexicalpreservation;
++package com.github.javaparser.printer.lexicalpreservation.text;
+ 
+ import com.github.javaparser.Range;
+ import com.github.javaparser.ast.Node;
+ import com.github.javaparser.ast.comments.Comment;
++import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
++import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingVisitor;
+ 
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
+ import java.util.Optional;
+ 
+ /**
+  * Represent the position of a child node in the NodeText of its parent.
+  */
+-class ChildTextElement extends TextElement {
++public class ChildTextElement extends TextElement {
+ 
+     private final Node child;
+ 
+-    ChildTextElement(Node child) {
++    public ChildTextElement(Node child) {
+         this.child = child;
+     }
+ 
+-    String expand() {
++    @Override
++    public String expand() {
+         return LexicalPreservingPrinter.print(child);
+     }
+ 
+-    Node getChild() {
++    public Node getChild() {
+         return child;
+     }
+ 
+     @Override
+-    boolean isToken(int tokenKind) {
++    public boolean isToken(int tokenKind) {
+         return false;
+     }
+ 
+     @Override
+-    boolean isNode(Node node) {
++    public boolean isNode(Node node) {
+         return node == child;
+     }
+ 
+-    NodeText getNodeTextForWrappedNode() {
+-        return LexicalPreservingPrinter.getOrCreateNodeText(child);
++    public NodeText getNodeTextForWrappedNode() {
++        try {
++            Method method = LexicalPreservingPrinter.class.getDeclaredMethod("getOrCreateNodeText", Node.class);
++            method.setAccessible(true);
++            return (NodeText) method.invoke(null, child);
++        } catch (InvocationTargetException e) {
++            Throwable cause = e.getCause();
++            if (cause instanceof RuntimeException) {
++                throw (RuntimeException) cause;
++            }
++            if (cause instanceof Error) {
++                throw (Error) cause;
++            }
++            throw new IllegalStateException(cause);
++        } catch (ReflectiveOperationException e) {
++            throw new IllegalStateException(e);
++        }
+     }
+ 
+     @Override
+@@ -130,13 +150,13 @@ class ChildTextElement extends TextElement {
+     }
+ 
+     @Override
+-    Optional<Range> getRange() {
++    public Optional<Range> getRange() {
+         return child.getRange();
+     }
+ 
+-	@Override
+-	public void accept(LexicalPreservingVisitor visitor) {
+-		NodeText nodeText = getNodeTextForWrappedNode();
+-		nodeText.getElements().forEach(element -> element.accept(visitor));
+-	}
++    @Override
++    public void accept(LexicalPreservingVisitor visitor) {
++        NodeText nodeText = getNodeTextForWrappedNode();
++        nodeText.getElements().forEach(element -> element.accept(visitor));
++    }
+ }
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/NodeText.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/NodeText.java
+similarity index 69%
+rename from javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/NodeText.java
+rename to javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/NodeText.java
+index abd3ef556..5fb48cb43 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/NodeText.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/NodeText.java
+@@ -18,9 +18,10 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+  */
+-package com.github.javaparser.printer.lexicalpreservation;
++package com.github.javaparser.printer.lexicalpreservation.text;
+ 
+ import com.github.javaparser.ast.Node;
++import com.github.javaparser.printer.lexicalpreservation.TextElementMatcher;
+ 
+ import java.util.LinkedList;
+ import java.util.List;
+@@ -29,67 +30,58 @@ import java.util.List;
+  * This contains the lexical information for a single node.
+  * It is basically a list of tokens and children.
+  */
+-class NodeText {
++public class NodeText {
+ 
+     private final List<TextElement> elements;
+ 
+     public static final int NOT_FOUND = -1;
+ 
+-    // 
+-    // Constructors
+-    // 
+-    NodeText(List<TextElement> elements) {
++    public NodeText(List<TextElement> elements) {
+         this.elements = elements;
+     }
+ 
+     /**
+      * Initialize with an empty list of elements.
+      */
+-    NodeText() {
++    public NodeText() {
+         this(new LinkedList<>());
+     }
+ 
+-    // 
+-    // Adding elements
+-    // 
+     /**
+      * Add an element at the end.
+      */
+-    void addElement(TextElement nodeTextElement) {
++    public void addElement(TextElement nodeTextElement) {
+         this.elements.add(nodeTextElement);
+     }
+ 
+     /**
+      * Add an element at the given position.
+      */
+-    void addElement(int index, TextElement nodeTextElement) {
++    public void addElement(int index, TextElement nodeTextElement) {
+         this.elements.add(index, nodeTextElement);
+     }
+ 
+-    void addChild(Node child) {
++    public void addChild(Node child) {
+         addElement(new ChildTextElement(child));
+     }
+ 
+-    void addChild(int index, Node child) {
++    public void addChild(int index, Node child) {
+         addElement(index, new ChildTextElement(child));
+     }
+ 
+-    void addToken(int tokenKind, String text) {
++    public void addToken(int tokenKind, String text) {
+         elements.add(new TokenTextElement(tokenKind, text));
+     }
+ 
+-    void addToken(int index, int tokenKind, String text) {
++    public void addToken(int index, int tokenKind, String text) {
+         elements.add(index, new TokenTextElement(tokenKind, text));
+     }
+ 
+-    // 
+-    // Finding elements
+-    // 
+-    int findElement(TextElementMatcher matcher) {
++    public int findElement(TextElementMatcher matcher) {
+         return findElement(matcher, 0);
+     }
+ 
+-    int findElement(TextElementMatcher matcher, int from) {
++    public int findElement(TextElementMatcher matcher, int from) {
+         int res = tryToFindElement(matcher, from);
+         if (res == NOT_FOUND) {
+             throw new IllegalArgumentException(String.format("I could not find child '%s' from position %d. Elements: %s", matcher, from, elements));
+@@ -97,7 +89,7 @@ class NodeText {
+         return res;
+     }
+ 
+-    int tryToFindElement(TextElementMatcher matcher, int from) {
++    public int tryToFindElement(TextElementMatcher matcher, int from) {
+         for (int i = from; i < elements.size(); i++) {
+             TextElement element = elements.get(i);
+             if (matcher.match(element)) {
+@@ -107,25 +99,22 @@ class NodeText {
+         return NOT_FOUND;
+     }
+ 
+-    int findChild(Node child) {
++    public int findChild(Node child) {
+         return findChild(child, 0);
+     }
+ 
+-    int findChild(Node child, int from) {
+-        return findElement(TextElementMatchers.byNode(child), from);
++    public int findChild(Node child, int from) {
++        return findElement(element -> element.isNode(child), from);
+     }
+ 
+-    int tryToFindChild(Node child) {
++    public int tryToFindChild(Node child) {
+         return tryToFindChild(child, 0);
+     }
+ 
+-    int tryToFindChild(Node child, int from) {
+-        return tryToFindElement(TextElementMatchers.byNode(child), from);
++    public int tryToFindChild(Node child, int from) {
++        return tryToFindElement(element -> element.isNode(child), from);
+     }
+ 
+-    // 
+-    // Removing single elements
+-    // 
+     public void remove(TextElementMatcher matcher, boolean potentiallyFollowingWhitespace) {
+         int i = 0;
+         for (TextElement e : elements) {
+@@ -146,46 +135,31 @@ class NodeText {
+         throw new IllegalArgumentException();
+     }
+ 
+-    // 
+-    // Removing sequences
+-    // 
+-    void removeElement(int index) {
++    public void removeElement(int index) {
+         elements.remove(index);
+     }
+ 
+-    // 
+-    // Replacing elements
+-    // 
+-    void replace(TextElementMatcher position, TextElement newElement) {
++    public void replace(TextElementMatcher position, TextElement newElement) {
+         int index = findElement(position, 0);
+         elements.remove(index);
+         elements.add(index, newElement);
+     }
+ 
+-    // 
+-    // Other methods
+-    // 
+-    /**
+-     * Generate the corresponding string.
+-     */
+-    String expand() {
++    public String expand() {
+         StringBuffer sb = new StringBuffer();
+         elements.forEach(e -> sb.append(e.expand()));
+         return sb.toString();
+     }
+ 
+-    // Visible for testing
+-    int numberOfElements() {
++    public int numberOfElements() {
+         return elements.size();
+     }
+ 
+-    // Visible for testing
+-    TextElement getTextElement(int index) {
++    public TextElement getTextElement(int index) {
+         return elements.get(index);
+     }
+ 
+-    // Visible for testing
+-    List<TextElement> getElements() {
++    public List<TextElement> getElements() {
+         return elements;
+     }
+ 
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElement.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/TextElement.java
+similarity index 70%
+rename from javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElement.java
+rename to javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/TextElement.java
+index 9ab4442c2..f78b00629 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElement.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/TextElement.java
+@@ -18,21 +18,23 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+  */
+-package com.github.javaparser.printer.lexicalpreservation;
++package com.github.javaparser.printer.lexicalpreservation.text;
+ 
+ import com.github.javaparser.GeneratedJavaParserConstants;
+ import com.github.javaparser.Range;
+ import com.github.javaparser.ast.Node;
++import com.github.javaparser.printer.lexicalpreservation.PrintableTextElement;
++import com.github.javaparser.printer.lexicalpreservation.TextElementMatcher;
+ 
+ import java.util.Optional;
+ 
+ public abstract class TextElement implements TextElementMatcher, PrintableTextElement {
+ 
+-    abstract String expand();
++    public abstract String expand();
+ 
+-    abstract boolean isToken(int tokenKind);
++    public abstract boolean isToken(int tokenKind);
+ 
+-    final boolean isCommentToken() {
++    public final boolean isCommentToken() {
+         return isToken(GeneratedJavaParserConstants.JAVADOC_COMMENT) || isToken(GeneratedJavaParserConstants.SINGLE_LINE_COMMENT) || isToken(GeneratedJavaParserConstants.MULTI_LINE_COMMENT);
+     }
+ 
+@@ -41,7 +43,7 @@ public abstract class TextElement implements TextElementMatcher, PrintableTextEl
+         return this.equals(textElement);
+     }
+ 
+-    abstract boolean isNode(Node node);
++    public abstract boolean isNode(Node node);
+ 
+     public abstract boolean isLiteral();
+ 
+@@ -65,26 +67,16 @@ public abstract class TextElement implements TextElementMatcher, PrintableTextEl
+         return isWhiteSpace() || isComment();
+     }
+ 
+-    /**
+-     * Is this TextElement representing a child of the given class?
+-     */
+     public abstract boolean isChildOfClass(Class<? extends Node> nodeClass);
+ 
+     public boolean isChild() {
+         return isChildOfClass(Node.class);
+     }
+ 
+-    abstract Optional<Range> getRange();
+-
+-    /**
+-     * Creates a {@link TextElementMatcher} that matches any TextElement with the same range as this TextElement.<br>
+-     * This can be used to curry another TextElementMatcher.<br>
+-     * e.g. {@code someTextElementMatcher.and(textElement.matchByRange());}
+-     *
+-     * @return TextElementMatcher that matches any TextElement with the same Range
+-     */
+-    TextElementMatcher matchByRange() {
+-        return (TextElement textElement) -> getRange().flatMap(r1 -> textElement.getRange().map(r1::equals)).// We're missing range information. This may happen when a node is manually instantiated. Don't be too harsh on that:
++    public abstract Optional<Range> getRange();
++
++    public TextElementMatcher matchByRange() {
++        return (TextElement textElement) -> getRange().flatMap(r1 -> textElement.getRange().map(r1::equals)).
+         orElse(true);
+     }
+ }
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TokenTextElement.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/TokenTextElement.java
+similarity index 82%
+rename from javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TokenTextElement.java
+rename to javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/TokenTextElement.java
+index 9f3695250..a7285a52a 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TokenTextElement.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/text/TokenTextElement.java
+@@ -18,42 +18,42 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+  */
+-package com.github.javaparser.printer.lexicalpreservation;
++package com.github.javaparser.printer.lexicalpreservation.text;
+ 
+ import com.github.javaparser.JavaToken;
+ import com.github.javaparser.JavaToken.Kind;
+ import com.github.javaparser.Range;
+ import com.github.javaparser.ast.Node;
++import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingVisitor;
+ 
+ import java.util.Optional;
+ 
+-class TokenTextElement extends TextElement {
++public class TokenTextElement extends TextElement {
+ 
+     private final JavaToken token;
+ 
+-    TokenTextElement(JavaToken token) {
++    public TokenTextElement(JavaToken token) {
+         this.token = token;
+     }
+ 
+-    TokenTextElement(int tokenKind, String text) {
++    public TokenTextElement(int tokenKind, String text) {
+         this(new JavaToken(tokenKind, text));
+     }
+ 
+-    TokenTextElement(int tokenKind) {
++    public TokenTextElement(int tokenKind) {
+         this(new JavaToken(tokenKind));
+     }
+ 
+     @Override
+-    String expand() {
++    public String expand() {
+         return token.getText();
+     }
+ 
+-    // Visible for testing
+-    String getText() {
++    public String getText() {
+         return token.getText();
+     }
+ 
+-    int getTokenKind() {
++    public int getTokenKind() {
+         return token.getKind();
+     }
+ 
+@@ -82,12 +82,12 @@ class TokenTextElement extends TextElement {
+     }
+ 
+     @Override
+-    boolean isToken(int tokenKind) {
++    public boolean isToken(int tokenKind) {
+         return token.getKind() == tokenKind;
+     }
+ 
+     @Override
+-    boolean isNode(Node node) {
++    public boolean isNode(Node node) {
+         return false;
+     }
+ 
+@@ -142,12 +142,12 @@ class TokenTextElement extends TextElement {
+     }
+ 
+     @Override
+-    Optional<Range> getRange() {
++    public Optional<Range> getRange() {
+         return token.getRange();
+     }
+ 
+-	@Override
+-	public void accept(LexicalPreservingVisitor visitor) {
+-		visitor.visit(this);
+-	}
++    @Override
++    public void accept(LexicalPreservingVisitor visitor) {
++        visitor.visit(this);
++    }
+ }

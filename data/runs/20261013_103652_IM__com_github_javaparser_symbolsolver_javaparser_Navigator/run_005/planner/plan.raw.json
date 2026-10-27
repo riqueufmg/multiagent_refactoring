@@ -1,0 +1,113 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Preserve Navigator as a small compatibility facade while keeping node-related lookup behavior in NavigatorNodeLookup.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup",
+            "demandNodeOfGivenClass",
+            "demandParentNode",
+            "demandReturnStmt",
+            "demandSwitch",
+            "demandVariableDeclaration",
+            "findMethodCall",
+            "findNameExpression",
+            "findNodeOfGivenClass",
+            "findReturnStmt",
+            "findSimpleName",
+            "findSwitch",
+            "requireParentNode"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator"
+          ],
+          "details": "Keep Navigator as the public compatibility facade and ensure the listed node-oriented methods contain no lookup implementation beyond delegation to NavigatorNodeLookup. Do not duplicate traversal or search logic in Navigator.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Preserve Navigator as a small compatibility facade while keeping declaration-related lookup behavior in NavigatorDeclarationLookup.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup",
+            "demandConstructor",
+            "demandField",
+            "demandMethod"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator"
+          ],
+          "details": "Keep the deprecated declaration lookup methods as compatibility entry points, but ensure their implementation is limited to delegation to NavigatorDeclarationLookup. Retain the existing deprecation documentation and signatures.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Preserve Navigator as a small compatibility facade while keeping type lookup behavior in NavigatorTypeLookup.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "INTRODUCE_FACADE",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup",
+            "demandClass",
+            "demandClassOrInterface",
+            "demandEnum",
+            "demandInterface",
+            "findType"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator"
+          ],
+          "details": "Keep both findType overloads and the type-demand methods as compatibility entry points, with Navigator delegating all type resolution to NavigatorTypeLookup. Retain the existing method documentation and signatures.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Reduce the implementation responsibility of Navigator without breaking its existing public API.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "NavigatorNodeLookup",
+            "NavigatorDeclarationLookup",
+            "NavigatorTypeLookup"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+          ],
+          "details": "Keep only imports required by Navigator's public method signatures and delegation statements. Remove imports that are no longer needed after confirming all lookup implementations remain in the specialized lookup classes.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

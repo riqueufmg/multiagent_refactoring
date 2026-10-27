@@ -1,0 +1,26 @@
+project:
+  name: accumulo
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/accumulo/repository
+runs: 5
+target:
+  smell: HM
+  smell_name: Hub-like Modularization
+  target_type: class
+  target_name: org.apache.accumulo.manager.tableOps.Utils
+planner:
+  base_config: /data/henrique/historical-java-repro/benchmark/repositories/accumulo/commits/8e3ca1051ef1/planner_mars_HM.yml
+source_refactor:
+  base_config: /data/henrique/multiagent_refactoring/mvp/source_refactor/config.yml
+  compile:
+    timeout: 900
+    command:
+    - /data/henrique/historical-java-repro/benchmark/repositories/accumulo/commits/8e3ca1051ef1/build_mars.sh
+  mechanical_tools:
+    openrewrite_enabled: true
+    openrewrite_timeout: 900
+    openrewrite_command:
+    - /data/henrique/historical-java-repro/benchmark/repositories/accumulo/commits/8e3ca1051ef1/openrewrite_mars_online.sh
+quality_checker:
+  base_config: /data/henrique/multiagent_refactoring/mvp/quality_checker/config.yml
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs

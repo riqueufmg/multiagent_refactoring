@@ -1,0 +1,37 @@
+{
+  "id": 1,
+  "goal": "Extract TeamCity message formatting and output responsibilities from the event listener to reduce the number of general methods and formatting-related fields in TeamCityPlugin.",
+  "files": [
+    "cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java",
+    "cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityMessageFormatter.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.cucumber.core.plugin.TeamCityPlugin",
+        "io.cucumber.core.plugin.TeamCityMessageFormatter"
+      ],
+      "outputs": [
+        "io.cucumber.core.plugin.TeamCityMessageFormatter"
+      ],
+      "details": "Extract the TeamCity message templates and formatting state represented by DATE_FORMAT, TEAMCITY_PREFIX, TEMPLATE_ENTER_THE_MATRIX, TEMPLATE_TEST_RUN_STARTED, TEMPLATE_TEST_RUN_FINISHED, TEMPLATE_TEST_SUITE_STARTED, TEMPLATE_TEST_SUITE_FINISHED, TEMPLATE_TEST_STARTED, TEMPLATE_TEST_FINISHED, TEMPLATE_TEST_FAILED, TEMPLATE_TEST_COMPARISON_FAILED, TEMPLATE_TEST_IGNORED, TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED, TEMPLATE_BEFORE_ALL_AFTER_ALL_FAILED, TEMPLATE_BEFORE_ALL_AFTER_ALL_FINISHED, TEMPLATE_PROGRESS_COUNTING_STARTED, TEMPLATE_PROGRESS_COUNTING_FINISHED, TEMPLATE_PROGRESS_TEST_STARTED, TEMPLATE_PROGRESS_TEST_FINISHED, and TEMPLATE_ATTACH_WRITE_EVENT, together with print(PrintStream-compatible output), formatCommand(String,Object...), and escape(String), into TeamCityMessageFormatter. Preserve the existing output behavior and constructor injection of PrintStream.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "io.cucumber.core.plugin.TeamCityPlugin.print(String,Object...)",
+        "io.cucumber.core.plugin.TeamCityPlugin.formatCommand(String,Object...)",
+        "io.cucumber.core.plugin.TeamCityPlugin.escape(String)"
+      ],
+      "outputs": [
+        "io.cucumber.core.plugin.TeamCityMessageFormatter.print(String,Object...)",
+        "io.cucumber.core.plugin.TeamCityMessageFormatter.formatCommand(String,Object...)",
+        "io.cucumber.core.plugin.TeamCityMessageFormatter.escape(String)"
+      ],
+      "details": "Update TeamCityPlugin event handlers and helper methods that call print, formatCommand, or escape to use the extracted TeamCityMessageFormatter instance. Update references to the extracted message templates and extractTimeStamp so that TeamCityPlugin delegates message formatting while retaining event registration and event-specific behavior.",
+      "risk": "medium"
+    }
+  ]
+}

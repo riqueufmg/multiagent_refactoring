@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive profile and session option state from BaseClient to reduce its implementation size and group related public configuration methods.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileOptions.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient",
+        "org.pac4j.core.client.BaseClientProfileOptions"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientProfileOptions"
+      ],
+      "details": "Extract profileFactoryWhenNotAuthenticated, multiProfile, saveProfileInSession, warned, getProfileFactoryWhenNotAuthenticated(), setProfileFactoryWhenNotAuthenticated(), isMultiProfile(WebContext, UserProfile), setMultiProfile(boolean), getSaveProfileInSession(WebContext, UserProfile), and setSaveProfileInSession(boolean) into BaseClientProfileOptions. Preserve the existing public BaseClient methods in BaseClient as delegating methods where required by the Client API and existing callers, and preserve the warning behavior and logger usage for setProfileFactoryWhenNotAuthenticated().",
+      "risk": "medium"
+    }
+  ]
+}

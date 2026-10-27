@@ -1,0 +1,223 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract type-declaration lookup responsibilities from Navigator while preserving its existing public API.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "Navigator.findType(CompilationUnit, String)",
+            "Navigator.findType(TypeDeclaration<?>, String)",
+            "Navigator.demandClass(CompilationUnit, String)",
+            "Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "Navigator.demandEnum(CompilationUnit, String)",
+            "Navigator.demandInterface(CompilationUnit, String)",
+            "Navigator.getInnerTypeName(String)",
+            "Navigator.getOuterTypeName(String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup"
+          ],
+          "details": "Create NavigatorTypeLookup in the same package and move the cohesive type-resolution implementation into it. Keep the existing method signatures in Navigator as delegating facade methods so callers of Navigator remain source-compatible.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "Navigator.findType(CompilationUnit, String)",
+            "Navigator.findType(TypeDeclaration<?>, String)",
+            "Navigator.getInnerTypeName(String)",
+            "Navigator.getOuterTypeName(String)"
+          ],
+          "outputs": [
+            "NavigatorTypeLookup.findType(CompilationUnit, String)",
+            "NavigatorTypeLookup.findType(TypeDeclaration<?>, String)",
+            "NavigatorTypeLookup.getInnerTypeName(String)",
+            "NavigatorTypeLookup.getOuterTypeName(String)"
+          ],
+          "details": "Move the implementation of the type lookup methods and their private helpers to NavigatorTypeLookup. Update the demandClass, demandClassOrInterface, demandEnum, and demandInterface facade methods to call NavigatorTypeLookup.findType.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Navigator.demandClass(CompilationUnit, String)",
+            "Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "Navigator.demandEnum(CompilationUnit, String)",
+            "Navigator.demandInterface(CompilationUnit, String)"
+          ],
+          "outputs": [
+            "Navigator.demandClass(CompilationUnit, String)",
+            "Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "Navigator.demandEnum(CompilationUnit, String)",
+            "Navigator.demandInterface(CompilationUnit, String)"
+          ],
+          "details": "Replace direct calls to the moved findType implementations with calls to NavigatorTypeLookup while retaining the existing Navigator methods as the public entry points.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract AST node search and demand operations from Navigator to reduce the number of general methods in the facade.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.demandParentNode(Node)",
+            "Navigator.demandReturnStmt(MethodDeclaration)",
+            "Navigator.demandSwitch(Node)",
+            "Navigator.demandVariableDeclaration(Node, String)",
+            "Navigator.findMethodCall(Node, String)",
+            "Navigator.findNameExpression(Node, String)",
+            "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.findReturnStmt(MethodDeclaration)",
+            "Navigator.findSimpleName(Node, String)",
+            "Navigator.findSwitch(Node)",
+            "Navigator.findSwitchHelper(Node)",
+            "Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+          ],
+          "details": "Create NavigatorNodeLookup in the same package and move the cohesive node traversal, node search, demand, and deprecated compatibility implementations into it. Preserve the existing Navigator methods as delegating facade methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.demandParentNode(Node)",
+            "Navigator.demandReturnStmt(MethodDeclaration)",
+            "Navigator.demandSwitch(Node)",
+            "Navigator.demandVariableDeclaration(Node, String)",
+            "Navigator.findMethodCall(Node, String)",
+            "Navigator.findNameExpression(Node, String)",
+            "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.findReturnStmt(MethodDeclaration)",
+            "Navigator.findSimpleName(Node, String)",
+            "Navigator.findSwitch(Node)",
+            "Navigator.findSwitchHelper(Node)",
+            "Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "NavigatorNodeLookup.demandNodeOfGivenClass(Node, Class<N>)",
+            "NavigatorNodeLookup.demandParentNode(Node)",
+            "NavigatorNodeLookup.demandReturnStmt(MethodDeclaration)",
+            "NavigatorNodeLookup.demandSwitch(Node)",
+            "NavigatorNodeLookup.demandVariableDeclaration(Node, String)",
+            "NavigatorNodeLookup.findMethodCall(Node, String)",
+            "NavigatorNodeLookup.findNameExpression(Node, String)",
+            "NavigatorNodeLookup.findNodeOfGivenClass(Node, Class<N>)",
+            "NavigatorNodeLookup.findReturnStmt(MethodDeclaration)",
+            "NavigatorNodeLookup.findSimpleName(Node, String)",
+            "NavigatorNodeLookup.findSwitch(Node)",
+            "NavigatorNodeLookup.findSwitchHelper(Node)",
+            "NavigatorNodeLookup.requireParentNode(Node)"
+          ],
+          "details": "Move the implementations without changing behavior, including the deprecated aliases and the special handling in findSwitchHelper for a Node that is already a SwitchStmt.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.demandParentNode(Node)",
+            "Navigator.demandReturnStmt(MethodDeclaration)",
+            "Navigator.demandSwitch(Node)",
+            "Navigator.demandVariableDeclaration(Node, String)",
+            "Navigator.findMethodCall(Node, String)",
+            "Navigator.findNameExpression(Node, String)",
+            "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.findReturnStmt(MethodDeclaration)",
+            "Navigator.findSimpleName(Node, String)",
+            "Navigator.findSwitch(Node)",
+            "Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.demandParentNode(Node)",
+            "Navigator.demandReturnStmt(MethodDeclaration)",
+            "Navigator.demandSwitch(Node)",
+            "Navigator.demandVariableDeclaration(Node, String)",
+            "Navigator.findMethodCall(Node, String)",
+            "Navigator.findNameExpression(Node, String)",
+            "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+            "Navigator.findReturnStmt(MethodDeclaration)",
+            "Navigator.findSimpleName(Node, String)",
+            "Navigator.findSwitch(Node)",
+            "Navigator.requireParentNode(Node)"
+          ],
+          "details": "Make Navigator delegate these existing public methods to NavigatorNodeLookup so external callers continue using Navigator unchanged.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract declaration-member lookup operations from Navigator and retain Navigator as the stable public facade.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+            "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "Navigator.demandMethod(TypeDeclaration<?>, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup"
+          ],
+          "details": "Create NavigatorDeclarationLookup in the same package and move constructor, field, and method member lookup responsibilities into it. Keep the existing Navigator methods as delegating facade methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+            "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "Navigator.demandMethod(TypeDeclaration<?>, String)"
+          ],
+          "outputs": [
+            "NavigatorDeclarationLookup.demandConstructor(TypeDeclaration<?>, int)",
+            "NavigatorDeclarationLookup.demandField(ClassOrInterfaceDeclaration, String)",
+            "NavigatorDeclarationLookup.demandMethod(TypeDeclaration<?>, String)"
+          ],
+          "details": "Move the existing member iteration and ambiguity/error handling unchanged. Preserve the constructor index semantics and the existing exception messages.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+            "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "Navigator.demandMethod(TypeDeclaration<?>, String)"
+          ],
+          "outputs": [
+            "Navigator.demandConstructor(TypeDeclaration<?>, int)",
+            "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "Navigator.demandMethod(TypeDeclaration<?>, String)"
+          ],
+          "details": "Replace the method bodies in Navigator with delegation to NavigatorDeclarationLookup while retaining the original public signatures.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

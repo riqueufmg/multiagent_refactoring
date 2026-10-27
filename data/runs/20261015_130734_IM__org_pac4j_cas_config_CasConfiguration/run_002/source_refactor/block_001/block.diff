@@ -1,0 +1,276 @@
+commit f62ccb9e7077ba60dd2a0ebf7ca377baa9a59c66
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 15 13:16:45 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+index 2db2acb87..33f82218f 100644
+--- a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+@@ -7,8 +7,6 @@ import org.pac4j.cas.client.CasProxyReceptor;
+ import org.pac4j.core.client.config.BaseClientConfiguration;
+ import org.pac4j.core.context.WebContext;
+ import org.pac4j.core.exception.TechnicalException;
+-import org.pac4j.core.http.url.DefaultUrlResolver;
+-import org.pac4j.core.http.url.UrlResolver;
+ import org.pac4j.core.logout.handler.DefaultLogoutHandler;
+ import org.pac4j.core.logout.handler.LogoutHandler;
+ import org.pac4j.core.util.CommonHelper;
+@@ -42,12 +40,6 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private String encoding = StandardCharsets.UTF_8.name();
+ 
+-    private String loginUrl;
+-
+-    private String prefixUrl;
+-
+-    private String restUrl;
+-
+     private long timeTolerance = 1000L;
+ 
+     private CasProtocol protocol = CasProtocol.CAS30;
+@@ -66,8 +58,6 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private CasProxyReceptor proxyReceptor;
+ 
+-    private UrlResolver urlResolver;
+-
+     private String postLogoutUrlParameter = SERVICE_PARAMETER;
+ 
+     /* Map containing user defined parameters */
+@@ -85,30 +75,29 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private SSLSocketFactory sslSocketFactory;
+ 
++    private final CasUrlConfiguration urlConfiguration = new CasUrlConfiguration();
++
+     public CasConfiguration() {}
+ 
+     public CasConfiguration(final String loginUrl) {
+-        this.loginUrl = loginUrl;
++        setLoginUrl(loginUrl);
+     }
+ 
+     public CasConfiguration(final String loginUrl, final CasProtocol protocol) {
+-        this.loginUrl = loginUrl;
++        setLoginUrl(loginUrl);
+         this.protocol = protocol;
+     }
+ 
+     public CasConfiguration(final String loginUrl, final String prefixUrl) {
+-        this.loginUrl = loginUrl;
+-        this.prefixUrl = prefixUrl;
++        setLoginUrl(loginUrl);
++        setPrefixUrl(prefixUrl);
+     }
+ 
+     @Override
+     protected void internalInit(final boolean forceReinit) {
+-        if (CommonHelper.isBlank(this.loginUrl) && CommonHelper.isBlank(this.prefixUrl) && CommonHelper.isBlank(this.restUrl)) {
++        if (CommonHelper.isBlank(getLoginUrl()) && CommonHelper.isBlank(getPrefixUrl()) && CommonHelper.isBlank(getRestUrl())) {
+             throw new TechnicalException("loginUrl, prefixUrl and restUrl cannot be all blank");
+         }
+-        if (urlResolver == null) {
+-            urlResolver = new DefaultUrlResolver();
+-        }
+ 
+         initializeClientConfiguration();
+ 
+@@ -126,21 +115,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     protected void initializeClientConfiguration() {
+-        if (this.prefixUrl != null && !this.prefixUrl.endsWith("/")) {
+-            this.prefixUrl += "/";
+-        }
+-        if (CommonHelper.isBlank(this.prefixUrl)) {
+-            this.prefixUrl = this.loginUrl.replaceFirst("/login$", "/");
+-        } else if (CommonHelper.isBlank(this.loginUrl)) {
+-            this.loginUrl = this.prefixUrl + "login";
+-        }
+-        if (CommonHelper.isBlank(restUrl)) {
+-            restUrl = prefixUrl;
+-            if (!restUrl.endsWith("/")) {
+-                restUrl += "/";
+-            }
+-            restUrl += "v1/tickets";
+-        }
++        urlConfiguration.initializeClientConfiguration();
+     }
+ 
+     protected void initializeLogoutHandler() {
+@@ -196,29 +171,29 @@ public class CasConfiguration extends BaseClientConfiguration {
+     public String computeFinalLoginUrl(final WebContext context) {
+         init();
+ 
+-        return urlResolver.compute(this.loginUrl, context);
++        return urlConfiguration.computeFinalLoginUrl(context);
+     }
+ 
+     public String getLoginUrl() {
+-        return loginUrl;
++        return urlConfiguration.getLoginUrl();
+     }
+ 
+     public void setLoginUrl(final String loginUrl) {
+-        this.loginUrl = loginUrl;
++        urlConfiguration.setLoginUrl(loginUrl);
+     }
+ 
+     public String getPrefixUrl() {
+-        return prefixUrl;
++        return urlConfiguration.getPrefixUrl();
+     }
+ 
+     public String computeFinalPrefixUrl(final WebContext context) {
+         init();
+ 
+-        return urlResolver.compute(this.prefixUrl, context);
++        return urlConfiguration.computeFinalPrefixUrl(context);
+     }
+ 
+     public void setPrefixUrl(final String prefixUrl) {
+-        this.prefixUrl = prefixUrl;
++        urlConfiguration.setPrefixUrl(prefixUrl);
+     }
+ 
+     public HostnameVerifier getHostnameVerifier() {
+@@ -342,25 +317,25 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public String getRestUrl() {
+-        return restUrl;
++        return urlConfiguration.getRestUrl();
+     }
+ 
+     public void setRestUrl(final String restUrl) {
+-        this.restUrl = restUrl;
++        urlConfiguration.setRestUrl(restUrl);
+     }
+ 
+     public String computeFinalRestUrl(final WebContext context) {
+         init();
+ 
+-        return urlResolver.compute(this.restUrl, context);
++        return urlConfiguration.computeFinalRestUrl(context);
+     }
+ 
+-    public UrlResolver getUrlResolver() {
+-        return urlResolver;
++    public org.pac4j.core.http.url.UrlResolver getUrlResolver() {
++        return urlConfiguration.getUrlResolver();
+     }
+ 
+-    public void setUrlResolver(final UrlResolver urlResolver) {
+-        this.urlResolver = urlResolver;
++    public void setUrlResolver(final org.pac4j.core.http.url.UrlResolver urlResolver) {
++        urlConfiguration.setUrlResolver(urlResolver);
+     }
+ 
+     public void addCustomParam(final String name, final String value) {
+@@ -393,11 +368,11 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     @Override
+     public String toString() {
+-        return CommonHelper.toNiceString(this.getClass(), "loginUrl", this.loginUrl, "prefixUrl", this.prefixUrl, "restUrl", this.restUrl,
++        return CommonHelper.toNiceString(this.getClass(), "loginUrl", this.getLoginUrl(), "prefixUrl", this.getPrefixUrl(), "restUrl", this.getRestUrl(),
+                 "protocol", this.protocol, "renew", this.renew, "gateway", this.gateway, "encoding", this.encoding,
+                 "logoutHandler", this.logoutHandler, "acceptAnyProxy", this.acceptAnyProxy, "allowedProxyChains", this.allowedProxyChains,
+                 "proxyReceptor", this.proxyReceptor, "timeTolerance", this.timeTolerance, "postLogoutUrlParameter",
+-                this.postLogoutUrlParameter, "defaultTicketValidator", this.defaultTicketValidator, "urlResolver", this.urlResolver,
++                this.postLogoutUrlParameter, "defaultTicketValidator", this.defaultTicketValidator, "urlResolver", this.getUrlResolver(),
+                 "method", this.method, "privateKeyPath", this.privateKeyPath, "privateKeyAlgorithm", this.privateKeyAlgorithm);
+     }
+ }
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java
+new file mode 100644
+index 000000000..12bd6f8d4
+--- /dev/null
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java
+@@ -0,0 +1,85 @@
++package org.pac4j.cas.config;
++
++import org.pac4j.core.context.WebContext;
++import org.pac4j.core.http.url.DefaultUrlResolver;
++import org.pac4j.core.http.url.UrlResolver;
++import org.pac4j.core.util.CommonHelper;
++
++/**
++ * URL configuration for CAS.
++ */
++public class CasUrlConfiguration {
++
++    private String loginUrl;
++
++    private String prefixUrl;
++
++    private String restUrl;
++
++    private UrlResolver urlResolver;
++
++    public void initializeClientConfiguration() {
++        if (urlResolver == null) {
++            urlResolver = new DefaultUrlResolver();
++        }
++        if (this.prefixUrl != null && !this.prefixUrl.endsWith("/")) {
++            this.prefixUrl += "/";
++        }
++        if (CommonHelper.isBlank(this.prefixUrl)) {
++            this.prefixUrl = this.loginUrl.replaceFirst("/login$", "/");
++        } else if (CommonHelper.isBlank(this.loginUrl)) {
++            this.loginUrl = this.prefixUrl + "login";
++        }
++        if (CommonHelper.isBlank(restUrl)) {
++            restUrl = prefixUrl;
++            if (!restUrl.endsWith("/")) {
++                restUrl += "/";
++            }
++            restUrl += "v1/tickets";
++        }
++    }
++
++    public String computeFinalLoginUrl(final WebContext context) {
++        return urlResolver.compute(this.loginUrl, context);
++    }
++
++    public String computeFinalPrefixUrl(final WebContext context) {
++        return urlResolver.compute(this.prefixUrl, context);
++    }
++
++    public String computeFinalRestUrl(final WebContext context) {
++        return urlResolver.compute(this.restUrl, context);
++    }
++
++    public String getLoginUrl() {
++        return loginUrl;
++    }
++
++    public void setLoginUrl(final String loginUrl) {
++        this.loginUrl = loginUrl;
++    }
++
++    public String getPrefixUrl() {
++        return prefixUrl;
++    }
++
++    public void setPrefixUrl(final String prefixUrl) {
++        this.prefixUrl = prefixUrl;
++    }
++
++    public String getRestUrl() {
++        return restUrl;
++    }
++
++    public void setRestUrl(final String restUrl) {
++        this.restUrl = restUrl;
++    }
++
++    public UrlResolver getUrlResolver() {
++        return urlResolver;
++    }
++
++    public void setUrlResolver(final UrlResolver urlResolver) {
++        this.urlResolver = urlResolver;
++    }
++}

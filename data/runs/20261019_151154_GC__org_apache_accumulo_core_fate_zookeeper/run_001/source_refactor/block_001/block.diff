@@ -1,0 +1,550 @@
+commit a06fa2ab81e4706f52e4c7388f96f97f0d3c673b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Oct 19 15:23:16 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/core/src/main/java/org/apache/accumulo/core/clientImpl/ClientContext.java b/core/src/main/java/org/apache/accumulo/core/clientImpl/ClientContext.java
+index 34871de647..8c0cf3358d 100644
+--- a/core/src/main/java/org/apache/accumulo/core/clientImpl/ClientContext.java
++++ b/core/src/main/java/org/apache/accumulo/core/clientImpl/ClientContext.java
+@@ -76,9 +76,9 @@ import org.apache.accumulo.core.data.InstanceId;
+ import org.apache.accumulo.core.data.KeyValue;
+ import org.apache.accumulo.core.data.NamespaceId;
+ import org.apache.accumulo.core.data.TableId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+diff --git a/core/src/main/java/org/apache/accumulo/core/clientImpl/NamespaceMapping.java b/core/src/main/java/org/apache/accumulo/core/clientImpl/NamespaceMapping.java
+index 9d9073fdac..932a1c7499 100644
+--- a/core/src/main/java/org/apache/accumulo/core/clientImpl/NamespaceMapping.java
++++ b/core/src/main/java/org/apache/accumulo/core/clientImpl/NamespaceMapping.java
+@@ -32,8 +32,8 @@ import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.clientImpl.thrift.TableOperation;
+ import org.apache.accumulo.core.clientImpl.thrift.TableOperationExceptionType;
+ import org.apache.accumulo.core.data.NamespaceId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.zookeeper.KeeperException;
+ 
+ import com.google.common.collect.ImmutableSortedMap;
+diff --git a/core/src/main/java/org/apache/accumulo/core/clientImpl/ZookeeperLockChecker.java b/core/src/main/java/org/apache/accumulo/core/clientImpl/ZookeeperLockChecker.java
+index 314a82788a..e5028b6564 100644
+--- a/core/src/main/java/org/apache/accumulo/core/clientImpl/ZookeeperLockChecker.java
++++ b/core/src/main/java/org/apache/accumulo/core/clientImpl/ZookeeperLockChecker.java
+@@ -24,7 +24,7 @@ import java.util.Set;
+ 
+ import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.clientImpl.ClientTabletCacheImpl.TabletServerLockChecker;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockPaths;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.AddressSelector;
+diff --git a/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZcNode.java b/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/cache/ZcNode.java
+similarity index 98%
+rename from core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZcNode.java
+rename to core/src/main/java/org/apache/accumulo/core/fate/zookeeper/cache/ZcNode.java
+index d4ed3c955b..68560e8183 100644
+--- a/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZcNode.java
++++ b/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/cache/ZcNode.java
+@@ -16,7 +16,7 @@
+  * specific language governing permissions and limitations
+  * under the License.
+  */
+-package org.apache.accumulo.core.fate.zookeeper;
++package org.apache.accumulo.core.fate.zookeeper.cache;
+ 
+ import java.util.List;
+ import java.util.Objects;
+diff --git a/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooCache.java b/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/cache/ZooCache.java
+similarity index 99%
+rename from core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooCache.java
+rename to core/src/main/java/org/apache/accumulo/core/fate/zookeeper/cache/ZooCache.java
+index 6e2d334db7..e5c3777a0f 100644
+--- a/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooCache.java
++++ b/core/src/main/java/org/apache/accumulo/core/fate/zookeeper/cache/ZooCache.java
+@@ -16,7 +16,7 @@
+  * specific language governing permissions and limitations
+  * under the License.
+  */
+-package org.apache.accumulo.core.fate.zookeeper;
++package org.apache.accumulo.core.fate.zookeeper.cache;
+ 
+ import static java.nio.charset.StandardCharsets.UTF_8;
+ import static java.util.Objects.requireNonNull;
+diff --git a/core/src/main/java/org/apache/accumulo/core/lock/ServiceLock.java b/core/src/main/java/org/apache/accumulo/core/lock/ServiceLock.java
+index 18aeda770a..d2bc2c076c 100644
+--- a/core/src/main/java/org/apache/accumulo/core/lock/ServiceLock.java
++++ b/core/src/main/java/org/apache/accumulo/core/lock/ServiceLock.java
+@@ -26,12 +26,12 @@ import java.util.List;
+ import java.util.Optional;
+ import java.util.UUID;
+ 
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.LockID;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeMissingPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.ServiceLockPath;
+ import org.apache.accumulo.core.util.Timer;
+ import org.apache.accumulo.core.util.UuidUtil;
+@@ -670,8 +670,8 @@ public class ServiceLock implements Watcher {
+     return ServiceLockData.parse(data);
+   }
+ 
+-  public static Optional<ServiceLockData> getLockData(
+-      org.apache.accumulo.core.fate.zookeeper.ZooCache zc, ServiceLockPath path, ZcStat stat) {
++  public static Optional<ServiceLockData> getLockData(ZooCache zc, ServiceLockPath path,
++      ZcStat stat) {
+ 
+     List<String> children = validateAndSort(path, zc.getChildren(path.toString()));
+ 
+diff --git a/core/src/main/java/org/apache/accumulo/core/lock/ServiceLockPaths.java b/core/src/main/java/org/apache/accumulo/core/lock/ServiceLockPaths.java
+index 8fd3f361dc..e1aa81a0e4 100644
+--- a/core/src/main/java/org/apache/accumulo/core/lock/ServiceLockPaths.java
++++ b/core/src/main/java/org/apache/accumulo/core/lock/ServiceLockPaths.java
+@@ -34,8 +34,8 @@ import java.util.concurrent.FutureTask;
+ import java.util.function.Predicate;
+ 
+ import org.apache.accumulo.core.Constants;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.util.threads.ThreadPoolNames;
+ import org.apache.accumulo.core.util.threads.ThreadPools;
+ 
+diff --git a/core/src/main/java/org/apache/accumulo/core/metadata/schema/TabletMetadata.java b/core/src/main/java/org/apache/accumulo/core/metadata/schema/TabletMetadata.java
+index 2b59f78431..00e3d8caea 100644
+--- a/core/src/main/java/org/apache/accumulo/core/metadata/schema/TabletMetadata.java
++++ b/core/src/main/java/org/apache/accumulo/core/metadata/schema/TabletMetadata.java
+@@ -50,7 +50,7 @@ import org.apache.accumulo.core.data.TableId;
+ import org.apache.accumulo.core.data.Value;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+ import org.apache.accumulo.core.fate.FateId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.AddressSelector;
+diff --git a/core/src/main/java/org/apache/accumulo/core/rpc/clients/TServerClient.java b/core/src/main/java/org/apache/accumulo/core/rpc/clients/TServerClient.java
+index 45ab3c86fa..8b89eb617d 100644
+--- a/core/src/main/java/org/apache/accumulo/core/rpc/clients/TServerClient.java
++++ b/core/src/main/java/org/apache/accumulo/core/rpc/clients/TServerClient.java
+@@ -36,7 +36,7 @@ import org.apache.accumulo.core.client.AccumuloSecurityException;
+ import org.apache.accumulo.core.clientImpl.AccumuloServerException;
+ import org.apache.accumulo.core.clientImpl.ClientContext;
+ import org.apache.accumulo.core.clientImpl.thrift.ThriftSecurityException;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.AddressSelector;
+diff --git a/core/src/main/java/org/apache/accumulo/core/util/compaction/ExternalCompactionUtil.java b/core/src/main/java/org/apache/accumulo/core/util/compaction/ExternalCompactionUtil.java
+index 3d5fc44576..04eaf490c5 100644
+--- a/core/src/main/java/org/apache/accumulo/core/util/compaction/ExternalCompactionUtil.java
++++ b/core/src/main/java/org/apache/accumulo/core/util/compaction/ExternalCompactionUtil.java
+@@ -37,7 +37,7 @@ import java.util.concurrent.Future;
+ import org.apache.accumulo.core.clientImpl.ClientContext;
+ import org.apache.accumulo.core.clientImpl.thrift.ThriftSecurityException;
+ import org.apache.accumulo.core.compaction.thrift.CompactorService;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.AddressSelector;
+diff --git a/core/src/main/java/org/apache/accumulo/core/util/tables/TableMap.java b/core/src/main/java/org/apache/accumulo/core/util/tables/TableMap.java
+index 859d82dbc7..54e6213cb8 100644
+--- a/core/src/main/java/org/apache/accumulo/core/util/tables/TableMap.java
++++ b/core/src/main/java/org/apache/accumulo/core/util/tables/TableMap.java
+@@ -31,7 +31,7 @@ import org.apache.accumulo.core.clientImpl.Namespace;
+ import org.apache.accumulo.core.clientImpl.Namespaces;
+ import org.apache.accumulo.core.data.NamespaceId;
+ import org.apache.accumulo.core.data.TableId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+diff --git a/core/src/main/java/org/apache/accumulo/core/util/tables/TableZooHelper.java b/core/src/main/java/org/apache/accumulo/core/util/tables/TableZooHelper.java
+index 1ab1e1d708..69337c833e 100644
+--- a/core/src/main/java/org/apache/accumulo/core/util/tables/TableZooHelper.java
++++ b/core/src/main/java/org/apache/accumulo/core/util/tables/TableZooHelper.java
+@@ -34,7 +34,7 @@ import org.apache.accumulo.core.clientImpl.Namespace;
+ import org.apache.accumulo.core.clientImpl.Namespaces;
+ import org.apache.accumulo.core.data.NamespaceId;
+ import org.apache.accumulo.core.data.TableId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.manager.state.tables.TableState;
+ import org.apache.accumulo.core.metadata.AccumuloTable;
+ import org.apache.accumulo.core.util.cache.Caches.CacheName;
+diff --git a/core/src/test/java/org/apache/accumulo/core/clientImpl/ZookeeperLockCheckerTest.java b/core/src/test/java/org/apache/accumulo/core/clientImpl/ZookeeperLockCheckerTest.java
+index bb7402f78d..67021da3b0 100644
+--- a/core/src/test/java/org/apache/accumulo/core/clientImpl/ZookeeperLockCheckerTest.java
++++ b/core/src/test/java/org/apache/accumulo/core/clientImpl/ZookeeperLockCheckerTest.java
+@@ -30,8 +30,8 @@ import java.util.UUID;
+ import java.util.function.Predicate;
+ 
+ import org.apache.accumulo.core.data.InstanceId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+diff --git a/core/src/test/java/org/apache/accumulo/core/fate/zookeeper/ZooCacheTest.java b/core/src/test/java/org/apache/accumulo/core/fate/zookeeper/ZooCacheTest.java
+index 6d091d3aae..202a6a9ea9 100644
+--- a/core/src/test/java/org/apache/accumulo/core/fate/zookeeper/ZooCacheTest.java
++++ b/core/src/test/java/org/apache/accumulo/core/fate/zookeeper/ZooCacheTest.java
+@@ -34,8 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
+ 
+ import java.util.List;
+ 
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZooCacheWatcher;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZooCacheWatcher;
+ import org.apache.accumulo.core.zookeeper.ZooSession;
+ import org.apache.zookeeper.KeeperException;
+ import org.apache.zookeeper.WatchedEvent;
+diff --git a/core/src/test/java/org/apache/accumulo/core/lock/ServiceLockPathsTest.java b/core/src/test/java/org/apache/accumulo/core/lock/ServiceLockPathsTest.java
+index 0232376237..0fdd6e207b 100644
+--- a/core/src/test/java/org/apache/accumulo/core/lock/ServiceLockPathsTest.java
++++ b/core/src/test/java/org/apache/accumulo/core/lock/ServiceLockPathsTest.java
+@@ -45,8 +45,8 @@ import java.util.Optional;
+ import java.util.Set;
+ import java.util.UUID;
+ 
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.AddressSelector;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.ServiceLockPath;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/manager/LiveTServerSet.java b/server/base/src/main/java/org/apache/accumulo/server/manager/LiveTServerSet.java
+index ab593585b0..e7ba580991 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/manager/LiveTServerSet.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/manager/LiveTServerSet.java
+@@ -37,9 +37,9 @@ import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.clientImpl.thrift.ThriftSecurityException;
+ import org.apache.accumulo.core.data.TableId;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZooCacheWatcher;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZooCacheWatcher;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockPaths;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/security/handler/KerberosAuthenticator.java b/server/base/src/main/java/org/apache/accumulo/server/security/handler/KerberosAuthenticator.java
+index f38cb30d61..0b7c12cdc8 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/security/handler/KerberosAuthenticator.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/security/handler/KerberosAuthenticator.java
+@@ -29,10 +29,10 @@ import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
+ import org.apache.accumulo.core.client.security.tokens.KerberosToken;
+ import org.apache.accumulo.core.clientImpl.DelegationTokenImpl;
+ import org.apache.accumulo.core.clientImpl.thrift.SecurityErrorCode;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeMissingPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.server.ServerContext;
+ import org.apache.accumulo.server.rpc.UGIAssumingProcessor;
+ import org.apache.accumulo.server.security.SystemCredentials.SystemToken;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthenticator.java b/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthenticator.java
+index 1bcb54f0e2..b3b501ec3f 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthenticator.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthenticator.java
+@@ -29,10 +29,10 @@ import org.apache.accumulo.core.client.AccumuloSecurityException;
+ import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
+ import org.apache.accumulo.core.client.security.tokens.PasswordToken;
+ import org.apache.accumulo.core.clientImpl.thrift.SecurityErrorCode;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeMissingPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.server.ServerContext;
+ import org.apache.zookeeper.KeeperException;
+ import org.slf4j.Logger;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthorizor.java b/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthorizor.java
+index 5d18ac4625..d7e417f421 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthorizor.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKAuthorizor.java
+@@ -25,10 +25,10 @@ import java.util.List;
+ 
+ import org.apache.accumulo.core.client.AccumuloSecurityException;
+ import org.apache.accumulo.core.clientImpl.thrift.SecurityErrorCode;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeMissingPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.security.Authorizations;
+ import org.apache.accumulo.core.securityImpl.thrift.TCredentials;
+ import org.apache.accumulo.core.util.ByteBufferUtil;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKPermHandler.java b/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKPermHandler.java
+index 1cc933c347..9bf30f0454 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKPermHandler.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/security/handler/ZKPermHandler.java
+@@ -35,10 +35,10 @@ import org.apache.accumulo.core.clientImpl.Namespace;
+ import org.apache.accumulo.core.clientImpl.thrift.SecurityErrorCode;
+ import org.apache.accumulo.core.data.NamespaceId;
+ import org.apache.accumulo.core.data.TableId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeMissingPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.metadata.AccumuloTable;
+ import org.apache.accumulo.core.security.NamespacePermission;
+ import org.apache.accumulo.core.security.SystemPermission;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/tables/TableManager.java b/server/base/src/main/java/org/apache/accumulo/server/tables/TableManager.java
+index 3bd0f091de..6f3e067a51 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/tables/TableManager.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/tables/TableManager.java
+@@ -35,12 +35,12 @@ import org.apache.accumulo.core.clientImpl.thrift.TableOperationExceptionType;
+ import org.apache.accumulo.core.data.InstanceId;
+ import org.apache.accumulo.core.data.NamespaceId;
+ import org.apache.accumulo.core.data.TableId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZooCacheWatcher;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeMissingPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZooCacheWatcher;
+ import org.apache.accumulo.core.manager.state.tables.TableState;
+ import org.apache.accumulo.core.util.Pair;
+ import org.apache.accumulo.core.util.tables.TableNameUtil;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/util/Admin.java b/server/base/src/main/java/org/apache/accumulo/server/util/Admin.java
+index f8e8df3c52..e17ce670f9 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/util/Admin.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/util/Admin.java
+@@ -73,8 +73,8 @@ import org.apache.accumulo.core.fate.FateStore;
+ import org.apache.accumulo.core.fate.ReadOnlyFateStore;
+ import org.apache.accumulo.core.fate.user.UserFateStore;
+ import org.apache.accumulo.core.fate.zookeeper.MetaFateStore;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockPaths.AddressSelector;
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/util/TabletServerLocks.java b/server/base/src/main/java/org/apache/accumulo/server/util/TabletServerLocks.java
+index f075f50cf9..bc3a8e9b6c 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/util/TabletServerLocks.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/util/TabletServerLocks.java
+@@ -21,8 +21,8 @@ package org.apache.accumulo.server.util;
+ import java.util.Optional;
+ import java.util.Set;
+ 
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+diff --git a/server/base/src/test/java/org/apache/accumulo/server/util/AdminTest.java b/server/base/src/test/java/org/apache/accumulo/server/util/AdminTest.java
+index 3e77560e49..daeb285b97 100644
+--- a/server/base/src/test/java/org/apache/accumulo/server/util/AdminTest.java
++++ b/server/base/src/test/java/org/apache/accumulo/server/util/AdminTest.java
+@@ -50,9 +50,9 @@ import org.apache.accumulo.core.data.TableId;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+ import org.apache.accumulo.core.fate.FateId;
+ import org.apache.accumulo.core.fate.FateInstanceType;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+ import org.apache.accumulo.core.lock.ServiceLockPaths;
+diff --git a/server/base/src/test/java/org/apache/accumulo/server/util/ServiceStatusCmdTest.java b/server/base/src/test/java/org/apache/accumulo/server/util/ServiceStatusCmdTest.java
+index ffc2815a99..c7ed128c9b 100644
+--- a/server/base/src/test/java/org/apache/accumulo/server/util/ServiceStatusCmdTest.java
++++ b/server/base/src/test/java/org/apache/accumulo/server/util/ServiceStatusCmdTest.java
+@@ -39,10 +39,10 @@ import java.util.UUID;
+ 
+ import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.data.InstanceId;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReader;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLockPaths;
+ import org.apache.accumulo.core.zookeeper.ZooSession;
+ import org.apache.accumulo.server.ServerContext;
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/Manager.java b/server/manager/src/main/java/org/apache/accumulo/manager/Manager.java
+index f07b303c37..779e305f6d 100644
+--- a/server/manager/src/main/java/org/apache/accumulo/manager/Manager.java
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/Manager.java
+@@ -79,10 +79,10 @@ import org.apache.accumulo.core.fate.FateInstanceType;
+ import org.apache.accumulo.core.fate.FateStore;
+ import org.apache.accumulo.core.fate.user.UserFateStore;
+ import org.apache.accumulo.core.fate.zookeeper.MetaFateStore;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZcStat;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZcStat;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockData.ServiceDescriptor;
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/recovery/RecoveryManager.java b/server/manager/src/main/java/org/apache/accumulo/manager/recovery/RecoveryManager.java
+index 9c2dd1411d..a355030637 100644
+--- a/server/manager/src/main/java/org/apache/accumulo/manager/recovery/RecoveryManager.java
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/recovery/RecoveryManager.java
+@@ -37,7 +37,7 @@ import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.conf.AccumuloConfiguration;
+ import org.apache.accumulo.core.conf.Property;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.tabletserver.log.LogEntry;
+ import org.apache.accumulo.core.util.cache.Caches.CacheName;
+ import org.apache.accumulo.core.util.threads.ThreadPools;
+diff --git a/server/tserver/src/main/java/org/apache/accumulo/tserver/ScanServer.java b/server/tserver/src/main/java/org/apache/accumulo/tserver/ScanServer.java
+index 5e942a47c2..6f701bab97 100644
+--- a/server/tserver/src/main/java/org/apache/accumulo/tserver/ScanServer.java
++++ b/server/tserver/src/main/java/org/apache/accumulo/tserver/ScanServer.java
+@@ -66,9 +66,9 @@ import org.apache.accumulo.core.dataImpl.thrift.ScanResult;
+ import org.apache.accumulo.core.dataImpl.thrift.TColumn;
+ import org.apache.accumulo.core.dataImpl.thrift.TKeyExtent;
+ import org.apache.accumulo.core.dataImpl.thrift.TRange;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.file.blockfile.cache.impl.BlockCacheConfiguration;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLock.LockWatcher;
+diff --git a/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletHostingServer.java b/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletHostingServer.java
+index 8e5047bb40..af79b1426b 100644
+--- a/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletHostingServer.java
++++ b/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletHostingServer.java
+@@ -20,7 +20,7 @@ package org.apache.accumulo.tserver;
+ 
+ import org.apache.accumulo.core.conf.AccumuloConfiguration;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.spi.cache.BlockCacheManager;
+ import org.apache.accumulo.core.spi.scan.ScanServerInfo;
+diff --git a/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletServer.java b/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletServer.java
+index 05a6676cc0..62c0078366 100644
+--- a/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletServer.java
++++ b/server/tserver/src/main/java/org/apache/accumulo/tserver/TabletServer.java
+@@ -77,9 +77,9 @@ import org.apache.accumulo.core.conf.SiteConfiguration;
+ import org.apache.accumulo.core.data.InstanceId;
+ import org.apache.accumulo.core.data.TableId;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooUtil.NodeExistsPolicy;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.file.blockfile.cache.impl.BlockCacheConfiguration;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLock.LockWatcher;
+diff --git a/test/src/main/java/org/apache/accumulo/test/BadDeleteMarkersCreatedIT.java b/test/src/main/java/org/apache/accumulo/test/BadDeleteMarkersCreatedIT.java
+index ce0e21c468..88177a17a3 100644
+--- a/test/src/main/java/org/apache/accumulo/test/BadDeleteMarkersCreatedIT.java
++++ b/test/src/main/java/org/apache/accumulo/test/BadDeleteMarkersCreatedIT.java
+@@ -37,7 +37,7 @@ import org.apache.accumulo.core.clientImpl.ClientContext;
+ import org.apache.accumulo.core.conf.Property;
+ import org.apache.accumulo.core.data.Key;
+ import org.apache.accumulo.core.data.Value;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.metadata.AccumuloTable;
+diff --git a/test/src/main/java/org/apache/accumulo/test/functional/CacheTestReader.java b/test/src/main/java/org/apache/accumulo/test/functional/CacheTestReader.java
+index 4d554c5c3e..222ddc3d7d 100644
+--- a/test/src/main/java/org/apache/accumulo/test/functional/CacheTestReader.java
++++ b/test/src/main/java/org/apache/accumulo/test/functional/CacheTestReader.java
+@@ -28,7 +28,7 @@ import java.util.Map;
+ import java.util.TreeMap;
+ import java.util.UUID;
+ 
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.zookeeper.ZooSession;
+ import org.slf4j.LoggerFactory;
+ 
+diff --git a/test/src/main/java/org/apache/accumulo/test/functional/MemoryStarvedScanIT.java b/test/src/main/java/org/apache/accumulo/test/functional/MemoryStarvedScanIT.java
+index 78edc22525..9416b31e0d 100644
+--- a/test/src/main/java/org/apache/accumulo/test/functional/MemoryStarvedScanIT.java
++++ b/test/src/main/java/org/apache/accumulo/test/functional/MemoryStarvedScanIT.java
+@@ -50,7 +50,7 @@ import org.apache.accumulo.core.conf.Property;
+ import org.apache.accumulo.core.data.Key;
+ import org.apache.accumulo.core.data.Range;
+ import org.apache.accumulo.core.data.Value;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.iterators.WrappingIterator;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.lock.ServiceLockData.ThriftService;
+diff --git a/test/src/main/java/org/apache/accumulo/test/functional/ReadWriteIT.java b/test/src/main/java/org/apache/accumulo/test/functional/ReadWriteIT.java
+index 7a3c1f2089..db195b0785 100644
+--- a/test/src/main/java/org/apache/accumulo/test/functional/ReadWriteIT.java
++++ b/test/src/main/java/org/apache/accumulo/test/functional/ReadWriteIT.java
+@@ -46,7 +46,7 @@ import org.apache.accumulo.core.clientImpl.ClientContext;
+ import org.apache.accumulo.core.conf.Property;
+ import org.apache.accumulo.core.data.Mutation;
+ import org.apache.accumulo.core.data.Value;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.util.MonitorUtil;
+diff --git a/test/src/main/java/org/apache/accumulo/test/functional/RestartIT.java b/test/src/main/java/org/apache/accumulo/test/functional/RestartIT.java
+index bf515d94bd..48a90ef430 100644
+--- a/test/src/main/java/org/apache/accumulo/test/functional/RestartIT.java
++++ b/test/src/main/java/org/apache/accumulo/test/functional/RestartIT.java
+@@ -34,7 +34,7 @@ import org.apache.accumulo.core.client.Accumulo;
+ import org.apache.accumulo.core.client.AccumuloClient;
+ import org.apache.accumulo.core.conf.ClientProperty;
+ import org.apache.accumulo.core.conf.Property;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
+ import org.apache.accumulo.core.lock.ServiceLock;
+ import org.apache.accumulo.core.lock.ServiceLockData;
+ import org.apache.accumulo.core.metadata.AccumuloTable;
+diff --git a/test/src/main/java/org/apache/accumulo/test/zookeeper/ZooCacheIT.java b/test/src/main/java/org/apache/accumulo/test/zookeeper/ZooCacheIT.java
+index ef15a30959..3b98929f2c 100644
+--- a/test/src/main/java/org/apache/accumulo/test/zookeeper/ZooCacheIT.java
++++ b/test/src/main/java/org/apache/accumulo/test/zookeeper/ZooCacheIT.java
+@@ -32,9 +32,9 @@ import java.util.List;
+ import java.util.Optional;
+ import java.util.Set;
+ 
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache;
+-import org.apache.accumulo.core.fate.zookeeper.ZooCache.ZooCacheWatcher;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache;
++import org.apache.accumulo.core.fate.zookeeper.cache.ZooCache.ZooCacheWatcher;
+ import org.apache.accumulo.core.zookeeper.ZooSession;
+ import org.apache.accumulo.test.util.Wait;
+ import org.apache.zookeeper.Watcher;

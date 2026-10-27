@@ -43,6 +43,8 @@ Do not move all package classes in one block.
 
 Prefer small cohesive clusters that can compile after limited visibility updates.
 
+Only top-level classes count toward cluster size and MOVE_CLASS operations. Inner and nested classes move implicitly with their enclosing class.
+
 # PACKAGE RULES
 - Move classes only from the TARGET PACKAGE to a subpackage of the TARGET PACKAGE.
 - All moved classes must use the same destination package.

@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "tools.jackson.core.json",
+  "selected_cluster": [
+    "tools.jackson.core.json.JsonWriteContext",
+    "tools.jackson.core.json.UTF8JsonGenerator",
+    "tools.jackson.core.json.WriterBasedJsonGenerator"
+  ],
+  "destination_package": "tools.jackson.core.json.generator",
+  "cluster_reason": "These classes form a cohesive generator-side cluster: both concrete generators depend on JsonWriteContext, and the context encapsulates shared write-state behavior used by both implementations. Moving them together preserves their strongest internal relationship while avoiding the highly central JsonFactory and parser state-machine classes.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive generator cluster to a dedicated subpackage.",
+      "files": [
+        "src/main/java/tools/jackson/core/json/JsonWriteContext.java",
+        "src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java",
+        "src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "tools.jackson.core.json.generator"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.JsonWriteContext"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.generator.JsonWriteContext"
+          ],
+          "details": "Move JsonWriteContext to the generator subpackage with the related generator implementations.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.UTF8JsonGenerator"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.generator.UTF8JsonGenerator"
+          ],
+          "details": "Move UTF8JsonGenerator to the generator subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.WriterBasedJsonGenerator"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.generator.WriterBasedJsonGenerator"
+          ],
+          "details": "Move WriterBasedJsonGenerator to the generator subpackage.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

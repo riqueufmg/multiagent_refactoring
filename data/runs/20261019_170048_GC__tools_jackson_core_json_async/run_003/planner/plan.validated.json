@@ -1,0 +1,87 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "tools.jackson.core.json.async",
+  "selected_cluster": [
+    "tools.jackson.core.json.async.NonBlockingUtf8JsonParserBase",
+    "tools.jackson.core.json.async.NonBlockingByteArrayJsonParser",
+    "tools.jackson.core.json.async.NonBlockingByteBufferJsonParser"
+  ],
+  "destination_package": "tools.jackson.core.json.async.utf8",
+  "cluster_reason": "These three classes form a cohesive UTF-8 non-blocking parser family: the byte-array and byte-buffer implementations share the UTF-8 parser base and represent alternate input mechanisms for the same parsing responsibility. Moving them together preserves their inheritance and implementation relationship while leaving the more general parser base in the original package.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive UTF-8 non-blocking parser family into a dedicated subpackage.",
+      "files": [
+        "src/main/java/tools/jackson/core/json/async/NonBlockingByteArrayJsonParser.java",
+        "src/main/java/tools/jackson/core/json/async/NonBlockingByteBufferJsonParser.java",
+        "src/main/java/tools/jackson/core/json/async/NonBlockingUtf8JsonParserBase.java",
+        "src/main/java/tools/jackson/core/json/async/utf8/NonBlockingByteArrayJsonParser.java",
+        "src/main/java/tools/jackson/core/json/async/utf8/NonBlockingByteBufferJsonParser.java",
+        "src/main/java/tools/jackson/core/json/async/utf8/NonBlockingUtf8JsonParserBase.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "tools.jackson.core.json.async.utf8"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.async.NonBlockingUtf8JsonParserBase"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.async.utf8.NonBlockingUtf8JsonParserBase"
+          ],
+          "details": "Move the shared UTF-8 non-blocking parser base to the destination package.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.async.NonBlockingByteArrayJsonParser"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.async.utf8.NonBlockingByteArrayJsonParser"
+          ],
+          "details": "Move the byte-array UTF-8 non-blocking parser implementation to the destination package.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.async.NonBlockingByteBufferJsonParser"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.async.utf8.NonBlockingByteBufferJsonParser"
+          ],
+          "details": "Move the byte-buffer UTF-8 non-blocking parser implementation to the destination package.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "UPDATE_VISIBILITY",
+          "inputs": [
+            "tools.jackson.core.json.async.utf8.NonBlockingByteArrayJsonParser",
+            "tools.jackson.core.json.async.utf8.NonBlockingByteBufferJsonParser",
+            "tools.jackson.core.json.async.utf8.NonBlockingUtf8JsonParserBase"
+          ],
+          "outputs": [],
+          "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

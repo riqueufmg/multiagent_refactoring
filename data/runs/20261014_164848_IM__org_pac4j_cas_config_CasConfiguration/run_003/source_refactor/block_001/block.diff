@@ -1,0 +1,222 @@
+commit f35944b2b91e81567d7de1a1cf18ac81a1844504
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 16:59:49 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+index 09dc31e14..868ecfb13 100644
+--- a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+@@ -15,7 +15,6 @@ import javax.net.ssl.HostnameVerifier;
+ import javax.net.ssl.SSLSocketFactory;
+ import java.nio.charset.StandardCharsets;
+ import java.security.PrivateKey;
+-import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+@@ -40,17 +39,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private String encoding = StandardCharsets.UTF_8.name();
+ 
+-    private long timeTolerance = 1000L;
+-
+-    private CasProtocol protocol = CasProtocol.CAS30;
+-
+-    private boolean renew = false;
+-
+-    private boolean gateway = false;
+-
+-    private boolean acceptAnyProxy = false;
+-
+-    private ProxyList allowedProxyChains = new ProxyList();
++    private final CasProtocolConfiguration protocolConfiguration = new CasProtocolConfiguration();
+ 
+     private LogoutHandler logoutHandler;
+ 
+@@ -85,7 +74,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     public CasConfiguration(final String loginUrl, final CasProtocol protocol) {
+         this.urlConfiguration = new CasUrlConfiguration(loginUrl);
+-        this.protocol = protocol;
++        this.protocolConfiguration.setProtocol(protocol);
+     }
+ 
+     public CasConfiguration(final String loginUrl, final String prefixUrl) {
+@@ -216,61 +205,55 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public long getTimeTolerance() {
+-        return timeTolerance;
++        return protocolConfiguration.getTimeTolerance();
+     }
+ 
+     public void setTimeTolerance(final long timeTolerance) {
+-        this.timeTolerance = timeTolerance;
++        protocolConfiguration.setTimeTolerance(timeTolerance);
+     }
+ 
+     public CasProtocol getProtocol() {
+-        return protocol;
++        return protocolConfiguration.getProtocol();
+     }
+ 
+     public void setProtocol(final CasProtocol protocol) {
+-        this.protocol = protocol;
++        protocolConfiguration.setProtocol(protocol);
+     }
+ 
+     public boolean isRenew() {
+-        return renew;
++        return protocolConfiguration.isRenew();
+     }
+ 
+     public void setRenew(final boolean renew) {
+-        this.renew = renew;
++        protocolConfiguration.setRenew(renew);
+     }
+ 
+     public boolean isGateway() {
+-        return gateway;
++        return protocolConfiguration.isGateway();
+     }
+ 
+     public void setGateway(final boolean gateway) {
+-        this.gateway = gateway;
++        protocolConfiguration.setGateway(gateway);
+     }
+ 
+     public boolean isAcceptAnyProxy() {
+-        return acceptAnyProxy;
++        return protocolConfiguration.isAcceptAnyProxy();
+     }
+ 
+     public void setAcceptAnyProxy(final boolean acceptAnyProxy) {
+-        this.acceptAnyProxy = acceptAnyProxy;
++        protocolConfiguration.setAcceptAnyProxy(acceptAnyProxy);
+     }
+ 
+     public ProxyList getAllowedProxyChains() {
+-        return allowedProxyChains;
++        return protocolConfiguration.getAllowedProxyChains();
+     }
+ 
+     public void setAllowedProxyChains(final ProxyList allowedProxyChains) {
+-        this.allowedProxyChains = allowedProxyChains;
++        protocolConfiguration.setAllowedProxyChains(allowedProxyChains);
+     }
+ 
+     public void setAllowedProxies(final List<String> allowedProxies) {
+-        final List<String[]> proxyChains = new ArrayList<>();
+-        for (final String allowedProxyChain : allowedProxies) {
+-            final String[] proxyChain = new String[1];
+-            proxyChain[0] = allowedProxyChain;
+-            proxyChains.add(proxyChain);
+-        }
+-        this.allowedProxyChains = new ProxyList(proxyChains);
++        protocolConfiguration.setAllowedProxies(allowedProxies);
+     }
+ 
+     public LogoutHandler getLogoutHandler() {
+@@ -362,9 +345,9 @@ public class CasConfiguration extends BaseClientConfiguration {
+     @Override
+     public String toString() {
+         return CommonHelper.toNiceString(this.getClass(), "loginUrl", this.getLoginUrl(), "prefixUrl", this.getPrefixUrl(), "restUrl", this.getRestUrl(),
+-                "protocol", this.protocol, "renew", this.renew, "gateway", this.gateway, "encoding", this.encoding,
+-                "logoutHandler", this.logoutHandler, "acceptAnyProxy", this.acceptAnyProxy, "allowedProxyChains", this.allowedProxyChains,
+-                "proxyReceptor", this.proxyReceptor, "timeTolerance", this.timeTolerance, "postLogoutUrlParameter",
++                "protocol", this.getProtocol(), "renew", this.isRenew(), "gateway", this.isGateway(), "encoding", this.encoding,
++                "logoutHandler", this.logoutHandler, "acceptAnyProxy", this.isAcceptAnyProxy(), "allowedProxyChains", this.getAllowedProxyChains(),
++                "proxyReceptor", this.proxyReceptor, "timeTolerance", this.getTimeTolerance(), "postLogoutUrlParameter",
+                 this.postLogoutUrlParameter, "defaultTicketValidator", this.defaultTicketValidator, "urlResolver", this.getUrlResolver(),
+                 "method", this.method, "privateKeyPath", this.privateKeyPath, "privateKeyAlgorithm", this.privateKeyAlgorithm);
+     }
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasProtocolConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasProtocolConfiguration.java
+new file mode 100644
+index 000000000..1623f0467
+--- /dev/null
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasProtocolConfiguration.java
+@@ -0,0 +1,82 @@
++package org.pac4j.cas.config;
++
++import org.apereo.cas.client.validation.ProxyList;
++
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * Configuration for the CAS protocol, proxy, and validation policies.
++ */
++public class CasProtocolConfiguration {
++
++    private long timeTolerance = 1000L;
++
++    private CasProtocol protocol = CasProtocol.CAS30;
++
++    private boolean renew = false;
++
++    private boolean gateway = false;
++
++    private boolean acceptAnyProxy = false;
++
++    private ProxyList allowedProxyChains = new ProxyList();
++
++    public long getTimeTolerance() {
++        return timeTolerance;
++    }
++
++    public void setTimeTolerance(final long timeTolerance) {
++        this.timeTolerance = timeTolerance;
++    }
++
++    public CasProtocol getProtocol() {
++        return protocol;
++    }
++
++    public void setProtocol(final CasProtocol protocol) {
++        this.protocol = protocol;
++    }
++
++    public boolean isRenew() {
++        return renew;
++    }
++
++    public void setRenew(final boolean renew) {
++        this.renew = renew;
++    }
++
++    public boolean isGateway() {
++        return gateway;
++    }
++
++    public void setGateway(final boolean gateway) {
++        this.gateway = gateway;
++    }
++
++    public boolean isAcceptAnyProxy() {
++        return acceptAnyProxy;
++    }
++
++    public void setAcceptAnyProxy(final boolean acceptAnyProxy) {
++        this.acceptAnyProxy = acceptAnyProxy;
++    }
++
++    public ProxyList getAllowedProxyChains() {
++        return allowedProxyChains;
++    }
++
++    public void setAllowedProxyChains(final ProxyList allowedProxyChains) {
++        this.allowedProxyChains = allowedProxyChains;
++    }
++
++    public void setAllowedProxies(final List<String> allowedProxies) {
++        final List<String[]> proxyChains = new ArrayList<>();
++        for (final String allowedProxyChain : allowedProxies) {
++            final String[] proxyChain = new String[1];
++            proxyChain[0] = allowedProxyChain;
++            proxyChains.add(proxyChain);
++        }
++        this.allowedProxyChains = new ProxyList(proxyChains);
++    }
++}

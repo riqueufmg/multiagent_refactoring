@@ -1,0 +1,147 @@
+commit 4d6dae23c689556bd0a9c5f489302dc537a7271b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 15 20:25:48 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
+index 1e70c9817..ecd2a1f6c 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
+@@ -43,7 +43,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+ 
+     private String name;
+ 
+-    private List<AuthorizationGenerator> authorizationGenerators = new ArrayList<>();
++    private final BaseClientAuthorization authorization = new BaseClientAuthorization();
+ 
+     private CredentialsExtractor credentialsExtractor;
+ 
+@@ -105,11 +105,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+         var profile = retrieveUserProfile(credentials, context, sessionStore);
+         if (profile.isPresent()) {
+             profile.get().setClientName(getName());
+-            if (this.authorizationGenerators != null) {
+-                for (final var authorizationGenerator : this.authorizationGenerators) {
+-                    profile = authorizationGenerator.generate(context, sessionStore, profile.get());
+-                }
+-            }
++            profile = authorization.generate(context, sessionStore, profile);
+         }
+         return profile;
+     }
+@@ -156,17 +152,15 @@ public abstract class BaseClient extends InitializableObject implements Client {
+     }
+ 
+     public List<AuthorizationGenerator> getAuthorizationGenerators() {
+-        return this.authorizationGenerators;
++        return this.authorization.getAuthorizationGenerators();
+     }
+ 
+     public void setAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {
+-        CommonHelper.assertNotNull("authorizationGenerators", authorizationGenerators);
+-        this.authorizationGenerators = authorizationGenerators;
++        this.authorization.setAuthorizationGenerators(authorizationGenerators);
+     }
+ 
+     public void setAuthorizationGenerators(final AuthorizationGenerator... authorizationGenerators) {
+-        CommonHelper.assertNotNull("authorizationGenerators", authorizationGenerators);
+-        this.authorizationGenerators = Arrays.asList(authorizationGenerators);
++        this.authorization.setAuthorizationGenerators(authorizationGenerators);
+     }
+ 
+     /**
+@@ -175,17 +169,15 @@ public abstract class BaseClient extends InitializableObject implements Client {
+      * @param authorizationGenerator an authorizations generator
+      */
+     public void setAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {
+-        addAuthorizationGenerator(authorizationGenerator);
++        this.authorization.setAuthorizationGenerator(authorizationGenerator);
+     }
+ 
+     public void addAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {
+-        CommonHelper.assertNotNull("authorizationGenerator", authorizationGenerator);
+-        this.authorizationGenerators.add(authorizationGenerator);
++        this.authorization.addAuthorizationGenerator(authorizationGenerator);
+     }
+ 
+     public void addAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {
+-        CommonHelper.assertNotNull("authorizationGenerators", authorizationGenerators);
+-        this.authorizationGenerators.addAll(authorizationGenerators);
++        this.authorization.addAuthorizationGenerators(authorizationGenerators);
+     }
+ 
+     public CredentialsExtractor getCredentialsExtractor() {
+@@ -273,7 +265,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+     public String toString() {
+         return CommonHelper.toNiceString(this.getClass(), "name", getName(), "credentialsExtractor", this.credentialsExtractor,
+             "authenticator", this.authenticator, "profileCreator", this.profileCreator,
+-            "authorizationGenerators", authorizationGenerators, "customProperties", customProperties,
++            "authorizationGenerators", authorization.getAuthorizationGenerators(), "customProperties", customProperties,
+             "profileFactoryWhenNotAuthenticated", profileFactoryWhenNotAuthenticated, "multiProfile", multiProfile,
+             "saveProfileInSession", saveProfileInSession);
+     }
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java
+new file mode 100644
+index 000000000..762db475e
+--- /dev/null
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java
+@@ -0,0 +1,58 @@
++package org.pac4j.core.client;
++
++import org.pac4j.core.authorization.generator.AuthorizationGenerator;
++import org.pac4j.core.context.WebContext;
++import org.pac4j.core.context.session.SessionStore;
++import org.pac4j.core.profile.UserProfile;
++import org.pac4j.core.util.CommonHelper;
++
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.Optional;
++
++/**
++ * Manages the authorization generators used by a client.
++ */
++public class BaseClientAuthorization {
++
++    private List<AuthorizationGenerator> authorizationGenerators = new ArrayList<>();
++
++    public List<AuthorizationGenerator> getAuthorizationGenerators() {
++        return this.authorizationGenerators;
++    }
++
++    public void setAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {
++        CommonHelper.assertNotNull("authorizationGenerators", authorizationGenerators);
++        this.authorizationGenerators = authorizationGenerators;
++    }
++
++    public void setAuthorizationGenerators(final AuthorizationGenerator... authorizationGenerators) {
++        CommonHelper.assertNotNull("authorizationGenerators", authorizationGenerators);
++        this.authorizationGenerators = Arrays.asList(authorizationGenerators);
++    }
++
++    public void setAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {
++        addAuthorizationGenerator(authorizationGenerator);
++    }
++
++    public void addAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {
++        CommonHelper.assertNotNull("authorizationGenerator", authorizationGenerator);
++        this.authorizationGenerators.add(authorizationGenerator);
++    }
++
++    public void addAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {
++        CommonHelper.assertNotNull("authorizationGenerators", authorizationGenerators);
++        this.authorizationGenerators.addAll(authorizationGenerators);
++    }
++
++    public Optional<UserProfile> generate(final WebContext context, final SessionStore sessionStore,
++                                          Optional<UserProfile> profile) {
++        if (profile.isPresent()) {
++            for (final var authorizationGenerator : this.authorizationGenerators) {
++                profile = authorizationGenerator.generate(context, sessionStore, profile.get());
++            }
++        }
++        return profile;
++    }
++}

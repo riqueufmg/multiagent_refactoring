@@ -1,0 +1,10 @@
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/module-info.java",
+      "content": "// jackson-core main Module descriptor\nmodule tools.jackson.core {\n    // FastDoubleParser shaded but JPMS still requires it to compile?\n    requires static ch.randelshofer.fastdoubleparser;\n\n    exports tools.jackson.core;\n    exports tools.jackson.core.async;\n    exports tools.jackson.core.base;\n    exports tools.jackson.core.exc;\n    exports tools.jackson.core.filter;\n    exports tools.jackson.core.io;\n    exports tools.jackson.core.json;\n    exports tools.jackson.core.json.async.parser;\n    exports tools.jackson.core.sym;\n    exports tools.jackson.core.tree;\n    exports tools.jackson.core.type;\n    exports tools.jackson.core.util;\n\n    provides tools.jackson.core.TokenStreamFactory with\n        tools.jackson.core.json.JsonFactory;\n}\n"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "Updated the module descriptor to export the new non-blocking parser subpackage and removed the export of the now-empty parent package."
+}

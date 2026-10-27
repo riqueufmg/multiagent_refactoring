@@ -1,0 +1,76 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive ZooKeeper locking and reservation cluster together.",
+  "files": [
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/FateLock.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/MetaFateStore.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooReaderWriter.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooReservation.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooUtil.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/lock/FateLock.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/lock/ZooReaderWriter.java",
+    "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/lock/ZooReservation.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.lock"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter"
+      ],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.lock.ZooReaderWriter"
+      ],
+      "details": "Move ZooReaderWriter to the destination package with the lock and reservation classes.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.FateLock"
+      ],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.lock.FateLock"
+      ],
+      "details": "Move FateLock to the destination package alongside its ZooReaderWriter dependency.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.ZooReservation"
+      ],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.lock.ZooReservation"
+      ],
+      "details": "Move ZooReservation to the destination package alongside its ZooReaderWriter dependency.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.MetaFateStore",
+        "org.apache.accumulo.core.fate.zookeeper.ZooUtil",
+        "org.apache.accumulo.core.fate.zookeeper.lock.FateLock",
+        "org.apache.accumulo.core.fate.zookeeper.lock.ZooReaderWriter",
+        "org.apache.accumulo.core.fate.zookeeper.lock.ZooReservation"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

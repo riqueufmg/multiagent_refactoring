@@ -1,0 +1,53 @@
+{
+  "id": 1,
+  "goal": "Move node-navigation methods out of Navigator and consolidate them in NavigatorNodeLookup, reducing the number of public methods and preserving cohesive lookup responsibilities.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node, Class)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findNodeOfGivenClass(Node, Class)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findReturnStmt(MethodDeclaration)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.findSwitch(Node)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.requireParentNode(Node)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+      ],
+      "details": "Consolidate the node-navigation API in NavigatorNodeLookup and remove the corresponding forwarding methods from Navigator. The existing NavigatorNodeLookup methods are the destination implementations.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "demandNodeOfGivenClass",
+        "demandParentNode",
+        "demandReturnStmt",
+        "demandSwitch",
+        "demandVariableDeclaration",
+        "findMethodCall",
+        "findNameExpression",
+        "findNodeOfGivenClass",
+        "findReturnStmt",
+        "findSimpleName",
+        "findSwitch",
+        "requireParentNode"
+      ],
+      "outputs": [
+        "NavigatorNodeLookup"
+      ],
+      "details": "Update callers to invoke NavigatorNodeLookup directly after the forwarding methods are removed from Navigator.",
+      "risk": "high"
+    }
+  ]
+}

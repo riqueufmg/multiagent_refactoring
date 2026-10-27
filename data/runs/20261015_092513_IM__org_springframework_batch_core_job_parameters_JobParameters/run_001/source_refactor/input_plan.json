@@ -1,0 +1,66 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.springframework.batch.core.job.parameters.JobParameters",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive typed parameter access API from JobParameters to reduce the number of public methods and isolate the repeated type-validation logic.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameterTypedAccessors.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters",
+            "org.springframework.batch.core.job.parameters.JobParameterTypedAccessors"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParameterTypedAccessors"
+          ],
+          "details": "Extract the cohesive typed getter methods getLong(String), getLong(String, Long), getString(String), getString(String, String), getDouble(String), getDouble(String, Double), getDate(String), getDate(String, Date), getLocalDate(String), getLocalDate(String, LocalDate), getLocalTime(String), getLocalTime(String, LocalTime), getLocalDateTime(String), and getLocalDateTime(String, LocalDateTime). Move the shared parameter-map access and type-validation behavior required by these methods into the extracted class, preserving null handling and IllegalArgumentException behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameterTypedAccessors.java"
+          ],
+          "outputs": [
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameterTypedAccessors.java"
+          ],
+          "details": "Update imports in both classes for Date, LocalDate, LocalDateTime, LocalTime, JobParameter, Map, and Nullable according to the methods and fields retained by each class. Remove imports no longer used by JobParameters.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, Date)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, LocalDate)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, LocalTime)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, LocalDateTime)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParameterTypedAccessors"
+          ],
+          "details": "Update callers of the extracted typed getter methods to use JobParameterTypedAccessors. Preserve the existing method signatures and overload behavior at call sites, and ensure each accessor receives the same parameter map and returns the same values or exceptions.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

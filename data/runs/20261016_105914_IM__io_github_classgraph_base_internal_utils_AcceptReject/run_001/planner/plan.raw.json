@@ -1,0 +1,71 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "io.github.classgraph.base.internal.utils.AcceptReject",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the public API size and implementation complexity of AcceptReject by extracting its cohesive static utility operations for glob conversion, path and name normalization, pattern matching, and diagnostic formatting into a same-package utility class.",
+      "files": [
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectUtils.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.base.internal.utils.AcceptReject",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils"
+          ],
+          "outputs": [
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils"
+          ],
+          "details": "Extract the cohesive static utility methods globToPattern(String, char, boolean), stripTrailingDoubleGlob(String, char), indexOfWildcard(String), containsWildcard(String), normalizePath(String), normalizePackageOrClassName(String), pathToPackageName(String), packageNameToPath(String), classNameToClassfilePath(String), matchesPatternList(String, List<Pattern>), and quoteList(Collection<String>, StringBuilder) into AcceptRejectUtils. Preserve their existing behavior, visibility where required by callers, imports, nullability annotations, and package placement.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "io.github.classgraph.base.internal.utils.AcceptReject.globToPattern(String, char, boolean)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.stripTrailingDoubleGlob(String, char)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.containsWildcard(String)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.normalizePath(String)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.normalizePackageOrClassName(String)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.pathToPackageName(String)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.packageNameToPath(String)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.classNameToClassfilePath(String)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.matchesPatternList(String, List<Pattern>)",
+            "io.github.classgraph.base.internal.utils.AcceptReject.quoteList(Collection<String>, StringBuilder)"
+          ],
+          "outputs": [
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.globToPattern(String, char, boolean)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.stripTrailingDoubleGlob(String, char)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.containsWildcard(String)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.normalizePath(String)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.normalizePackageOrClassName(String)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.pathToPackageName(String)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.packageNameToPath(String)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.classNameToClassfilePath(String)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.matchesPatternList(String, List<Pattern>)",
+            "io.github.classgraph.base.internal.utils.AcceptRejectUtils.quoteList(Collection<String>, StringBuilder)"
+          ],
+          "details": "Update references inside AcceptReject and its nested classes to use AcceptRejectUtils for the extracted operations. Update external references to the moved public static methods while preserving method arguments and return types.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+            "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectUtils.java"
+          ],
+          "outputs": [
+            "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+            "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectUtils.java"
+          ],
+          "details": "Move Pattern, Collection, List, and Nullable imports required only by extracted methods to AcceptRejectUtils, retain imports still used by AcceptReject, and remove unused imports from both files.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

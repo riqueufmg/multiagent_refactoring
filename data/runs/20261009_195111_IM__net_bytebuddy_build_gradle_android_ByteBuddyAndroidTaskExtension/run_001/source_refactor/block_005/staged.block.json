@@ -1,0 +1,20 @@
+{
+  "id": 5,
+  "goal": "Update internal usage and call sites within the module so code compiles against the new structure and to apply the reduced responsibility of the original class.",
+  "files": [
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Adjust internal references inside ByteBuddyAndroidTaskExtension (constructor initialization, any use in configure(...) or resolve(...)) to use the new delegate instances (transformations and adjustmentSettings). Ensure the constructor assigns: this.transformations = new ByteBuddyAndroidTransformations(project); this.adjustmentSettings = new ByteBuddyAndroidAdjustment(); and that façade methods delegate. This keeps external behavior identical while moving implementation details out of the target class.",
+      "risk": "medium"
+    }
+  ]
+}

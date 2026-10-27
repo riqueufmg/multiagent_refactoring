@@ -1,0 +1,26 @@
+mvp:
+  name: planner
+  run_id: run_005
+project:
+  name: spring-batch
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/spring-batch/repository
+target:
+  smell: IM
+  smell_name: Insufficient Modularization
+  target_type: class
+  target_name: org.springframework.batch.core.job.parameters.JobParameters
+models:
+  planner: gpt-5.6-luna
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/planner/prompts/system.md
+  smell: /data/henrique/multiagent_refactoring/mvp/planner/prompts/planner_IM.md
+planner:
+  temperature: 0.0
+  timeout: 120
+  max_retries: 5
+designite:
+  java_path: /usr/lib/jvm/jdk-22.0.2-oracle-x64/bin/java
+  jar_path: /data/henrique/multiagent_refactoring/tools/DesigniteJava.jar
+  smells_csv: DesignSmells.csv
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20261013_114644_IM__org_springframework_batch_core_job_parameters_JobParameters

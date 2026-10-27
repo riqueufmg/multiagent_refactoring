@@ -1,0 +1,118 @@
+commit 11db275c43667bdd0676940f3cf225b9e3a4bdc2
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 9 19:58:26 2026 -0300
+
+    source_refactor: apply block 4
+
+diff --git a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+index 3627b071fa..b78467e7ee 100644
+--- a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
++++ b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+@@ -86,7 +86,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+     /**
+      * Grouped adjustment-related configuration.
+      */
+-    private final ByteBuddyAndroidAdjustment adjustmentConfiguration;
++    private final ByteBuddyAndroidAdjustment adjustmentSettings;
+ 
+     /**
+      * The class file version to use for creating auxiliary types or {@code null} if the
+@@ -109,7 +109,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+         warnOnEmptyTypeSet = true;
+         failFast = true;
+         discovery = Discovery.EMPTY;
+-        this.adjustmentConfiguration = new ByteBuddyAndroidAdjustment();
++        this.adjustmentSettings = new ByteBuddyAndroidAdjustment();
+     }
+ 
+     /**
+@@ -244,7 +244,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @return The adjustment for tasks that might depend on post-processed compile tasks.
+      */
+     public Adjustment getAdjustment() {
+-        return adjustmentConfiguration.getAdjustment();
++        return adjustmentSettings.getAdjustment();
+     }
+ 
+     /**
+@@ -253,7 +253,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @param adjustment The adjustment for tasks that might depend on post-processed compile tasks.
+      */
+     public void setAdjustment(Adjustment adjustment) {
+-        adjustmentConfiguration.setAdjustment(adjustment);
++        adjustmentSettings.setAdjustment(adjustment);
+     }
+ 
+     /**
+@@ -262,7 +262,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @return The error handler to be used when a task dependency cannot be resolved.
+      */
+     public Adjustment.ErrorHandler getAdjustmentErrorHandler() {
+-        return adjustmentConfiguration.getAdjustmentErrorHandler();
++        return adjustmentSettings.getAdjustmentErrorHandler();
+     }
+ 
+     /**
+@@ -271,7 +271,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @param adjustmentErrorHandler The error handler to be used when a task dependency cannot be resolved.
+      */
+     public void setAdjustmentErrorHandler(Adjustment.ErrorHandler adjustmentErrorHandler) {
+-        adjustmentConfiguration.setAdjustmentErrorHandler(adjustmentErrorHandler);
++        adjustmentSettings.setAdjustmentErrorHandler(adjustmentErrorHandler);
+     }
+ 
+     /**
+@@ -280,7 +280,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @return The adjustment post processor to apply.
+      */
+     public Action<Task> getAdjustmentPostProcessor() {
+-        return adjustmentConfiguration.getAdjustmentPostProcessor();
++        return adjustmentSettings.getAdjustmentPostProcessor();
+     }
+ 
+     /**
+@@ -289,7 +289,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @param adjustmentPostProcessor The adjustment post processor to apply.
+      */
+     public void setAdjustmentPostProcessor(Action<Task> adjustmentPostProcessor) {
+-        adjustmentConfiguration.setAdjustmentPostProcessor(adjustmentPostProcessor);
++        adjustmentSettings.setAdjustmentPostProcessor(adjustmentPostProcessor);
+     }
+ 
+     /**
+@@ -298,7 +298,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @return The number of threads to use for transforming or {@code 0} if the transformation should be applied in the main thread.
+      */
+     public int getThreads() {
+-        return adjustmentConfiguration.getThreads();
++        return adjustmentSettings.getThreads();
+     }
+ 
+     /**
+@@ -307,7 +307,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @param threads The number of threads to use for transforming or {@code 0} if the transformation should be applied in the main thread.
+      */
+     public void setThreads(int threads) {
+-        adjustmentConfiguration.setThreads(threads);
++        adjustmentSettings.setThreads(threads);
+     }
+ 
+     /**
+@@ -316,7 +316,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @return {@code true}, task dependencies are only adjusted when the task graph is fully resolved.
+      */
+     public boolean isLazy() {
+-        return adjustmentConfiguration.isLazy();
++        return adjustmentSettings.isLazy();
+     }
+ 
+     /**
+@@ -325,7 +325,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      * @param lazy {@code true}, task dependencies are only adjusted when the task graph is fully resolved.
+      */
+     public void setLazy(boolean lazy) {
+-        adjustmentConfiguration.setLazy(lazy);
++        adjustmentSettings.setLazy(lazy);
+     }
+ 
+     /**

@@ -1,0 +1,59 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.cas.config.CasConfiguration",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive URL configuration state and behavior from CasConfiguration while preserving its existing public API through delegation.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.loginUrl",
+            "org.pac4j.cas.config.CasConfiguration.prefixUrl",
+            "org.pac4j.cas.config.CasConfiguration.restUrl",
+            "org.pac4j.cas.config.CasConfiguration.urlResolver",
+            "org.pac4j.cas.config.CasConfiguration.initializeClientConfiguration()",
+            "org.pac4j.cas.config.CasConfiguration.getLoginUrl()",
+            "org.pac4j.cas.config.CasConfiguration.setLoginUrl(String)",
+            "org.pac4j.cas.config.CasConfiguration.computeFinalLoginUrl(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.getPrefixUrl()",
+            "org.pac4j.cas.config.CasConfiguration.setPrefixUrl(String)",
+            "org.pac4j.cas.config.CasConfiguration.computeFinalPrefixUrl(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.getRestUrl()",
+            "org.pac4j.cas.config.CasConfiguration.setRestUrl(String)",
+            "org.pac4j.cas.config.CasConfiguration.computeFinalRestUrl(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.getUrlResolver()",
+            "org.pac4j.cas.config.CasConfiguration.setUrlResolver(UrlResolver)"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasUrlConfiguration"
+          ],
+          "details": "Create CasUrlConfiguration in the same package. Move the URL fields and cohesive URL initialization, accessor, and URL computation methods into it. Preserve the existing public methods on CasConfiguration as delegating facade methods so callers and subclasses of CasConfiguration do not need to change. CasUrlConfiguration should use DefaultUrlResolver when its UrlResolver is null and retain the existing loginUrl, prefixUrl, and restUrl normalization behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.internalInit(boolean)",
+            "org.pac4j.cas.config.CasConfiguration()",
+            "org.pac4j.cas.config.CasConfiguration(String)",
+            "org.pac4j.cas.config.CasConfiguration(String, CasProtocol)",
+            "org.pac4j.cas.config.CasConfiguration(String, String)",
+            "org.pac4j.cas.config.CasConfiguration.toString()"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasConfiguration"
+          ],
+          "details": "Add a CasUrlConfiguration field to CasConfiguration, initialize it from each existing constructor, delegate URL access and computation methods to it, and update internalInit(boolean) to validate and initialize URL state through the extracted object. Update toString() to obtain loginUrl, prefixUrl, and restUrl through the existing CasConfiguration facade methods.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

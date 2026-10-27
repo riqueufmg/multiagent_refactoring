@@ -1,0 +1,183 @@
+commit 46394954f1d0d33211c16d3658e314ef23dd87e0
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 15 20:38:37 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
+index cedcf58fb..6adcce13b 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
+@@ -46,15 +46,9 @@ public abstract class BaseClient extends InitializableObject implements Client {
+ 
+     private final BaseClientProfileConfiguration profileConfiguration = new BaseClientProfileConfiguration();
+ 
+-    private Map<String, Object> customProperties = new LinkedHashMap<>();
+-
+-    private ProfileFactory profileFactoryWhenNotAuthenticated;
+-
+-    private boolean multiProfile = false;
++    private final BaseClientProfileOptions profileOptions = new BaseClientProfileOptions(logger);
+ 
+-    protected Boolean saveProfileInSession;
+-
+-    private static boolean warned;
++    private Map<String, Object> customProperties = new LinkedHashMap<>();
+ 
+     /**
+      * Retrieve the credentials.
+@@ -88,6 +82,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+         init();
+         logger.debug("credentials : {}", credentials);
+         if (credentials == null) {
++            final var profileFactoryWhenNotAuthenticated = profileOptions.getProfileFactoryWhenNotAuthenticated();
+             if (profileFactoryWhenNotAuthenticated != null) {
+                 final var customProfile = profileFactoryWhenNotAuthenticated.apply(new Object[] {context});
+                 logger.debug("force custom profile when not authenticated: {}", customProfile);
+@@ -221,33 +216,27 @@ public abstract class BaseClient extends InitializableObject implements Client {
+     }
+ 
+     public ProfileFactory getProfileFactoryWhenNotAuthenticated() {
+-        return profileFactoryWhenNotAuthenticated;
++        return profileOptions.getProfileFactoryWhenNotAuthenticated();
+     }
+ 
+     public void setProfileFactoryWhenNotAuthenticated(final ProfileFactory profileFactoryWhenNotAuthenticated) {
+-        if (!warned) {
+-            logger.warn("Be careful when using the 'setProfileFactoryWhenNotAuthenticated' method: a custom profile "
+-                + "is returned when the authentication fails or is cancelled and it is stored for the whole session. "
+-                + "You may need to define additional 'Authorizer's to secure your web resources.");
+-            warned = true;
+-        }
+-        this.profileFactoryWhenNotAuthenticated = profileFactoryWhenNotAuthenticated;
++        profileOptions.setProfileFactoryWhenNotAuthenticated(profileFactoryWhenNotAuthenticated);
+     }
+ 
+     public boolean isMultiProfile(final WebContext context, final UserProfile profile) {
+-        return multiProfile;
++        return profileOptions.isMultiProfile(context, profile);
+     }
+ 
+     public void setMultiProfile(final boolean multiProfile) {
+-        this.multiProfile = multiProfile;
++        profileOptions.setMultiProfile(multiProfile);
+     }
+ 
+     public Boolean getSaveProfileInSession(final WebContext context, final UserProfile profile) {
+-        return saveProfileInSession;
++        return profileOptions.getSaveProfileInSession(context, profile);
+     }
+ 
+     public void setSaveProfileInSession(final boolean saveProfileInSession) {
+-        this.saveProfileInSession = saveProfileInSession;
++        profileOptions.setSaveProfileInSession(saveProfileInSession);
+     }
+ 
+     @Override
+@@ -255,7 +244,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+         return CommonHelper.toNiceString(this.getClass(), "name", getName(), "credentialsExtractor", profileConfiguration.getCredentialsExtractor(),
+             "authenticator", profileConfiguration.getAuthenticator(), "profileCreator", profileConfiguration.getProfileCreator(),
+             "authorizationGenerators", authorization.getAuthorizationGenerators(), "customProperties", customProperties,
+-            "profileFactoryWhenNotAuthenticated", profileFactoryWhenNotAuthenticated, "multiProfile", multiProfile,
+-            "saveProfileInSession", saveProfileInSession);
++            "profileFactoryWhenNotAuthenticated", profileOptions.getProfileFactoryWhenNotAuthenticated(), "multiProfile", profileOptions.isMultiProfile(null, null),
++            "saveProfileInSession", profileOptions.getSaveProfileInSession(null, null));
+     }
+ }
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileOptions.java b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileOptions.java
+new file mode 100644
+index 000000000..a11214239
+--- /dev/null
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileOptions.java
+@@ -0,0 +1,61 @@
++package org.pac4j.core.client;
++
++import org.pac4j.core.context.WebContext;
++import org.pac4j.core.profile.UserProfile;
++import org.pac4j.core.profile.factory.ProfileFactory;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++/**
++ * Profile and session options for a client.
++ */
++public class BaseClientProfileOptions {
++
++    private final Logger logger;
++
++    private ProfileFactory profileFactoryWhenNotAuthenticated;
++
++    private boolean multiProfile = false;
++
++    private Boolean saveProfileInSession;
++
++    private static boolean warned;
++
++    public BaseClientProfileOptions() {
++        this(LoggerFactory.getLogger(BaseClientProfileOptions.class));
++    }
++
++    BaseClientProfileOptions(final Logger logger) {
++        this.logger = logger;
++    }
++
++    public ProfileFactory getProfileFactoryWhenNotAuthenticated() {
++        return profileFactoryWhenNotAuthenticated;
++    }
++
++    public void setProfileFactoryWhenNotAuthenticated(final ProfileFactory profileFactoryWhenNotAuthenticated) {
++        if (!warned) {
++            logger.warn("Be careful when using the 'setProfileFactoryWhenNotAuthenticated' method: a custom profile "
++                + "is returned when the authentication fails or is cancelled and it is stored for the whole session. "
++                + "You may need to define additional 'Authorizer's to secure your web resources.");
++            warned = true;
++        }
++        this.profileFactoryWhenNotAuthenticated = profileFactoryWhenNotAuthenticated;
++    }
++
++    public boolean isMultiProfile(final WebContext context, final UserProfile profile) {
++        return multiProfile;
++    }
++
++    public void setMultiProfile(final boolean multiProfile) {
++        this.multiProfile = multiProfile;
++    }
++
++    public Boolean getSaveProfileInSession(final WebContext context, final UserProfile profile) {
++        return saveProfileInSession;
++    }
++
++    public void setSaveProfileInSession(final boolean saveProfileInSession) {
++        this.saveProfileInSession = saveProfileInSession;
++    }
++}
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/DirectClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/DirectClient.java
+index 4d7c8a366..4d072a75b 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/DirectClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/DirectClient.java
+@@ -22,8 +22,8 @@ public abstract class DirectClient extends BaseClient {
+ 
+     @Override
+     protected void beforeInternalInit(final boolean forceReinit) {
+-        if (saveProfileInSession == null) {
+-            saveProfileInSession = false;
++        if (getSaveProfileInSession(null, null) == null) {
++            setSaveProfileInSession(false);
+         }
+     }
+ 
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
+index 28090584d..aabc14f39 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
+@@ -64,8 +64,8 @@ public abstract class IndirectClient extends BaseClient {
+         if (this.ajaxRequestResolver == null) {
+             ajaxRequestResolver = new DefaultAjaxRequestResolver();
+         }
+-        if (saveProfileInSession == null) {
+-            saveProfileInSession = true;
++        if (getSaveProfileInSession(null, null) == null) {
++            setSaveProfileInSession(true);
+         }
+     }
+ 

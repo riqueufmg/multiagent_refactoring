@@ -1,0 +1,188 @@
+## CONTEXT
+
+A plan was developed to refactor a target that suffers from a specific type of code smell. The plan consists of blocks, each of which is formed by a list of refactoring operations. The blocks were designed to perform the refactoring in steps, such that after the execution of each block, it will have a compilable sub-solution with functional tests. For this, both the source code mentioned in the plan and the related tests may need to be rewritten.
+
+## TASK
+
+Apply the staged refactoring block to the provided Java source files.
+
+Preserving behavior does not require preserving the original target-class API when the plan explicitly moves methods or responsibilities to another class.
+
+## CONSTRAINTS
+
+- Modify only files listed in allowed_files field.
+- Return the full new content for every modified file.
+- Do not return partial patches.
+- Do not edit unrelated tests.
+- Do not change unrelated code.
+- Do not undo previous refactorings.
+- If the block cannot be safely applied, return an empty files_to_write list and explain the reason in "notes".
+- Return only files that actually changed.
+- Do not include unchanged files in files_to_write.
+- Implement the refactoring operations requested in the current block. Do not replace the requested refactoring with a more conservative alternative.
+
+## INPUT PLAN
+
+{
+  "repo_path": "/data/henrique/historical-java-repro/benchmark/repositories/spring-batch/repository",
+  "target": {
+    "smell": "GC",
+    "smell_name": "God Component",
+    "target_type": "package",
+    "target_name": "org.springframework.batch.core.configuration.support"
+  },
+  "block": {
+    "id": 1,
+    "goal": "Move the cohesive job registry and factory cluster into a dedicated subpackage.",
+    "files": [
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultBatchConfiguration.java",
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobFactoryRegistrationListener.java",
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/MapJobRegistry.java",
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ReferenceJobFactory.java",
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/JobFactoryRegistrationListener.java",
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/MapJobRegistry.java",
+      "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/ReferenceJobFactory.java"
+    ],
+    "ops": [
+      {
+        "op": "CREATE_PACKAGE",
+        "inputs": [],
+        "outputs": [
+          "org.springframework.batch.core.configuration.support.registry"
+        ],
+        "details": "Create the destination subpackage if it does not exist.",
+        "risk": "low",
+        "api_change": false
+      },
+      {
+        "op": "MOVE_CLASS",
+        "inputs": [
+          "org.springframework.batch.core.configuration.support.MapJobRegistry"
+        ],
+        "outputs": [
+          "org.springframework.batch.core.configuration.support.registry.MapJobRegistry"
+        ],
+        "details": "Move the job registry implementation to the dedicated registry subpackage.",
+        "risk": "medium",
+        "api_change": true
+      },
+      {
+        "op": "MOVE_CLASS",
+        "inputs": [
+          "org.springframework.batch.core.configuration.support.JobFactoryRegistrationListener"
+        ],
+        "outputs": [
+          "org.springframework.batch.core.configuration.support.registry.JobFactoryRegistrationListener"
+        ],
+        "details": "Move the job factory registration listener alongside the registry implementation and factory adapter.",
+        "risk": "medium",
+        "api_change": true
+      },
+      {
+        "op": "MOVE_CLASS",
+        "inputs": [
+          "org.springframework.batch.core.configuration.support.ReferenceJobFactory"
+        ],
+        "outputs": [
+          "org.springframework.batch.core.configuration.support.registry.ReferenceJobFactory"
+        ],
+        "details": "Move the reference job factory into the dedicated registry and factory subpackage.",
+        "risk": "medium",
+        "api_change": true
+      },
+      {
+        "op": "UPDATE_VISIBILITY",
+        "inputs": [
+          "org.springframework.batch.core.configuration.support.DefaultBatchConfiguration",
+          "org.springframework.batch.core.configuration.support.registry.JobFactoryRegistrationListener",
+          "org.springframework.batch.core.configuration.support.registry.MapJobRegistry",
+          "org.springframework.batch.core.configuration.support.registry.ReferenceJobFactory"
+        ],
+        "outputs": [],
+        "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+        "risk": "medium",
+        "api_change": true
+      }
+    ]
+  },
+  "allowed_files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultBatchConfiguration.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobFactoryRegistrationListener.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/MapJobRegistry.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ReferenceJobFactory.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/JobFactoryRegistrationListener.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/MapJobRegistry.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/ReferenceJobFactory.java"
+  ],
+  "executor_existing_files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultBatchConfiguration.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobFactoryRegistrationListener.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/MapJobRegistry.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ReferenceJobFactory.java"
+  ],
+  "executor_new_files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/JobFactoryRegistrationListener.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/MapJobRegistry.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/ReferenceJobFactory.java"
+  ],
+  "executor_rejected_files": [],
+  "files_context": [
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultBatchConfiguration.java",
+      "exists": "true",
+      "content": "/*\n * Copyright 2012-2025 the original author or authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\npackage org.springframework.batch.core.configuration.support;\n\nimport io.micrometer.observation.ObservationRegistry;\n\nimport org.springframework.batch.core.configuration.DuplicateJobException;\nimport org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;\nimport org.springframework.batch.core.configuration.support.registry.MapJobRegistry;\nimport org.springframework.batch.core.job.Job;\nimport org.springframework.batch.core.configuration.BatchConfigurationException;\nimport org.springframework.batch.core.configuration.JobRegistry;\nimport org.springframework.batch.core.converter.DefaultJobParametersConverter;\nimport org.springframework.batch.core.converter.JobParametersConverter;\nimport org.springframework.batch.core.launch.JobOperator;\nimport org.springframework.batch.core.launch.support.JobOperatorFactoryBean;\nimport org.springframework.batch.core.launch.support.TaskExecutorJobOperator;\nimport org.springframework.batch.core.repository.JobRepository;\nimport org.springframework.batch.core.repository.support.ResourcelessJobRepository;\nimport org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;\nimport org.springframework.beans.BeansException;\nimport org.springframework.context.ApplicationContext;\nimport org.springframework.context.ApplicationContextAware;\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.context.annotation.Import;\nimport org.springframework.core.task.SyncTaskExecutor;\nimport org.springframework.core.task.TaskExecutor;\nimport org.springframework.transaction.PlatformTransactionManager;\n\n/**\n * Base {@link Configuration} class that provides common infrastructure beans for enabling\n * and using Spring Batch.\n * <p>\n * This configuration class configures and registers the following beans in the\n * application context:\n *\n * <ul>\n * <li>a {@link ResourcelessJobRepository} named \"jobRepository\"</li>\n * <li>a {@link TaskExecutorJobOperator} named \"jobOperator\"</li>\n * <li>a {@link org.springframework.batch.core.scope.StepScope} named \"stepScope\"</li>\n * <li>a {@link org.springframework.batch.core.scope.JobScope} named \"jobScope\"</li>\n * </ul>\n *\n * Customization is possible by extending the class and overriding getters.\n * <p>\n * A typical usage of this class is as follows: <pre class=\"code\">\n * &#064;Configuration\n * public class MyJobConfiguration extends DefaultBatchConfiguration {\n *\n *     &#064;Bean\n *     public Job job(JobRepository jobRepository) {\n *         return new JobBuilder(\"myJob\", jobRepository)\n *                 // define job flow as needed\n *                 .build();\n *     }\n *\n * }\n * </pre>\n *\n * @author Dave Syer\n * @author Michael Minella\n * @author Mahmoud Ben Hassine\n * @author Taeik Lim\n * @since 5.0\n */\n@Configuration(proxyBeanMethods = false)\n@Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class })\npublic class DefaultBatchConfiguration implements ApplicationContextAware {\n\n\t@SuppressWarnings(\"NullAway.Init\")\n\tprotected ApplicationContext applicationContext;\n\n\t@Override\n\tpublic void setApplicationContext(ApplicationContext applicationContext) throws BeansException {\n\t\tthis.applicationContext = applicationContext;\n\t}\n\n\t@Bean\n\tpublic JobRepository jobRepository() {\n\t\treturn new ResourcelessJobRepository();\n\t}\n\n\t@Bean\n\tpublic JobOperator jobOperator(JobRepository jobRepository) throws BatchConfigurationException {\n\t\tJobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();\n\t\tjobOperatorFactoryBean.setJobRepository(jobRepository);\n\t\tjobOperatorFactoryBean.setJobRegistry(getJobRegistry());\n\t\tjobOperatorFactoryBean.setTransactionManager(getTransactionManager());\n\t\tjobOperatorFactoryBean.setObservationRegistry(getObservationRegistry());\n\t\tjobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());\n\t\tjobOperatorFactoryBean.setTaskExecutor(getTaskExecutor());\n\t\ttry {\n\t\t\tjobOperatorFactoryBean.afterPropertiesSet();\n\t\t\treturn jobOperatorFactoryBean.getObject();\n\t\t}\n\t\tcatch (Exception e) {\n\t\t\tthrow new BatchConfigurationException(\"Unable to configure the default job operator\", e);\n\t\t}\n\t}\n\n\t// FIXME getter with side effect, see JobOperatorFactoryBean.populateJobRegistry\n\tprotected JobRegistry getJobRegistry() {\n\t\tMapJobRegistry jobRegistry = new MapJobRegistry();\n\t\tthis.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {\n\t\t\ttry {\n\t\t\t\tjobRegistry.register(job);\n\t\t\t}\n\t\t\tcatch (DuplicateJobException e) {\n\t\t\t\tthrow new BatchConfigurationException(e);\n\t\t\t}\n\t\t});\n\t\treturn jobRegistry;\n\t}\n\n\t/**\n\t * Return the {@link ObservationRegistry} to use for the job operator. Defaults to\n\t * {@link ObservationRegistry#NOOP}.\n\t * @return The ObservationRegistry to use for the job operator\n\t * @since 6.0\n\t */\n\tprotected ObservationRegistry getObservationRegistry() {\n\t\treturn ObservationRegistry.NOOP;\n\t}\n\n\t/**\n\t * Return the transaction manager to use for the job operator. Defaults to\n\t * {@link ResourcelessTransactionManager}.\n\t * @return The transaction manager to use for the job operator\n\t */\n\tprotected PlatformTransactionManager getTransactionManager() {\n\t\treturn new ResourcelessTransactionManager();\n\t}\n\n\t/**\n\t * Return the {@link TaskExecutor} to use in the job operator. Defaults to\n\t * {@link SyncTaskExecutor}.\n\t * @return the {@link TaskExecutor} to use in the job operator.\n\t */\n\tprotected TaskExecutor getTaskExecutor() {\n\t\treturn new SyncTaskExecutor();\n\t}\n\n\t/**\n\t * Return the {@link JobParametersConverter} to use in the job operator. Defaults to\n\t * {@link DefaultJobParametersConverter}\n\t * @return the {@link JobParametersConverter} to use in the job operator.\n\t * @deprecated since 6.0 with no replacement and scheduled for removal in 6.2 or\n\t * later.\n\t */\n\t@Deprecated(since = \"6.0\", forRemoval = true)\n\tprotected JobParametersConverter getJobParametersConverter() {\n\t\treturn new DefaultJobParametersConverter();\n\t}\n\n}\n"
+    },
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobFactoryRegistrationListener.java",
+      "exists": "false",
+      "content": ""
+    },
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/MapJobRegistry.java",
+      "exists": "false",
+      "content": ""
+    },
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ReferenceJobFactory.java",
+      "exists": "false",
+      "content": ""
+    },
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/JobFactoryRegistrationListener.java",
+      "exists": "true",
+      "content": "/*\n * Copyright 2006-2025 the original author or authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\npackage org.springframework.batch.core.configuration.support.registry;\n\nimport java.util.Map;\n\nimport org.apache.commons.logging.Log;\nimport org.apache.commons.logging.LogFactory;\nimport org.jspecify.annotations.NullUnmarked;\n\nimport org.springframework.batch.core.configuration.JobFactory;\nimport org.springframework.batch.core.configuration.JobRegistry;\n\n/**\n * Generic service that can bind and unbind a {@link JobFactory} in a {@link JobRegistry}.\n *\n * @author Dave Syer\n * @author Mahmoud Ben Hassine\n * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.\n */\n@NullUnmarked\n@Deprecated(since = \"6.0\", forRemoval = true)\npublic class JobFactoryRegistrationListener {\n\n\tprivate final Log logger = LogFactory.getLog(getClass());\n\n\tprivate JobRegistry jobRegistry;\n\n\t/**\n\t * Public setter for a {@link JobRegistry} to use for all the bind and unbind events.\n\t * @param jobRegistry {@link JobRegistry}\n\t */\n\tpublic void setJobRegistry(JobRegistry jobRegistry) {\n\t\tthis.jobRegistry = jobRegistry;\n\t}\n\n\t/**\n\t * Take the {@link JobFactory} provided and register it with the {@link JobRegistry}.\n\t * @param jobFactory a {@link JobFactory}\n\t * @param params not needed by this listener.\n\t * @throws Exception if there is a problem\n\t */\n\tpublic void bind(JobFactory jobFactory, Map<String, ?> params) throws Exception {\n\t\tif (logger.isInfoEnabled()) {\n\t\t\tlogger.info(\"Binding JobFactory: \" + jobFactory.getJobName());\n\t\t}\n\t\tjobRegistry.register(jobFactory.createJob());\n\t}\n\n\t/**\n\t * Take the provided {@link JobFactory} and unregister it with the\n\t * {@link JobRegistry}.\n\t * @param jobFactory a {@link JobFactory}\n\t * @param params not needed by this listener.\n\t * @throws Exception if there is a problem\n\t */\n\tpublic void unbind(JobFactory jobFactory, Map<String, ?> params) throws Exception {\n\t\tif (logger.isInfoEnabled()) {\n\t\t\tlogger.info(\"Unbinding JobFactory: \" + jobFactory.getJobName());\n\t\t}\n\t\tjobRegistry.unregister(jobFactory.getJobName());\n\t}\n\n}\n"
+    },
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/MapJobRegistry.java",
+      "exists": "true",
+      "content": "/*\n * Copyright 2006-2025 the original author or authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\npackage org.springframework.batch.core.configuration.support.registry;\n\nimport java.util.Collections;\nimport java.util.Map;\nimport java.util.Set;\nimport java.util.concurrent.ConcurrentHashMap;\nimport java.util.concurrent.ConcurrentMap;\n\nimport org.apache.commons.logging.Log;\nimport org.apache.commons.logging.LogFactory;\nimport org.jspecify.annotations.Nullable;\n\nimport org.springframework.batch.core.job.Job;\nimport org.springframework.batch.core.configuration.DuplicateJobException;\nimport org.springframework.batch.core.configuration.JobRegistry;\nimport org.springframework.beans.BeansException;\nimport org.springframework.beans.factory.SmartInitializingSingleton;\nimport org.springframework.context.ApplicationContext;\nimport org.springframework.context.ApplicationContextAware;\nimport org.springframework.util.Assert;\n\n/**\n * Simple, thread-safe, map-based implementation of {@link JobRegistry}. This registry is\n * a {@link SmartInitializingSingleton} that is automatically populated with all\n * {@link Job} beans in the {@link ApplicationContext}.\n *\n * @author Dave Syer\n * @author Robert Fischer\n * @author Mahmoud Ben Hassine\n */\npublic class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, ApplicationContextAware {\n\n\tprotected final Log logger = LogFactory.getLog(getClass());\n\n\t/**\n\t * The map holding the registered jobs.\n\t */\n\tprivate final ConcurrentMap<String, Job> map = new ConcurrentHashMap<>();\n\n\t@SuppressWarnings(\"NullAway.Init\")\n\tprivate ApplicationContext applicationContext;\n\n\t@Override\n\tpublic void setApplicationContext(ApplicationContext applicationContext) throws BeansException {\n\t\tthis.applicationContext = applicationContext;\n\t}\n\n\t@Override\n\tpublic void afterSingletonsInstantiated() {\n\t\tMap<String, Job> jobBeans = this.applicationContext.getBeansOfType(Job.class);\n\t\tthis.map.putAll(jobBeans);\n\t}\n\n\t@Override\n\tpublic void register(Job job) throws DuplicateJobException {\n\t\tAssert.notNull(job, \"job must not be null\");\n\t\tString jobName = job.getName();\n\t\tAssert.notNull(jobName, \"Job name must not be null\");\n\t\tJob previousValue = this.map.putIfAbsent(jobName, job);\n\t\tif (previousValue != null) {\n\t\t\tthrow new DuplicateJobException(\"A job with this name [\" + jobName + \"] was already registered\");\n\t\t}\n\t}\n\n\t@Override\n\tpublic void unregister(String name) {\n\t\tAssert.notNull(name, \"Job name must not be null\");\n\t\tthis.map.remove(name);\n\t}\n\n\t@Nullable\n\t@Override\n\tpublic Job getJob(String name) {\n\t\treturn this.map.get(name);\n\t}\n\n\t/**\n\t * Provides an unmodifiable view of job names.\n\t */\n\t@Override\n\tpublic Set<String> getJobNames() {\n\t\treturn Collections.unmodifiableSet(this.map.keySet());\n\t}\n\n}\n"
+    },
+    {
+      "path": "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/registry/ReferenceJobFactory.java",
+      "exists": "true",
+      "content": "/*\n * Copyright 2006-2025 the original author or authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\npackage org.springframework.batch.core.configuration.support.registry;\n\nimport org.jspecify.annotations.NullUnmarked;\n\nimport org.springframework.batch.core.job.Job;\nimport org.springframework.batch.core.configuration.JobFactory;\n\n/**\n * A {@link JobFactory} that keeps a reference to a {@link Job}. It never modifies its\n * {@link Job}.\n *\n * @author Dave Syer\n * @author Mahmoud Ben Hassine\n * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.\n */\n@NullUnmarked\n@Deprecated(since = \"6.0\", forRemoval = true)\npublic class ReferenceJobFactory implements JobFactory {\n\n\tprivate final Job job;\n\n\t/**\n\t * @param job the {@link Job} to return from {@link #createJob()}.\n\t */\n\tpublic ReferenceJobFactory(Job job) {\n\t\tthis.job = job;\n\t}\n\n\t/**\n\t * Return the instance that was passed in on initialization.\n\t *\n\t * @see JobFactory#createJob()\n\t */\n\t@Override\n\tpublic final Job createJob() {\n\t\treturn job;\n\t}\n\n\t/**\n\t * Return the name of the instance that was passed in on initialization.\n\t *\n\t * @see JobFactory#getJobName()\n\t */\n\t@Override\n\tpublic String getJobName() {\n\t\treturn job.getName();\n\t}\n\n}\n"
+    }
+  ],
+  "feedback": "",
+  "attempt": 0,
+  "move_class_constraints": {
+    "moved_old_files": [],
+    "moved_new_files": [],
+    "rule": "When MOVE_CLASS is present, OpenRewrite has already moved the classes before this executor runs. Do not recreate or write files listed in moved_old_files. Edit destination files and related remaining files only."
+  }
+}
+
+## OUTPUT
+
+Return ONLY valid JSON in this format:
+
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/..." or "src/test/java/...",
+      "content": "full file content here"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "short explanation"
+}

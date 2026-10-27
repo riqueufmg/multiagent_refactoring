@@ -1,0 +1,48 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive private-key and TLS configuration responsibilities from CasConfiguration to reduce its implementation complexity while preserving the existing CasConfiguration API through delegation.",
+  "files": [
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.privateKeyPath",
+        "org.pac4j.cas.config.CasConfiguration.privateKeyAlgorithm",
+        "org.pac4j.cas.config.CasConfiguration.privateKey",
+        "org.pac4j.cas.config.CasConfiguration.hostnameVerifier",
+        "org.pac4j.cas.config.CasConfiguration.sslSocketFactory",
+        "org.pac4j.cas.config.CasConfiguration.getHostnameVerifier()",
+        "org.pac4j.cas.config.CasConfiguration.setHostnameVerifier(HostnameVerifier)",
+        "org.pac4j.cas.config.CasConfiguration.getSslSocketFactory()",
+        "org.pac4j.cas.config.CasConfiguration.setSslSocketFactory(SSLSocketFactory)",
+        "org.pac4j.cas.config.CasConfiguration.getPrivateKeyPath()",
+        "org.pac4j.cas.config.CasConfiguration.setPrivateKeyPath(String)",
+        "org.pac4j.cas.config.CasConfiguration.getPrivateKeyAlgorithm()",
+        "org.pac4j.cas.config.CasConfiguration.setPrivateKeyAlgorithm(String)",
+        "org.pac4j.cas.config.CasConfiguration.addPrivateKey(Cas20ServiceTicketValidator)",
+        "org.pac4j.cas.config.CasConfiguration.internalInit(boolean)"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasSecurityConfiguration"
+      ],
+      "details": "Create CasSecurityConfiguration in the same package. Move the private-key and TLS fields and their accessors into the extracted class. Move the private-key loading logic currently contained in internalInit(boolean) and the addPrivateKey(Cas20ServiceTicketValidator) behavior into the extracted class. Keep CasConfiguration as the public configuration entry point by retaining delegating accessors and delegation from internalInit(boolean). Preserve the existing default RSA algorithm behavior and PrivateKeyUtils.createKey usage.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration",
+        "org.pac4j.cas.config.CasSecurityConfiguration"
+      ],
+      "outputs": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java"
+      ],
+      "details": "Move PrivateKeyUtils, Cas20ServiceTicketValidator, HostnameVerifier, SSLSocketFactory, PrivateKey, and related imports to CasSecurityConfiguration where required, and remove imports no longer used by CasConfiguration.",
+      "risk": "low"
+    }
+  ]
+}

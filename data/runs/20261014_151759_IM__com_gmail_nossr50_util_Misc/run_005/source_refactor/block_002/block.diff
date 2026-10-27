@@ -1,0 +1,81 @@
+commit edcd89cf2b8e67a7a5447e51939f412f1f250558
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 15:41:00 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/Misc.java
+index 96af965ff..c3600e021 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/Misc.java
+@@ -3,8 +3,6 @@ package com.gmail.nossr50.util;
+ import com.gmail.nossr50.api.ItemSpawnReason;
+ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
+ import com.gmail.nossr50.mcMMO;
+-import com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask;
+-import com.gmail.nossr50.util.player.UserManager;
+ import org.bukkit.Location;
+ import org.bukkit.entity.*;
+ import org.bukkit.inventory.ItemStack;
+@@ -32,13 +30,11 @@ public final class Misc {
+         return MiscLocationUtil.getBlockCenter(blockState);
+     }
+ 
++    /**
++     * Compatibility delegate for callers not migrated in this refactoring block.
++     */
+     public static void profileCleanup(@NotNull String playerName) {
+-        Player player = mcMMO.p.getServer().getPlayerExact(playerName);
+-
+-        if (player != null) {
+-            UserManager.remove(player);
+-            mcMMO.p.getFoliaLib().getImpl().runLaterAsync(new PlayerProfileLoadingTask(player), 1);
+-        }
++        MiscPlayerUtil.profileCleanup(playerName);
+     }
+ 
+     public static void printProgress(int convertedUsers, int progressInterval, long startMillis) {
+@@ -55,8 +51,11 @@ public final class Misc {
+         return MiscLocationUtil.getRandom();
+     }
+ 
++    /**
++     * Compatibility delegate for callers not migrated in this refactoring block.
++     */
+     public static boolean isPartyLeader(@NotNull McMMOPlayer mmoPlayer) {
+-        return mmoPlayer.getParty().getLeader().getUniqueId().equals(mmoPlayer.getPlayer().getUniqueId());
++        return MiscPlayerUtil.isPartyLeader(mmoPlayer);
+     }
+ 
+     public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {
+diff --git a/src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java b/src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java
+new file mode 100644
+index 000000000..8effc2944
+--- /dev/null
++++ b/src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java
+@@ -0,0 +1,25 @@
++package com.gmail.nossr50.util;
++
++import com.gmail.nossr50.datatypes.player.McMMOPlayer;
++import com.gmail.nossr50.mcMMO;
++import com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask;
++import com.gmail.nossr50.util.player.UserManager;
++import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++
++public final class MiscPlayerUtil {
++    private MiscPlayerUtil() {}
++
++    public static void profileCleanup(@NotNull String playerName) {
++        Player player = mcMMO.p.getServer().getPlayerExact(playerName);
++
++        if (player != null) {
++            UserManager.remove(player);
++            mcMMO.p.getFoliaLib().getImpl().runLaterAsync(new PlayerProfileLoadingTask(player), 1);
++        }
++    }
++
++    public static boolean isPartyLeader(@NotNull McMMOPlayer mmoPlayer) {
++        return mmoPlayer.getParty().getLeader().getUniqueId().equals(mmoPlayer.getPlayer().getUniqueId());
++    }
++}

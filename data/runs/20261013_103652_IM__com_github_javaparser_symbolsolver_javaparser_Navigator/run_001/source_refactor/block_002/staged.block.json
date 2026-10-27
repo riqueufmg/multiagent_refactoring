@@ -1,0 +1,101 @@
+{
+  "id": 2,
+  "goal": "Extract AST node search and demand operations from Navigator to reduce the number of general methods in the facade.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.demandParentNode(Node)",
+        "Navigator.demandReturnStmt(MethodDeclaration)",
+        "Navigator.demandSwitch(Node)",
+        "Navigator.demandVariableDeclaration(Node, String)",
+        "Navigator.findMethodCall(Node, String)",
+        "Navigator.findNameExpression(Node, String)",
+        "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.findReturnStmt(MethodDeclaration)",
+        "Navigator.findSimpleName(Node, String)",
+        "Navigator.findSwitch(Node)",
+        "Navigator.findSwitchHelper(Node)",
+        "Navigator.requireParentNode(Node)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+      ],
+      "details": "Create NavigatorNodeLookup in the same package and move the cohesive node traversal, node search, demand, and deprecated compatibility implementations into it. Preserve the existing Navigator methods as delegating facade methods.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.demandParentNode(Node)",
+        "Navigator.demandReturnStmt(MethodDeclaration)",
+        "Navigator.demandSwitch(Node)",
+        "Navigator.demandVariableDeclaration(Node, String)",
+        "Navigator.findMethodCall(Node, String)",
+        "Navigator.findNameExpression(Node, String)",
+        "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.findReturnStmt(MethodDeclaration)",
+        "Navigator.findSimpleName(Node, String)",
+        "Navigator.findSwitch(Node)",
+        "Navigator.findSwitchHelper(Node)",
+        "Navigator.requireParentNode(Node)"
+      ],
+      "outputs": [
+        "NavigatorNodeLookup.demandNodeOfGivenClass(Node, Class<N>)",
+        "NavigatorNodeLookup.demandParentNode(Node)",
+        "NavigatorNodeLookup.demandReturnStmt(MethodDeclaration)",
+        "NavigatorNodeLookup.demandSwitch(Node)",
+        "NavigatorNodeLookup.demandVariableDeclaration(Node, String)",
+        "NavigatorNodeLookup.findMethodCall(Node, String)",
+        "NavigatorNodeLookup.findNameExpression(Node, String)",
+        "NavigatorNodeLookup.findNodeOfGivenClass(Node, Class<N>)",
+        "NavigatorNodeLookup.findReturnStmt(MethodDeclaration)",
+        "NavigatorNodeLookup.findSimpleName(Node, String)",
+        "NavigatorNodeLookup.findSwitch(Node)",
+        "NavigatorNodeLookup.findSwitchHelper(Node)",
+        "NavigatorNodeLookup.requireParentNode(Node)"
+      ],
+      "details": "Move the implementations without changing behavior, including the deprecated aliases and the special handling in findSwitchHelper for a Node that is already a SwitchStmt.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.demandParentNode(Node)",
+        "Navigator.demandReturnStmt(MethodDeclaration)",
+        "Navigator.demandSwitch(Node)",
+        "Navigator.demandVariableDeclaration(Node, String)",
+        "Navigator.findMethodCall(Node, String)",
+        "Navigator.findNameExpression(Node, String)",
+        "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.findReturnStmt(MethodDeclaration)",
+        "Navigator.findSimpleName(Node, String)",
+        "Navigator.findSwitch(Node)",
+        "Navigator.requireParentNode(Node)"
+      ],
+      "outputs": [
+        "Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.demandParentNode(Node)",
+        "Navigator.demandReturnStmt(MethodDeclaration)",
+        "Navigator.demandSwitch(Node)",
+        "Navigator.demandVariableDeclaration(Node, String)",
+        "Navigator.findMethodCall(Node, String)",
+        "Navigator.findNameExpression(Node, String)",
+        "Navigator.findNodeOfGivenClass(Node, Class<N>)",
+        "Navigator.findReturnStmt(MethodDeclaration)",
+        "Navigator.findSimpleName(Node, String)",
+        "Navigator.findSwitch(Node)",
+        "Navigator.requireParentNode(Node)"
+      ],
+      "details": "Make Navigator delegate these existing public methods to NavigatorNodeLookup so external callers continue using Navigator unchanged.",
+      "risk": "low"
+    }
+  ]
+}

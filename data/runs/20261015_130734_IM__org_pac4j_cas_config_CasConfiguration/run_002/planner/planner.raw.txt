@@ -1,0 +1,51 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.cas.config.CasConfiguration",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract URL resolution and URL initialization responsibilities from CasConfiguration into a cohesive configuration component.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration",
+            "org.pac4j.cas.config.CasUrlConfiguration"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasUrlConfiguration"
+          ],
+          "details": "Extract the loginUrl, prefixUrl, restUrl, and urlResolver fields together with initializeClientConfiguration(), computeFinalLoginUrl(WebContext), computeFinalPrefixUrl(WebContext), computeFinalRestUrl(WebContext), getLoginUrl(), setLoginUrl(String), getPrefixUrl(), setPrefixUrl(String), getRestUrl(), setRestUrl(String), getUrlResolver(), and setUrlResolver(UrlResolver). Keep CasConfiguration as the owning integration point used by internalInit(boolean), constructors, and toString(), using delegation where necessary to preserve the existing public behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java"
+          ],
+          "outputs": [
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java"
+          ],
+          "details": "Update imports after moving URL-related implementation and retain only imports still required by CasConfiguration.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java"
+          ],
+          "outputs": [
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasUrlConfiguration.java"
+          ],
+          "details": "Add imports required by the extracted URL configuration, including WebContext and UrlResolver-related types.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,312 @@
+commit 62fc662e16b2a256694891468cf96414ed0e6657
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Oct 19 18:28:06 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/tools/jackson/core/json/JsonGeneratorBase.java b/src/main/java/tools/jackson/core/json/JsonGeneratorBase.java
+index 383040275..01d089a3f 100644
+--- a/src/main/java/tools/jackson/core/json/JsonGeneratorBase.java
++++ b/src/main/java/tools/jackson/core/json/JsonGeneratorBase.java
+@@ -5,6 +5,8 @@ import tools.jackson.core.base.GeneratorBase;
+ import tools.jackson.core.io.CharTypes;
+ import tools.jackson.core.io.CharacterEscapes;
+ import tools.jackson.core.io.IOContext;
++import tools.jackson.core.json.context.DupDetector;
++import tools.jackson.core.json.context.JsonWriteContext;
+ import tools.jackson.core.util.JacksonFeatureSet;
+ 
+ /**
+diff --git a/src/main/java/tools/jackson/core/json/JsonParserBase.java b/src/main/java/tools/jackson/core/json/JsonParserBase.java
+index 755d8e380..d4618b023 100644
+--- a/src/main/java/tools/jackson/core/json/JsonParserBase.java
++++ b/src/main/java/tools/jackson/core/json/JsonParserBase.java
+@@ -6,6 +6,8 @@ import tools.jackson.core.exc.InputCoercionException;
+ import tools.jackson.core.exc.StreamReadException;
+ import tools.jackson.core.io.IOContext;
+ import tools.jackson.core.io.NumberInput;
++import tools.jackson.core.json.context.DupDetector;
++import tools.jackson.core.json.context.JsonReadContext;
+ import tools.jackson.core.util.JacksonFeatureSet;
+ 
+ /**
+diff --git a/src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java b/src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java
+index 30b353c87..fde52c6da 100644
+--- a/src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java
++++ b/src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java
+@@ -9,6 +9,7 @@ import tools.jackson.core.io.CharTypes;
+ import tools.jackson.core.io.CharacterEscapes;
+ import tools.jackson.core.io.IOContext;
+ import tools.jackson.core.io.NumberOutput;
++import tools.jackson.core.json.context.JsonWriteContext;
+ 
+ public class UTF8JsonGenerator
+     extends JsonGeneratorBase
+diff --git a/src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java b/src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java
+index f6d5581e7..83d83e967 100644
+--- a/src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java
++++ b/src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java
+@@ -9,6 +9,7 @@ import tools.jackson.core.io.CharTypes;
+ import tools.jackson.core.io.CharacterEscapes;
+ import tools.jackson.core.io.IOContext;
+ import tools.jackson.core.io.NumberOutput;
++import tools.jackson.core.json.context.JsonWriteContext;
+ 
+ /**
+  * {@link JsonGenerator} that outputs JSON content using a {@link java.io.Writer}
+diff --git a/src/main/java/tools/jackson/core/json/async/NonBlockingJsonParserBase.java b/src/main/java/tools/jackson/core/json/async/NonBlockingJsonParserBase.java
+index bb2489ce3..2e5c8351a 100644
+--- a/src/main/java/tools/jackson/core/json/async/NonBlockingJsonParserBase.java
++++ b/src/main/java/tools/jackson/core/json/async/NonBlockingJsonParserBase.java
+@@ -5,8 +5,8 @@ import java.io.*;
+ import tools.jackson.core.*;
+ import tools.jackson.core.io.IOContext;
+ import tools.jackson.core.json.JsonParserBase;
+-import tools.jackson.core.json.JsonReadContext;
+ import tools.jackson.core.json.JsonReadFeature;
++import tools.jackson.core.json.context.JsonReadContext;
+ import tools.jackson.core.sym.ByteQuadsCanonicalizer;
+ import tools.jackson.core.util.ByteArrayBuilder;
+ 
+diff --git a/src/main/java/tools/jackson/core/json/DupDetector.java b/src/main/java/tools/jackson/core/json/context/DupDetector.java
+similarity index 98%
+rename from src/main/java/tools/jackson/core/json/DupDetector.java
+rename to src/main/java/tools/jackson/core/json/context/DupDetector.java
+index 20a9ebc95..e49c05fb6 100644
+--- a/src/main/java/tools/jackson/core/json/DupDetector.java
++++ b/src/main/java/tools/jackson/core/json/context/DupDetector.java
+@@ -1,4 +1,4 @@
+-package tools.jackson.core.json;
++package tools.jackson.core.json.context;
+ 
+ import java.util.*;
+ 
+diff --git a/src/main/java/tools/jackson/core/json/JsonReadContext.java b/src/main/java/tools/jackson/core/json/context/JsonReadContext.java
+similarity index 99%
+rename from src/main/java/tools/jackson/core/json/JsonReadContext.java
+rename to src/main/java/tools/jackson/core/json/context/JsonReadContext.java
+index 15f4e46ad..1668d8404 100644
+--- a/src/main/java/tools/jackson/core/json/JsonReadContext.java
++++ b/src/main/java/tools/jackson/core/json/context/JsonReadContext.java
+@@ -1,4 +1,4 @@
+-package tools.jackson.core.json;
++package tools.jackson.core.json.context;
+ 
+ import tools.jackson.core.*;
+ import tools.jackson.core.exc.StreamReadException;
+diff --git a/src/main/java/tools/jackson/core/json/JsonWriteContext.java b/src/main/java/tools/jackson/core/json/context/JsonWriteContext.java
+similarity index 57%
+rename from src/main/java/tools/jackson/core/json/JsonWriteContext.java
+rename to src/main/java/tools/jackson/core/json/context/JsonWriteContext.java
+index 4e696e951..ffd86f385 100644
+--- a/src/main/java/tools/jackson/core/json/JsonWriteContext.java
++++ b/src/main/java/tools/jackson/core/json/context/JsonWriteContext.java
+@@ -1,4 +1,4 @@
+-package tools.jackson.core.json;
++package tools.jackson.core.json.context;
+ 
+ import tools.jackson.core.*;
+ import tools.jackson.core.exc.StreamWriteException;
+@@ -10,59 +10,20 @@ import tools.jackson.core.exc.StreamWriteException;
+  */
+ public class JsonWriteContext extends TokenStreamContext
+ {
+-    // // // Return values for writeValue()
+-
+     public final static int STATUS_OK_AS_IS = 0;
+     public final static int STATUS_OK_AFTER_COMMA = 1;
+     public final static int STATUS_OK_AFTER_COLON = 2;
+-    public final static int STATUS_OK_AFTER_SPACE = 3; // in root context
++    public final static int STATUS_OK_AFTER_SPACE = 3;
+     public final static int STATUS_EXPECT_VALUE = 4;
+     public final static int STATUS_EXPECT_NAME = 5;
+ 
+-    /**
+-     * Parent context for this context; null for root context.
+-     */
+     protected final JsonWriteContext _parent;
+-
+-    // // // Optional duplicate detection
+-
+     protected DupDetector _dups;
+-
+-    /*
+-    /**********************************************************************
+-    /* Simple instance reuse slots; speed up things a bit (10-15%)
+-    /* for docs with lots of small arrays/objects
+-    /**********************************************************************
+-     */
+-
+     protected JsonWriteContext _child;
+-
+-    /*
+-    /**********************************************************************
+-    /* Location/state information (minus source reference)
+-    /**********************************************************************
+-     */
+-
+-    /**
+-     * Name of the Object property of which value is to be written; only
+-     * used for OBJECT contexts
+-     */
+     protected String _currentName;
+-
+     protected Object _currentValue;
+-
+-    /**
+-     * Marker used to indicate that we just wrote a name, and
+-     * now expect a value to write
+-     */
+     protected boolean _gotName;
+ 
+-    /*
+-    /**********************************************************************
+-    /* Life-cycle
+-    /**********************************************************************
+-     */
+-
+     protected JsonWriteContext(int type, JsonWriteContext parent, DupDetector dups,
+             Object currValue) {
+         super();
+@@ -75,20 +36,9 @@ public class JsonWriteContext extends TokenStreamContext
+     }
+ 
+     /**
+-     * Internal method to allow instance reuse: DO NOT USE unless you absolutely
+-     * know what you are doing.
+-     * Clears up state, changes type to one specified, assigns "current value";
+-     * resets current duplicate-detection state (if any).
+-     * Parent link left as-is since it is {@code final}.
+-     *
+-     * @param type Type to assign to this context node
+-     * @param currValue Current value to assign to this context node
+-     *
+-     * @return This context instance to allow call-chaining
+-     *
+-     * @since 2.10
++     * Internal method to allow instance reuse.
+      */
+-    protected JsonWriteContext reset(int type, Object currValue) {
++    public JsonWriteContext reset(int type, Object currValue) {
+         _type = type;
+         _index = -1;
+         _currentName = null;
+@@ -113,17 +63,10 @@ public class JsonWriteContext extends TokenStreamContext
+         _currentValue = v;
+     }
+ 
+-    /*
+-    /**********************************************************************
+-    /* Factory methods
+-    /**********************************************************************
+-     */
+-
+     public static JsonWriteContext createRootContext(DupDetector dd) {
+         return new JsonWriteContext(TYPE_ROOT, null, dd, null);
+     }
+ 
+-
+     public JsonWriteContext createChildArrayContext(Object currValue) {
+         JsonWriteContext ctxt = _child;
+         if (ctxt == null) {
+@@ -148,19 +91,8 @@ public class JsonWriteContext extends TokenStreamContext
+     @Override public final String currentName() { return _currentName; }
+     @Override public boolean hasCurrentName() { return _currentName != null; }
+ 
+-    /**
+-     * Method that can be used to both clear the accumulated references
+-     * (specifically value set with {@link #assignCurrentValue(Object)})
+-     * that should not be retained, and returns parent (as would
+-     * {@link #getParent()} do). Typically called when closing the active
+-     * context when encountering {@link JsonToken#END_ARRAY} or
+-     * {@link JsonToken#END_OBJECT}.
+-     *
+-     * @return Parent context of this context node, if any; {@code null} for root context
+-     */
+     public JsonWriteContext clearAndGetParent() {
+         _currentValue = null;
+-        // could also clear the current name, but seems cheap enough to leave?
+         return _parent;
+     }
+ 
+@@ -168,16 +100,6 @@ public class JsonWriteContext extends TokenStreamContext
+         return _dups;
+     }
+ 
+-    /**
+-     * Method that generator is to call when it writes a name of Object property.
+-     *
+-     * @param name Property name being written
+-     *
+-     * @return Index of the Object property (0-based)
+-     *
+-     * @throws StreamWriteException if duplicate check restriction is violated (which
+-     *    assumes that duplicate-detection is enabled)
+-     */
+     public int writeName(String name) throws StreamWriteException
+     {
+         if ((_type != TYPE_OBJECT) || _gotName) {
+@@ -199,7 +121,6 @@ public class JsonWriteContext extends TokenStreamContext
+     }
+ 
+     public int writeValue() {
+-        // Most likely, object:
+         if (_type == TYPE_OBJECT) {
+             if (!_gotName) {
+                 return STATUS_EXPECT_NAME;
+@@ -208,16 +129,11 @@ public class JsonWriteContext extends TokenStreamContext
+             ++_index;
+             return STATUS_OK_AFTER_COLON;
+         }
+-
+-        // Ok, array?
+         if (_type == TYPE_ARRAY) {
+             int ix = _index;
+             ++_index;
+             return (ix < 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_COMMA;
+         }
+-
+-        // Nope, root context
+-        // No commas within root context, but need space
+         ++_index;
+         return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
+     }
+diff --git a/src/main/java/tools/jackson/core/util/SimpleStreamReadContext.java b/src/main/java/tools/jackson/core/util/SimpleStreamReadContext.java
+index dc477cb58..8e0cb945b 100644
+--- a/src/main/java/tools/jackson/core/util/SimpleStreamReadContext.java
++++ b/src/main/java/tools/jackson/core/util/SimpleStreamReadContext.java
+@@ -3,7 +3,7 @@ package tools.jackson.core.util;
+ import tools.jackson.core.*;
+ import tools.jackson.core.exc.StreamReadException;
+ import tools.jackson.core.io.ContentReference;
+-import tools.jackson.core.json.DupDetector;
++import tools.jackson.core.json.context.DupDetector;
+ 
+ /**
+  * Basic implementation of {@link TokenStreamContext} useful for most
+diff --git a/src/main/java/tools/jackson/core/util/SimpleStreamWriteContext.java b/src/main/java/tools/jackson/core/util/SimpleStreamWriteContext.java
+index 200772126..cd5bd3339 100644
+--- a/src/main/java/tools/jackson/core/util/SimpleStreamWriteContext.java
++++ b/src/main/java/tools/jackson/core/util/SimpleStreamWriteContext.java
+@@ -2,7 +2,7 @@ package tools.jackson.core.util;
+ 
+ import tools.jackson.core.*;
+ import tools.jackson.core.exc.StreamWriteException;
+-import tools.jackson.core.json.DupDetector;
++import tools.jackson.core.json.context.DupDetector;
+ 
+ /**
+  * Basic implementation of {@link TokenStreamContext} useful for most
+diff --git a/src/test/java/tools/jackson/core/json/JsonReadContextTest.java b/src/test/java/tools/jackson/core/json/JsonReadContextTest.java
+index f9a47c17a..dfd5f776e 100644
+--- a/src/test/java/tools/jackson/core/json/JsonReadContextTest.java
++++ b/src/test/java/tools/jackson/core/json/JsonReadContextTest.java
+@@ -6,6 +6,8 @@ import tools.jackson.core.JacksonCoreTestBase;
+ import tools.jackson.core.JsonGenerator;
+ import tools.jackson.core.exc.StreamReadException;
+ import tools.jackson.core.io.ContentReference;
++import tools.jackson.core.json.context.DupDetector;
++import tools.jackson.core.json.context.JsonReadContext;
+ 
+ import static org.junit.jupiter.api.Assertions.*;
+ 

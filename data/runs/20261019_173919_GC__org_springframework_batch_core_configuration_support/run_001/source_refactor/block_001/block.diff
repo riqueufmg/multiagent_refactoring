@@ -1,0 +1,272 @@
+commit 2b558e8b308934f0a57ccf3d36c0395549a05fe1
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Oct 19 17:43:47 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/AutomaticJobRegistrarBeanPostProcessor.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/AutomaticJobRegistrarBeanPostProcessor.java
+index c9bb8a041..de8b73f8c 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/AutomaticJobRegistrarBeanPostProcessor.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/AutomaticJobRegistrarBeanPostProcessor.java
+@@ -18,9 +18,9 @@ package org.springframework.batch.core.configuration.annotation;
+ import org.jspecify.annotations.NullUnmarked;
+ 
+ import org.springframework.batch.core.configuration.JobRegistry;
+-import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
+ import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
+ import org.springframework.batch.core.configuration.support.DefaultJobLoader;
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.beans.BeansException;
+ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+ import org.springframework.beans.factory.config.BeanPostProcessor;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/EnableBatchProcessing.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/EnableBatchProcessing.java
+index baa9e5d18..870a2db81 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/EnableBatchProcessing.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/annotation/EnableBatchProcessing.java
+@@ -15,10 +15,10 @@
+  */
+ package org.springframework.batch.core.configuration.annotation;
+ 
+-import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
+ import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
+ import org.springframework.batch.core.configuration.support.GroupAwareJob;
+ import org.springframework.batch.core.configuration.support.ScopeConfiguration;
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.batch.core.converter.JobParametersConverter;
+ import org.springframework.batch.core.repository.JobRepository;
+ import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AbstractApplicationContextFactory.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AbstractApplicationContextFactory.java
+index cb61736ae..c0d196b87 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AbstractApplicationContextFactory.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AbstractApplicationContextFactory.java
+@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.jspecify.annotations.NullUnmarked;
+ 
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.beans.BeansException;
+ import org.springframework.beans.factory.BeanFactoryAware;
+ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrar.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrar.java
+index e5be267d1..f5a76589e 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrar.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrar.java
+@@ -21,7 +21,7 @@ import java.util.Arrays;
+ import java.util.Collection;
+ 
+ import org.jspecify.annotations.NullUnmarked;
+-
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.configuration.DuplicateJobException;
+ import org.springframework.batch.core.configuration.JobRegistry;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultJobLoader.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultJobLoader.java
+index f9b42de5f..99a7a0ec1 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultJobLoader.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultJobLoader.java
+@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.jspecify.annotations.NullUnmarked;
+-
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.step.ListableStepLocator;
+ import org.springframework.batch.core.step.Step;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobLoader.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobLoader.java
+index 879f0e768..4eac837cd 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobLoader.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JobLoader.java
+@@ -18,7 +18,7 @@ package org.springframework.batch.core.configuration.support;
+ import java.util.Collection;
+ 
+ import org.jspecify.annotations.NullUnmarked;
+-
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.configuration.DuplicateJobException;
+ 
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ApplicationContextFactory.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ApplicationContextFactory.java
+similarity index 95%
+rename from spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ApplicationContextFactory.java
+rename to spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ApplicationContextFactory.java
+index 343e25644..414eb2fbd 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ApplicationContextFactory.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ApplicationContextFactory.java
+@@ -14,7 +14,7 @@
+  * limitations under the License.
+  */
+ 
+-package org.springframework.batch.core.configuration.support;
++package org.springframework.batch.core.configuration.support.context;
+ 
+ import org.jspecify.annotations.NullUnmarked;
+ 
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactory.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ApplicationContextJobFactory.java
+similarity index 93%
+rename from spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactory.java
+rename to spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ApplicationContextJobFactory.java
+index 33f93cc1a..86eaeebe2 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactory.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ApplicationContextJobFactory.java
+@@ -13,10 +13,10 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-package org.springframework.batch.core.configuration.support;
++package org.springframework.batch.core.configuration.support.context;
+ 
+ import org.jspecify.annotations.NullUnmarked;
+-
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.configuration.JobFactory;
+ import org.springframework.context.ApplicationContext;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ClasspathXmlApplicationContextsFactoryBean.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ClasspathXmlApplicationContextsFactoryBean.java
+similarity index 95%
+rename from spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ClasspathXmlApplicationContextsFactoryBean.java
+rename to spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ClasspathXmlApplicationContextsFactoryBean.java
+index e2a2cad4e..ca5cfd5db 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/ClasspathXmlApplicationContextsFactoryBean.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/ClasspathXmlApplicationContextsFactoryBean.java
+@@ -13,7 +13,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-package org.springframework.batch.core.configuration.support;
++package org.springframework.batch.core.configuration.support.context;
+ 
+ import java.util.ArrayList;
+ import java.util.Arrays;
+@@ -21,6 +21,8 @@ import java.util.List;
+ 
+ import org.jspecify.annotations.NullUnmarked;
+ 
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
++import org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory;
+ import org.springframework.beans.factory.BeanFactoryAware;
+ import org.springframework.beans.factory.FactoryBean;
+ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactory.java b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/GenericApplicationContextFactory.java
+similarity index 98%
+rename from spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactory.java
+rename to spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/GenericApplicationContextFactory.java
+index a4ed22461..18c9fe1d8 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactory.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/context/GenericApplicationContextFactory.java
+@@ -14,8 +14,9 @@
+  * limitations under the License.
+  */
+ 
+-package org.springframework.batch.core.configuration.support;
++package org.springframework.batch.core.configuration.support.context;
+ 
++import org.springframework.batch.core.configuration.support.AbstractApplicationContextFactory;
+ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+diff --git a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/annotation/JobLoaderConfigurationTests.java b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/annotation/JobLoaderConfigurationTests.java
+index c506f5a23..7b0987fac 100644
+--- a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/annotation/JobLoaderConfigurationTests.java
++++ b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/annotation/JobLoaderConfigurationTests.java
+@@ -23,15 +23,15 @@ import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ 
+ import org.springframework.batch.core.BatchStatus;
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
++import org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.job.JobExecution;
+ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+ import org.springframework.batch.core.step.Step;
+ import org.springframework.batch.core.step.StepContribution;
+ import org.springframework.batch.core.configuration.JobRegistry;
+-import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
+ import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
+-import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
+ import org.springframework.batch.core.repository.explore.JobExplorer;
+ import org.springframework.batch.core.job.builder.JobBuilder;
+ import org.springframework.batch.core.job.builder.SimpleJobBuilder;
+diff --git a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactoryTests.java b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactoryTests.java
+index a24e1fb37..e4468cbf5 100644
+--- a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactoryTests.java
++++ b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/ApplicationContextJobFactoryTests.java
+@@ -19,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
+ import static org.junit.jupiter.api.Assertions.assertNotNull;
+ 
+ import org.junit.jupiter.api.Test;
++
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
++import org.springframework.batch.core.configuration.support.context.ApplicationContextJobFactory;
+ import org.springframework.batch.core.job.JobSupport;
+ import org.springframework.beans.BeansException;
+ import org.springframework.beans.factory.config.BeanPostProcessor;
+diff --git a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarTests.java b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarTests.java
+index 4d880b30e..c405d7f63 100644
+--- a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarTests.java
++++ b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarTests.java
+@@ -27,6 +27,9 @@ import java.util.Collection;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.mockito.Mockito;
++
++import org.springframework.batch.core.configuration.support.context.ApplicationContextFactory;
++import org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.beans.factory.BeanCreationException;
+ import org.springframework.context.ApplicationContext;
+diff --git a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/DefaultJobLoaderTests.java b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/DefaultJobLoaderTests.java
+index 551c245bb..fb743bec8 100644
+--- a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/DefaultJobLoaderTests.java
++++ b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/DefaultJobLoaderTests.java
+@@ -21,6 +21,7 @@ import java.util.Map;
+ 
+ import org.jspecify.annotations.Nullable;
+ import org.junit.jupiter.api.Test;
++import org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.job.JobExecution;
+ import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+diff --git a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactoryTests.java b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactoryTests.java
+index 02cdf6258..e042dbdfe 100644
+--- a/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactoryTests.java
++++ b/spring-batch-core/src/test/java/org/springframework/batch/core/configuration/support/GenericApplicationContextFactoryTests.java
+@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
+ import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ 
++import org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.job.JobSupport;
+ import org.springframework.beans.BeansException;
+diff --git a/spring-batch-core/src/test/resources/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarContextTests-context.xml b/spring-batch-core/src/test/resources/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarContextTests-context.xml
+index 9569329fd..cb0aaa56f 100644
+--- a/spring-batch-core/src/test/resources/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarContextTests-context.xml
++++ b/spring-batch-core/src/test/resources/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarContextTests-context.xml
+@@ -4,7 +4,7 @@
+ 
+ 	<bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+ 		<property name="applicationContextFactories">
+-			<bean class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
++			<bean class="org.springframework.batch.core.configuration.support.context.ClasspathXmlApplicationContextsFactoryBean">
+ 				<property name="resources" value="classpath*:org/springframework/batch/core/launch/support/job*.xml" />
+ 			</bean>
+ 		</property>
+diff --git a/spring-batch-samples/src/main/java/org/springframework/batch/samples/misc/jmx/JobRegistryBackgroundJobRunner.java b/spring-batch-samples/src/main/java/org/springframework/batch/samples/misc/jmx/JobRegistryBackgroundJobRunner.java
+index 4d775619a..755a1be7f 100644
+--- a/spring-batch-samples/src/main/java/org/springframework/batch/samples/misc/jmx/JobRegistryBackgroundJobRunner.java
++++ b/spring-batch-samples/src/main/java/org/springframework/batch/samples/misc/jmx/JobRegistryBackgroundJobRunner.java
+@@ -23,12 +23,12 @@ import java.util.List;
+ 
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.springframework.batch.core.configuration.support.context.GenericApplicationContextFactory;
+ import org.springframework.batch.core.job.Job;
+ import org.springframework.batch.core.configuration.DuplicateJobException;
+ import org.springframework.batch.core.configuration.JobFactory;
+ import org.springframework.batch.core.configuration.JobRegistry;
+ import org.springframework.batch.core.configuration.support.DefaultJobLoader;
+-import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
+ import org.springframework.batch.core.configuration.support.JobLoader;
+ import org.springframework.batch.core.launch.JobLauncher;
+ import org.springframework.beans.factory.BeanFactory;

@@ -1,0 +1,469 @@
+commit 208396fc6af8fb7eb661f389f58fac53805c8143
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 11:51:11 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameterTypedAccessors.java b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameterTypedAccessors.java
+new file mode 100644
+index 000000000..c9ed9bf82
+--- /dev/null
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameterTypedAccessors.java
+@@ -0,0 +1,185 @@
++/*
++ * Copyright 2006-2024 the original author or authors.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.springframework.batch.core.job.parameters;
++
++import java.io.Serializable;
++import java.time.LocalDate;
++import java.time.LocalDateTime;
++import java.time.LocalTime;
++import java.util.Date;
++import java.util.Map;
++
++import org.jspecify.annotations.Nullable;
++
++/**
++ * Provides typesafe access to job parameters.
++ *
++ * @author Mahmoud Ben Hassine
++ */
++public class JobParameterTypedAccessors implements Serializable {
++
++	private final Map<String, JobParameter<?>> parameters;
++
++	/**
++	 * Create a new instance using the provided parameters.
++	 * @param parameters the parameters to access
++	 */
++	public JobParameterTypedAccessors(Map<String, JobParameter<?>> parameters) {
++		this.parameters = parameters;
++	}
++
++	public @Nullable Long getLong(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(Long.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type Long");
++		}
++		return (Long) jobParameter.getValue();
++	}
++
++	public @Nullable Long getLong(String key, @Nullable Long defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getLong(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++	public @Nullable String getString(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(String.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type String");
++		}
++		return (String) jobParameter.getValue();
++	}
++
++	public @Nullable String getString(String key, @Nullable String defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getString(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++	public @Nullable Double getDouble(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(Double.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type Double");
++		}
++		return (Double) jobParameter.getValue();
++	}
++
++	public @Nullable Double getDouble(String key, @Nullable Double defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getDouble(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++	public @Nullable Date getDate(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(Date.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type java.util.Date");
++		}
++		return (Date) jobParameter.getValue();
++	}
++
++	public @Nullable Date getDate(String key, @Nullable Date defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getDate(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++	public @Nullable LocalDate getLocalDate(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(LocalDate.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDate");
++		}
++		return (LocalDate) jobParameter.getValue();
++	}
++
++	public @Nullable LocalDate getLocalDate(String key, @Nullable LocalDate defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getLocalDate(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++	public @Nullable LocalTime getLocalTime(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(LocalTime.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalTime");
++		}
++		return (LocalTime) jobParameter.getValue();
++	}
++
++	public @Nullable LocalTime getLocalTime(String key, @Nullable LocalTime defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getLocalTime(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++	public @Nullable LocalDateTime getLocalDateTime(String key) {
++		if (!parameters.containsKey(key)) {
++			return null;
++		}
++		JobParameter<?> jobParameter = parameters.get(key);
++		if (!jobParameter.getType().equals(LocalDateTime.class)) {
++			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDateTime");
++		}
++		return (LocalDateTime) jobParameter.getValue();
++	}
++
++	public @Nullable LocalDateTime getLocalDateTime(String key, @Nullable LocalDateTime defaultValue) {
++		if (parameters.containsKey(key)) {
++			return getLocalDateTime(key);
++		}
++		else {
++			return defaultValue;
++		}
++	}
++
++}
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java
+index 7c4fe66d2..f46d126f2 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java
+@@ -52,11 +52,14 @@ public class JobParameters implements Serializable {
+ 
+ 	private final Map<String, JobParameter<?>> parameters;
+ 
++	private final JobParameterTypedAccessors typedAccessors;
++
+ 	/**
+ 	 * Default constructor.
+ 	 */
+ 	public JobParameters() {
+ 		this.parameters = new HashMap<>();
++		this.typedAccessors = new JobParameterTypedAccessors(this.parameters);
+ 	}
+ 
+ 	/**
+@@ -67,237 +70,63 @@ public class JobParameters implements Serializable {
+ 	 */
+ 	public JobParameters(Map<String, JobParameter<?>> parameters) {
+ 		this.parameters = new HashMap<>(parameters);
++		this.typedAccessors = new JobParameterTypedAccessors(this.parameters);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link Long} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return The {@link Long} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable Long getLong(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(Long.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type Long");
+-		}
+-		return (Long) jobParameter.getValue();
++		return typedAccessors.getLong(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link Long} represented by the provided key. If the key
+-	 * does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The default value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable Long getLong(String key, @Nullable Long defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getLong(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getLong(key, defaultValue);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link String} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return The {@link String} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable String getString(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(String.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type String");
+-		}
+-		return (String) jobParameter.getValue();
++		return typedAccessors.getString(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link String} represented by the provided key. If the key
+-	 * does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The defult value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable String getString(String key, @Nullable String defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getString(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getString(key, defaultValue);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link Double} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return The {@link Double} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable Double getDouble(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(Double.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type Double");
+-		}
+-		return (Double) jobParameter.getValue();
++		return typedAccessors.getDouble(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link Double} represented by the provided key. If the key
+-	 * does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The default value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable Double getDouble(String key, @Nullable Double defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getDouble(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getDouble(key, defaultValue);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link Date} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return the {@link java.util.Date} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable Date getDate(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(Date.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type java.util.Date");
+-		}
+-		return (Date) jobParameter.getValue();
++		return typedAccessors.getDate(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link Date} represented by the provided key. If the key
+-	 * does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The default value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable Date getDate(String key, @Nullable Date defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getDate(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getDate(key, defaultValue);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link LocalDate} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return the {@link LocalDate} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable LocalDate getLocalDate(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(LocalDate.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDate");
+-		}
+-		return (LocalDate) jobParameter.getValue();
++		return typedAccessors.getLocalDate(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link LocalDate} represented by the provided key. If the
+-	 * key does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The default value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable LocalDate getLocalDate(String key, @Nullable LocalDate defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getLocalDate(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getLocalDate(key, defaultValue);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link LocalTime} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return the {@link LocalTime} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable LocalTime getLocalTime(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(LocalTime.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalTime");
+-		}
+-		return (LocalTime) jobParameter.getValue();
++		return typedAccessors.getLocalTime(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link LocalTime} represented by the provided key. If the
+-	 * key does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The default value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable LocalTime getLocalTime(String key, @Nullable LocalTime defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getLocalTime(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getLocalTime(key, defaultValue);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link LocalDateTime} represented by the provided key.
+-	 * @param key The key for which to get a value.
+-	 * @return the {@link LocalDateTime} value or {@code null} if the key is absent.
+-	 */
+ 	public @Nullable LocalDateTime getLocalDateTime(String key) {
+-		if (!parameters.containsKey(key)) {
+-			return null;
+-		}
+-		JobParameter<?> jobParameter = parameters.get(key);
+-		if (!jobParameter.getType().equals(LocalDateTime.class)) {
+-			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDateTime");
+-		}
+-		return (LocalDateTime) jobParameter.getValue();
++		return typedAccessors.getLocalDateTime(key);
+ 	}
+ 
+-	/**
+-	 * Typesafe getter for the {@link LocalDateTime} represented by the provided key. If
+-	 * the key does not exist, the default value is returned.
+-	 * @param key The key for which to return the value.
+-	 * @param defaultValue The default value to return if the value does not exist.
+-	 * @return the parameter represented by the provided key or, if that is missing, the
+-	 * default value.
+-	 */
+ 	public @Nullable LocalDateTime getLocalDateTime(String key, @Nullable LocalDateTime defaultValue) {
+-		if (parameters.containsKey(key)) {
+-			return getLocalDateTime(key);
+-		}
+-		else {
+-			return defaultValue;
+-		}
++		return typedAccessors.getLocalDateTime(key, defaultValue);
+ 	}
+ 
+ 	public @Nullable JobParameter<?> getParameter(String key) {

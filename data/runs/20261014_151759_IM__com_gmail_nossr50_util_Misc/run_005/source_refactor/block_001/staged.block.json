@@ -1,0 +1,53 @@
+{
+  "id": 1,
+  "goal": "Extract cohesive location and randomization utilities from Misc.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+        "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+        "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+        "com.gmail.nossr50.util.Misc.getRandom()",
+        "com.gmail.nossr50.util.Misc.random"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil"
+      ],
+      "details": "Create final utility class com.gmail.nossr50.util.MiscLocationUtil in the same package. Move the location-related methods and the random field into it. Preserve the existing static behavior and annotations. Keep compatibility delegates in Misc while callers are migrated.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java"
+      ],
+      "outputs": [
+        "org.bukkit.Location",
+        "org.bukkit.block.BlockState",
+        "org.jetbrains.annotations.NotNull",
+        "java.util.Random"
+      ],
+      "details": "Add the imports required by the extracted methods and field, and remove imports from Misc that are no longer used by this group.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

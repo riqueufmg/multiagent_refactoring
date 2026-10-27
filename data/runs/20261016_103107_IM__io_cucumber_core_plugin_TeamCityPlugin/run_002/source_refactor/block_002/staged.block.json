@@ -1,0 +1,39 @@
+{
+  "id": 2,
+  "goal": "Extract cohesive test-step naming and location formatting responsibilities from TeamCityPlugin to reduce general methods and simplify event handling.",
+  "files": [
+    "cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java",
+    "cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityStepFormatter.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.cucumber.core.plugin.TeamCityPlugin",
+        "io.cucumber.core.plugin.TeamCityStepFormatter"
+      ],
+      "outputs": [
+        "io.cucumber.core.plugin.TeamCityStepFormatter"
+      ],
+      "details": "Extract the cohesive step naming and location logic represented by ANNOTATION_GLUE_CODE_LOCATION_PATTERN, LAMBDA_GLUE_CODE_LOCATION_PATTERN, extractLocation(TestStepStarted), javaTestLocationUri(), formatHookStepLocation(HookTestStep,BiFunction<String,String,String>,Function<HookTestStep,String>), getHookName(HookTestStep), extractName(TestStep), and hookNameFormat(HookTestStep) into TeamCityStepFormatter. Preserve the existing handling of PickleStepTestStep, HookTestStep, HookType, Java annotation locations, and Java 8 lambda locations.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "io.cucumber.core.plugin.TeamCityPlugin.extractLocation(TestStepStarted)",
+        "io.cucumber.core.plugin.TeamCityPlugin.extractName(TestStep)",
+        "io.cucumber.core.plugin.TeamCityPlugin.formatHookStepLocation(HookTestStep,BiFunction<String,String,String>,Function<HookTestStep,String>)",
+        "io.cucumber.core.plugin.TeamCityPlugin.getHookName(HookTestStep)"
+      ],
+      "outputs": [
+        "io.cucumber.core.plugin.TeamCityStepFormatter.extractLocation(TestStepStarted)",
+        "io.cucumber.core.plugin.TeamCityStepFormatter.extractName(TestStep)",
+        "io.cucumber.core.plugin.TeamCityStepFormatter.formatHookStepLocation(HookTestStep,BiFunction<String,String,String>,Function<HookTestStep,String>)",
+        "io.cucumber.core.plugin.TeamCityStepFormatter.getHookName(HookTestStep)"
+      ],
+      "details": "Update printTestStepStarted and printTestStepFinished to delegate step name and location calculation to TeamCityStepFormatter. Remove the duplicated private step-formatting methods and regular expression fields from TeamCityPlugin after all references are updated.",
+      "risk": "medium"
+    }
+  ]
+}

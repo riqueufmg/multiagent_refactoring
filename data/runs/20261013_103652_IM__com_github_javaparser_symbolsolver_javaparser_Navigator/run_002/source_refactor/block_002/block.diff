@@ -1,0 +1,187 @@
+commit 77c1681ebb7f0a56ead86f9510fcffa0dd814d35
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 10:59:07 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index ccb40727b..ac9c01737 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -24,6 +24,11 @@ package com.github.javaparser.symbolsolver.javaparser;
+ import com.github.javaparser.ast.CompilationUnit;
+ import com.github.javaparser.ast.Node;
+ import com.github.javaparser.ast.body.*;
++import com.github.javaparser.ast.expr.MethodCallExpr;
++import com.github.javaparser.ast.expr.NameExpr;
++import com.github.javaparser.ast.expr.SimpleName;
++import com.github.javaparser.ast.stmt.ReturnStmt;
++import com.github.javaparser.ast.stmt.SwitchStmt;
+ 
+ import java.util.Optional;
+ 
+@@ -40,42 +45,6 @@ public final class Navigator {
+         // prevent instantiation
+     }
+ 
+-    /**
+-     * Returns the {@code (i+1)}'th constructor of the given type declaration, in textual order. The constructor that
+-     * appears first has the index 0, the second one the index 1, and so on.
+-     *
+-     * @param td    The type declaration to search in. Note that only classes and enums have constructors.
+-     * @param index The index of the desired constructor.
+-     * @return The desired ConstructorDeclaration if it was found, else an exception is thrown.
+-     */
+-    public static ConstructorDeclaration demandConstructor(TypeDeclaration<?> td, int index) {
+-        return NavigatorDeclarationLookup.demandConstructor(td, index);
+-    }
+-
+-    public static VariableDeclarator demandField(ClassOrInterfaceDeclaration cd, String name) {
+-        return NavigatorDeclarationLookup.demandField(cd, name);
+-    }
+-
+-    public static MethodDeclaration demandMethod(TypeDeclaration<?> cd, String name) {
+-        return NavigatorDeclarationLookup.demandMethod(cd, name);
+-    }
+-
+-    public static ClassOrInterfaceDeclaration demandClass(CompilationUnit cu, String qualifiedName) {
+-        return NavigatorTypeLookup.demandClass(cu, qualifiedName);
+-    }
+-
+-    public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit cu, String qualifiedName) {
+-        return NavigatorTypeLookup.demandClassOrInterface(cu, qualifiedName);
+-    }
+-
+-    public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
+-        return NavigatorTypeLookup.demandEnum(cu, qualifiedName);
+-    }
+-
+-    public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
+-        return NavigatorTypeLookup.demandInterface(cu, qualifiedName);
+-    }
+-
+     public static <N extends Node> N demandNodeOfGivenClass(Node node, Class<N> clazz) {
+         return NavigatorNodeLookup.demandNodeOfGivenClass(node, clazz);
+     }
+@@ -84,11 +53,11 @@ public final class Navigator {
+         return NavigatorNodeLookup.demandParentNode(node);
+     }
+ 
+-    public static com.github.javaparser.ast.stmt.ReturnStmt demandReturnStmt(MethodDeclaration method) {
++    public static ReturnStmt demandReturnStmt(MethodDeclaration method) {
+         return NavigatorNodeLookup.demandReturnStmt(method);
+     }
+ 
+-    public static com.github.javaparser.ast.stmt.SwitchStmt demandSwitch(Node node) {
++    public static SwitchStmt demandSwitch(Node node) {
+         return NavigatorNodeLookup.demandSwitch(node);
+     }
+ 
+@@ -96,16 +65,16 @@ public final class Navigator {
+         return NavigatorNodeLookup.demandVariableDeclaration(node, name);
+     }
+ 
+-    public static Optional<com.github.javaparser.ast.expr.MethodCallExpr> findMethodCall(Node node, String methodName) {
++    public static Optional<MethodCallExpr> findMethodCall(Node node, String methodName) {
+         return NavigatorNodeLookup.findMethodCall(node, methodName);
+     }
+ 
+-    public static Optional<com.github.javaparser.ast.expr.NameExpr> findNameExpression(Node node, String name) {
++    public static Optional<NameExpr> findNameExpression(Node node, String name) {
+         return NavigatorNodeLookup.findNameExpression(node, name);
+     }
+ 
+     /**
+-     * @deprecated Use {@link #demandNodeOfGivenClass(Node, Class)}
++     * @deprecated Use {@link NavigatorNodeLookup#demandNodeOfGivenClass(Node, Class)}
+      */
+     @Deprecated
+     public static <N extends Node> N findNodeOfGivenClass(Node node, Class<N> clazz) {
+@@ -113,25 +82,69 @@ public final class Navigator {
+     }
+ 
+     /**
+-     * @deprecated Use {@link #demandReturnStmt(MethodDeclaration)}
++     * @deprecated Use {@link NavigatorNodeLookup#demandReturnStmt(MethodDeclaration)}
+      */
+     @Deprecated
+-    public static com.github.javaparser.ast.stmt.ReturnStmt findReturnStmt(MethodDeclaration method) {
++    public static ReturnStmt findReturnStmt(MethodDeclaration method) {
+         return NavigatorNodeLookup.findReturnStmt(method);
+     }
+ 
+-    public static Optional<com.github.javaparser.ast.expr.SimpleName> findSimpleName(Node node, String name) {
++    public static Optional<SimpleName> findSimpleName(Node node, String name) {
+         return NavigatorNodeLookup.findSimpleName(node, name);
+     }
+ 
+     /**
+-     * @deprecated Use {@link #demandSwitch(Node)}
++     * @deprecated Use {@link NavigatorNodeLookup#demandSwitch(Node)}
+      */
+     @Deprecated
+-    public static com.github.javaparser.ast.stmt.SwitchStmt findSwitch(Node node) {
++    public static SwitchStmt findSwitch(Node node) {
+         return NavigatorNodeLookup.findSwitch(node);
+     }
+ 
++    /**
++     * @deprecated Use {@link NavigatorNodeLookup#demandParentNode(Node)}
++     */
++    @Deprecated
++    public static Node requireParentNode(Node node) {
++        return NavigatorNodeLookup.requireParentNode(node);
++    }
++
++    /**
++     * Returns the {@code (i+1)}'th constructor of the given type declaration, in textual order. The constructor that
++     * appears first has the index 0, the second one the index 1, and so on.
++     *
++     * @param td    The type declaration to search in. Note that only classes and enums have constructors.
++     * @param index The index of the desired constructor.
++     * @return The desired ConstructorDeclaration if it was found, else an exception is thrown.
++     */
++    public static ConstructorDeclaration demandConstructor(TypeDeclaration<?> td, int index) {
++        return NavigatorDeclarationLookup.demandConstructor(td, index);
++    }
++
++    public static VariableDeclarator demandField(ClassOrInterfaceDeclaration cd, String name) {
++        return NavigatorDeclarationLookup.demandField(cd, name);
++    }
++
++    public static MethodDeclaration demandMethod(TypeDeclaration<?> cd, String name) {
++        return NavigatorDeclarationLookup.demandMethod(cd, name);
++    }
++
++    public static ClassOrInterfaceDeclaration demandClass(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandClass(cu, qualifiedName);
++    }
++
++    public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandClassOrInterface(cu, qualifiedName);
++    }
++
++    public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandEnum(cu, qualifiedName);
++    }
++
++    public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandInterface(cu, qualifiedName);
++    }
++
+     /**
+      * Looks among the type declared in the Compilation Unit for one having the specified name.
+      * The name can be qualified with respect to the compilation unit. For example, if the compilation
+@@ -152,12 +165,4 @@ public final class Navigator {
+         return NavigatorTypeLookup.findType(td, qualifiedName);
+     }
+ 
+-    /**
+-     * @deprecated Use {@link #demandParentNode(Node)}
+-     */
+-    @Deprecated
+-    public static Node requireParentNode(Node node) {
+-        return NavigatorNodeLookup.requireParentNode(node);
+-    }
+-
+ }

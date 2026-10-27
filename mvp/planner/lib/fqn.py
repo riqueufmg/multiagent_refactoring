@@ -10,8 +10,14 @@ class Fqn:
         r'\b(class|interface|enum|record)\s+([A-Za-z_]\w*)'
     )
 
-    IGNORED_DIRS = {
+    '''IGNORED_DIRS = {
         ".git", "build", "target", ".gradle",
+        "node_modules", "__pycache__",
+        "test", "tests"
+    }'''
+
+    IGNORED_DIRS = {
+        ".git", "target", ".gradle",
         "node_modules", "__pycache__",
         "test", "tests"
     }

@@ -1,0 +1,21 @@
+{
+  "id": 3,
+  "goal": "Group task-adjustment related configuration (adjustment, adjustmentErrorHandler, adjustmentPostProcessor, threads, lazy) into a single Adjustment configuration class to reduce the count of getters/setters in the primary class.",
+  "files": [
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidAdjustment.java",
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidAdjustment.java"
+      ],
+      "details": "Create net.bytebuddy.build.gradle.android.ByteBuddyAndroidAdjustment that owns the fields: Adjustment adjustment; Adjustment.ErrorHandler adjustmentErrorHandler; Action<Task> adjustmentPostProcessor; int threads; boolean lazy. Provide getters and setters for each, and a constructor that establishes the same default values currently assigned in the ByteBuddyAndroidTaskExtension constructor (Adjustment.FULL, Adjustment.ErrorHandler.WARN, Adjustment.NoOpPostProcessor.INSTANCE, threads default 0, lazy default false).",
+      "risk": "medium"
+    }
+  ]
+}

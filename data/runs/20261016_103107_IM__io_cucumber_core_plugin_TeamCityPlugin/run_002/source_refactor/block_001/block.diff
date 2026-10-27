@@ -1,0 +1,538 @@
+commit 23603177dd761d9a4ac114282bf1c62f115d47a2
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 16 10:42:12 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityMessageFormatter.java b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityMessageFormatter.java
+new file mode 100644
+index 000000000..ed991dea5
+--- /dev/null
++++ b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityMessageFormatter.java
+@@ -0,0 +1,78 @@
++package io.cucumber.core.plugin;
++
++import io.cucumber.plugin.event.Event;
++
++import java.io.PrintStream;
++import java.time.ZoneOffset;
++import java.time.ZonedDateTime;
++import java.time.format.DateTimeFormatter;
++
++class TeamCityMessageFormatter {
++    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss.SSSZ");
++    private static final String TEAMCITY_PREFIX = "##teamcity";
++    static final String TEMPLATE_ENTER_THE_MATRIX = TEAMCITY_PREFIX + "[enteredTheMatrix timestamp = '%s']";
++    static final String TEMPLATE_TEST_RUN_STARTED = TEAMCITY_PREFIX
++            + "[testSuiteStarted timestamp = '%s' name = 'Cucumber']";
++    static final String TEMPLATE_TEST_RUN_FINISHED = TEAMCITY_PREFIX
++            + "[testSuiteFinished timestamp = '%s' name = 'Cucumber']";
++    static final String TEMPLATE_TEST_SUITE_STARTED = TEAMCITY_PREFIX
++            + "[testSuiteStarted timestamp = '%s' locationHint = '%s' name = '%s']";
++    static final String TEMPLATE_TEST_SUITE_FINISHED = TEAMCITY_PREFIX
++            + "[testSuiteFinished timestamp = '%s' name = '%s']";
++    static final String TEMPLATE_TEST_STARTED = TEAMCITY_PREFIX
++            + "[testStarted timestamp = '%s' locationHint = '%s' captureStandardOutput = 'true' name = '%s']";
++    static final String TEMPLATE_TEST_FINISHED = TEAMCITY_PREFIX
++            + "[testFinished timestamp = '%s' duration = '%s' name = '%s']";
++    static final String TEMPLATE_TEST_FAILED = TEAMCITY_PREFIX
++            + "[testFailed timestamp = '%s' duration = '%s' message = '%s' details = '%s' name = '%s']";
++    static final String TEMPLATE_TEST_COMPARISON_FAILED = TEAMCITY_PREFIX
++            + "[testFailed timestamp = '%s' duration = '%s' message = '%s' details = '%s' expected = '%s' actual = '%s' name = '%s']";
++    static final String TEMPLATE_TEST_IGNORED = TEAMCITY_PREFIX
++            + "[testIgnored timestamp = '%s' duration = '%s' message = '%s' name = '%s']";
++    static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED = TEAMCITY_PREFIX
++            + "[testStarted timestamp = '%s' name = '%s']";
++    static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_FAILED = TEAMCITY_PREFIX
++            + "[testFailed timestamp = '%s' message = '%s' details = '%s' name = '%s']";
++    static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_FINISHED = TEAMCITY_PREFIX
++            + "[testFinished timestamp = '%s' name = '%s']";
++    static final String TEMPLATE_PROGRESS_COUNTING_STARTED = TEAMCITY_PREFIX
++            + "[customProgressStatus testsCategory = 'Scenarios' count = '0' timestamp = '%s']";
++    static final String TEMPLATE_PROGRESS_COUNTING_FINISHED = TEAMCITY_PREFIX
++            + "[customProgressStatus testsCategory = '' count = '0' timestamp = '%s']";
++    static final String TEMPLATE_PROGRESS_TEST_STARTED = TEAMCITY_PREFIX
++            + "[customProgressStatus type = 'testStarted' timestamp = '%s']";
++    static final String TEMPLATE_PROGRESS_TEST_FINISHED = TEAMCITY_PREFIX
++            + "[customProgressStatus type = 'testFinished' timestamp = '%s']";
++    static final String TEMPLATE_ATTACH_WRITE_EVENT = TEAMCITY_PREFIX + "[message text='%s' status='NORMAL']";
++
++    private final PrintStream out;
++
++    TeamCityMessageFormatter(PrintStream out) {
++        this.out = out;
++    }
++
++    void print(String command, Object... args) {
++        out.println(formatCommand(command, args));
++    }
++
++    String formatCommand(String command, Object... parameters) {
++        String[] escapedParameters = new String[parameters.length];
++        for (int i = 0; i < escapedParameters.length; i++) {
++            escapedParameters[i] = escape(parameters[i].toString());
++        }
++        return String.format(command, (Object[]) escapedParameters);
++    }
++
++    String escape(String source) {
++        if (source == null) {
++            return "";
++        }
++        return source.replace("|", "||").replace("'", "|'").replace("\n", "|n").replace("\r", "|r")
++                .replace("[", "|[").replace("]", "|]");
++    }
++
++    String extractTimeStamp(Event event) {
++        ZonedDateTime date = event.getInstant().atZone(ZoneOffset.UTC);
++        return DATE_FORMAT.format(date);
++    }
++}
+diff --git a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
+index df4f3b8b1..f64e68073 100644
+--- a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
++++ b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
+@@ -1,42 +1,12 @@
+ package io.cucumber.core.plugin;
+ 
+ import io.cucumber.plugin.EventListener;
+-import io.cucumber.plugin.event.EmbedEvent;
+-import io.cucumber.plugin.event.Event;
+-import io.cucumber.plugin.event.EventPublisher;
+-import io.cucumber.plugin.event.HookTestStep;
+-import io.cucumber.plugin.event.HookType;
+-import io.cucumber.plugin.event.Location;
+-import io.cucumber.plugin.event.Node;
+-import io.cucumber.plugin.event.PickleStepTestStep;
+-import io.cucumber.plugin.event.Result;
+-import io.cucumber.plugin.event.SnippetsSuggestedEvent;
++import io.cucumber.plugin.event.*;
+ import io.cucumber.plugin.event.SnippetsSuggestedEvent.Suggestion;
+-import io.cucumber.plugin.event.Status;
+-import io.cucumber.plugin.event.TestCase;
+-import io.cucumber.plugin.event.TestCaseFinished;
+-import io.cucumber.plugin.event.TestCaseStarted;
+-import io.cucumber.plugin.event.TestRunFinished;
+-import io.cucumber.plugin.event.TestRunStarted;
+-import io.cucumber.plugin.event.TestSourceParsed;
+-import io.cucumber.plugin.event.TestStep;
+-import io.cucumber.plugin.event.TestStepFinished;
+-import io.cucumber.plugin.event.TestStepStarted;
+-import io.cucumber.plugin.event.WriteEvent;
+ 
+ import java.io.PrintStream;
+ import java.net.URI;
+-import java.time.ZoneOffset;
+-import java.time.ZonedDateTime;
+-import java.time.format.DateTimeFormatter;
+-import java.util.ArrayList;
+-import java.util.Collection;
+-import java.util.Collections;
+-import java.util.HashMap;
+-import java.util.List;
+-import java.util.Locale;
+-import java.util.Map;
+-import java.util.Optional;
++import java.util.*;
+ import java.util.function.BiFunction;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
+@@ -52,51 +22,15 @@ import static java.util.stream.Collectors.joining;
+ /**
+  * Outputs Teamcity services messages to std out.
+  *
+- * @see <a
+- *      href=https://www.jetbrains.com/help/teamcity/service-messages.html>TeamCity
++ * @see <a href=
++ *      "https://www.jetbrains.com/help/teamcity/service-messages.html">TeamCity
+  *      - Service Messages</a>
+  */
+ public class TeamCityPlugin implements EventListener {
+-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+-    private static final String TEAMCITY_PREFIX = "##teamcity";
+-    private static final String TEMPLATE_ENTER_THE_MATRIX = TEAMCITY_PREFIX + "[enteredTheMatrix timestamp = '%s']";
+-    private static final String TEMPLATE_TEST_RUN_STARTED = TEAMCITY_PREFIX
+-            + "[testSuiteStarted timestamp = '%s' name = 'Cucumber']";
+-    private static final String TEMPLATE_TEST_RUN_FINISHED = TEAMCITY_PREFIX
+-            + "[testSuiteFinished timestamp = '%s' name = 'Cucumber']";
+-    private static final String TEMPLATE_TEST_SUITE_STARTED = TEAMCITY_PREFIX
+-            + "[testSuiteStarted timestamp = '%s' locationHint = '%s' name = '%s']";
+-    private static final String TEMPLATE_TEST_SUITE_FINISHED = TEAMCITY_PREFIX
+-            + "[testSuiteFinished timestamp = '%s' name = '%s']";
+-    private static final String TEMPLATE_TEST_STARTED = TEAMCITY_PREFIX
+-            + "[testStarted timestamp = '%s' locationHint = '%s' captureStandardOutput = 'true' name = '%s']";
+-    private static final String TEMPLATE_TEST_FINISHED = TEAMCITY_PREFIX
+-            + "[testFinished timestamp = '%s' duration = '%s' name = '%s']";
+-    private static final String TEMPLATE_TEST_FAILED = TEAMCITY_PREFIX
+-            + "[testFailed timestamp = '%s' duration = '%s' message = '%s' details = '%s' name = '%s']";
+-    private static final String TEMPLATE_TEST_COMPARISON_FAILED = TEAMCITY_PREFIX
+-            + "[testFailed timestamp = '%s' duration = '%s' message = '%s' details = '%s' expected = '%s' actual = '%s' name = '%s']";
+-    private static final String TEMPLATE_TEST_IGNORED = TEAMCITY_PREFIX
+-            + "[testIgnored timestamp = '%s' duration = '%s' message = '%s' name = '%s']";
+-    private static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED = TEAMCITY_PREFIX
+-            + "[testStarted timestamp = '%s' name = '%s']";
+-    private static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_FAILED = TEAMCITY_PREFIX
+-            + "[testFailed timestamp = '%s' message = '%s' details = '%s' name = '%s']";
+-    private static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_FINISHED = TEAMCITY_PREFIX
+-            + "[testFinished timestamp = '%s' name = '%s']";
+-    private static final String TEMPLATE_PROGRESS_COUNTING_STARTED = TEAMCITY_PREFIX
+-            + "[customProgressStatus testsCategory = 'Scenarios' count = '0' timestamp = '%s']";
+-    private static final String TEMPLATE_PROGRESS_COUNTING_FINISHED = TEAMCITY_PREFIX
+-            + "[customProgressStatus testsCategory = '' count = '0' timestamp = '%s']";
+-    private static final String TEMPLATE_PROGRESS_TEST_STARTED = TEAMCITY_PREFIX
+-            + "[customProgressStatus type = 'testStarted' timestamp = '%s']";
+-    private static final String TEMPLATE_PROGRESS_TEST_FINISHED = TEAMCITY_PREFIX
+-            + "[customProgressStatus type = 'testFinished' timestamp = '%s']";
+-    private static final String TEMPLATE_ATTACH_WRITE_EVENT = TEAMCITY_PREFIX + "[message text='%s' status='NORMAL']";
+     private static final Pattern ANNOTATION_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\([^:]*\\)");
+     private static final Pattern LAMBDA_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\(.*:.*\\)");
+ 
+-    private final PrintStream out;
++    private final TeamCityMessageFormatter formatter;
+     private final List<SnippetsSuggestedEvent> suggestions = new ArrayList<>();
+     private final Map<URI, Collection<Node>> parsedTestSources = new HashMap<>();
+     private List<Node> currentStack = new ArrayList<>();
+@@ -108,7 +42,7 @@ public class TeamCityPlugin implements EventListener {
+     }
+ 
+     TeamCityPlugin(PrintStream out) {
+-        this.out = out;
++        this.formatter = new TeamCityMessageFormatter(out);
+     }
+ 
+     @Override
+@@ -130,43 +64,38 @@ public class TeamCityPlugin implements EventListener {
+     }
+ 
+     private void printTestRunStarted(TestRunStarted event) {
+-        String timestamp = extractTimeStamp(event);
+-        print(TEMPLATE_ENTER_THE_MATRIX, timestamp);
+-        print(TEMPLATE_TEST_RUN_STARTED, timestamp);
+-        print(TEMPLATE_PROGRESS_COUNTING_STARTED, timestamp);
+-    }
+-
+-    private String extractTimeStamp(Event event) {
+-        ZonedDateTime date = event.getInstant().atZone(ZoneOffset.UTC);
+-        return DATE_FORMAT.format(date);
++        String timestamp = formatter.extractTimeStamp(event);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_ENTER_THE_MATRIX, timestamp);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_RUN_STARTED, timestamp);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_PROGRESS_COUNTING_STARTED, timestamp);
+     }
+ 
+     private void printTestCaseStarted(TestCaseStarted event) {
+         TestCase testCase = event.getTestCase();
+         URI uri = testCase.getUri();
+-        String timestamp = extractTimeStamp(event);
++        String timestamp = formatter.extractTimeStamp(event);
+         Location location = testCase.getLocation();
+         Predicate<Node> withLocation = candidate -> location.equals(candidate.getLocation());
+         List<Node> path = parsedTestSources.get(uri).stream().map(node -> node.findPathTo(withLocation))
+                 .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(emptyList());
+         poppedNodes(path).forEach(node -> finishNode(timestamp, node));
+         pushedNodes(path).forEach(node -> startNode(uri, timestamp, node));
+-        this.currentStack = path;
+-        this.currentTestCase = testCase;
+-        print(TEMPLATE_PROGRESS_TEST_STARTED, timestamp);
++        currentStack = path;
++        currentTestCase = testCase;
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_PROGRESS_TEST_STARTED, timestamp);
+     }
+ 
+     private void startNode(URI uri, String timestamp, Node node) {
+         Supplier<String> keyword = () -> node.getKeyword().orElse("Unknown");
+         String name = node.getName().orElseGet(keyword);
+         String location = uri + ":" + node.getLocation().getLine();
+-        print(TEMPLATE_TEST_SUITE_STARTED, timestamp, location, name);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_SUITE_STARTED, timestamp, location, name);
+     }
+ 
+     private void finishNode(String timestamp, Node node) {
+         Supplier<String> keyword = () -> node.getKeyword().orElse("Unknown");
+         String name = node.getName().orElseGet(keyword);
+-        print(TEMPLATE_TEST_SUITE_FINISHED, timestamp, name);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_SUITE_FINISHED, timestamp, name);
+     }
+ 
+     private List<Node> poppedNodes(List<Node> newStack) {
+@@ -175,13 +104,13 @@ public class TeamCityPlugin implements EventListener {
+         return nodes;
+     }
+ 
+-    private List<Node> reversedPoppedNodes(List<Node> currentStack, List<Node> newStack) {
+-        for (int i = 0; i < currentStack.size() && i < newStack.size(); i++) {
+-            if (!currentStack.get(i).equals(newStack.get(i)))
+-                return currentStack.subList(i, currentStack.size());
++    private List<Node> reversedPoppedNodes(List<Node> oldStack, List<Node> newStack) {
++        for (int i = 0; i < oldStack.size() && i < newStack.size(); i++) {
++            if (!oldStack.get(i).equals(newStack.get(i)))
++                return oldStack.subList(i, oldStack.size());
+         }
+-        if (newStack.size() < currentStack.size())
+-            return currentStack.subList(newStack.size(), currentStack.size());
++        if (newStack.size() < oldStack.size())
++            return oldStack.subList(newStack.size(), oldStack.size());
+         return emptyList();
+     }
+ 
+@@ -196,85 +125,82 @@ public class TeamCityPlugin implements EventListener {
+     }
+ 
+     private void printTestStepStarted(TestStepStarted event) {
+-        String timestamp = extractTimeStamp(event);
+-        String name = extractName(event.getTestStep());
+-        String location = extractLocation(event);
+-        print(TEMPLATE_TEST_STARTED, timestamp, location, name);
++        String timestamp = formatter.extractTimeStamp(event);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_STARTED, timestamp, extractLocation(event),
++            extractName(event.getTestStep()));
+     }
+ 
+     private String extractLocation(TestStepStarted event) {
+-        TestStep testStep = event.getTestStep();
+-        if (testStep instanceof PickleStepTestStep) {
+-            PickleStepTestStep pickleStepTestStep = (PickleStepTestStep) testStep;
+-            return pickleStepTestStep.getUri() + ":" + pickleStepTestStep.getStep().getLine();
++        TestStep step = event.getTestStep();
++        if (step instanceof PickleStepTestStep) {
++            PickleStepTestStep pickle = (PickleStepTestStep) step;
++            return pickle.getUri() + ":" + pickle.getStep().getLine();
+         }
+-        if (testStep instanceof HookTestStep) {
+-            return formatHookStepLocation((HookTestStep) testStep, javaTestLocationUri(), TestStep::getCodeLocation);
+-        }
+-        return testStep.getCodeLocation();
++        if (step instanceof HookTestStep)
++            return formatHookStepLocation((HookTestStep) step, javaTestLocationUri(), TestStep::getCodeLocation);
++        return step.getCodeLocation();
+     }
+ 
+     private static BiFunction<String, String, String> javaTestLocationUri() {
+-        return (fqDeclaringClassName, classOrMethodName) -> String.format("java:test://%s/%s", fqDeclaringClassName,
+-            classOrMethodName);
++        return (declaringClass, method) -> String.format("java:test://%s/%s", declaringClass, method);
+     }
+ 
+     private String formatHookStepLocation(
+-            HookTestStep hookTestStep, BiFunction<String, String, String> hookStepCase,
+-            Function<HookTestStep, String> defaultHookName
++            HookTestStep hook, BiFunction<String, String, String> format, Function<HookTestStep, String> fallback
+     ) {
+-        Matcher javaMatcher = ANNOTATION_GLUE_CODE_LOCATION_PATTERN.matcher(hookTestStep.getCodeLocation());
+-        if (javaMatcher.matches())
+-            return hookStepCase.apply(javaMatcher.group(1), javaMatcher.group(2));
+-        Matcher java8Matcher = LAMBDA_GLUE_CODE_LOCATION_PATTERN.matcher(hookTestStep.getCodeLocation());
+-        if (java8Matcher.matches()) {
+-            String fqDeclaringClassName = java8Matcher.group(1);
+-            int indexOfPackageSeparator = fqDeclaringClassName.lastIndexOf(".");
+-            String declaringClassName = indexOfPackageSeparator == -1 ? fqDeclaringClassName
+-                    : fqDeclaringClassName.substring(indexOfPackageSeparator + 1);
+-            return hookStepCase.apply(fqDeclaringClassName, declaringClassName);
++        Matcher matcher = ANNOTATION_GLUE_CODE_LOCATION_PATTERN.matcher(hook.getCodeLocation());
++        if (matcher.matches())
++            return format.apply(matcher.group(1), matcher.group(2));
++        matcher = LAMBDA_GLUE_CODE_LOCATION_PATTERN.matcher(hook.getCodeLocation());
++        if (matcher.matches()) {
++            String declaringClass = matcher.group(1);
++            int separator = declaringClass.lastIndexOf(".");
++            String simpleName = separator == -1 ? declaringClass : declaringClass.substring(separator + 1);
++            return format.apply(declaringClass, simpleName);
+         }
+-        return defaultHookName.apply(hookTestStep);
++        return fallback.apply(hook);
+     }
+ 
+     private void printTestStepFinished(TestStepFinished event) {
+-        String timeStamp = extractTimeStamp(event);
+-        long duration = extractDuration(event.getResult());
++        String timestamp = formatter.extractTimeStamp(event);
++        long duration = event.getResult().getDuration().toMillis();
+         String name = extractName(event.getTestStep());
+         Throwable error = event.getResult().getError();
+-        Status status = event.getResult().getStatus();
+-        switch (status) {
++        switch (event.getResult().getStatus()) {
+             case SKIPPED:
+-                print(TEMPLATE_TEST_IGNORED, timeStamp, duration, error == null ? "Step skipped" : error.getMessage(),
+-                    name);
++                formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_IGNORED, timestamp, duration,
++                    error == null ? "Step skipped" : error.getMessage(), name);
+                 break;
+             case PENDING:
+-                print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step pending",
++                formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_FAILED, timestamp, duration, "Step pending",
+                     error == null ? "" : error.getMessage(), name);
+                 break;
+             case UNDEFINED:
+-                print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step undefined", getSnippets(currentTestCase), name);
++                formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_FAILED, timestamp, duration, "Step undefined",
++                    getSnippets(currentTestCase), name);
+                 break;
+             case AMBIGUOUS:
+             case FAILED:
+                 String details = printStackTrace(error);
+                 String message = error.getMessage();
+                 if (message == null) {
+-                    print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step failed", details, name);
++                    formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_FAILED, timestamp, duration, "Step failed",
++                        details, name);
+                     break;
+                 }
+-                ComparisonFailure comparisonFailure = ComparisonFailure.parse(message.trim());
+-                if (comparisonFailure == null) {
+-                    print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step failed", details, name);
++                ComparisonFailure comparison = ComparisonFailure.parse(message.trim());
++                if (comparison == null) {
++                    formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_FAILED, timestamp, duration, "Step failed",
++                        details, name);
+                     break;
+                 }
+-                print(TEMPLATE_TEST_COMPARISON_FAILED, timeStamp, duration, "Step failed", details,
+-                    comparisonFailure.getExpected(), comparisonFailure.getActual(), name);
++                formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_COMPARISON_FAILED, timestamp, duration,
++                    "Step failed", details, comparison.getExpected(), comparison.getActual(), name);
+                 break;
+             default:
+                 break;
+         }
+-        print(TEMPLATE_TEST_FINISHED, timeStamp, duration, name);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_FINISHED, timestamp, duration, name);
+     }
+ 
+     private String getHookName(HookTestStep hook) {
+@@ -292,73 +218,56 @@ public class TeamCityPlugin implements EventListener {
+         }
+     }
+ 
+-    private String extractName(TestStep testStep) {
+-        if (testStep instanceof PickleStepTestStep)
+-            return ((PickleStepTestStep) testStep).getStep().getText();
+-        if (testStep instanceof HookTestStep) {
+-            HookTestStep hookTestStep = (HookTestStep) testStep;
+-            return formatHookStepLocation(hookTestStep, hookNameFormat(hookTestStep), this::getHookName);
++    private String extractName(TestStep step) {
++        if (step instanceof PickleStepTestStep)
++            return ((PickleStepTestStep) step).getStep().getText();
++        if (step instanceof HookTestStep) {
++            HookTestStep hook = (HookTestStep) step;
++            return formatHookStepLocation(hook,
++                (declaringClass, method) -> String.format("%s(%s)", getHookName(hook), method), this::getHookName);
+         }
+         return "Unknown step";
+     }
+ 
+-    private BiFunction<String, String, String> hookNameFormat(HookTestStep hookTestStep) {
+-        return (fqDeclaringClassName, classOrMethodName) -> String.format("%s(%s)", getHookName(hookTestStep),
+-            classOrMethodName);
+-    }
+-
+     private String getSnippets(TestCase testCase) {
+         URI uri = testCase.getUri();
+         Location location = testCase.getLocation();
+-        List<Suggestion> suggestionForTestCase = suggestions.stream()
+-                .filter(
+-                    suggestion -> suggestion.getUri().equals(uri) && suggestion.getTestCaseLocation().equals(location))
++        List<Suggestion> matching = suggestions.stream()
++                .filter(s -> s.getUri().equals(uri) && s.getTestCaseLocation().equals(location))
+                 .map(SnippetsSuggestedEvent::getSuggestion).collect(Collectors.toList());
+-        return createMessage(suggestionForTestCase);
+-    }
+-
+-    private static String createMessage(Collection<Suggestion> suggestions) {
+-        if (suggestions.isEmpty())
++        if (matching.isEmpty())
+             return "";
+-        StringBuilder sb = new StringBuilder("You can implement this step");
+-        if (suggestions.size() > 1)
+-            sb.append(" and ").append(suggestions.size() - 1).append(" other step(s)");
+-        sb.append(" using the snippet(s) below:\n\n");
+-        sb.append(suggestions.stream().map(Suggestion::getSnippets).flatMap(Collection::stream).distinct()
++        StringBuilder result = new StringBuilder("You can implement this step");
++        if (matching.size() > 1)
++            result.append(" and ").append(matching.size() - 1).append(" other step(s)");
++        result.append(" using the snippet(s) below:\n\n");
++        result.append(matching.stream().map(Suggestion::getSnippets).flatMap(Collection::stream).distinct()
+                 .collect(joining("\n", "", "\n")));
+-        return sb.toString();
++        return result.toString();
+     }
+ 
+     private void printTestCaseFinished(TestCaseFinished event) {
+-        String timestamp = extractTimeStamp(event);
+-        print(TEMPLATE_PROGRESS_TEST_FINISHED, timestamp);
++        String timestamp = formatter.extractTimeStamp(event);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_PROGRESS_TEST_FINISHED, timestamp);
+         finishNode(timestamp, currentStack.remove(currentStack.size() - 1));
+-        this.currentTestCase = null;
+-    }
+-
+-    private long extractDuration(Result result) {
+-        return result.getDuration().toMillis();
++        currentTestCase = null;
+     }
+ 
+     private void printTestRunFinished(TestRunFinished event) {
+-        String timestamp = extractTimeStamp(event);
+-        print(TEMPLATE_PROGRESS_COUNTING_FINISHED, timestamp);
++        String timestamp = formatter.extractTimeStamp(event);
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_PROGRESS_COUNTING_FINISHED, timestamp);
+         List<Node> emptyStack = new ArrayList<>();
+         poppedNodes(emptyStack).forEach(node -> finishNode(timestamp, node));
+         currentStack = emptyStack;
+-        printBeforeAfterAllResult(event, timestamp);
+-        print(TEMPLATE_TEST_RUN_FINISHED, timestamp);
+-    }
+-
+-    private void printBeforeAfterAllResult(TestRunFinished event, String timestamp) {
+         Throwable error = event.getResult().getError();
+-        if (error == null)
+-            return;
+-        String name = "Before All/After All";
+-        print(TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED, timestamp, name);
+-        String details = printStackTrace(error);
+-        print(TEMPLATE_BEFORE_ALL_AFTER_ALL_FAILED, timestamp, "Before All/After All failed", details, name);
+-        print(TEMPLATE_BEFORE_ALL_AFTER_ALL_FINISHED, timestamp, name);
++        if (error != null) {
++            String name = "Before All/After All";
++            formatter.print(TeamCityMessageFormatter.TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED, timestamp, name);
++            formatter.print(TeamCityMessageFormatter.TEMPLATE_BEFORE_ALL_AFTER_ALL_FAILED, timestamp,
++                "Before All/After All failed", printStackTrace(error), name);
++            formatter.print(TeamCityMessageFormatter.TEMPLATE_BEFORE_ALL_AFTER_ALL_FINISHED, timestamp, name);
++        }
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_TEST_RUN_FINISHED, timestamp);
+     }
+ 
+     private void handleSnippetSuggested(SnippetsSuggestedEvent event) {
+@@ -367,29 +276,12 @@ public class TeamCityPlugin implements EventListener {
+ 
+     private void handleEmbedEvent(EmbedEvent event) {
+         String name = event.getName() == null ? "" : event.getName() + " ";
+-        print(TEMPLATE_ATTACH_WRITE_EVENT,
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_ATTACH_WRITE_EVENT,
+             "Embed event: " + name + "[" + event.getMediaType() + " " + event.getData().length + " bytes]\n");
+     }
+ 
+     private void handleWriteEvent(WriteEvent event) {
+-        print(TEMPLATE_ATTACH_WRITE_EVENT, "Write event:\n" + event.getText() + "\n");
+-    }
+-
+-    private void print(String command, Object... args) {
+-        out.println(formatCommand(command, args));
+-    }
+-
+-    private String formatCommand(String command, Object... parameters) {
+-        String[] escapedParameters = new String[parameters.length];
+-        for (int i = 0; i < escapedParameters.length; i++)
+-            escapedParameters[i] = escape(parameters[i].toString());
+-        return String.format(command, (Object[]) escapedParameters);
+-    }
+-
+-    private String escape(String source) {
+-        if (source == null)
+-            return "";
+-        return source.replace("|", "||").replace("'", "|'").replace("\n", "|n").replace("\r", "|r").replace("[", "|[")
+-                .replace("]", "|]");
++        formatter.print(TeamCityMessageFormatter.TEMPLATE_ATTACH_WRITE_EVENT,
++            "Write event:\n" + event.getText() + "\n");
+     }
+ }

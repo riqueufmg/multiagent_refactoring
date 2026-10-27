@@ -1,0 +1,56 @@
+{
+  "id": 1,
+  "goal": "Extract location and random-coordinate behavior from Misc into a cohesive utility class, reducing the number of public methods and fields in Misc.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+        "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+        "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+        "com.gmail.nossr50.util.Misc.getRandom()",
+        "com.gmail.nossr50.util.Misc.random"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil"
+      ],
+      "details": "Create com.gmail.nossr50.util.MiscLocationUtil in the same package and move the cohesive location and random-related methods and field into it. Preserve the existing static behavior and required imports.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+        "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+        "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+        "com.gmail.nossr50.util.Misc.getRandom()"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil.isNear(Location, Location, double)",
+        "com.gmail.nossr50.util.MiscLocationUtil.getBlockCenter(BlockState)",
+        "com.gmail.nossr50.util.MiscLocationUtil.getLocationOffset(Location, double)",
+        "com.gmail.nossr50.util.MiscLocationUtil.getRandom()"
+      ],
+      "details": "Update repository call sites to use MiscLocationUtil directly, then remove the moved methods and random field from Misc as part of the extraction.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

@@ -1,0 +1,217 @@
+commit 312d3283d5df7d7967b6615dba9e31386b176363
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 16 11:11:45 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
+index 4fbb170cf..b3b647d29 100644
+--- a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
++++ b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
+@@ -5,26 +5,14 @@
+  */
+ package io.github.classgraph.base.internal.utils;
+ 
+-import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.List;
+-import java.util.Set;
+ import java.util.regex.Pattern;
+ 
+ import org.jspecify.annotations.Nullable;
+ 
+ /** A class storing accept or reject criteria. */
+-public abstract class AcceptReject {
+-    protected @Nullable Set<String> accept;
+-    protected @Nullable Set<String> reject;
+-    protected @Nullable Set<String> acceptPrefixesSet;
+-    protected @Nullable List<String> acceptPrefixes;
+-    protected @Nullable List<String> rejectPrefixes;
+-    protected @Nullable Set<String> acceptGlobs;
+-    protected @Nullable Set<String> rejectGlobs;
+-    protected @Nullable List<Pattern> acceptPatterns;
+-    protected @Nullable List<Pattern> acceptPrefixPatterns;
+-    protected @Nullable List<Pattern> rejectPatterns;
++public abstract class AcceptReject extends AcceptRejectCriteria {
+     protected char separatorChar;
+ 
+     protected AcceptReject(final char separatorChar) {
+@@ -115,18 +103,6 @@ public abstract class AcceptReject {
+ 
+     public abstract boolean isRejected(String str);
+ 
+-    public boolean acceptIsEmpty() {
+-        return accept == null && acceptPrefixes == null && acceptPrefixesSet == null && acceptGlobs == null;
+-    }
+-
+-    public boolean rejectIsEmpty() {
+-        return reject == null && rejectPrefixes == null && rejectGlobs == null;
+-    }
+-
+-    public boolean acceptAndRejectAreEmpty() {
+-        return acceptIsEmpty() && rejectIsEmpty();
+-    }
+-
+     public boolean isSpecificallyAcceptedAndNotRejected(final String str) {
+         return !acceptIsEmpty() && isAcceptedAndNotRejected(str);
+     }
+@@ -134,56 +110,4 @@ public abstract class AcceptReject {
+     public boolean isSpecificallyAccepted(final String str) {
+         return !acceptIsEmpty() && isAccepted(str);
+     }
+-
+-    public void sortPrefixes() {
+-        if (acceptPrefixesSet != null) {
+-            acceptPrefixes = new ArrayList<>(acceptPrefixesSet);
+-        }
+-        if (acceptPrefixes != null) {
+-            CollectionUtils.sortIfNotEmpty(acceptPrefixes);
+-        }
+-        if (rejectPrefixes != null) {
+-            CollectionUtils.sortIfNotEmpty(rejectPrefixes);
+-        }
+-    }
+-
+-    @Override
+-    public String toString() {
+-        final StringBuilder buf = new StringBuilder();
+-        if (accept != null) {
+-            buf.append("accept: ");
+-            AcceptRejectUtils.quoteList(accept, buf);
+-        }
+-        if (acceptPrefixes != null) {
+-            if (!buf.isEmpty())
+-                buf.append("; ");
+-            buf.append("acceptPrefixes: ");
+-            AcceptRejectUtils.quoteList(acceptPrefixes, buf);
+-        }
+-        if (acceptGlobs != null) {
+-            if (!buf.isEmpty())
+-                buf.append("; ");
+-            buf.append("acceptGlobs: ");
+-            AcceptRejectUtils.quoteList(acceptGlobs, buf);
+-        }
+-        if (reject != null) {
+-            if (!buf.isEmpty())
+-                buf.append("; ");
+-            buf.append("reject: ");
+-            AcceptRejectUtils.quoteList(reject, buf);
+-        }
+-        if (rejectPrefixes != null) {
+-            if (!buf.isEmpty())
+-                buf.append("; ");
+-            buf.append("rejectPrefixes: ");
+-            AcceptRejectUtils.quoteList(rejectPrefixes, buf);
+-        }
+-        if (rejectGlobs != null) {
+-            if (!buf.isEmpty())
+-                buf.append("; ");
+-            buf.append("rejectGlobs: ");
+-            AcceptRejectUtils.quoteList(rejectGlobs, buf);
+-        }
+-        return buf.toString();
+-    }
+ }
+diff --git a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectCriteria.java b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectCriteria.java
+new file mode 100644
+index 000000000..e132618dc
+--- /dev/null
++++ b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectCriteria.java
+@@ -0,0 +1,97 @@
++/*
++ * This file is part of ClassGraph.
++ *
++ * The MIT License (MIT)
++ */
++package io.github.classgraph.base.internal.utils;
++
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.List;
++import java.util.Set;
++import java.util.regex.Pattern;
++
++import org.jspecify.annotations.Nullable;
++
++/** State and concrete behavior for accept/reject criteria. */
++public abstract class AcceptRejectCriteria {
++    protected @Nullable Set<String> accept;
++    protected @Nullable Set<String> reject;
++    protected @Nullable Set<String> acceptPrefixesSet;
++    protected @Nullable List<String> acceptPrefixes;
++    protected @Nullable List<String> rejectPrefixes;
++    protected @Nullable Set<String> acceptGlobs;
++    protected @Nullable Set<String> rejectGlobs;
++    protected @Nullable List<Pattern> acceptPatterns;
++    protected @Nullable List<Pattern> acceptPrefixPatterns;
++    protected @Nullable List<Pattern> rejectPatterns;
++
++    public boolean acceptIsEmpty() {
++        return accept == null && acceptPrefixes == null && acceptPrefixesSet == null && acceptGlobs == null;
++    }
++
++    public boolean rejectIsEmpty() {
++        return reject == null && rejectPrefixes == null && rejectGlobs == null;
++    }
++
++    public boolean acceptAndRejectAreEmpty() {
++        return acceptIsEmpty() && rejectIsEmpty();
++    }
++
++    public void sortPrefixes() {
++        if (acceptPrefixesSet != null) {
++            acceptPrefixes = new ArrayList<>(acceptPrefixesSet);
++        }
++        if (acceptPrefixes != null) {
++            CollectionUtils.sortIfNotEmpty(acceptPrefixes);
++        }
++        if (rejectPrefixes != null) {
++            CollectionUtils.sortIfNotEmpty(rejectPrefixes);
++        }
++    }
++
++    @Override
++    public String toString() {
++        final StringBuilder buf = new StringBuilder();
++        if (accept != null) {
++            buf.append("accept: ");
++            AcceptRejectUtils.quoteList(accept, buf);
++        }
++        if (acceptPrefixes != null) {
++            if (!buf.isEmpty()) {
++                buf.append("; ");
++            }
++            buf.append("acceptPrefixes: ");
++            AcceptRejectUtils.quoteList(acceptPrefixes, buf);
++        }
++        if (acceptGlobs != null) {
++            if (!buf.isEmpty()) {
++                buf.append("; ");
++            }
++            buf.append("acceptGlobs: ");
++            AcceptRejectUtils.quoteList(acceptGlobs, buf);
++        }
++        if (reject != null) {
++            if (!buf.isEmpty()) {
++                buf.append("; ");
++            }
++            buf.append("reject: ");
++            AcceptRejectUtils.quoteList(reject, buf);
++        }
++        if (rejectPrefixes != null) {
++            if (!buf.isEmpty()) {
++                buf.append("; ");
++            }
++            buf.append("rejectPrefixes: ");
++            AcceptRejectUtils.quoteList(rejectPrefixes, buf);
++        }
++        if (rejectGlobs != null) {
++            if (!buf.isEmpty()) {
++                buf.append("; ");
++            }
++            buf.append("rejectGlobs: ");
++            AcceptRejectUtils.quoteList(rejectGlobs, buf);
++        }
++        return buf.toString();
++    }
++}

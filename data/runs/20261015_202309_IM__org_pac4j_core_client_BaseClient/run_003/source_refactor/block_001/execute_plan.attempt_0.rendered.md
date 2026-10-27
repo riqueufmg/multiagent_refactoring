@@ -1,0 +1,181 @@
+## CONTEXT
+
+A plan was developed to refactor a target that suffers from a specific type of code smell. The plan consists of blocks, each of which is formed by a list of refactoring operations. The blocks were designed to perform the refactoring in steps, such that after the execution of each block, it will have a compilable sub-solution with functional tests. For this, both the source code mentioned in the plan and the related tests may need to be rewritten.
+
+## TASK
+
+Apply the staged refactoring block to the provided Java source files.
+
+Preserving behavior does not require preserving the original target-class API when the plan explicitly moves methods or responsibilities to another class.
+
+## CONSTRAINTS
+
+- Modify only files listed in allowed_files field.
+- Return the full new content for every modified file.
+- Do not return partial patches.
+- Do not edit unrelated tests.
+- Do not change unrelated code.
+- Do not undo previous refactorings.
+- If the block cannot be safely applied, return an empty files_to_write list and explain the reason in "notes".
+- Return only files that actually changed.
+- Do not include unchanged files in files_to_write.
+- Implement the refactoring operations requested in the current block. Do not replace the requested refactoring with a more conservative alternative.
+
+## INPUT PLAN
+
+{
+  "repo_path": "/data/henrique/historical-java-repro/benchmark/repositories/pac4j/repository",
+  "target": {
+    "smell": "IM",
+    "smell_name": "Insufficient Modularization",
+    "target_type": "class",
+    "target_name": "org.pac4j.core.client.BaseClient"
+  },
+  "block": {
+    "id": 1,
+    "goal": "Move the cohesive authorization-generator API out of BaseClient into the existing BaseClientAuthorization component, reducing the number of public methods in BaseClient.",
+    "files": [
+      "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+      "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java"
+    ],
+    "ops": [
+      {
+        "op": "MOVE_METHOD",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+          "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+        ],
+        "details": "Move the authorization-generator accessor to BaseClientAuthorization, which already owns the authorization generator state.",
+        "risk": "medium"
+      },
+      {
+        "op": "MOVE_METHOD",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+        ],
+        "details": "Move the list-based authorization-generator setter to BaseClientAuthorization.",
+        "risk": "medium"
+      },
+      {
+        "op": "MOVE_METHOD",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])",
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])"
+        ],
+        "details": "Move the varargs authorization-generator setter to BaseClientAuthorization.",
+        "risk": "medium"
+      },
+      {
+        "op": "MOVE_METHOD",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+        ],
+        "details": "Move the single authorization-generator setter to BaseClientAuthorization.",
+        "risk": "medium"
+      },
+      {
+        "op": "MOVE_METHOD",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+          "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)"
+        ],
+        "details": "Move the single authorization-generator addition method to BaseClientAuthorization.",
+        "risk": "medium"
+      },
+      {
+        "op": "MOVE_METHOD",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+          "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+        ],
+        "details": "Move the list-based authorization-generator addition method to BaseClientAuthorization.",
+        "risk": "medium"
+      },
+      {
+        "op": "UPDATE_CALL_SITES",
+        "inputs": [
+          "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+          "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+          "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])",
+          "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+          "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+          "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+        ],
+        "outputs": [
+          "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()",
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator[])",
+          "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+          "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+          "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+        ],
+        "details": "Update callers to access the authorization-generator operations through BaseClientAuthorization after the methods are moved.",
+        "risk": "high"
+      }
+    ]
+  },
+  "allowed_files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java"
+  ],
+  "executor_existing_files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java"
+  ],
+  "executor_new_files": [],
+  "executor_rejected_files": [],
+  "files_context": [
+    {
+      "path": "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+      "exists": "true",
+      "content": "package org.pac4j.core.client;\n\nimport org.pac4j.core.authorization.generator.AuthorizationGenerator;\nimport org.pac4j.core.context.WebContext;\nimport org.pac4j.core.context.session.SessionStore;\nimport org.pac4j.core.credentials.Credentials;\nimport org.pac4j.core.credentials.authenticator.Authenticator;\nimport org.pac4j.core.credentials.extractor.CredentialsExtractor;\nimport org.pac4j.core.exception.CredentialsException;\nimport org.pac4j.core.profile.UserProfile;\nimport org.pac4j.core.profile.creator.ProfileCreator;\nimport org.pac4j.core.profile.factory.ProfileFactory;\nimport org.pac4j.core.profile.factory.ProfileManagerFactory;\nimport org.pac4j.core.util.CommonHelper;\nimport org.pac4j.core.util.InitializableObject;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\nimport java.util.*;\n\n/**\n * <p>This class is the default implementation of an authentication client (whatever the mechanism). It has the core concepts:</p>\n * <ul>\n * <li>The initialization process is handled by the {@link InitializableObject} inheritance, the {@link #internalInit(boolean)}\n * must be implemented in sub-classes. The {@link #init()} method must be called implicitly by the main methods of\n * the {@link Client} interface, so that no explicit call is required to initialize the client</li>\n * <li>The name of the client is handled through the {@link #setName(String)} and {@link #getName()} methods</li>\n * <li>After retrieving the user profile, the client can generate the authorization information (roles and remember-me) by\n * using the appropriate {@link AuthorizationGenerator}</li>\n * <li>The credentials extraction and validation in the {@link #getCredentials(WebContext, SessionStore)} method are handled by the\n * {@link #credentialsExtractor} and {@link #authenticator} components</li>\n * <li>The user profile retrieval in the {@link #getUserProfile(Credentials, WebContext, SessionStore)} method is ensured\n * by the {@link #profileCreator} component.</li>\n * </ul>\n *\n * @author Jerome Leleu\n * @since 1.4.0\n */\npublic abstract class BaseClient extends InitializableObject implements Client {\n\n    protected final Logger logger = LoggerFactory.getLogger(getClass());\n\n    private String name;\n\n    private final BaseClientAuthorization authorization = new BaseClientAuthorization();\n\n    private final BaseClientProfileConfiguration profileConfiguration = new BaseClientProfileConfiguration();\n\n    private Map<String, Object> customProperties = new LinkedHashMap<>();\n\n    private ProfileFactory profileFactoryWhenNotAuthenticated;\n\n    private boolean multiProfile = false;\n\n    protected Boolean saveProfileInSession;\n\n    private static boolean warned;\n\n    /**\n     * Retrieve the credentials.\n     *\n     * @param context the web context\n     * @return the credentials\n     */\n    protected Optional<Credentials> retrieveCredentials(final WebContext context, final SessionStore sessionStore,\n                                                        final ProfileManagerFactory profileManagerFactory) {\n        try {\n            final var optCredentials = this.profileConfiguration.getCredentialsExtractor().extract(context, sessionStore, profileManagerFactory);\n            if (optCredentials.isPresent()) {\n                final var t0 = System.currentTimeMillis();\n                try {\n                    return this.profileConfiguration.getAuthenticator().validate(optCredentials.get(), context, sessionStore);\n                } finally {\n                    final var t1 = System.currentTimeMillis();\n                    logger.debug(\"Credentials validation took: {} ms\", t1 - t0);\n                }\n            }\n        } catch (CredentialsException e) {\n            logger.info(\"Failed to retrieve or validate credentials: {}\", e.getMessage());\n            logger.debug(\"Failed to retrieve or validate credentials\", e);\n        }\n        return Optional.empty();\n    }\n\n    @Override\n    public final Optional<UserProfile> getUserProfile(final Credentials credentials, final WebContext context,\n                                                      final SessionStore sessionStore) {\n        init();\n        logger.debug(\"credentials : {}\", credentials);\n        if (credentials == null) {\n            if (profileFactoryWhenNotAuthenticated != null) {\n                final var customProfile = profileFactoryWhenNotAuthenticated.apply(new Object[] {context});\n                logger.debug(\"force custom profile when not authenticated: {}\", customProfile);\n                return Optional.ofNullable(customProfile);\n            } else {\n                return Optional.empty();\n            }\n        }\n\n        var profile = retrieveUserProfile(credentials, context, sessionStore);\n        if (profile.isPresent()) {\n            profile.get().setClientName(getName());\n            profile = authorization.generate(context, sessionStore, profile);\n        }\n        return profile;\n    }\n\n    /**\n     * Retrieve a user profile.\n     *\n     * @param credentials the credentials\n     * @param context     the web context\n     * @return the user profile\n     */\n    protected final Optional<UserProfile> retrieveUserProfile(final Credentials credentials, final WebContext context,\n                                                              final SessionStore sessionStore) {\n        final var profile = this.profileConfiguration.getProfileCreator().create(credentials, context, sessionStore);\n        logger.debug(\"profile: {}\", profile);\n        return profile;\n    }\n\n    @Override\n    public Optional<UserProfile> renewUserProfile(final UserProfile profile, final WebContext context, final SessionStore sessionStore) {\n        return Optional.empty();\n    }\n\n    public void setName(final String name) {\n        this.name = name;\n    }\n\n    @Override\n    public String getName() {\n        if (CommonHelper.isBlank(this.name)) {\n            return this.getClass().getSimpleName();\n        }\n        return this.name;\n    }\n\n    /**\n     * Notify of the web session renewal.\n     *\n     * @param oldSessionId the old session identifier\n     * @param context      the web context\n     * @param sessionStore the session store\n     */\n    public void notifySessionRenewal(final String oldSessionId, final WebContext context, final SessionStore sessionStore) {\n    }\n\n    public List<AuthorizationGenerator> getAuthorizationGenerators() {\n        return this.authorization.getAuthorizationGenerators();\n    }\n\n    public void setAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {\n        this.authorization.setAuthorizationGenerators(authorizationGenerators);\n    }\n\n    public void setAuthorizationGenerators(final AuthorizationGenerator... authorizationGenerators) {\n        this.authorization.setAuthorizationGenerators(authorizationGenerators);\n    }\n\n    /**\n     * Add an authorization generator.\n     *\n     * @param authorizationGenerator an authorizations generator\n     */\n    public void setAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {\n        this.authorization.setAuthorizationGenerator(authorizationGenerator);\n    }\n\n    public void addAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {\n        this.authorization.addAuthorizationGenerator(authorizationGenerator);\n    }\n\n    public void addAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {\n        this.authorization.addAuthorizationGenerators(authorizationGenerators);\n    }\n\n    public CredentialsExtractor getCredentialsExtractor() {\n        return profileConfiguration.getCredentialsExtractor();\n    }\n\n    protected void defaultCredentialsExtractor(final CredentialsExtractor credentialsExtractor) {\n        profileConfiguration.defaultCredentialsExtractor(credentialsExtractor);\n    }\n\n    public Authenticator getAuthenticator() {\n        return profileConfiguration.getAuthenticator();\n    }\n\n    protected void defaultAuthenticator(final Authenticator authenticator) {\n        profileConfiguration.defaultAuthenticator(authenticator);\n    }\n\n    public ProfileCreator getProfileCreator() {\n        return profileConfiguration.getProfileCreator();\n    }\n\n    protected void defaultProfileCreator(final ProfileCreator profileCreator) {\n        profileConfiguration.defaultProfileCreator(profileCreator);\n    }\n\n    public void setCredentialsExtractor(final CredentialsExtractor credentialsExtractor) {\n        profileConfiguration.setCredentialsExtractor(credentialsExtractor);\n    }\n\n    public void setAuthenticator(final Authenticator authenticator) {\n        profileConfiguration.setAuthenticator(authenticator);\n    }\n\n    public void setProfileCreator(final ProfileCreator profileCreator) {\n        profileConfiguration.setProfileCreator(profileCreator);\n    }\n\n    public Map<String, Object> getCustomProperties() {\n        return customProperties;\n    }\n\n    public void setCustomProperties(final Map<String, Object> customProperties) {\n        CommonHelper.assertNotNull(\"customProperties\", customProperties);\n        this.customProperties =  customProperties;\n    }\n\n    public ProfileFactory getProfileFactoryWhenNotAuthenticated() {\n        return profileFactoryWhenNotAuthenticated;\n    }\n\n    public void setProfileFactoryWhenNotAuthenticated(final ProfileFactory profileFactoryWhenNotAuthenticated) {\n        if (!warned) {\n            logger.warn(\"Be careful when using the 'setProfileFactoryWhenNotAuthenticated' method: a custom profile \"\n                + \"is returned when the authentication fails or is cancelled and it is stored for the whole session. \"\n                + \"You may need to define additional 'Authorizer's to secure your web resources.\");\n            warned = true;\n        }\n        this.profileFactoryWhenNotAuthenticated = profileFactoryWhenNotAuthenticated;\n    }\n\n    public boolean isMultiProfile(final WebContext context, final UserProfile profile) {\n        return multiProfile;\n    }\n\n    public void setMultiProfile(final boolean multiProfile) {\n        this.multiProfile = multiProfile;\n    }\n\n    public Boolean getSaveProfileInSession(final WebContext context, final UserProfile profile) {\n        return saveProfileInSession;\n    }\n\n    public void setSaveProfileInSession(final boolean saveProfileInSession) {\n        this.saveProfileInSession = saveProfileInSession;\n    }\n\n    @Override\n    public String toString() {\n        return CommonHelper.toNiceString(this.getClass(), \"name\", getName(), \"credentialsExtractor\", profileConfiguration.getCredentialsExtractor(),\n            \"authenticator\", profileConfiguration.getAuthenticator(), \"profileCreator\", profileConfiguration.getProfileCreator(),\n            \"authorizationGenerators\", authorization.getAuthorizationGenerators(), \"customProperties\", customProperties,\n            \"profileFactoryWhenNotAuthenticated\", profileFactoryWhenNotAuthenticated, \"multiProfile\", multiProfile,\n            \"saveProfileInSession\", saveProfileInSession);\n    }\n}\n"
+    },
+    {
+      "path": "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java",
+      "exists": "true",
+      "content": "package org.pac4j.core.client;\n\nimport org.pac4j.core.authorization.generator.AuthorizationGenerator;\nimport org.pac4j.core.context.WebContext;\nimport org.pac4j.core.context.session.SessionStore;\nimport org.pac4j.core.profile.UserProfile;\nimport org.pac4j.core.util.CommonHelper;\n\nimport java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.List;\nimport java.util.Optional;\n\n/**\n * Manages the authorization generators used by a client.\n */\npublic class BaseClientAuthorization {\n\n    private List<AuthorizationGenerator> authorizationGenerators = new ArrayList<>();\n\n    public List<AuthorizationGenerator> getAuthorizationGenerators() {\n        return this.authorizationGenerators;\n    }\n\n    public void setAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {\n        CommonHelper.assertNotNull(\"authorizationGenerators\", authorizationGenerators);\n        this.authorizationGenerators = authorizationGenerators;\n    }\n\n    public void setAuthorizationGenerators(final AuthorizationGenerator... authorizationGenerators) {\n        CommonHelper.assertNotNull(\"authorizationGenerators\", authorizationGenerators);\n        this.authorizationGenerators = Arrays.asList(authorizationGenerators);\n    }\n\n    public void setAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {\n        addAuthorizationGenerator(authorizationGenerator);\n    }\n\n    public void addAuthorizationGenerator(final AuthorizationGenerator authorizationGenerator) {\n        CommonHelper.assertNotNull(\"authorizationGenerator\", authorizationGenerator);\n        this.authorizationGenerators.add(authorizationGenerator);\n    }\n\n    public void addAuthorizationGenerators(final List<AuthorizationGenerator> authorizationGenerators) {\n        CommonHelper.assertNotNull(\"authorizationGenerators\", authorizationGenerators);\n        this.authorizationGenerators.addAll(authorizationGenerators);\n    }\n\n    public Optional<UserProfile> generate(final WebContext context, final SessionStore sessionStore,\n                                          Optional<UserProfile> profile) {\n        if (profile.isPresent()) {\n            for (final var authorizationGenerator : this.authorizationGenerators) {\n                profile = authorizationGenerator.generate(context, sessionStore, profile.get());\n            }\n        }\n        return profile;\n    }\n}\n"
+    }
+  ],
+  "feedback": "",
+  "attempt": 0,
+  "move_class_constraints": {
+    "moved_old_files": [],
+    "moved_new_files": [],
+    "rule": "When MOVE_CLASS is present, OpenRewrite has already moved the classes before this executor runs. Do not recreate or write files listed in moved_old_files. Edit destination files and related remaining files only."
+  }
+}
+
+## OUTPUT
+
+Return ONLY valid JSON in this format:
+
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/..." or "src/test/java/...",
+      "content": "full file content here"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "short explanation"
+}

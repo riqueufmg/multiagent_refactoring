@@ -1,0 +1,94 @@
+commit 853315f5a75ec8979f4d7fddf2a58b52fb378001
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 15:42:10 2026 -0300
+
+    source_refactor: apply block 4
+
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/Misc.java
+index ba0a95c49..62543817d 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/Misc.java
+@@ -58,12 +58,11 @@ public final class Misc {
+         return MiscPlayerUtil.isPartyLeader(mmoPlayer);
+     }
+ 
++    /**
++     * Compatibility delegate for callers not migrated in this refactoring block.
++     */
+     public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {
+-        if (location.getWorld() == null)
+-            return;
+-
+-        ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+-        experienceOrb.setExperience(experienceValue);
++        MiscExperienceOrbUtil.spawnExperienceOrb(location, experienceValue);
+     }
+ 
+     public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
+@@ -131,23 +130,4 @@ public final class Misc {
+     public static boolean isNPCIncludingVillagers(@Nullable Entity entity) {
+         return NPCUtil.isNPCIncludingVillagers(entity);
+     }
+-
+-    private static class SpawnOrbTask implements Runnable {
+-        private final Location location;
+-        private int orbExpValue;
+-
+-        private SpawnOrbTask(Location location, int orbExpValue) {
+-            this.location = location;
+-            this.orbExpValue = orbExpValue;
+-        }
+-
+-        @Override
+-        public void run() {
+-            if (location == null || location.getWorld() == null)
+-                return;
+-
+-            ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+-            experienceOrb.setExperience(orbExpValue);
+-        }
+-    }
+ }
+diff --git a/src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java b/src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java
+new file mode 100644
+index 000000000..42aea041e
+--- /dev/null
++++ b/src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java
+@@ -0,0 +1,37 @@
++package com.gmail.nossr50.util;
++
++import org.bukkit.Location;
++import org.bukkit.entity.EntityType;
++import org.bukkit.entity.ExperienceOrb;
++import org.jetbrains.annotations.NotNull;
++
++public final class MiscExperienceOrbUtil {
++    private MiscExperienceOrbUtil() {}
++
++    public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {
++        if (location.getWorld() == null)
++            return;
++
++        ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
++        experienceOrb.setExperience(experienceValue);
++    }
++
++    private static class SpawnOrbTask implements Runnable {
++        private final Location location;
++        private int orbExpValue;
++
++        private SpawnOrbTask(Location location, int orbExpValue) {
++            this.location = location;
++            this.orbExpValue = orbExpValue;
++        }
++
++        @Override
++        public void run() {
++            if (location == null || location.getWorld() == null)
++                return;
++
++            ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
++            experienceOrb.setExperience(orbExpValue);
++        }
++    }
++}

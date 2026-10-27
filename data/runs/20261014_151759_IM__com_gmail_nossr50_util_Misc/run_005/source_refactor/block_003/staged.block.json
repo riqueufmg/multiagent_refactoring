@@ -1,0 +1,47 @@
+{
+  "id": 3,
+  "goal": "Extract conversion progress reporting from Misc.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscConversionUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.printProgress(int, int, long)",
+        "com.gmail.nossr50.util.Misc.TIME_CONVERSION_FACTOR"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscConversionUtil"
+      ],
+      "details": "Create final utility class com.gmail.nossr50.util.MiscConversionUtil in the same package. Move printProgress and the TIME_CONVERSION_FACTOR field together because the field is used only by the conversion-progress calculation shown in the input. Keep a compatibility delegate for printProgress in Misc and preserve the public constant in Misc if external callers may use it.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/MiscConversionUtil.java"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.mcMMO"
+      ],
+      "details": "Add the import required for logger access in the extracted progress method.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

@@ -1,0 +1,165 @@
+commit 7390a2d971f2b512f65b58d703a510ee14186946
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 17:08:36 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+index 311769093..6ba330a19 100644
+--- a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+@@ -41,8 +41,6 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private LogoutHandler logoutHandler;
+ 
+-    private TicketValidator defaultTicketValidator;
+-
+     private CasProxyReceptor proxyReceptor;
+ 
+     private String postLogoutUrlParameter = SERVICE_PARAMETER;
+@@ -54,6 +52,9 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private final CasSecurityConfiguration securityConfiguration = new CasSecurityConfiguration();
+ 
++    private final CasTicketValidatorConfiguration ticketValidatorConfiguration =
++            new CasTicketValidatorConfiguration(this, securityConfiguration);
++
+     private CasUrlConfiguration urlConfiguration = new CasUrlConfiguration();
+ 
+     public CasConfiguration() {}
+@@ -95,35 +96,35 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public TicketValidator retrieveTicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).retrieveTicketValidator(context);
++        return ticketValidatorConfiguration.retrieveTicketValidator(context);
+     }
+ 
+     protected TicketValidator buildSAMLTicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).buildSAMLTicketValidator(context);
++        return ticketValidatorConfiguration.buildSAMLTicketValidator(context);
+     }
+ 
+     protected void addPrivateKey(final Cas20ServiceTicketValidator validator) {
+-        securityConfiguration.addPrivateKey(validator);
++        ticketValidatorConfiguration.addPrivateKey(validator);
+     }
+ 
+     protected TicketValidator buildCas30ProxyTicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).buildCas30ProxyTicketValidator(context);
++        return ticketValidatorConfiguration.buildCas30ProxyTicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas30TicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).buildCas30TicketValidator(context);
++        return ticketValidatorConfiguration.buildCas30TicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas20ProxyTicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).buildCas20ProxyTicketValidator(context);
++        return ticketValidatorConfiguration.buildCas20ProxyTicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas20TicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).buildCas20TicketValidator(context);
++        return ticketValidatorConfiguration.buildCas20TicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas10TicketValidator(final WebContext context) {
+-        return new CasTicketValidatorFactory(this).buildCas10TicketValidator(context);
++        return ticketValidatorConfiguration.buildCas10TicketValidator(context);
+     }
+ 
+     public String getEncoding() {
+@@ -250,11 +251,11 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public TicketValidator getDefaultTicketValidator() {
+-        return defaultTicketValidator;
++        return ticketValidatorConfiguration.getDefaultTicketValidator();
+     }
+ 
+     public void setDefaultTicketValidator(final TicketValidator defaultTicketValidator) {
+-        this.defaultTicketValidator = defaultTicketValidator;
++        ticketValidatorConfiguration.setDefaultTicketValidator(defaultTicketValidator);
+     }
+ 
+     public CasProxyReceptor getProxyReceptor() {
+@@ -328,7 +329,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+                 "protocol", this.getProtocol(), "renew", this.isRenew(), "gateway", this.isGateway(), "encoding", this.encoding,
+                 "logoutHandler", this.logoutHandler, "acceptAnyProxy", this.isAcceptAnyProxy(), "allowedProxyChains", this.getAllowedProxyChains(),
+                 "proxyReceptor", this.proxyReceptor, "timeTolerance", this.getTimeTolerance(), "postLogoutUrlParameter",
+-                this.postLogoutUrlParameter, "defaultTicketValidator", this.defaultTicketValidator, "urlResolver", this.getUrlResolver(),
++                this.postLogoutUrlParameter, "defaultTicketValidator", this.getDefaultTicketValidator(), "urlResolver", this.getUrlResolver(),
+                 "method", this.method, "privateKeyPath", this.getPrivateKeyPath(), "privateKeyAlgorithm", this.getPrivateKeyAlgorithm());
+     }
+ }
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorConfiguration.java
+new file mode 100644
+index 000000000..af057654e
+--- /dev/null
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorConfiguration.java
+@@ -0,0 +1,63 @@
++package org.pac4j.cas.config;
++
++import org.apereo.cas.client.validation.Cas20ServiceTicketValidator;
++import org.apereo.cas.client.validation.TicketValidator;
++import org.pac4j.core.context.WebContext;
++
++/**
++ * Configuration for CAS ticket validation.
++ */
++public class CasTicketValidatorConfiguration {
++
++    private final CasConfiguration casConfiguration;
++
++    private final CasSecurityConfiguration securityConfiguration;
++
++    private TicketValidator defaultTicketValidator;
++
++    public CasTicketValidatorConfiguration(final CasConfiguration casConfiguration,
++                                           final CasSecurityConfiguration securityConfiguration) {
++        this.casConfiguration = casConfiguration;
++        this.securityConfiguration = securityConfiguration;
++    }
++
++    public TicketValidator retrieveTicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).retrieveTicketValidator(context);
++    }
++
++    protected TicketValidator buildSAMLTicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).buildSAMLTicketValidator(context);
++    }
++
++    protected void addPrivateKey(final Cas20ServiceTicketValidator validator) {
++        securityConfiguration.addPrivateKey(validator);
++    }
++
++    protected TicketValidator buildCas30ProxyTicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).buildCas30ProxyTicketValidator(context);
++    }
++
++    protected TicketValidator buildCas30TicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).buildCas30TicketValidator(context);
++    }
++
++    protected TicketValidator buildCas20ProxyTicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).buildCas20ProxyTicketValidator(context);
++    }
++
++    protected TicketValidator buildCas20TicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).buildCas20TicketValidator(context);
++    }
++
++    protected TicketValidator buildCas10TicketValidator(final WebContext context) {
++        return new CasTicketValidatorFactory(casConfiguration).buildCas10TicketValidator(context);
++    }
++
++    public TicketValidator getDefaultTicketValidator() {
++        return defaultTicketValidator;
++    }
++
++    public void setDefaultTicketValidator(final TicketValidator defaultTicketValidator) {
++        this.defaultTicketValidator = defaultTicketValidator;
++    }
++}

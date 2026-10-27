@@ -1,0 +1,138 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.gmail.nossr50.util.Misc",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Remove the item-spawning compatibility methods from Misc and use the existing cohesive item-spawning API in MiscItemSpawner.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Misc.spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason)",
+            "Misc.spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason, int)",
+            "Misc.spawnItem(Collection<ItemStack>, ItemSpawnReason, Location, Predicate<String>, Player)",
+            "Misc.spawnItem(ItemStack, ItemSpawnReason, Location, Predicate<String>, Player)",
+            "Misc.spawnItems(Player, Location, ItemStack, int, ItemSpawnReason)",
+            "Misc.spawnItem(Player, Location, ItemStack, ItemSpawnReason)",
+            "Misc.spawnItemNaturally(Player, Location, ItemStack, ItemSpawnReason)",
+            "Misc.spawnItemsTowardsLocation(Player, Location, Location, ItemStack, int, double, ItemSpawnReason)",
+            "Misc.spawnItemTowardsLocation(Player, Location, Location, ItemStack, double, ItemSpawnReason)",
+            "MiscItemSpawner"
+          ],
+          "outputs": [
+            "Call sites that invoke the corresponding methods on MiscItemSpawner"
+          ],
+          "details": "Replace callers of the forwarding methods in Misc with direct calls to the corresponding existing methods in MiscItemSpawner. Preserve argument order, nullability, return values, and overload selection.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc",
+            "com.gmail.nossr50.util.MiscItemSpawner",
+            "spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason)",
+            "spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason, int)",
+            "spawnItem(Collection<ItemStack>, ItemSpawnReason, Location, Predicate<String>, Player)",
+            "spawnItem(ItemStack, ItemSpawnReason, Location, Predicate<String>, Player)",
+            "spawnItems(Player, Location, ItemStack, int, ItemSpawnReason)",
+            "spawnItem(Player, Location, ItemStack, ItemSpawnReason)",
+            "spawnItemNaturally(Player, Location, ItemStack, ItemSpawnReason)",
+            "spawnItemsTowardsLocation(Player, Location, Location, ItemStack, int, double, ItemSpawnReason)",
+            "spawnItemTowardsLocation(Player, Location, Location, ItemStack, double, ItemSpawnReason)"
+          ],
+          "outputs": [
+            "Misc without the item-spawning forwarding methods",
+            "MiscItemSpawner as the single owner of the item-spawning API"
+          ],
+          "details": "Consolidate the forwarding methods into the existing MiscItemSpawner implementation. Do not create duplicate overloads; retain the existing MiscItemSpawner implementations and remove the obsolete forwarding declarations from Misc after call sites have been updated.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Remove the NPC-related compatibility delegates from Misc and use the existing cohesive NPCUtil API.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Misc.isNPCEntityExcludingVillagers(Entity)",
+            "Misc.isNPCClassType(Entity)",
+            "Misc.hasNPCMetadataTag(Entity)",
+            "Misc.isVillager(Entity)",
+            "Misc.isNPCIncludingVillagers(Entity)",
+            "NPCUtil"
+          ],
+          "outputs": [
+            "Call sites that invoke the corresponding methods on NPCUtil"
+          ],
+          "details": "Replace callers of the compatibility delegates in Misc with direct calls to the corresponding existing methods in NPCUtil. Preserve nullable handling for isNPCIncludingVillagers.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc",
+            "com.gmail.nossr50.util.NPCUtil",
+            "isNPCEntityExcludingVillagers(Entity)",
+            "isNPCClassType(Entity)",
+            "hasNPCMetadataTag(Entity)",
+            "isVillager(Entity)",
+            "isNPCIncludingVillagers(Entity)"
+          ],
+          "outputs": [
+            "Misc without the NPC compatibility delegates",
+            "NPCUtil as the owner of the NPC classification API"
+          ],
+          "details": "Consolidate the compatibility delegates into the existing NPCUtil implementation. Do not create duplicate methods; retain the existing NPCUtil implementations and remove the obsolete delegate declarations from Misc after call sites have been updated.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Reduce the remaining utility class surface by isolating the experience-orb spawning implementation from Misc.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnExperienceOrb(Location, int)",
+            "com.gmail.nossr50.util.Misc.SpawnOrbTask",
+            "Location",
+            "ExperienceOrb",
+            "EntityType"
+          ],
+          "outputs": [
+            "A same-package class responsible for experience-orb spawning",
+            "Misc without the experience-orb spawning implementation and SpawnOrbTask"
+          ],
+          "details": "Extract spawnExperienceOrb and the related private SpawnOrbTask into one cohesive same-package class. Preserve the current null-world checks, entity type, experience value, and behavior. Update callers to the extracted class before removing the original method and nested task from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Misc.spawnExperienceOrb(Location, int)",
+            "The extracted experience-orb spawning class"
+          ],
+          "outputs": [
+            "Call sites invoking the extracted experience-orb spawning method"
+          ],
+          "details": "Update all callers of Misc.spawnExperienceOrb to use the extracted same-package class while preserving the existing static invocation behavior.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

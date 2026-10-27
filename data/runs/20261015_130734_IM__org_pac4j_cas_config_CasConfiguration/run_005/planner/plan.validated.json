@@ -1,0 +1,250 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.cas.config.CasConfiguration",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the public-method count in CasConfiguration by relocating the cohesive URL configuration API to CasUrlConfiguration.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getLoginUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.getLoginUrl()"
+          ],
+          "outputs": [],
+          "details": "Move the login URL accessor to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setLoginUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.setLoginUrl()"
+          ],
+          "outputs": [],
+          "details": "Move the login URL mutator to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.computeFinalLoginUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.computeFinalLoginUrl()"
+          ],
+          "outputs": [],
+          "details": "Move final login URL computation to CasUrlConfiguration while preserving initialization behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getPrefixUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.getPrefixUrl()"
+          ],
+          "outputs": [],
+          "details": "Move the prefix URL accessor to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setPrefixUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.setPrefixUrl()"
+          ],
+          "outputs": [],
+          "details": "Move the prefix URL mutator to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.computeFinalPrefixUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.computeFinalPrefixUrl()"
+          ],
+          "outputs": [],
+          "details": "Move final prefix URL computation to CasUrlConfiguration while preserving initialization behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getRestUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.getRestUrl()"
+          ],
+          "outputs": [],
+          "details": "Move the REST URL accessor to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setRestUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.setRestUrl()"
+          ],
+          "outputs": [],
+          "details": "Move the REST URL mutator to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.computeFinalRestUrl()",
+            "org.pac4j.cas.config.CasUrlConfiguration.computeFinalRestUrl()"
+          ],
+          "outputs": [],
+          "details": "Move final REST URL computation to CasUrlConfiguration while preserving initialization behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getUrlResolver()",
+            "org.pac4j.cas.config.CasUrlConfiguration.getUrlResolver()"
+          ],
+          "outputs": [],
+          "details": "Move the URL resolver accessor to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setUrlResolver()",
+            "org.pac4j.cas.config.CasUrlConfiguration.setUrlResolver()"
+          ],
+          "outputs": [],
+          "details": "Move the URL resolver mutator to the existing URL configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getLoginUrl()",
+            "org.pac4j.cas.config.CasConfiguration.setLoginUrl()",
+            "org.pac4j.cas.config.CasConfiguration.computeFinalLoginUrl()",
+            "org.pac4j.cas.config.CasConfiguration.getPrefixUrl()",
+            "org.pac4j.cas.config.CasConfiguration.setPrefixUrl()",
+            "org.pac4j.cas.config.CasConfiguration.computeFinalPrefixUrl()",
+            "org.pac4j.cas.config.CasConfiguration.getRestUrl()",
+            "org.pac4j.cas.config.CasConfiguration.setRestUrl()",
+            "org.pac4j.cas.config.CasConfiguration.computeFinalRestUrl()",
+            "org.pac4j.cas.config.CasConfiguration.getUrlResolver()",
+            "org.pac4j.cas.config.CasConfiguration.setUrlResolver()"
+          ],
+          "outputs": [],
+          "details": "Update callers to use the corresponding methods on CasUrlConfiguration.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce the public-method count in CasConfiguration by relocating the cohesive security configuration API to CasSecurityConfiguration.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getHostnameVerifier()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.getHostnameVerifier()"
+          ],
+          "outputs": [],
+          "details": "Move the hostname verifier accessor to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setHostnameVerifier()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.setHostnameVerifier()"
+          ],
+          "outputs": [],
+          "details": "Move the hostname verifier mutator to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getSslSocketFactory()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.getSslSocketFactory()"
+          ],
+          "outputs": [],
+          "details": "Move the SSL socket factory accessor to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setSslSocketFactory()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.setSslSocketFactory()"
+          ],
+          "outputs": [],
+          "details": "Move the SSL socket factory mutator to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getPrivateKeyPath()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.getPrivateKeyPath()"
+          ],
+          "outputs": [],
+          "details": "Move the private key path accessor to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setPrivateKeyPath()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.setPrivateKeyPath()"
+          ],
+          "outputs": [],
+          "details": "Move the private key path mutator to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getPrivateKeyAlgorithm()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.getPrivateKeyAlgorithm()"
+          ],
+          "outputs": [],
+          "details": "Move the private key algorithm accessor to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.setPrivateKeyAlgorithm()",
+            "org.pac4j.cas.config.CasSecurityConfiguration.setPrivateKeyAlgorithm()"
+          ],
+          "outputs": [],
+          "details": "Move the private key algorithm mutator to the existing security configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.getHostnameVerifier()",
+            "org.pac4j.cas.config.CasConfiguration.setHostnameVerifier()",
+            "org.pac4j.cas.config.CasConfiguration.getSslSocketFactory()",
+            "org.pac4j.cas.config.CasConfiguration.setSslSocketFactory()",
+            "org.pac4j.cas.config.CasConfiguration.getPrivateKeyPath()",
+            "org.pac4j.cas.config.CasConfiguration.setPrivateKeyPath()",
+            "org.pac4j.cas.config.CasConfiguration.getPrivateKeyAlgorithm()",
+            "org.pac4j.cas.config.CasConfiguration.setPrivateKeyAlgorithm()"
+          ],
+          "outputs": [],
+          "details": "Update callers to use the corresponding methods on CasSecurityConfiguration.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

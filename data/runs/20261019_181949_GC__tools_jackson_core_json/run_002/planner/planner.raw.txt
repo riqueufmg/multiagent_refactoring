@@ -1,0 +1,86 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "tools.jackson.core.json",
+  "selected_cluster": [
+    "tools.jackson.core.json.JsonWriteContext",
+    "tools.jackson.core.json.JsonWriteFeature",
+    "tools.jackson.core.json.UTF8JsonGenerator",
+    "tools.jackson.core.json.WriterBasedJsonGenerator"
+  ],
+  "destination_package": "tools.jackson.core.json.write",
+  "cluster_reason": "These four classes form a cohesive JSON writing cluster: both concrete generators depend on JsonWriteContext and JsonWriteFeature, while JsonWriteContext models writer state and JsonWriteFeature defines writer configuration. Moving them together preserves their close implementation relationship and limits the change to one focused writer subpackage.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive JSON writing cluster into a dedicated subpackage.",
+      "files": [
+        "src/main/java/tools/jackson/core/json/JsonWriteContext.java",
+        "src/main/java/tools/jackson/core/json/JsonWriteFeature.java",
+        "src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java",
+        "src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "tools.jackson.core.json.write"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.JsonWriteContext"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.write.JsonWriteContext"
+          ],
+          "details": "Move the writer state context class to the dedicated writer subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.JsonWriteFeature"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.write.JsonWriteFeature"
+          ],
+          "details": "Move the writer feature definition to the dedicated writer subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.UTF8JsonGenerator"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.write.UTF8JsonGenerator"
+          ],
+          "details": "Move the UTF-8 stream JSON generator to the dedicated writer subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.WriterBasedJsonGenerator"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.write.WriterBasedJsonGenerator"
+          ],
+          "details": "Move the character-writer JSON generator to the dedicated writer subpackage.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "tools.jackson.core.json.generator"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.JsonGeneratorBase"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.JsonGeneratorBase"
+      ],
+      "details": "Move JsonGeneratorBase to the destination package with the other JSON generator implementation classes.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.WriterBasedJsonGenerator"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.WriterBasedJsonGenerator"
+      ],
+      "details": "Move WriterBasedJsonGenerator to the destination package with its shared generator base class and feature definition.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.UTF8JsonGenerator"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.UTF8JsonGenerator"
+      ],
+      "details": "Move UTF8JsonGenerator to the destination package with the other JSON generator implementation classes.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.JsonWriteFeature"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.JsonWriteFeature"
+      ],
+      "details": "Move JsonWriteFeature alongside the generator classes that consume it.",
+      "risk": "low",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "tools.jackson.core.json.JsonFactory",
+        "tools.jackson.core.json.JsonFactoryBuilder",
+        "tools.jackson.core.json.generator.JsonGeneratorBase",
+        "tools.jackson.core.json.generator.JsonWriteFeature",
+        "tools.jackson.core.json.generator.UTF8JsonGenerator",
+        "tools.jackson.core.json.generator.WriterBasedJsonGenerator"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

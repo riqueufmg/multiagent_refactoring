@@ -1,0 +1,179 @@
+commit c7649a6dd70ccb8a628a6a14b91320307cf6b6bd
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 10:45:53 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index 8378696b0..a4944e40d 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -63,23 +63,7 @@ public final class Navigator {
+      * @return The desired ConstructorDeclaration if it was found, else an exception is thrown.
+      */
+     public static ConstructorDeclaration demandConstructor(TypeDeclaration<?> td, int index) {
+-        // TODO: Refactor to use `td.findAll(ConstructorDeclaration.class);` - potential difference re: searching only immediate children?
+-        ConstructorDeclaration found = null;
+-        int i = 0;
+-        for (BodyDeclaration<?> bd : td.getMembers()) {
+-            if (bd instanceof ConstructorDeclaration) {
+-                ConstructorDeclaration cd = (ConstructorDeclaration) bd;
+-                if (i == index) {
+-                    found = cd;
+-                    break;
+-                }
+-                i++;
+-            }
+-        }
+-        if (found == null) {
+-            throw new IllegalStateException("No constructor with index " + index);
+-        }
+-        return found;
++        return NavigatorDeclarationLookup.demandConstructor(td, index);
+     }
+ 
+     public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
+@@ -94,17 +78,7 @@ public final class Navigator {
+     }
+ 
+     public static VariableDeclarator demandField(ClassOrInterfaceDeclaration cd, String name) {
+-        for (BodyDeclaration<?> bd : cd.getMembers()) {
+-            if (bd instanceof FieldDeclaration) {
+-                FieldDeclaration fd = (FieldDeclaration) bd;
+-                for (VariableDeclarator vd : fd.getVariables()) {
+-                    if (vd.getName().getId().equals(name)) {
+-                        return vd;
+-                    }
+-                }
+-            }
+-        }
+-        throw new IllegalStateException("No field with given name");
++        return NavigatorDeclarationLookup.demandField(cd, name);
+     }
+ 
+     public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
+@@ -116,22 +90,7 @@ public final class Navigator {
+     }
+ 
+     public static MethodDeclaration demandMethod(TypeDeclaration<?> cd, String name) {
+-        MethodDeclaration found = null;
+-        for (BodyDeclaration<?> bd : cd.getMembers()) {
+-            if (bd instanceof MethodDeclaration) {
+-                MethodDeclaration md = (MethodDeclaration) bd;
+-                if (md.getNameAsString().equals(name)) {
+-                    if (found != null) {
+-                        throw new IllegalStateException("Ambiguous getName");
+-                    }
+-                    found = md;
+-                }
+-            }
+-        }
+-        if (found == null) {
+-            throw new IllegalStateException("No method called " + name);
+-        }
+-        return found;
++        return NavigatorDeclarationLookup.demandMethod(cd, name);
+     }
+ 
+     public static <N extends Node> N demandNodeOfGivenClass(Node node, Class<N> clazz) {
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java
+new file mode 100644
+index 000000000..6e5b74031
+--- /dev/null
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java
+@@ -0,0 +1,95 @@
++/*
++ * Copyright (C) 2015-2016 Federico Tomassetti
++ * Copyright (C) 2017-2020 The JavaParser Team.
++ *
++ * This file is part of JavaParser.
++ *
++ * JavaParser can be used either under the terms of
++ * a) the GNU Lesser General Public License as published by
++ *     the Free Software Foundation, either version 3 of the License, or
++ *     (at your option) any later version.
++ * b) the terms of the Apache License
++ *
++ * You should have received a copy of both licenses in LICENCE.LGPL and
++ * LICENCE.APACHE. Please refer to those files for details.
++ *
++ * JavaParser is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ */
++
++package com.github.javaparser.symbolsolver.javaparser;
++
++import com.github.javaparser.ast.body.*;
++
++/**
++ * Provides lookup operations for members declared directly in a type declaration.
++ */
++public final class NavigatorDeclarationLookup {
++
++    private NavigatorDeclarationLookup() {
++        // prevent instantiation
++    }
++
++    /**
++     * Returns the {@code (i+1)}'th constructor of the given type declaration, in textual order. The constructor that
++     * appears first has the index 0, the second one the index 1, and so on.
++     *
++     * @param td    The type declaration to search in. Note that only classes and enums have constructors.
++     * @param index The index of the desired constructor.
++     * @return The desired ConstructorDeclaration if it was found, else an exception is thrown.
++     */
++    public static ConstructorDeclaration demandConstructor(TypeDeclaration<?> td, int index) {
++        // TODO: Refactor to use `td.findAll(ConstructorDeclaration.class);` - potential difference re: searching only immediate children?
++        ConstructorDeclaration found = null;
++        int i = 0;
++        for (BodyDeclaration<?> bd : td.getMembers()) {
++            if (bd instanceof ConstructorDeclaration) {
++                ConstructorDeclaration cd = (ConstructorDeclaration) bd;
++                if (i == index) {
++                    found = cd;
++                    break;
++                }
++                i++;
++            }
++        }
++        if (found == null) {
++            throw new IllegalStateException("No constructor with index " + index);
++        }
++        return found;
++    }
++
++    public static VariableDeclarator demandField(ClassOrInterfaceDeclaration cd, String name) {
++        for (BodyDeclaration<?> bd : cd.getMembers()) {
++            if (bd instanceof FieldDeclaration) {
++                FieldDeclaration fd = (FieldDeclaration) bd;
++                for (VariableDeclarator vd : fd.getVariables()) {
++                    if (vd.getName().getId().equals(name)) {
++                        return vd;
++                    }
++                }
++            }
++        }
++        throw new IllegalStateException("No field with given name");
++    }
++
++    public static MethodDeclaration demandMethod(TypeDeclaration<?> cd, String name) {
++        MethodDeclaration found = null;
++        for (BodyDeclaration<?> bd : cd.getMembers()) {
++            if (bd instanceof MethodDeclaration) {
++                MethodDeclaration md = (MethodDeclaration) bd;
++                if (md.getNameAsString().equals(name)) {
++                    if (found != null) {
++                        throw new IllegalStateException("Ambiguous getName");
++                    }
++                    found = md;
++                }
++            }
++        }
++        if (found == null) {
++            throw new IllegalStateException("No method called " + name);
++        }
++        return found;
++    }
++}

@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive parameter-map storage and query responsibilities from JobParameters while preserving its existing public API and value-object behavior.",
+  "files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersStore.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.springframework.batch.core.job.parameters.JobParameters",
+        "org.springframework.batch.core.job.parameters.JobParametersStore"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.job.parameters.JobParametersStore"
+      ],
+      "details": "Extract the parameters field and its cohesive map-oriented behavior into JobParametersStore. Move the implementation responsibilities for getParameter(String), getParameters(), getIdentifyingParameters(), and isEmpty() into the extracted class. Keep JobParameters as the public facade, delegating these methods to JobParametersStore so existing callers and the typed-accessor API remain unchanged. Preserve the defensive copying, unmodifiable-map results, identifying-parameter filtering, and parameter-map access required by equals(Object), hashCode(), toString(), and JobParametersTypedAccessors.",
+      "risk": "medium"
+    }
+  ]
+}

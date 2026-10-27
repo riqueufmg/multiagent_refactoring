@@ -1,0 +1,166 @@
+commit f9ad5a66b76edf6c6e60c542a44348c31189486f
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 9 19:54:44 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+index d9513fadd4..c1b95283e3 100644
+--- a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
++++ b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+@@ -41,9 +41,9 @@ public abstract class ByteBuddyAndroidTaskExtension {
+     private final Project project;
+ 
+     /**
+-     * The transformations to apply.
++     * Encapsulated transformations manager.
+      */
+-    private final List<Transformation> transformations;
++    private final ByteBuddyAndroidTransformations transformations;
+ 
+     /**
+      * The entry point to use.
+@@ -124,7 +124,7 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      */
+     public ByteBuddyAndroidTaskExtension(Project project) {
+         this.project = project;
+-        transformations = new ArrayList<Transformation>();
++        this.transformations = new ByteBuddyAndroidTransformations(project);
+         entryPoint = EntryPoint.Default.REBASE;
+         suffix = "";
+         failOnLiveInitializer = true;
+@@ -136,42 +136,6 @@ public abstract class ByteBuddyAndroidTaskExtension {
+         adjustmentPostProcessor = Adjustment.NoOpPostProcessor.INSTANCE;
+     }
+ 
+-    /**
+-     * Returns the transformations to apply.
+-     *
+-     * @return The transformations to apply.
+-     */
+-    public List<Transformation> getTransformations() {
+-        return transformations;
+-    }
+-
+-    /**
+-     * Adds an additional transformation.
+-     *
+-     * @param closure The closure to configure the transformation.
+-     */
+-    public void transformation(Closure<Transformation> closure) {
+-        Transformation transformation = ObjectFactory.newInstance(project, Transformation.class, project);
+-        if (transformation == null) {
+-            transformation = new Transformation(project);
+-        }
+-        transformations.add((Transformation) project.configure(transformation, closure));
+-    }
+-
+-    /**
+-     * Adds an additional transformation.
+-     *
+-     * @param action The action to configure the transformation.
+-     */
+-    public void transformation(Action<Transformation> action) {
+-        Transformation transformation = ObjectFactory.newInstance(project, Transformation.class, project);
+-        if (transformation == null) {
+-            transformation = new Transformation(project);
+-        }
+-        action.execute(transformation);
+-        transformations.add(transformation);
+-    }
+-
+     /**
+      * Returns the entry point to use.
+      *
+diff --git a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java
+new file mode 100644
+index 0000000000..483cd378c9
+--- /dev/null
++++ b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTransformations.java
+@@ -0,0 +1,86 @@
++/*
++ * Copyright 2014 - Present Rafael Winterhalter
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package net.bytebuddy.build.gradle.android;
++
++import groovy.lang.Closure;
++import net.bytebuddy.build.gradle.*;
++import org.gradle.api.Action;
++import org.gradle.api.Project;
++
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * Helper that encapsulates the transformations management for the Android task extension.
++ */
++public class ByteBuddyAndroidTransformations {
++
++    /**
++     * The current Gradle project.
++     */
++    private final Project project;
++
++    /**
++     * The transformations to apply.
++     */
++    private final List<Transformation> transformations;
++
++    /**
++     * Creates a new transformations helper for the given project.
++     *
++     * @param project The current Gradle project.
++     */
++    public ByteBuddyAndroidTransformations(Project project) {
++        this.project = project;
++        this.transformations = new ArrayList<Transformation>();
++    }
++
++    /**
++     * Returns the transformations to apply.
++     *
++     * @return The transformations to apply.
++     */
++    public List<Transformation> getTransformations() {
++        return transformations;
++    }
++
++    /**
++     * Adds an additional transformation.
++     *
++     * @param closure The closure to configure the transformation.
++     */
++    public void transformation(Closure<Transformation> closure) {
++        Transformation transformation = ObjectFactory.newInstance(project, Transformation.class, project);
++        if (transformation == null) {
++            transformation = new Transformation(project);
++        }
++        transformations.add((Transformation) project.configure(transformation, closure));
++    }
++
++    /**
++     * Adds an additional transformation.
++     *
++     * @param action The action to configure the transformation.
++     */
++    public void transformation(Action<Transformation> action) {
++        Transformation transformation = ObjectFactory.newInstance(project, Transformation.class, project);
++        if (transformation == null) {
++            transformation = new Transformation(project);
++        }
++        action.execute(transformation);
++        transformations.add(transformation);
++    }
++}

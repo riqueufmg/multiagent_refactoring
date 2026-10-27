@@ -1,0 +1,40 @@
+commit c0759aafcab685e78277d59f7a8faacabf01e47b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 15:06:41 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/Misc.java
+index 26702383e..b9f980449 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/Misc.java
+@@ -99,6 +99,14 @@ public final class Misc {
+         return mmoPlayer.getParty().getLeader().getUniqueId().equals(mmoPlayer.getPlayer().getUniqueId());
+     }
+ 
++    public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {
++        if (location.getWorld() == null) {
++            return;
++        }
++        ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
++        experienceOrb.setExperience(experienceValue);
++    }
++
+     public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
+         MiscItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason);
+     }
+@@ -135,14 +143,6 @@ public final class Misc {
+         return MiscItemSpawnUtil.spawnItemTowardsLocation(player, fromLocation, toLocation, itemStack, speed, itemSpawnReason);
+     }
+ 
+-    public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {
+-        if (location.getWorld() == null) {
+-            return;
+-        }
+-        ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+-        experienceOrb.setExperience(experienceValue);
+-    }
+-
+     private static class SpawnOrbTask implements Runnable {
+         private final Location location;
+         private int orbExpValue;

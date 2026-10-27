@@ -19,17 +19,15 @@ Strategy:
 
 ## ALLOWED REFACTORINGS
 A list of refactorings allowed in the refactoring plan is presented as following:
-- ADD_OR_UPDATE_IMPORTS
-- CREATE_PACKAGE
-- DEPENDENCY_INVERSION
-- EXTRACT_CLASS
-- EXTRACT_INTERFACE
-- INTRODUCE_FACADE
-- MOVE_CLASS
-- MOVE_FIELD
-- MOVE_METHOD
-- REPLACE_DEPENDENCY
-- UPDATE_CALL_SITES
+- ADD_OR_UPDATE_IMPORTS(file): Adds, removes, or updates imports required by the refactoring.
+- CREATE_PACKAGE(pkgA.subpkg): Creates a new package under the current source root.
+- EXTRACT_CLASS(pkgA.C1, pkgA.C2): Extracts part of class C1 into a new class C2.
+- EXTRACT_INTERFACE(pkgA.C1, pkgA.I1): Extracts an interface I1 from class C1.
+- MOVE_CLASS(pkgA.C1, pkgB.C1): Moves class C1 from package A to package B.
+- MOVE_FIELD(pkgA.C1.field, pkgA.C2.field): Moves a field from class C1 to class C2.
+- MOVE_METHOD(pkgA.C1.m(), pkgA.C2.m()): Moves a method from class C1 to class C2.
+- REPLACE_DEPENDENCY(pkgA.C1, pkgA.C2): Replaces a direct dependency in C1 with a different dependency C2.
+- UPDATE_CALL_SITES(pkgA.C1.m(), pkgA.C2.m()): Updates callers to use the new method or class location.
 
 ## INPUT
 {input}

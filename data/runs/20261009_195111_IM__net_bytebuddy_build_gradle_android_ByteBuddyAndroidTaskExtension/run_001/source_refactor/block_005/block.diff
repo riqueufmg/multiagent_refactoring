@@ -1,0 +1,38 @@
+commit 5549c7590108c524eb2ec4efbe0b583173469a81
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 9 19:59:37 2026 -0300
+
+    source_refactor: apply block 5
+
+diff --git a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+index b78467e7ee..eb037a8ba7 100644
+--- a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
++++ b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+@@ -402,16 +402,17 @@ public abstract class ByteBuddyAndroidTaskExtension {
+      *
+      * @param task The task to configure.
+      */
+-    protected void configure(T task) {
+-//        task.getTransformations().addAll(getTransformations());
++    protected <T extends ByteBuddyTask> void configure(T task) {
++        // Delegate transformations and adjustment-related properties to the underlying managers
++        task.getTransformations().addAll(getTransformations());
+         task.getEntryPoint().convention(getEntryPoint());
+-//        task.setSuffix(getSuffix());
+-//        task.setFailOnLiveInitializer(isFailOnLiveInitializer());
+-//        task.setWarnOnEmptyTypeSet(isWarnOnEmptyTypeSet());
+-//        task.setFailFast(isFailFast());
+-//        task.setExtendedParsing(isExtendedParsing());
+-//        task.setDiscovery(getDiscovery());
+-//        task.setThreads(getThreads());
+-//        task.setClassFileVersion(getClassFileVersion());
++        task.setSuffix(getSuffix());
++        task.setFailOnLiveInitializer(isFailOnLiveInitializer());
++        task.setWarnOnEmptyTypeSet(isWarnOnEmptyTypeSet());
++        task.setFailFast(isFailFast());
++        task.setExtendedParsing(isExtendedParsing());
++        task.setDiscovery(getDiscovery());
++        task.setThreads(getThreads());
++        task.setClassFileVersion(getClassFileVersion());
+     }
+ }

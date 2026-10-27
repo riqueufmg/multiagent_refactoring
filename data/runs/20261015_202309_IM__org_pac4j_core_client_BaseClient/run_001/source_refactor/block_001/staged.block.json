@@ -1,0 +1,29 @@
+{
+  "id": 1,
+  "goal": "Extract authorization-generator state and management behavior from BaseClient to reduce its public API implementation and improve cohesion.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClientAuthorization.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient",
+        "org.pac4j.core.client.BaseClientAuthorization",
+        "org.pac4j.core.client.BaseClient.authorizationGenerators",
+        "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(org.pac4j.core.authorization.generator.AuthorizationGenerator...)",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(org.pac4j.core.authorization.generator.AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(java.util.List<org.pac4j.core.authorization.generator.AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization"
+      ],
+      "details": "Move the authorizationGenerators field and its cohesive management methods into BaseClientAuthorization. Keep compatible forwarding methods in BaseClient where required by existing callers, and update getUserProfile(javaCredentials, org.pac4j.core.context.WebContext, org.pac4j.core.context.session.SessionStore) and toString() to use the extracted component.",
+      "risk": "medium"
+    }
+  ]
+}

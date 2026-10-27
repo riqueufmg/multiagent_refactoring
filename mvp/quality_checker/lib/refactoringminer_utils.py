@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,7 @@ def run_refactoringminer(
     after_commit: str,
     output_dir: str | Path,
     timeout: int,
+    java_home: str | Path | None = None,
 ) -> dict[str, Any]:
     binary = Path(refactoringminer_bin).expanduser().resolve()
     repo = Path(repo_path).expanduser().resolve()
@@ -42,7 +44,7 @@ def run_refactoringminer(
         write_json(summary_path, summary)
         return summary
 
-    command = [
+    base_command = [
         str(binary),
         "-bc",
         str(repo),
@@ -51,6 +53,20 @@ def run_refactoringminer(
         "-json",
         str(json_path),
     ]
+
+    effective_java_home = ""
+    if java_home:
+        java_home_path = Path(java_home).expanduser().resolve()
+        effective_java_home = str(java_home_path)
+
+        command = [
+            "env",
+            f"JAVA_HOME={effective_java_home}",
+            f"PATH={java_home_path / 'bin'}:{os.environ.get('PATH', '')}",
+            *base_command,
+        ]
+    else:
+        command = base_command
 
     command_path.write_text(" ".join(command) + "\n", encoding="utf-8")
 
@@ -92,6 +108,8 @@ def run_refactoringminer(
                 "ok": False,
                 "return_code": return_code,
                 "error": f"failed_to_parse_refactoringminer_json: {exc}",
+                "java_home": effective_java_home,
+                "command": command,
                 "json_path": str(json_path),
                 "log_path": str(log_path),
                 "refactorings_count": 0,
@@ -105,6 +123,7 @@ def run_refactoringminer(
         "ok": return_code == 0,
         "return_code": return_code,
         "skipped": False,
+        "java_home": effective_java_home,
         "command": command,
         "json_path": str(json_path),
         "log_path": str(log_path),

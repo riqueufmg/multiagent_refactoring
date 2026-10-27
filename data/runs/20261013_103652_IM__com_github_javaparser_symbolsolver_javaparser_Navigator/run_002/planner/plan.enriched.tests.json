@@ -1,0 +1,161 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move type-resolution operations out of Navigator and consolidate them in NavigatorTypeLookup.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandEnum(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandInterface(CompilationUnit, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClass(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClassOrInterface(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandEnum(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandInterface(CompilationUnit, String)"
+          ],
+          "details": "Move the cohesive class, interface, and enum lookup methods to the existing type-lookup component. Preserve their current validation and exception behavior, and remove them from Navigator.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandEnum(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandInterface(CompilationUnit, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClass(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClassOrInterface(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandEnum(CompilationUnit, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandInterface(CompilationUnit, String)"
+          ],
+          "details": "Update references to the moved type lookup methods so callers use NavigatorTypeLookup directly. Update imports only where required.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Remove node-navigation delegation methods from Navigator and use the existing NavigatorNodeLookup component as their owner.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node, Class)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findNodeOfGivenClass(Node, Class)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findReturnStmt(MethodDeclaration)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findSwitch(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+          ],
+          "details": "Transfer the node-oriented public operations to the existing NavigatorNodeLookup component. Preserve the deprecated status and documentation of findNodeOfGivenClass, findReturnStmt, findSwitch, and requireParentNode.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node, Class)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findNodeOfGivenClass(Node, Class)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findReturnStmt(MethodDeclaration)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findSwitch(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorNodeLookup"
+          ],
+          "details": "Update all callers to use NavigatorNodeLookup after the methods are removed from Navigator. Retain equivalent generic signatures and Optional return types.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Remove declaration-oriented delegation methods from Navigator and use the existing NavigatorDeclarationLookup component as their owner.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorDeclarationLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandConstructor(TypeDeclaration, int)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandMethod(TypeDeclaration, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup"
+          ],
+          "details": "Move constructor, field, and method lookup operations to the existing NavigatorDeclarationLookup component, preserving their current signatures and behavior.",
+          "risk": "high"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandConstructor(TypeDeclaration, int)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandMethod(TypeDeclaration, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorDeclarationLookup"
+          ],
+          "details": "Update all callers to use NavigatorDeclarationLookup directly and remove the corresponding delegation methods from Navigator.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Remove obsolete imports and leave Navigator focused only on responsibilities that remain after the lookup operations are moved.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator"
+          ],
+          "details": "Remove imports no longer required after the type, declaration, and node lookup methods are removed. Keep only imports needed by methods that remain in Navigator.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

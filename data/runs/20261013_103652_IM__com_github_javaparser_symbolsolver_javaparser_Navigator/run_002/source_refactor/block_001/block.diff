@@ -1,0 +1,134 @@
+commit 8cec25be2ca5d39001bfcf9a19694f727ef0785a
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 10:55:41 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index a4944e40d..ccb40727b 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -40,20 +40,6 @@ public final class Navigator {
+         // prevent instantiation
+     }
+ 
+-    public static ClassOrInterfaceDeclaration demandClass(CompilationUnit cu, String qualifiedName) {
+-        ClassOrInterfaceDeclaration cd = demandClassOrInterface(cu, qualifiedName);
+-        if (cd.isInterface()) {
+-            throw new IllegalStateException("Type is not a class");
+-        }
+-        return cd;
+-    }
+-
+-    public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit compilationUnit, String qualifiedName) {
+-        return NavigatorTypeLookup.findType(compilationUnit, qualifiedName)
+-            .map(res -> res.toClassOrInterfaceDeclaration().orElseThrow(() -> new IllegalStateException("Type is not a class or an interface, it is " + res.getClass().getCanonicalName())))
+-            .orElseThrow(() -> new IllegalStateException("No type named '" + qualifiedName + "'found"));
+-    }
+-
+     /**
+      * Returns the {@code (i+1)}'th constructor of the given type declaration, in textual order. The constructor that
+      * appears first has the index 0, the second one the index 1, and so on.
+@@ -66,33 +52,30 @@ public final class Navigator {
+         return NavigatorDeclarationLookup.demandConstructor(td, index);
+     }
+ 
+-    public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
+-        Optional<TypeDeclaration<?>> res = NavigatorTypeLookup.findType(cu, qualifiedName);
+-        if (!res.isPresent()) {
+-            throw new IllegalStateException("No type found");
+-        }
+-        if (!(res.get() instanceof EnumDeclaration)) {
+-            throw new IllegalStateException("Type is not an enum");
+-        }
+-        return (EnumDeclaration) res.get();
+-    }
+-
+     public static VariableDeclarator demandField(ClassOrInterfaceDeclaration cd, String name) {
+         return NavigatorDeclarationLookup.demandField(cd, name);
+     }
+ 
+-    public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
+-        ClassOrInterfaceDeclaration cd = demandClassOrInterface(cu, qualifiedName);
+-        if (!cd.isInterface()) {
+-            throw new IllegalStateException("Type is not an interface");
+-        }
+-        return cd;
+-    }
+-
+     public static MethodDeclaration demandMethod(TypeDeclaration<?> cd, String name) {
+         return NavigatorDeclarationLookup.demandMethod(cd, name);
+     }
+ 
++    public static ClassOrInterfaceDeclaration demandClass(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandClass(cu, qualifiedName);
++    }
++
++    public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandClassOrInterface(cu, qualifiedName);
++    }
++
++    public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandEnum(cu, qualifiedName);
++    }
++
++    public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
++        return NavigatorTypeLookup.demandInterface(cu, qualifiedName);
++    }
++
+     public static <N extends Node> N demandNodeOfGivenClass(Node node, Class<N> clazz) {
+         return NavigatorNodeLookup.demandNodeOfGivenClass(node, clazz);
+     }
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java
+index 8d460b653..1057de61e 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java
+@@ -23,6 +23,8 @@ package com.github.javaparser.symbolsolver.javaparser;
+ 
+ import com.github.javaparser.ast.CompilationUnit;
+ import com.github.javaparser.ast.Node;
++import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
++import com.github.javaparser.ast.body.EnumDeclaration;
+ import com.github.javaparser.ast.body.TypeDeclaration;
+ 
+ import java.util.Optional;
+@@ -36,6 +38,39 @@ public final class NavigatorTypeLookup {
+         // prevent instantiation
+     }
+ 
++    public static ClassOrInterfaceDeclaration demandClass(CompilationUnit cu, String qualifiedName) {
++        ClassOrInterfaceDeclaration cd = demandClassOrInterface(cu, qualifiedName);
++        if (cd.isInterface()) {
++            throw new IllegalStateException("Type is not a class");
++        }
++        return cd;
++    }
++
++    public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit compilationUnit, String qualifiedName) {
++        return findType(compilationUnit, qualifiedName)
++            .map(res -> res.toClassOrInterfaceDeclaration().orElseThrow(() -> new IllegalStateException("Type is not a class or an interface, it is " + res.getClass().getCanonicalName())))
++            .orElseThrow(() -> new IllegalStateException("No type named '" + qualifiedName + "'found"));
++    }
++
++    public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
++        Optional<TypeDeclaration<?>> res = findType(cu, qualifiedName);
++        if (!res.isPresent()) {
++            throw new IllegalStateException("No type found");
++        }
++        if (!(res.get() instanceof EnumDeclaration)) {
++            throw new IllegalStateException("Type is not an enum");
++        }
++        return (EnumDeclaration) res.get();
++    }
++
++    public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
++        ClassOrInterfaceDeclaration cd = demandClassOrInterface(cu, qualifiedName);
++        if (!cd.isInterface()) {
++            throw new IllegalStateException("Type is not an interface");
++        }
++        return cd;
++    }
++
+     /**
+      * Looks among the type declared in the Compilation Unit for one having the specified name.
+      * The name can be qualified with respect to the compilation unit. For example, if the compilation

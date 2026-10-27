@@ -1,0 +1,186 @@
+commit d569a8aee28fcf3ffb662e074c5dd9f9ddf234c3
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 15 20:27:12 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
+index ecd2a1f6c..cedcf58fb 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java
+@@ -8,7 +8,6 @@ import org.pac4j.core.credentials.authenticator.Authenticator;
+ import org.pac4j.core.credentials.extractor.CredentialsExtractor;
+ import org.pac4j.core.exception.CredentialsException;
+ import org.pac4j.core.profile.UserProfile;
+-import org.pac4j.core.profile.creator.AuthenticatorProfileCreator;
+ import org.pac4j.core.profile.creator.ProfileCreator;
+ import org.pac4j.core.profile.factory.ProfileFactory;
+ import org.pac4j.core.profile.factory.ProfileManagerFactory;
+@@ -45,11 +44,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+ 
+     private final BaseClientAuthorization authorization = new BaseClientAuthorization();
+ 
+-    private CredentialsExtractor credentialsExtractor;
+-
+-    private Authenticator authenticator;
+-
+-    private ProfileCreator profileCreator = AuthenticatorProfileCreator.INSTANCE;
++    private final BaseClientProfileConfiguration profileConfiguration = new BaseClientProfileConfiguration();
+ 
+     private Map<String, Object> customProperties = new LinkedHashMap<>();
+ 
+@@ -70,11 +65,11 @@ public abstract class BaseClient extends InitializableObject implements Client {
+     protected Optional<Credentials> retrieveCredentials(final WebContext context, final SessionStore sessionStore,
+                                                         final ProfileManagerFactory profileManagerFactory) {
+         try {
+-            final var optCredentials = this.credentialsExtractor.extract(context, sessionStore, profileManagerFactory);
++            final var optCredentials = this.profileConfiguration.getCredentialsExtractor().extract(context, sessionStore, profileManagerFactory);
+             if (optCredentials.isPresent()) {
+                 final var t0 = System.currentTimeMillis();
+                 try {
+-                    return this.authenticator.validate(optCredentials.get(), context, sessionStore);
++                    return this.profileConfiguration.getAuthenticator().validate(optCredentials.get(), context, sessionStore);
+                 } finally {
+                     final var t1 = System.currentTimeMillis();
+                     logger.debug("Credentials validation took: {} ms", t1 - t0);
+@@ -119,7 +114,7 @@ public abstract class BaseClient extends InitializableObject implements Client {
+      */
+     protected final Optional<UserProfile> retrieveUserProfile(final Credentials credentials, final WebContext context,
+                                                               final SessionStore sessionStore) {
+-        final var profile = this.profileCreator.create(credentials, context, sessionStore);
++        final var profile = this.profileConfiguration.getProfileCreator().create(credentials, context, sessionStore);
+         logger.debug("profile: {}", profile);
+         return profile;
+     }
+@@ -181,45 +176,39 @@ public abstract class BaseClient extends InitializableObject implements Client {
+     }
+ 
+     public CredentialsExtractor getCredentialsExtractor() {
+-        return credentialsExtractor;
++        return profileConfiguration.getCredentialsExtractor();
+     }
+ 
+     protected void defaultCredentialsExtractor(final CredentialsExtractor credentialsExtractor) {
+-        if (this.credentialsExtractor == null) {
+-            this.credentialsExtractor = credentialsExtractor;
+-        }
++        profileConfiguration.defaultCredentialsExtractor(credentialsExtractor);
+     }
+ 
+     public Authenticator getAuthenticator() {
+-        return authenticator;
++        return profileConfiguration.getAuthenticator();
+     }
+ 
+     protected void defaultAuthenticator(final Authenticator authenticator) {
+-        if (this.authenticator == null) {
+-            this.authenticator = authenticator;
+-        }
++        profileConfiguration.defaultAuthenticator(authenticator);
+     }
+ 
+     public ProfileCreator getProfileCreator() {
+-        return profileCreator;
++        return profileConfiguration.getProfileCreator();
+     }
+ 
+     protected void defaultProfileCreator(final ProfileCreator profileCreator) {
+-        if (this.profileCreator == null || this.profileCreator == AuthenticatorProfileCreator.INSTANCE) {
+-            this.profileCreator = profileCreator;
+-        }
++        profileConfiguration.defaultProfileCreator(profileCreator);
+     }
+ 
+     public void setCredentialsExtractor(final CredentialsExtractor credentialsExtractor) {
+-        this.credentialsExtractor = credentialsExtractor;
++        profileConfiguration.setCredentialsExtractor(credentialsExtractor);
+     }
+ 
+     public void setAuthenticator(final Authenticator authenticator) {
+-        this.authenticator = authenticator;
++        profileConfiguration.setAuthenticator(authenticator);
+     }
+ 
+     public void setProfileCreator(final ProfileCreator profileCreator) {
+-        this.profileCreator = profileCreator;
++        profileConfiguration.setProfileCreator(profileCreator);
+     }
+ 
+     public Map<String, Object> getCustomProperties() {
+@@ -263,8 +252,8 @@ public abstract class BaseClient extends InitializableObject implements Client {
+ 
+     @Override
+     public String toString() {
+-        return CommonHelper.toNiceString(this.getClass(), "name", getName(), "credentialsExtractor", this.credentialsExtractor,
+-            "authenticator", this.authenticator, "profileCreator", this.profileCreator,
++        return CommonHelper.toNiceString(this.getClass(), "name", getName(), "credentialsExtractor", profileConfiguration.getCredentialsExtractor(),
++            "authenticator", profileConfiguration.getAuthenticator(), "profileCreator", profileConfiguration.getProfileCreator(),
+             "authorizationGenerators", authorization.getAuthorizationGenerators(), "customProperties", customProperties,
+             "profileFactoryWhenNotAuthenticated", profileFactoryWhenNotAuthenticated, "multiProfile", multiProfile,
+             "saveProfileInSession", saveProfileInSession);
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileConfiguration.java b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileConfiguration.java
+new file mode 100644
+index 000000000..1b6d3e60a
+--- /dev/null
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/BaseClientProfileConfiguration.java
+@@ -0,0 +1,60 @@
++package org.pac4j.core.client;
++
++import org.pac4j.core.credentials.authenticator.Authenticator;
++import org.pac4j.core.credentials.extractor.CredentialsExtractor;
++import org.pac4j.core.profile.creator.AuthenticatorProfileCreator;
++import org.pac4j.core.profile.creator.ProfileCreator;
++
++/**
++ * Configuration of the credential extraction, authentication and profile creation components of a client.
++ */
++public class BaseClientProfileConfiguration {
++
++    private CredentialsExtractor credentialsExtractor;
++
++    private Authenticator authenticator;
++
++    private ProfileCreator profileCreator = AuthenticatorProfileCreator.INSTANCE;
++
++    public CredentialsExtractor getCredentialsExtractor() {
++        return credentialsExtractor;
++    }
++
++    protected void defaultCredentialsExtractor(final CredentialsExtractor credentialsExtractor) {
++        if (this.credentialsExtractor == null) {
++            this.credentialsExtractor = credentialsExtractor;
++        }
++    }
++
++    public Authenticator getAuthenticator() {
++        return authenticator;
++    }
++
++    protected void defaultAuthenticator(final Authenticator authenticator) {
++        if (this.authenticator == null) {
++            this.authenticator = authenticator;
++        }
++    }
++
++    public ProfileCreator getProfileCreator() {
++        return profileCreator;
++    }
++
++    protected void defaultProfileCreator(final ProfileCreator profileCreator) {
++        if (this.profileCreator == null || this.profileCreator == AuthenticatorProfileCreator.INSTANCE) {
++            this.profileCreator = profileCreator;
++        }
++    }
++
++    public void setCredentialsExtractor(final CredentialsExtractor credentialsExtractor) {
++        this.credentialsExtractor = credentialsExtractor;
++    }
++
++    public void setAuthenticator(final Authenticator authenticator) {
++        this.authenticator = authenticator;
++    }
++
++    public void setProfileCreator(final ProfileCreator profileCreator) {
++        this.profileCreator = profileCreator;
++    }
++}

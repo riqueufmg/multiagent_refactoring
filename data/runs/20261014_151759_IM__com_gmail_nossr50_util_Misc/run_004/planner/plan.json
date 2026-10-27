@@ -1,0 +1,112 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.gmail.nossr50.util.Misc",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract mod-name lookup data and behavior from the broadly scoped Misc utility class.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/ModUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.modNames",
+            "com.gmail.nossr50.util.Misc.getModName(String)"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.ModUtil"
+          ],
+          "details": "Create a final utility class in com.gmail.nossr50.util containing modNames and getModName(String), preserving their current public static visibility and behavior. Remove the extracted field and method from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.modNames",
+            "com.gmail.nossr50.util.Misc.getModName(String)"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.ModUtil.modNames",
+            "com.gmail.nossr50.util.ModUtil.getModName(String)"
+          ],
+          "details": "Update all callers to use ModUtil instead of Misc for the extracted field and method.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract cohesive location and randomized location operations from the broadly scoped Misc utility class.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/LocationUtil.java",
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.random",
+            "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+            "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+            "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+            "com.gmail.nossr50.util.Misc.getRandom()"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.LocationUtil"
+          ],
+          "details": "Create a final utility class in com.gmail.nossr50.util containing the random field and the four location-related methods, preserving current signatures, annotations, visibility, and behavior. Remove the extracted field and methods from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+            "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+            "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+            "com.gmail.nossr50.util.Misc.getRandom()"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.LocationUtil.isNear(Location, Location, double)",
+            "com.gmail.nossr50.util.LocationUtil.getBlockCenter(BlockState)",
+            "com.gmail.nossr50.util.LocationUtil.getLocationOffset(Location, double)",
+            "com.gmail.nossr50.util.LocationUtil.getRandom()"
+          ],
+          "details": "Update all callers to use LocationUtil for the extracted location and random operations.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    }
+  ]
+}

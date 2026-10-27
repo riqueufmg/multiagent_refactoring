@@ -1,0 +1,89 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive optional parameter binding cluster into a dedicated subpackage.",
+  "files": [
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalParamBinder.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalDoubleParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalIntParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalLongParamConverterProvider.java",
+    "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalParamBinder.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "io.dropwizard.jersey.optional.param"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.OptionalParamBinder"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.param.OptionalParamBinder"
+      ],
+      "details": "Move the optional parameter binder to the dedicated parameter subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.OptionalDoubleParamConverterProvider"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.param.OptionalDoubleParamConverterProvider"
+      ],
+      "details": "Move the optional double parameter converter provider to the dedicated parameter subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.OptionalIntParamConverterProvider"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.param.OptionalIntParamConverterProvider"
+      ],
+      "details": "Move the optional int parameter converter provider to the dedicated parameter subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "io.dropwizard.jersey.optional.OptionalLongParamConverterProvider"
+      ],
+      "outputs": [
+        "io.dropwizard.jersey.optional.param.OptionalLongParamConverterProvider"
+      ],
+      "details": "Move the optional long parameter converter provider to the dedicated parameter subpackage.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "io.dropwizard.jersey.optional.OptionalParamConverterProvider",
+        "io.dropwizard.jersey.optional.param.OptionalDoubleParamConverterProvider",
+        "io.dropwizard.jersey.optional.param.OptionalIntParamConverterProvider",
+        "io.dropwizard.jersey.optional.param.OptionalLongParamConverterProvider",
+        "io.dropwizard.jersey.optional.param.OptionalParamBinder"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

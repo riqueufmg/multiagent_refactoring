@@ -1,0 +1,56 @@
+{
+  "id": 2,
+  "goal": "Extract location and randomization responsibilities from Misc into a cohesive utility class.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.random",
+        "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+        "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+        "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+        "com.gmail.nossr50.util.Misc.getRandom()"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil"
+      ],
+      "details": "Create MiscLocationUtil in com.gmail.nossr50.util, move the random field and the listed location-related methods, and preserve the existing Random behavior and method contracts.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear",
+        "com.gmail.nossr50.util.Misc.getBlockCenter",
+        "com.gmail.nossr50.util.Misc.getLocationOffset",
+        "com.gmail.nossr50.util.Misc.getRandom"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil.isNear",
+        "com.gmail.nossr50.util.MiscLocationUtil.getBlockCenter",
+        "com.gmail.nossr50.util.MiscLocationUtil.getLocationOffset",
+        "com.gmail.nossr50.util.MiscLocationUtil.getRandom"
+      ],
+      "details": "Replace repository call sites of the moved location and random methods with calls to MiscLocationUtil.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

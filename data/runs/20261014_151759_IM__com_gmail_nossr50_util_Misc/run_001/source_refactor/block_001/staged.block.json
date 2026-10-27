@@ -1,0 +1,71 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive item-spawning API and its implementation from Misc to reduce the number of public methods and isolate Bukkit item-spawning responsibilities.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/ItemSpawnUtil.java",
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason)",
+        "com.gmail.nossr50.util.Misc.spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason, int)",
+        "com.gmail.nossr50.util.Misc.spawnItem(Collection<ItemStack>, ItemSpawnReason, Location, Predicate<String>, Player)",
+        "com.gmail.nossr50.util.Misc.spawnItem(ItemStack, ItemSpawnReason, Location, Predicate<String>, Player)",
+        "com.gmail.nossr50.util.Misc.spawnItems(Player, Location, ItemStack, int, ItemSpawnReason)",
+        "com.gmail.nossr50.util.Misc.spawnItem(Player, Location, ItemStack, ItemSpawnReason)",
+        "com.gmail.nossr50.util.Misc.spawnItemNaturally(Player, Location, ItemStack, ItemSpawnReason)",
+        "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation(Player, Location, Location, ItemStack, int, double, ItemSpawnReason)",
+        "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation(Player, Location, Location, ItemStack, double, ItemSpawnReason)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.ItemSpawnUtil"
+      ],
+      "details": "Create ItemSpawnUtil in com.gmail.nossr50.util and move the listed public static methods into it without changing signatures or behavior. Preserve the existing event dispatch through McMMOItemSpawnEvent and the dependency on mcMMO.p. Keep overloaded method names intact and include all required imports in the new class.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+        "com.gmail.nossr50.util.Misc.spawnItem",
+        "com.gmail.nossr50.util.Misc.spawnItems",
+        "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+        "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+        "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+      ],
+      "outputs": [
+        "All source call sites of the moved item-spawning methods"
+      ],
+      "details": "Replace calls to the moved methods with calls to the corresponding static methods on ItemSpawnUtil and retain or add imports as needed.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/ItemSpawnUtil.java",
+        "All files updated by the item-spawning call-site migration"
+      ],
+      "outputs": [
+        "Compilation-valid imports for ItemSpawnUtil and its Bukkit, event, API, and annotation dependencies"
+      ],
+      "details": "Remove imports from Misc that are no longer used after extraction and add ItemSpawnUtil imports to migrated callers where required.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

@@ -1,0 +1,209 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.gmail.nossr50.util.Misc",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract cohesive location and randomization utilities from Misc.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNear(Location, Location, double)",
+            "com.gmail.nossr50.util.Misc.getBlockCenter(BlockState)",
+            "com.gmail.nossr50.util.Misc.getLocationOffset(Location, double)",
+            "com.gmail.nossr50.util.Misc.getRandom()",
+            "com.gmail.nossr50.util.Misc.random"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscLocationUtil"
+          ],
+          "details": "Create final utility class com.gmail.nossr50.util.MiscLocationUtil in the same package. Move the location-related methods and the random field into it. Preserve the existing static behavior and annotations. Keep compatibility delegates in Misc while callers are migrated.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java"
+          ],
+          "outputs": [
+            "org.bukkit.Location",
+            "org.bukkit.block.BlockState",
+            "org.jetbrains.annotations.NotNull",
+            "java.util.Random"
+          ],
+          "details": "Add the imports required by the extracted methods and field, and remove imports from Misc that are no longer used by this group.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract player profile and party-related behavior from Misc.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.profileCleanup(String)",
+            "com.gmail.nossr50.util.Misc.isPartyLeader(McMMOPlayer)"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscPlayerUtil"
+          ],
+          "details": "Create final utility class com.gmail.nossr50.util.MiscPlayerUtil in the same package. Move profileCleanup and isPartyLeader into the new class, retaining their existing implementations and annotations. Keep compatibility delegates in Misc until call sites are migrated.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.datatypes.player.McMMOPlayer",
+            "com.gmail.nossr50.mcMMO",
+            "com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask",
+            "com.gmail.nossr50.util.player.UserManager",
+            "org.bukkit.entity.Player",
+            "org.jetbrains.annotations.NotNull"
+          ],
+          "details": "Add imports required by the extracted player-related methods.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract conversion progress reporting from Misc.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscConversionUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.printProgress(int, int, long)",
+            "com.gmail.nossr50.util.Misc.TIME_CONVERSION_FACTOR"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscConversionUtil"
+          ],
+          "details": "Create final utility class com.gmail.nossr50.util.MiscConversionUtil in the same package. Move printProgress and the TIME_CONVERSION_FACTOR field together because the field is used only by the conversion-progress calculation shown in the input. Keep a compatibility delegate for printProgress in Misc and preserve the public constant in Misc if external callers may use it.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscConversionUtil.java"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.mcMMO"
+          ],
+          "details": "Add the import required for logger access in the extracted progress method.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 4,
+      "goal": "Extract experience-orb spawning behavior and its task implementation from Misc.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnExperienceOrb(Location, int)",
+            "com.gmail.nossr50.util.Misc.SpawnOrbTask"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscExperienceOrbUtil"
+          ],
+          "details": "Create final utility class com.gmail.nossr50.util.MiscExperienceOrbUtil in the same package. Move spawnExperienceOrb and the private SpawnOrbTask implementation into the new class, preserving the existing null checks, entity spawning behavior, and task state. Keep a compatibility delegate in Misc for spawnExperienceOrb.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java"
+          ],
+          "outputs": [
+            "org.bukkit.Location",
+            "org.bukkit.EntityType",
+            "org.bukkit.entity.ExperienceOrb",
+            "org.jetbrains.annotations.NotNull"
+          ],
+          "details": "Add imports required by the extracted orb-spawning method and Runnable implementation.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    }
+  ]
+}

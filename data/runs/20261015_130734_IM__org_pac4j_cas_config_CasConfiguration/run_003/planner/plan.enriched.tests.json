@@ -1,0 +1,42 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.cas.config.CasConfiguration",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive TLS and private-key configuration responsibilities from CasConfiguration into a dedicated configuration class, reducing the implementation size and responsibility of the target class while preserving the existing configuration behavior through delegation.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration",
+            "org.pac4j.cas.config.CasSecurityConfiguration"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasSecurityConfiguration"
+          ],
+          "details": "Extract the fields hostnameVerifier, sslSocketFactory, privateKeyPath, privateKeyAlgorithm, and privateKey, together with getHostnameVerifier(), setHostnameVerifier(), getSslSocketFactory(), setSslSocketFactory(), getPrivateKeyPath(), setPrivateKeyPath(), getPrivateKeyAlgorithm(), setPrivateKeyAlgorithm(), and getPrivateKey(). Keep CasConfiguration as the public facade by delegating its existing accessors and private-key initialization behavior to CasSecurityConfiguration. Preserve package visibility needed by CasTicketValidatorFactory.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java"
+          ],
+          "outputs": [
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+            "pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java"
+          ],
+          "details": "Update imports after extraction so CasConfiguration and CasSecurityConfiguration compile with HostnameVerifier, SSLSocketFactory, PrivateKey, and the existing private-key utility dependencies used by the extracted implementation.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

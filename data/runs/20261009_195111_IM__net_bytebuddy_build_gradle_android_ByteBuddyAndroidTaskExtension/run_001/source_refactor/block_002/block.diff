@@ -1,0 +1,47 @@
+commit 320de81b19d6f508ae8ad893d03bb147cad05473
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 9 19:55:56 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+index c1b95283e3..d0c3d126a1 100644
+--- a/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
++++ b/byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java
+@@ -373,6 +373,36 @@ public abstract class ByteBuddyAndroidTaskExtension {
+         this.classFileVersion = classFileVersion;
+     }
+ 
++    /**
++     * Returns the list of transformations configured for this extension.
++     * Delegates to the encapsulated ByteBuddyAndroidTransformations instance.
++     *
++     * @return The list of transformations.
++     */
++    public List<Transformation> getTransformations() {
++        return transformations.getTransformations();
++    }
++
++    /**
++     * Adds a transformation configured by a Groovy closure.
++     * Delegates to the encapsulated ByteBuddyAndroidTransformations instance.
++     *
++     * @param closure The closure configuring the transformation.
++     */
++    public void transformation(Closure closure) {
++        transformations.transformation(closure);
++    }
++
++    /**
++     * Adds a transformation configured by an Action.
++     * Delegates to the encapsulated ByteBuddyAndroidTransformations instance.
++     *
++     * @param action The action configuring the transformation.
++     */
++    public void transformation(Action<? super Transformation> action) {
++        transformations.transformation(action);
++    }
++
+     /**
+      * Resolves default properties and considers the contextual Java version.
+      *

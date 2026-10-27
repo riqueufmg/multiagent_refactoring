@@ -1,0 +1,62 @@
+{
+  "id": 1,
+  "goal": "Extract type-declaration lookup responsibilities from Navigator while preserving its existing public API.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "Navigator.findType(CompilationUnit, String)",
+        "Navigator.findType(TypeDeclaration<?>, String)",
+        "Navigator.demandClass(CompilationUnit, String)",
+        "Navigator.demandClassOrInterface(CompilationUnit, String)",
+        "Navigator.demandEnum(CompilationUnit, String)",
+        "Navigator.demandInterface(CompilationUnit, String)",
+        "Navigator.getInnerTypeName(String)",
+        "Navigator.getOuterTypeName(String)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup"
+      ],
+      "details": "Create NavigatorTypeLookup in the same package and move the cohesive type-resolution implementation into it. Keep the existing method signatures in Navigator as delegating facade methods so callers of Navigator remain source-compatible.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "Navigator.findType(CompilationUnit, String)",
+        "Navigator.findType(TypeDeclaration<?>, String)",
+        "Navigator.getInnerTypeName(String)",
+        "Navigator.getOuterTypeName(String)"
+      ],
+      "outputs": [
+        "NavigatorTypeLookup.findType(CompilationUnit, String)",
+        "NavigatorTypeLookup.findType(TypeDeclaration<?>, String)",
+        "NavigatorTypeLookup.getInnerTypeName(String)",
+        "NavigatorTypeLookup.getOuterTypeName(String)"
+      ],
+      "details": "Move the implementation of the type lookup methods and their private helpers to NavigatorTypeLookup. Update the demandClass, demandClassOrInterface, demandEnum, and demandInterface facade methods to call NavigatorTypeLookup.findType.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "Navigator.demandClass(CompilationUnit, String)",
+        "Navigator.demandClassOrInterface(CompilationUnit, String)",
+        "Navigator.demandEnum(CompilationUnit, String)",
+        "Navigator.demandInterface(CompilationUnit, String)"
+      ],
+      "outputs": [
+        "Navigator.demandClass(CompilationUnit, String)",
+        "Navigator.demandClassOrInterface(CompilationUnit, String)",
+        "Navigator.demandEnum(CompilationUnit, String)",
+        "Navigator.demandInterface(CompilationUnit, String)"
+      ],
+      "details": "Replace direct calls to the moved findType implementations with calls to NavigatorTypeLookup while retaining the existing Navigator methods as the public entry points.",
+      "risk": "low"
+    }
+  ]
+}

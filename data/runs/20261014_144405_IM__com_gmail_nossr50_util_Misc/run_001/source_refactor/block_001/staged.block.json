@@ -1,0 +1,69 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive entity classification methods from Misc to reduce the number of general public methods and improve API cohesion.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/EntityUtil.java",
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCClassType(Entity)",
+        "com.gmail.nossr50.util.Misc.hasNPCMetadataTag(Entity)",
+        "com.gmail.nossr50.util.Misc.isVillager(Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(Entity)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.EntityUtil"
+      ],
+      "details": "Create EntityUtil in the same package and move the five cohesive NPC and villager classification methods into it. Preserve the existing public static behavior and method signatures. The extracted methods should continue to use org.bukkit.entity.Entity, NPC, and Villager.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCClassType(Entity)",
+        "com.gmail.nossr50.util.Misc.hasNPCMetadataTag(Entity)",
+        "com.gmail.nossr50.util.Misc.isVillager(Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(Entity)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.EntityUtil.isNPCEntityExcludingVillagers(Entity)",
+        "com.gmail.nossr50.util.EntityUtil.isNPCClassType(Entity)",
+        "com.gmail.nossr50.util.EntityUtil.hasNPCMetadataTag(Entity)",
+        "com.gmail.nossr50.util.EntityUtil.isVillager(Entity)",
+        "com.gmail.nossr50.util.EntityUtil.isNPCIncludingVillagers(Entity)"
+      ],
+      "details": "Replace references to the moved Misc methods with EntityUtil method references. Update imports only where callers are outside com.gmail.nossr50.util.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "com.gmail.nossr50.util.EntityUtil"
+      ],
+      "outputs": [
+        "call sites of EntityUtil methods"
+      ],
+      "details": "Add com.gmail.nossr50.util.EntityUtil imports in callers that require them and remove imports no longer needed after the move.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

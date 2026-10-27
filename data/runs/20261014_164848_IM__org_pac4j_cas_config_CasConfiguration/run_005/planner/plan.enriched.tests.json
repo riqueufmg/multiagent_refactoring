@@ -1,0 +1,103 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.cas.config.CasConfiguration",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive ticket-validation configuration and factory delegation responsibilities from CasConfiguration while preserving its existing public and protected API through delegation methods.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.retrieveTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.addPrivateKey(Cas20ServiceTicketValidator)",
+            "org.pac4j.cas.config.CasConfiguration.defaultTicketValidator"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasTicketValidatorConfiguration",
+            "org.pac4j.cas.config.CasConfiguration"
+          ],
+          "details": "Create CasTicketValidatorConfiguration in the same package. Move the ticket-validator methods and defaultTicketValidator state into the extracted class. Keep CasConfiguration methods with their existing signatures and visibility as delegating adapters so existing callers and CasTicketValidatorFactory interactions remain source-compatible. The extracted class should use the existing CasTicketValidatorFactory and CasSecurityConfiguration responsibilities rather than duplicating ticket-validation logic.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.retrieveTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(WebContext)",
+            "org.pac4j.cas.config.CasConfiguration.getDefaultTicketValidator()",
+            "org.pac4j.cas.config.CasConfiguration.setDefaultTicketValidator(TicketValidator)"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasConfiguration"
+          ],
+          "details": "Route the existing CasConfiguration ticket-validator methods and default-ticket-validator accessors through a CasTicketValidatorConfiguration instance. Preserve method signatures, visibility, and behavior so external callers do not need to change.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract logout lifecycle and logout-specific state from CasConfiguration to reduce the number of unrelated public methods and simplify internal initialization.",
+      "files": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasLogoutConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.initializeLogoutHandler()",
+            "org.pac4j.cas.config.CasConfiguration.getLogoutHandler()",
+            "org.pac4j.cas.config.CasConfiguration.findLogoutHandler()",
+            "org.pac4j.cas.config.CasConfiguration.setLogoutHandler(LogoutHandler)",
+            "org.pac4j.cas.config.CasConfiguration.getPostLogoutUrlParameter()",
+            "org.pac4j.cas.config.CasConfiguration.setPostLogoutUrlParameter(String)",
+            "org.pac4j.cas.config.CasConfiguration.logoutHandler",
+            "org.pac4j.cas.config.CasConfiguration.postLogoutUrlParameter"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasLogoutConfiguration",
+            "org.pac4j.cas.config.CasConfiguration"
+          ],
+          "details": "Create CasLogoutConfiguration in the same package. Move logoutHandler, postLogoutUrlParameter, initializeLogoutHandler, and their accessors into the extracted class. Retain CasConfiguration methods with their existing signatures as delegating adapters. Preserve the existing default initialization with DefaultLogoutHandler and the init behavior of findLogoutHandler.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.cas.config.CasConfiguration.internalInit(boolean)",
+            "org.pac4j.cas.config.CasConfiguration.initializeLogoutHandler()",
+            "org.pac4j.cas.config.CasConfiguration.getLogoutHandler()",
+            "org.pac4j.cas.config.CasConfiguration.findLogoutHandler()",
+            "org.pac4j.cas.config.CasConfiguration.setLogoutHandler(LogoutHandler)",
+            "org.pac4j.cas.config.CasConfiguration.getPostLogoutUrlParameter()",
+            "org.pac4j.cas.config.CasConfiguration.setPostLogoutUrlParameter(String)",
+            "org.pac4j.cas.config.CasConfiguration.toString()"
+          ],
+          "outputs": [
+            "org.pac4j.cas.config.CasConfiguration"
+          ],
+          "details": "Add a CasLogoutConfiguration instance to CasConfiguration, delegate logout initialization and accessors to it, and update internalInit and toString to obtain logout values through the extracted component. Preserve the existing public API and output values.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

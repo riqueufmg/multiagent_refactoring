@@ -1,0 +1,314 @@
+commit cf043af1828235e6c79453f60f33955cf284d371
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 14:47:37 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/ItemSpawnUtil.java
+similarity index 51%
+copy from src/main/java/com/gmail/nossr50/util/Misc.java
+copy to src/main/java/com/gmail/nossr50/util/ItemSpawnUtil.java
+index 78ba546d1..4bb618514 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/ItemSpawnUtil.java
+@@ -1,57 +1,22 @@
+ package com.gmail.nossr50.util;
+ 
+ import com.gmail.nossr50.api.ItemSpawnReason;
+-import com.gmail.nossr50.datatypes.player.McMMOPlayer;
+ import com.gmail.nossr50.events.items.McMMOItemSpawnEvent;
+ import com.gmail.nossr50.mcMMO;
+-import com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask;
+-import com.gmail.nossr50.util.player.UserManager;
+-import com.google.common.collect.ImmutableSet;
+ import org.bukkit.Location;
+ import org.bukkit.Material;
+-import org.bukkit.block.BlockState;
+-import org.bukkit.entity.EntityType;
+-import org.bukkit.entity.ExperienceOrb;
+ import org.bukkit.entity.Item;
+ import org.bukkit.entity.Player;
+-import org.jetbrains.annotations.NotNull;
+-import org.jetbrains.annotations.Nullable;
+ import org.bukkit.inventory.ItemStack;
+ import org.bukkit.util.Vector;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
+ 
+ import java.util.Collection;
+-import java.util.Locale;
+-import java.util.Random;
+-import java.util.Set;
+ import java.util.function.Predicate;
+ 
+-public final class Misc {
+-    private static final @NotNull Random random = new Random();
+-
+-    public static final int TIME_CONVERSION_FACTOR = 1000;
+-    public static final int TICK_CONVERSION_FACTOR = 20;
+-    public static final int PLAYER_RESPAWN_COOLDOWN_SECONDS = 5;
+-    public static final double SKILL_MESSAGE_MAX_SENDING_DISTANCE = 10.0;
+-
+-    public static final @NotNull Set<String> modNames = ImmutableSet.of("LOTR", "BUILDCRAFT", "ENDERIO", "ENHANCEDBIOMES", "IC2", "METALLURGY", "FORESTRY", "GALACTICRAFT", "RAILCRAFT", "TWILIGHTFOREST", "THAUMCRAFT", "GRAVESTONEMOD", "GROWTHCRAFT", "ARCTICMOBS", "DEMONMOBS", "INFERNOMOBS", "SWAMPMOBS", "MARICULTURE", "MINESTRAPPOLATION");
+-
+-    private Misc() {
+-    }
+-
+-    public static boolean isNPCEntityExcludingVillagers(@NotNull org.bukkit.entity.Entity entity) {
+-        return EntityUtil.isNPCEntityExcludingVillagers(entity);
+-    }
+-
+-    public static boolean isNPCIncludingVillagers(@Nullable org.bukkit.entity.Entity entity) {
+-        return EntityUtil.isNPCIncludingVillagers(entity);
+-    }
+-
+-    public static boolean isNear(@NotNull Location first, @NotNull Location second, double maxDistance) {
+-        return first.getWorld() == second.getWorld() && (first.distanceSquared(second) < maxDistance * maxDistance || maxDistance == 0);
+-    }
+-
+-    public static Location getBlockCenter(BlockState blockState) {
+-        return blockState.getLocation().add(0.5, 0.5, 0.5);
++public final class ItemSpawnUtil {
++    private ItemSpawnUtil() {
+     }
+ 
+     public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
+@@ -137,76 +102,4 @@ public final class Misc {
+         spawnedItem.setVelocity(direction);
+         return spawnedItem;
+     }
+-
+-    public static void profileCleanup(@NotNull String playerName) {
+-        Player player = mcMMO.p.getServer().getPlayerExact(playerName);
+-        if (player != null) {
+-            UserManager.remove(player);
+-            mcMMO.p.getFoliaLib().getImpl().runLaterAsync(new PlayerProfileLoadingTask(player), 1);
+-        }
+-    }
+-
+-    public static void printProgress(int convertedUsers, int progressInterval, long startMillis) {
+-        if (convertedUsers % progressInterval == 0) {
+-            mcMMO.p.getLogger().info(String.format("Conversion progress: %d users at %.2f users/second", convertedUsers, convertedUsers / (double) ((System.currentTimeMillis() - startMillis) / TIME_CONVERSION_FACTOR)));
+-        }
+-    }
+-
+-    public static String getModName(@NotNull String materialName) {
+-        for (String mod : modNames) {
+-            if (materialName.contains(mod)) {
+-                return mod;
+-            }
+-        }
+-        String[] materialSplit = materialName.split("_");
+-        if (materialSplit.length > 1) {
+-            return materialSplit[0].toLowerCase(Locale.ENGLISH);
+-        }
+-        return "UnknownMods";
+-    }
+-
+-    public static Location getLocationOffset(@NotNull Location location, double strength) {
+-        double blockX = location.getBlockX();
+-        double blockZ = location.getBlockZ();
+-        double distance = strength * random.nextDouble();
+-        blockX = random.nextBoolean() ? blockX + distance : blockX - distance;
+-        distance = strength * random.nextDouble();
+-        blockZ = random.nextBoolean() ? blockZ + distance : blockZ - distance;
+-        return new Location(location.getWorld(), blockX, location.getY(), blockZ);
+-    }
+-
+-    public static @NotNull Random getRandom() {
+-        return random;
+-    }
+-
+-    public static boolean isPartyLeader(@NotNull McMMOPlayer mmoPlayer) {
+-        return mmoPlayer.getParty().getLeader().getUniqueId().equals(mmoPlayer.getPlayer().getUniqueId());
+-    }
+-
+-    public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {
+-        if (location.getWorld() == null) {
+-            return;
+-        }
+-        ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+-        experienceOrb.setExperience(experienceValue);
+-    }
+-
+-    private static class SpawnOrbTask implements Runnable {
+-        private final Location location;
+-        private int orbExpValue;
+-
+-        private SpawnOrbTask(Location location, int orbExpValue) {
+-            this.location = location;
+-            this.orbExpValue = orbExpValue;
+-        }
+-
+-        @Override
+-        public void run() {
+-            if (location == null || location.getWorld() == null) {
+-                return;
+-            }
+-            ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
+-            experienceOrb.setExperience(orbExpValue);
+-        }
+-    }
+ }
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/Misc.java
+index 78ba546d1..022bc8693 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/Misc.java
+@@ -2,22 +2,19 @@ package com.gmail.nossr50.util;
+ 
+ import com.gmail.nossr50.api.ItemSpawnReason;
+ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
+-import com.gmail.nossr50.events.items.McMMOItemSpawnEvent;
+ import com.gmail.nossr50.mcMMO;
+ import com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask;
+ import com.gmail.nossr50.util.player.UserManager;
+ import com.google.common.collect.ImmutableSet;
+ import org.bukkit.Location;
+-import org.bukkit.Material;
+ import org.bukkit.block.BlockState;
+ import org.bukkit.entity.EntityType;
+ import org.bukkit.entity.ExperienceOrb;
+ import org.bukkit.entity.Item;
+ import org.bukkit.entity.Player;
++import org.bukkit.inventory.ItemStack;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+-import org.bukkit.inventory.ItemStack;
+-import org.bukkit.util.Vector;
+ 
+ import java.util.Collection;
+ import java.util.Locale;
+@@ -54,90 +51,6 @@ public final class Misc {
+         return blockState.getLocation().add(0.5, 0.5, 0.5);
+     }
+ 
+-    public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
+-        for (ItemStack drop : drops) {
+-            spawnItem(player, location, drop, itemSpawnReason);
+-        }
+-    }
+-
+-    public static void spawnItemsFromCollection(@Nullable Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason, int sizeLimit) {
+-        ItemStack[] arrayDrops = drops.toArray(new ItemStack[0]);
+-        for (int i = 0; i < sizeLimit - 1; i++) {
+-            spawnItem(player, location, arrayDrops[i], itemSpawnReason);
+-        }
+-    }
+-
+-    public static void spawnItem(@NotNull Collection<ItemStack> potentialItemDrops, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
+-        for (ItemStack drop : potentialItemDrops) {
+-            spawnItem(drop, itemSpawnReason, spawnLocation, predicate, player);
+-        }
+-    }
+-
+-    public static void spawnItem(@NotNull ItemStack potentialItemSpawn, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
+-        if (predicate.test(potentialItemSpawn.getType().getKey().getKey())) {
+-            spawnItem(player, spawnLocation, potentialItemSpawn, itemSpawnReason);
+-        }
+-    }
+-
+-    public static void spawnItems(@Nullable Player player, @NotNull Location location, @NotNull ItemStack is, int quantity, @NotNull ItemSpawnReason itemSpawnReason) {
+-        for (int i = 0; i < quantity; i++) {
+-            spawnItem(player, location, is, itemSpawnReason);
+-        }
+-    }
+-
+-    public static @Nullable Item spawnItem(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
+-        if (itemStack.getType() == Material.AIR || location.getWorld() == null) {
+-            return null;
+-        }
+-        McMMOItemSpawnEvent event = new McMMOItemSpawnEvent(location, itemStack, itemSpawnReason, player);
+-        mcMMO.p.getServer().getPluginManager().callEvent(event);
+-        if (event.isCancelled()) {
+-            return null;
+-        }
+-        return location.getWorld().dropItem(location, itemStack);
+-    }
+-
+-    public static @Nullable Item spawnItemNaturally(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
+-        if (itemStack.getType() == Material.AIR || location.getWorld() == null) {
+-            return null;
+-        }
+-        McMMOItemSpawnEvent event = new McMMOItemSpawnEvent(location, itemStack, itemSpawnReason, player);
+-        mcMMO.p.getServer().getPluginManager().callEvent(event);
+-        if (event.isCancelled()) {
+-            return null;
+-        }
+-        return location.getWorld().dropItemNaturally(location, itemStack);
+-    }
+-
+-    public static void spawnItemsTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack is, int quantity, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
+-        for (int i = 0; i < quantity; i++) {
+-            spawnItemTowardsLocation(player, fromLocation, toLocation, is, speed, itemSpawnReason);
+-        }
+-    }
+-
+-    public static @Nullable Item spawnItemTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemToSpawn, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
+-        if (itemToSpawn.getType() == Material.AIR) {
+-            return null;
+-        }
+-        ItemStack clonedItem = itemToSpawn.clone();
+-        Location spawnLocation = fromLocation.clone();
+-        Location targetLocation = toLocation.clone();
+-        if (spawnLocation.getWorld() == null) {
+-            return null;
+-        }
+-        McMMOItemSpawnEvent event = new McMMOItemSpawnEvent(spawnLocation, clonedItem, itemSpawnReason, player);
+-        mcMMO.p.getServer().getPluginManager().callEvent(event);
+-        if (event.isCancelled()) {
+-            return null;
+-        }
+-        Item spawnedItem = spawnLocation.getWorld().dropItem(spawnLocation, clonedItem);
+-        Vector vecFrom = spawnLocation.clone().toVector().clone();
+-        Vector vecTo = targetLocation.clone().toVector().clone();
+-        Vector direction = vecTo.subtract(vecFrom).normalize().multiply(speed);
+-        spawnedItem.setVelocity(direction);
+-        return spawnedItem;
+-    }
+-
+     public static void profileCleanup(@NotNull String playerName) {
+         Player player = mcMMO.p.getServer().getPlayerExact(playerName);
+         if (player != null) {
+@@ -191,6 +104,42 @@ public final class Misc {
+         experienceOrb.setExperience(experienceValue);
+     }
+ 
++    public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
++        ItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason);
++    }
++
++    public static void spawnItemsFromCollection(@Nullable Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason, int sizeLimit) {
++        ItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason, sizeLimit);
++    }
++
++    public static void spawnItem(@NotNull Collection<ItemStack> potentialItemDrops, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
++        ItemSpawnUtil.spawnItem(potentialItemDrops, itemSpawnReason, spawnLocation, predicate, player);
++    }
++
++    public static void spawnItem(@NotNull ItemStack potentialItemSpawn, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
++        ItemSpawnUtil.spawnItem(potentialItemSpawn, itemSpawnReason, spawnLocation, predicate, player);
++    }
++
++    public static void spawnItems(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, int quantity, @NotNull ItemSpawnReason itemSpawnReason) {
++        ItemSpawnUtil.spawnItems(player, location, itemStack, quantity, itemSpawnReason);
++    }
++
++    public static @Nullable Item spawnItem(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
++        return ItemSpawnUtil.spawnItem(player, location, itemStack, itemSpawnReason);
++    }
++
++    public static @Nullable Item spawnItemNaturally(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
++        return ItemSpawnUtil.spawnItemNaturally(player, location, itemStack, itemSpawnReason);
++    }
++
++    public static void spawnItemsTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemStack, int quantity, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
++        ItemSpawnUtil.spawnItemsTowardsLocation(player, fromLocation, toLocation, itemStack, quantity, speed, itemSpawnReason);
++    }
++
++    public static @Nullable Item spawnItemTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemStack, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
++        return ItemSpawnUtil.spawnItemTowardsLocation(player, fromLocation, toLocation, itemStack, speed, itemSpawnReason);
++    }
++
+     private static class SpawnOrbTask implements Runnable {
+         private final Location location;
+         private int orbExpValue;

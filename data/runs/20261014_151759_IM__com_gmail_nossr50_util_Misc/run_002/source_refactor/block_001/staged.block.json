@@ -1,0 +1,61 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive item-spawning API from Misc into a dedicated utility class, reducing the number of public methods and preserving behavior through updated callers.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscItemSpawner.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+        "com.gmail.nossr50.util.Misc.spawnItem",
+        "com.gmail.nossr50.util.Misc.spawnItems",
+        "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+        "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+        "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscItemSpawner"
+      ],
+      "details": "Create com.gmail.nossr50.util.MiscItemSpawner with the extracted static methods and their existing signatures. Preserve each method's delegation to ItemSpawnUtil. Remove the extracted methods from Misc.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+        "com.gmail.nossr50.util.Misc.spawnItem",
+        "com.gmail.nossr50.util.Misc.spawnItems",
+        "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+        "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+        "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscItemSpawner.spawnItemsFromCollection",
+        "com.gmail.nossr50.util.MiscItemSpawner.spawnItem",
+        "com.gmail.nossr50.util.MiscItemSpawner.spawnItems",
+        "com.gmail.nossr50.util.MiscItemSpawner.spawnItemNaturally",
+        "com.gmail.nossr50.util.MiscItemSpawner.spawnItemsTowardsLocation",
+        "com.gmail.nossr50.util.MiscItemSpawner.spawnItemTowardsLocation"
+      ],
+      "details": "Update references to the extracted item-spawning methods to use MiscItemSpawner and add imports where callers are outside com.gmail.nossr50.util.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

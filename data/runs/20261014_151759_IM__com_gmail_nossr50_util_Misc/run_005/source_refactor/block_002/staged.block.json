@@ -1,0 +1,52 @@
+{
+  "id": 2,
+  "goal": "Extract player profile and party-related behavior from Misc.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.profileCleanup(String)",
+        "com.gmail.nossr50.util.Misc.isPartyLeader(McMMOPlayer)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscPlayerUtil"
+      ],
+      "details": "Create final utility class com.gmail.nossr50.util.MiscPlayerUtil in the same package. Move profileCleanup and isPartyLeader into the new class, retaining their existing implementations and annotations. Keep compatibility delegates in Misc until call sites are migrated.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/MiscPlayerUtil.java"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.datatypes.player.McMMOPlayer",
+        "com.gmail.nossr50.mcMMO",
+        "com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask",
+        "com.gmail.nossr50.util.player.UserManager",
+        "org.bukkit.entity.Player",
+        "org.jetbrains.annotations.NotNull"
+      ],
+      "details": "Add imports required by the extracted player-related methods.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

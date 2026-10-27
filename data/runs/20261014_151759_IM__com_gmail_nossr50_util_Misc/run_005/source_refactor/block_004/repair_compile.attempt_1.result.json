@@ -1,0 +1,10 @@
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java",
+      "content": "package com.gmail.nossr50.util;\n\nimport org.bukkit.Location;\nimport org.bukkit.entity.EntityType;\nimport org.bukkit.entity.ExperienceOrb;\nimport org.jetbrains.annotations.NotNull;\n\npublic final class MiscExperienceOrbUtil {\n    private MiscExperienceOrbUtil() {}\n\n    public static void spawnExperienceOrb(@NotNull Location location, int experienceValue) {\n        if (location.getWorld() == null)\n            return;\n\n        ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);\n        experienceOrb.setExperience(experienceValue);\n    }\n\n    private static class SpawnOrbTask implements Runnable {\n        private final Location location;\n        private int orbExpValue;\n\n        private SpawnOrbTask(Location location, int orbExpValue) {\n            this.location = location;\n            this.orbExpValue = orbExpValue;\n        }\n\n        @Override\n        public void run() {\n            if (location == null || location.getWorld() == null)\n                return;\n\n            ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);\n            experienceOrb.setExperience(orbExpValue);\n        }\n    }\n}\n"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "Fixed the EntityType import to use org.bukkit.entity.EntityType, which resolves all reported compilation errors."
+}

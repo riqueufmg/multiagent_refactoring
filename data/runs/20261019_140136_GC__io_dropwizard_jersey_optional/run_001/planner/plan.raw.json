@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "io.dropwizard.jersey.optional",
+  "selected_cluster": [
+    "io.dropwizard.jersey.optional.EmptyOptionalException",
+    "io.dropwizard.jersey.optional.EmptyOptionalExceptionMapper",
+    "io.dropwizard.jersey.optional.EmptyOptionalNoContentExceptionMapper"
+  ],
+  "destination_package": "io.dropwizard.jersey.optional.exception",
+  "cluster_reason": "These three classes form a cohesive exception-handling unit: both exception mappers depend directly on EmptyOptionalException, and moving them together preserves their strong internal relationship while isolating error-mapping concerns from the optional parameter and message-body components.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive optional exception-handling cluster into a dedicated subpackage.",
+      "files": [
+        "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalException.java",
+        "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java",
+        "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalNoContentExceptionMapper.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "io.dropwizard.jersey.optional.exception"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "io.dropwizard.jersey.optional.EmptyOptionalException"
+          ],
+          "outputs": [
+            "io.dropwizard.jersey.optional.exception.EmptyOptionalException"
+          ],
+          "details": "Move the exception class to the dedicated optional exception subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "io.dropwizard.jersey.optional.EmptyOptionalExceptionMapper"
+          ],
+          "outputs": [
+            "io.dropwizard.jersey.optional.exception.EmptyOptionalExceptionMapper"
+          ],
+          "details": "Move the exception mapper alongside the exception it handles.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "io.dropwizard.jersey.optional.EmptyOptionalNoContentExceptionMapper"
+          ],
+          "outputs": [
+            "io.dropwizard.jersey.optional.exception.EmptyOptionalNoContentExceptionMapper"
+          ],
+          "details": "Move the no-content exception mapper alongside the exception it handles.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

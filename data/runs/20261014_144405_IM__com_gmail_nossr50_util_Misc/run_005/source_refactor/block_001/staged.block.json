@@ -1,0 +1,50 @@
+{
+  "id": 1,
+  "goal": "Remove NPC-related public wrapper methods from Misc by consolidating them in the existing EntityUtil utility.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/EntityUtil.java",
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.EntityUtil.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+        "com.gmail.nossr50.util.EntityUtil.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+      ],
+      "details": "Move the two NPC-related public methods from Misc to the existing EntityUtil class, preserving their current behavior and annotations where applicable.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.EntityUtil.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+        "com.gmail.nossr50.util.EntityUtil.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+      ],
+      "details": "Update callers to use EntityUtil directly after removing the corresponding methods from Misc.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

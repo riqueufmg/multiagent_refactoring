@@ -1,0 +1,102 @@
+{
+  "id": 1,
+  "goal": "Reduce the number of public methods in BaseClient by moving the cohesive authorization-generator API to BaseClientAuthorization.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+      ],
+      "details": "Move the authorization-generator getter to the existing authorization component.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(List<AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(List<AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(List<AuthorizationGenerator>)"
+      ],
+      "details": "Move the list-based authorization-generator setter to the existing authorization component.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(AuthorizationGenerator...)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(AuthorizationGenerator...)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(AuthorizationGenerator...)"
+      ],
+      "details": "Move the varargs authorization-generator setter to the existing authorization component.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(AuthorizationGenerator)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(AuthorizationGenerator)"
+      ],
+      "details": "Move the single authorization-generator setter to the existing authorization component.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(AuthorizationGenerator)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(AuthorizationGenerator)"
+      ],
+      "details": "Move the single authorization-generator addition method to the existing authorization component.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(List<AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+      ],
+      "details": "Move the list-based authorization-generator addition method to the existing authorization component.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(List<AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(AuthorizationGenerator...)",
+        "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(List<AuthorizationGenerator>)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(AuthorizationGenerator...)",
+        "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(AuthorizationGenerator)",
+        "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+      ],
+      "details": "Update callers to use the authorization component after the methods are moved.",
+      "risk": "high"
+    }
+  ]
+}

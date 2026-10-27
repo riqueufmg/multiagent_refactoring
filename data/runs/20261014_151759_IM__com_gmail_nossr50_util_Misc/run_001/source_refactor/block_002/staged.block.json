@@ -1,0 +1,66 @@
+{
+  "id": 2,
+  "goal": "Extract the cohesive NPC and villager classification methods from Misc to reduce its public API and isolate entity compatibility logic.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/NPCUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCClassType(Entity)",
+        "com.gmail.nossr50.util.Misc.hasNPCMetadataTag(Entity)",
+        "com.gmail.nossr50.util.Misc.isVillager(Entity)",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(Entity)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.NPCUtil"
+      ],
+      "details": "Create NPCUtil in com.gmail.nossr50.util and move the listed public static methods into it. Preserve the existing method relationships, null handling, NPC metadata checks, NPC type checks, villager compatibility behavior, and method documentation. Include the required Bukkit entity and annotation imports.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers",
+        "com.gmail.nossr50.util.Misc.isNPCClassType",
+        "com.gmail.nossr50.util.Misc.hasNPCMetadataTag",
+        "com.gmail.nossr50.util.Misc.isVillager",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers"
+      ],
+      "outputs": [
+        "All source call sites of the moved NPC methods"
+      ],
+      "details": "Replace calls to the moved methods with calls to the corresponding static methods on NPCUtil.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/NPCUtil.java",
+        "All files updated by the NPC call-site migration"
+      ],
+      "outputs": [
+        "Compilation-valid imports for NPCUtil and its entity and annotation dependencies"
+      ],
+      "details": "Remove no-longer-used entity imports from Misc and add NPCUtil imports to migrated callers where required.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

@@ -1,0 +1,23 @@
+commit d8a0707085d449305b73ced7aeda16a5151acfc2
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 11:29:53 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index e5fc6a16c..cc0e04477 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -38,7 +38,11 @@ import com.github.javaparser.ast.stmt.SwitchStmt;
+ import java.util.Optional;
+ 
+ /**
+- * This class can be used to easily retrieve nodes from a JavaParser AST.
++ * Compatibility facade for the AST navigation helpers.
++ *
++ * Node-oriented lookup is implemented by {@link NavigatorNodeLookup}; this class
++ * preserves the public Navigator API while delegating those operations without
++ * duplicating traversal or search logic.
+  *
+  * Note that methods with the prefix `demand` indicate that if the search value is not found, an exception will be thrown.
+  *

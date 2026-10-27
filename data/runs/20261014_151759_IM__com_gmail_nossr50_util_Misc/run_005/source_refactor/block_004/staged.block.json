@@ -1,0 +1,50 @@
+{
+  "id": 4,
+  "goal": "Extract experience-orb spawning behavior and its task implementation from Misc.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.spawnExperienceOrb(Location, int)",
+        "com.gmail.nossr50.util.Misc.SpawnOrbTask"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscExperienceOrbUtil"
+      ],
+      "details": "Create final utility class com.gmail.nossr50.util.MiscExperienceOrbUtil in the same package. Move spawnExperienceOrb and the private SpawnOrbTask implementation into the new class, preserving the existing null checks, entity spawning behavior, and task state. Keep a compatibility delegate in Misc for spawnExperienceOrb.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/MiscExperienceOrbUtil.java"
+      ],
+      "outputs": [
+        "org.bukkit.Location",
+        "org.bukkit.EntityType",
+        "org.bukkit.entity.ExperienceOrb",
+        "org.jetbrains.annotations.NotNull"
+      ],
+      "details": "Add imports required by the extracted orb-spawning method and Runnable implementation.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

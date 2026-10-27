@@ -1,0 +1,42 @@
+commit 53fd4e5bc79c5528e654bff8cd574bfa786b315b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 11:02:25 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index ac9c01737..fd157d46e 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -110,21 +110,25 @@ public final class Navigator {
+     }
+ 
+     /**
+-     * Returns the {@code (i+1)}'th constructor of the given type declaration, in textual order. The constructor that
+-     * appears first has the index 0, the second one the index 1, and so on.
+-     *
+-     * @param td    The type declaration to search in. Note that only classes and enums have constructors.
+-     * @param index The index of the desired constructor.
+-     * @return The desired ConstructorDeclaration if it was found, else an exception is thrown.
++     * @deprecated Use {@link NavigatorDeclarationLookup#demandConstructor(TypeDeclaration, int)}
+      */
++    @Deprecated
+     public static ConstructorDeclaration demandConstructor(TypeDeclaration<?> td, int index) {
+         return NavigatorDeclarationLookup.demandConstructor(td, index);
+     }
+ 
++    /**
++     * @deprecated Use {@link NavigatorDeclarationLookup#demandField(ClassOrInterfaceDeclaration, String)}
++     */
++    @Deprecated
+     public static VariableDeclarator demandField(ClassOrInterfaceDeclaration cd, String name) {
+         return NavigatorDeclarationLookup.demandField(cd, name);
+     }
+ 
++    /**
++     * @deprecated Use {@link NavigatorDeclarationLookup#demandMethod(TypeDeclaration, String)}
++     */
++    @Deprecated
+     public static MethodDeclaration demandMethod(TypeDeclaration<?> cd, String name) {
+         return NavigatorDeclarationLookup.demandMethod(cd, name);
+     }

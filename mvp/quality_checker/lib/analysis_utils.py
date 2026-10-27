@@ -5,6 +5,12 @@ from pathlib import Path
 from typing import Any
 
 
+SUPPORTED_SMELL_FILES = {
+    "architecturesmells.csv",
+    "designsmells.csv",
+}
+
+
 def _norm(value: Any) -> str:
     return str(value or "").strip()
 
@@ -50,35 +56,25 @@ def _numeric(value: Any) -> int | float | None:
     return as_float
 
 
-def _infer_entity(row: dict[str, str]) -> str:
-    direct_aliases = {
-        "fullyqualifiedname",
-        "qualifiedname",
-        "fqn",
-        "entity",
-        "element",
-        "classname",
-        "typename",
-        "packagename",
-        "package",
-    }
-
-    direct = _get_by_alias(row, direct_aliases)
-    if direct and "." in direct:
-        return direct
+def _infer_entity(
+    row: dict[str, str],
+    source_name: str | None = None,
+) -> str:
+    source = _norm(source_name).lower()
 
     package_name = _get_by_alias(row, {"package", "packagename"})
     type_name = _get_by_alias(row, {"type", "typename", "class", "classname", "name"})
 
-    if package_name and type_name and not type_name.startswith(package_name):
-        return f"{package_name}.{type_name}"
+    if source == "architecturesmells.csv":
+        return package_name
 
-    if direct:
-        return direct
+    if source == "designsmells.csv":
+        if package_name and type_name:
+            if type_name.startswith(package_name + "."):
+                return type_name
+            return f"{package_name}.{type_name}"
 
-    method_name = _get_by_alias(row, {"method", "methodname"})
-    if method_name:
-        return method_name
+        return type_name or package_name
 
     return ""
 
@@ -87,8 +83,6 @@ def _infer_smell_name(row: dict[str, str]) -> str:
     aliases = {
         "smell",
         "smellname",
-        "codedsmell",
-        "codesmell",
         "designsmell",
         "architecturesmell",
         "typeofsmell",
@@ -108,20 +102,11 @@ def _infer_smell_name(row: dict[str, str]) -> str:
 def _infer_level_from_filename(path: Path) -> str:
     name = path.name.lower()
 
-    if "architecture" in name:
+    if name == "architecturesmells.csv":
         return "architecture"
 
-    if "design" in name:
+    if name == "designsmells.csv":
         return "design"
-
-    if "implementation" in name:
-        return "implementation"
-
-    if "method" in name:
-        return "method"
-
-    if "type" in name or "class" in name:
-        return "class"
 
     return "unknown"
 
@@ -143,7 +128,7 @@ def load_designite_smells(designite_dir: str | Path) -> list[dict[str, Any]]:
     for csv_path in _csv_files(designite_dir):
         name = csv_path.name.lower()
 
-        if "smell" not in name:
+        if name not in SUPPORTED_SMELL_FILES:
             continue
 
         try:
@@ -153,7 +138,7 @@ def load_designite_smells(designite_dir: str | Path) -> list[dict[str, Any]]:
 
         for row in rows:
             smell_name = _infer_smell_name(row)
-            entity = _infer_entity(row)
+            entity = _infer_entity(row, csv_path.name)
 
             if not smell_name and not entity:
                 continue

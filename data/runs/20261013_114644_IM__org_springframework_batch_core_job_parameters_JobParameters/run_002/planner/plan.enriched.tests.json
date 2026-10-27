@@ -1,0 +1,53 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.springframework.batch.core.job.parameters.JobParameters",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive parameter-map management responsibilities from JobParameters so the target becomes a smaller value-object facade while preserving its public API.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersMap.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.parameters",
+            "org.springframework.batch.core.job.parameters.JobParameters.getParameter(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getParameters()",
+            "org.springframework.batch.core.job.parameters.JobParameters.getIdentifyingParameters()",
+            "org.springframework.batch.core.job.parameters.JobParameters.isEmpty()"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersMap"
+          ],
+          "details": "Create JobParametersMap in the same package. Move the parameter-map field and its cohesive map access, identifying-parameter filtering, and emptiness operations into the extracted class. Update JobParameters constructors and the affected methods to delegate to JobParametersMap while retaining the existing public method signatures and behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersMap"
+          ],
+          "details": "Update internal references in JobParameters from the extracted parameters field to JobParametersMap delegation. Preserve equals, hashCode, and toString semantics by obtaining the underlying parameter map through the extracted component.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersMap.java"
+          ],
+          "outputs": [],
+          "details": "Add or remove imports resulting from moving the map-management implementation, retaining only imports required by each class.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

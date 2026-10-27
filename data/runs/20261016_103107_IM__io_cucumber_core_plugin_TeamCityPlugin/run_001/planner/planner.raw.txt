@@ -1,0 +1,29 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "io.cucumber.core.plugin.TeamCityPlugin",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive comparison-failure parsing and value-holding logic from TeamCityPlugin to reduce the target class's implementation complexity.",
+      "files": [
+        "cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java",
+        "cucumber-core/src/main/java/io/cucumber/core/plugin/ComparisonFailure.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.cucumber.core.plugin.TeamCityPlugin",
+            "io.cucumber.core.plugin.ComparisonFailure"
+          ],
+          "outputs": [
+            "io.cucumber.core.plugin.ComparisonFailure"
+          ],
+          "details": "Extract the existing nested ComparisonFailure class into a top-level ComparisonFailure class in the same package, including COMPARE_PATTERNS, parse(String), parse(String, Pattern), expected, actual, the constructor, getExpected(), and getActual(). Update TeamCityPlugin to reference the extracted class while preserving the existing ComparisonFailure.parse(message.trim()) behavior.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

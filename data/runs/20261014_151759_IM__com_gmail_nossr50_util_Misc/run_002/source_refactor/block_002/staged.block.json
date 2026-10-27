@@ -1,0 +1,56 @@
+{
+  "id": 2,
+  "goal": "Extract the cohesive location and randomization functionality from Misc into a dedicated utility class.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscLocationUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear",
+        "com.gmail.nossr50.util.Misc.getBlockCenter",
+        "com.gmail.nossr50.util.Misc.getLocationOffset",
+        "com.gmail.nossr50.util.Misc.getRandom",
+        "com.gmail.nossr50.util.Misc.random"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil"
+      ],
+      "details": "Create com.gmail.nossr50.util.MiscLocationUtil with the extracted static methods, move the random field into the new class, and preserve the existing randomization and Bukkit Location behavior. Remove the extracted methods and field from Misc.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNear",
+        "com.gmail.nossr50.util.Misc.getBlockCenter",
+        "com.gmail.nossr50.util.Misc.getLocationOffset",
+        "com.gmail.nossr50.util.Misc.getRandom"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscLocationUtil.isNear",
+        "com.gmail.nossr50.util.MiscLocationUtil.getBlockCenter",
+        "com.gmail.nossr50.util.MiscLocationUtil.getLocationOffset",
+        "com.gmail.nossr50.util.MiscLocationUtil.getRandom"
+      ],
+      "details": "Update all references to the extracted location and randomization methods to use MiscLocationUtil.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

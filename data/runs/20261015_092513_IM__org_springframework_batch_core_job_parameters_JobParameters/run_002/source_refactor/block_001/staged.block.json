@@ -1,0 +1,35 @@
+{
+  "id": 1,
+  "goal": "Reduce the number of public methods and implementation complexity in JobParameters by extracting the cohesive typed parameter accessors while preserving the existing JobParameters API through delegation.",
+  "files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersTypedAccessors.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.springframework.batch.core.job.parameters.JobParameters",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors"
+      ],
+      "details": "Extract the cohesive typed accessor methods getLong(String), getLong(String, Long), getString(String), getString(String, String), getDouble(String), getDouble(String, Double), getDate(String), getDate(String, Date), getLocalDate(String), getLocalDate(String, LocalDate), getLocalTime(String), getLocalTime(String, LocalTime), getLocalDateTime(String), and getLocalDateTime(String, LocalDateTime) into JobParametersTypedAccessors. The extracted class should receive the parameter map through its constructor, retain the existing type validation and default-value behavior, and JobParameters should retain delegating methods with the same public signatures so existing callers remain compatible.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersTypedAccessors.java"
+      ],
+      "outputs": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersTypedAccessors.java"
+      ],
+      "details": "Add the existing java.time.LocalDate, java.time.LocalDateTime, java.time.LocalTime, java.util.Date, java.util.Map, and org.jspecify.annotations.Nullable imports required by JobParametersTypedAccessors, and remove any imports from JobParameters that are no longer needed after extraction.",
+      "risk": "low"
+    }
+  ]
+}

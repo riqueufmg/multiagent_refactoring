@@ -1,0 +1,44 @@
+{
+  "id": 1,
+  "goal": "Move type-resolution operations out of Navigator and consolidate them in NavigatorTypeLookup.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClassOrInterface(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandEnum(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandInterface(CompilationUnit, String)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClass(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClassOrInterface(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandEnum(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandInterface(CompilationUnit, String)"
+      ],
+      "details": "Move the cohesive class, interface, and enum lookup methods to the existing type-lookup component. Preserve their current validation and exception behavior, and remove them from Navigator.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClassOrInterface(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandEnum(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.Navigator.demandInterface(CompilationUnit, String)"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClass(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandClassOrInterface(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandEnum(CompilationUnit, String)",
+        "com.github.javaparser.symbolsolver.javaparser.NavigatorTypeLookup.demandInterface(CompilationUnit, String)"
+      ],
+      "details": "Update references to the moved type lookup methods so callers use NavigatorTypeLookup directly. Update imports only where required.",
+      "risk": "high"
+    }
+  ]
+}

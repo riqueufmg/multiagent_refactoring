@@ -1,0 +1,80 @@
+{
+  "id": 1,
+  "goal": "Group configuration-related state and behaviour into a new helper class to reduce the size and public surface of ByteBuddyAndroidTaskExtension. Move entryPoint, suffix, parsing/fail flags, discovery and classFileVersion state plus their accessors and resolve(JavaVersion) to a new ByteBuddyAndroidConfiguration class. Replace the moved members in the extension with a single configuration field and update usages to delegate to that field.",
+  "files": [
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java",
+    "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java"
+      ],
+      "details": "Create a new class ByteBuddyAndroidConfiguration in the same package that will encapsulate the following fields and their semantics: EntryPoint entryPoint; String suffix; boolean failOnLiveInitializer; boolean warnOnEmptyTypeSet; boolean failFast; boolean extendedParsing; Discovery discovery; @MaybeNull ClassFileVersion classFileVersion. The new class must provide public getters and setters for each field and a resolve(JavaVersion) method implementing the original resolution logic: if (classFileVersion == null) { classFileVersion = ClassFileVersion.ofJavaVersion(Integer.parseInt(version.getMajorVersion())); }. The class should initialize defaults equivalent to those previously set in the ByteBuddyAndroidTaskExtension constructor: entryPoint = EntryPoint.Default.REBASE; suffix = \"\"; failOnLiveInitializer = true; warnOnEmptyTypeSet = true; failFast = true; discovery = Discovery.EMPTY; (classFileVersion defaults to null). Place the new class in package net.bytebuddy.build.gradle.android and import the same types as needed.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_FIELD",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Move these fields from ByteBuddyAndroidTaskExtension into ByteBuddyAndroidConfiguration: entryPoint, suffix, failOnLiveInitializer, warnOnEmptyTypeSet, failFast, extendedParsing, discovery, classFileVersion. Remove their declarations from the extension. Add a new private final field in ByteBuddyAndroidTaskExtension: private final ByteBuddyAndroidConfiguration configuration; and initialize it in the ByteBuddyAndroidTaskExtension constructor (new ByteBuddyAndroidConfiguration()).",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Move the following accessors and methods into ByteBuddyAndroidConfiguration: getEntryPoint(), setEntryPoint(EntryPoint), getSuffix(), setSuffix(String), isFailOnLiveInitializer(), setFailOnLiveInitializer(boolean), isWarnOnEmptyTypeSet(), setWarnOnEmptyTypeSet(boolean), isFailFast(), setFailFast(boolean), isExtendedParsing(), setExtendedParsing(boolean), getDiscovery(), setDiscovery(Discovery), getClassFileVersion(), setClassFileVersion(ClassFileVersion), and resolve(JavaVersion). Remove these methods from the extension. In the extension add a minimal accessor public ByteBuddyAndroidConfiguration getConfiguration() { return configuration; } to expose the grouped settings.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java",
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Ensure both files have the necessary imports for EntryPoint, ClassFileVersion, MaybeNull, Discovery and JavaVersion (same imports as original file). Because both classes live in the same package, no package change is necessary.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidTaskExtension.java"
+      ],
+      "details": "Update usages within ByteBuddyAndroidTaskExtension to use the new configuration field. Specifically: - In the constructor remove direct initializations of the moved fields (those are handled by ByteBuddyAndroidConfiguration). - In configure(T task) replace calls like getTransformations(). (unchanged), task.getEntryPoint().convention(getEntryPoint()); -> task.getEntryPoint().convention(configuration.getEntryPoint()); task.setSuffix(getSuffix()); -> task.setSuffix(configuration.getSuffix()); task.setFailOnLiveInitializer(isFailOnLiveInitializer()); -> task.setFailOnLiveInitializer(configuration.isFailOnLiveInitializer()); task.setWarnOnEmptyTypeSet(isWarnOnEmptyTypeSet()); -> task.setWarnOnEmptyTypeSet(configuration.isWarnOnEmptyTypeSet()); task.setFailFast(isFailFast()); -> task.setFailFast(configuration.isFailFast()); task.setExtendedParsing(isExtendedParsing()); -> task.setExtendedParsing(configuration.isExtendedParsing()); task.setDiscovery(getDiscovery()); -> task.setDiscovery(configuration.getDiscovery()); task.setThreads(getThreads()); (threads is kept in adjustmentSettings, unchanged) task.setClassFileVersion(getClassFileVersion()); -> task.setClassFileVersion(configuration.getClassFileVersion()); - Remove or adapt any direct field references to the moved fields to use configuration.getX()/configuration.isX().",
+      "risk": "medium"
+    },
+    {
+      "op": "EXTRACT_INTERFACE",
+      "inputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java"
+      ],
+      "outputs": [
+        "byte-buddy-gradle-plugin/android-plugin/src/main/java/net/bytebuddy/build/gradle/android/ByteBuddyAndroidConfiguration.java"
+      ],
+      "details": "Keep the new class's API focused: the ByteBuddyAndroidConfiguration class should be self-contained and expose the public getters/setters used by configure(...) and external callers. No other members of ByteBuddyAndroidTaskExtension need to be exposed differently. Extracting an interface is optional here if future decoupling is desired; include a small public interface (e.g., Configuration) only if necessary for other refactorings. This step is low effort and optional; mark as low risk.",
+      "risk": "low"
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+commit ce2ed0af93fad7aa398c8780e8e9617f05740c0c
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 15:26:48 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/com/gmail/nossr50/util/Misc.java b/src/main/java/com/gmail/nossr50/util/Misc.java
+index f6593bd93..b946b5cd5 100644
+--- a/src/main/java/com/gmail/nossr50/util/Misc.java
++++ b/src/main/java/com/gmail/nossr50/util/Misc.java
+@@ -100,39 +100,39 @@ public final class Misc {
+     }
+ 
+     public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
+-        ItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason);
++        MiscItemSpawner.spawnItemsFromCollection(player, location, drops, itemSpawnReason);
+     }
+ 
+     public static void spawnItemsFromCollection(@Nullable Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason, int sizeLimit) {
+-        ItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason, sizeLimit);
++        MiscItemSpawner.spawnItemsFromCollection(player, location, drops, itemSpawnReason, sizeLimit);
+     }
+ 
+     public static void spawnItem(@NotNull Collection<ItemStack> potentialItemDrops, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
+-        ItemSpawnUtil.spawnItem(potentialItemDrops, itemSpawnReason, spawnLocation, predicate, player);
++        MiscItemSpawner.spawnItem(potentialItemDrops, itemSpawnReason, spawnLocation, predicate, player);
+     }
+ 
+     public static void spawnItem(@NotNull ItemStack potentialItemSpawn, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
+-        ItemSpawnUtil.spawnItem(potentialItemSpawn, itemSpawnReason, spawnLocation, predicate, player);
++        MiscItemSpawner.spawnItem(potentialItemSpawn, itemSpawnReason, spawnLocation, predicate, player);
+     }
+ 
+     public static void spawnItems(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, int quantity, @NotNull ItemSpawnReason itemSpawnReason) {
+-        ItemSpawnUtil.spawnItems(player, location, itemStack, quantity, itemSpawnReason);
++        MiscItemSpawner.spawnItems(player, location, itemStack, quantity, itemSpawnReason);
+     }
+ 
+     public static @Nullable Item spawnItem(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
+-        return ItemSpawnUtil.spawnItem(player, location, itemStack, itemSpawnReason);
++        return MiscItemSpawner.spawnItem(player, location, itemStack, itemSpawnReason);
+     }
+ 
+     public static @Nullable Item spawnItemNaturally(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
+-        return ItemSpawnUtil.spawnItemNaturally(player, location, itemStack, itemSpawnReason);
++        return MiscItemSpawner.spawnItemNaturally(player, location, itemStack, itemSpawnReason);
+     }
+ 
+     public static void spawnItemsTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemStack, int quantity, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
+-        ItemSpawnUtil.spawnItemsTowardsLocation(player, fromLocation, toLocation, itemStack, quantity, speed, itemSpawnReason);
++        MiscItemSpawner.spawnItemsTowardsLocation(player, fromLocation, toLocation, itemStack, quantity, speed, itemSpawnReason);
+     }
+ 
+     public static @Nullable Item spawnItemTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemStack, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
+-        return ItemSpawnUtil.spawnItemTowardsLocation(player, fromLocation, toLocation, itemStack, speed, itemSpawnReason);
++        return MiscItemSpawner.spawnItemTowardsLocation(player, fromLocation, toLocation, itemStack, speed, itemSpawnReason);
+     }
+ 
+     /**
+diff --git a/src/main/java/com/gmail/nossr50/util/MiscItemSpawner.java b/src/main/java/com/gmail/nossr50/util/MiscItemSpawner.java
+new file mode 100644
+index 000000000..2b84a502b
+--- /dev/null
++++ b/src/main/java/com/gmail/nossr50/util/MiscItemSpawner.java
+@@ -0,0 +1,52 @@
++package com.gmail.nossr50.util;
++
++import com.gmail.nossr50.api.ItemSpawnReason;
++import org.bukkit.Location;
++import org.bukkit.entity.Item;
++import org.bukkit.entity.Player;
++import org.bukkit.inventory.ItemStack;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Collection;
++import java.util.function.Predicate;
++
++public final class MiscItemSpawner {
++    private MiscItemSpawner() {}
++
++    public static void spawnItemsFromCollection(@NotNull Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason) {
++        ItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason);
++    }
++
++    public static void spawnItemsFromCollection(@Nullable Player player, @NotNull Location location, @NotNull Collection<ItemStack> drops, @NotNull ItemSpawnReason itemSpawnReason, int sizeLimit) {
++        ItemSpawnUtil.spawnItemsFromCollection(player, location, drops, itemSpawnReason, sizeLimit);
++    }
++
++    public static void spawnItem(@NotNull Collection<ItemStack> potentialItemDrops, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
++        ItemSpawnUtil.spawnItem(potentialItemDrops, itemSpawnReason, spawnLocation, predicate, player);
++    }
++
++    public static void spawnItem(@NotNull ItemStack potentialItemSpawn, @NotNull ItemSpawnReason itemSpawnReason, @NotNull Location spawnLocation, @NotNull Predicate<String> predicate, @NotNull Player player) {
++        ItemSpawnUtil.spawnItem(potentialItemSpawn, itemSpawnReason, spawnLocation, predicate, player);
++    }
++
++    public static void spawnItems(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, int quantity, @NotNull ItemSpawnReason itemSpawnReason) {
++        ItemSpawnUtil.spawnItems(player, location, itemStack, quantity, itemSpawnReason);
++    }
++
++    public static @Nullable Item spawnItem(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
++        return ItemSpawnUtil.spawnItem(player, location, itemStack, itemSpawnReason);
++    }
++
++    public static @Nullable Item spawnItemNaturally(@Nullable Player player, @NotNull Location location, @NotNull ItemStack itemStack, @NotNull ItemSpawnReason itemSpawnReason) {
++        return ItemSpawnUtil.spawnItemNaturally(player, location, itemStack, itemSpawnReason);
++    }
++
++    public static void spawnItemsTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemStack, int quantity, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
++        ItemSpawnUtil.spawnItemsTowardsLocation(player, fromLocation, toLocation, itemStack, quantity, speed, itemSpawnReason);
++    }
++
++    public static @Nullable Item spawnItemTowardsLocation(@Nullable Player player, @NotNull Location fromLocation, @NotNull Location toLocation, @NotNull ItemStack itemStack, double speed, @NotNull ItemSpawnReason itemSpawnReason) {
++        return ItemSpawnUtil.spawnItemTowardsLocation(player, fromLocation, toLocation, itemStack, speed, itemSpawnReason);
++    }
++}

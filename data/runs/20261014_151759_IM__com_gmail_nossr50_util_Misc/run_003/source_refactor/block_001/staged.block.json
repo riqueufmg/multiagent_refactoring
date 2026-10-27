@@ -1,0 +1,65 @@
+{
+  "id": 1,
+  "goal": "Remove the item-spawning compatibility methods from Misc and use the existing cohesive item-spawning API in MiscItemSpawner.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "Misc.spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason)",
+        "Misc.spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason, int)",
+        "Misc.spawnItem(Collection<ItemStack>, ItemSpawnReason, Location, Predicate<String>, Player)",
+        "Misc.spawnItem(ItemStack, ItemSpawnReason, Location, Predicate<String>, Player)",
+        "Misc.spawnItems(Player, Location, ItemStack, int, ItemSpawnReason)",
+        "Misc.spawnItem(Player, Location, ItemStack, ItemSpawnReason)",
+        "Misc.spawnItemNaturally(Player, Location, ItemStack, ItemSpawnReason)",
+        "Misc.spawnItemsTowardsLocation(Player, Location, Location, ItemStack, int, double, ItemSpawnReason)",
+        "Misc.spawnItemTowardsLocation(Player, Location, Location, ItemStack, double, ItemSpawnReason)",
+        "MiscItemSpawner"
+      ],
+      "outputs": [
+        "Call sites that invoke the corresponding methods on MiscItemSpawner"
+      ],
+      "details": "Replace callers of the forwarding methods in Misc with direct calls to the corresponding existing methods in MiscItemSpawner. Preserve argument order, nullability, return values, and overload selection.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc",
+        "com.gmail.nossr50.util.MiscItemSpawner",
+        "spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason)",
+        "spawnItemsFromCollection(Player, Location, Collection<ItemStack>, ItemSpawnReason, int)",
+        "spawnItem(Collection<ItemStack>, ItemSpawnReason, Location, Predicate<String>, Player)",
+        "spawnItem(ItemStack, ItemSpawnReason, Location, Predicate<String>, Player)",
+        "spawnItems(Player, Location, ItemStack, int, ItemSpawnReason)",
+        "spawnItem(Player, Location, ItemStack, ItemSpawnReason)",
+        "spawnItemNaturally(Player, Location, ItemStack, ItemSpawnReason)",
+        "spawnItemsTowardsLocation(Player, Location, Location, ItemStack, int, double, ItemSpawnReason)",
+        "spawnItemTowardsLocation(Player, Location, Location, ItemStack, double, ItemSpawnReason)"
+      ],
+      "outputs": [
+        "Misc without the item-spawning forwarding methods",
+        "MiscItemSpawner as the single owner of the item-spawning API"
+      ],
+      "details": "Consolidate the forwarding methods into the existing MiscItemSpawner implementation. Do not create duplicate overloads; retain the existing MiscItemSpawner implementations and remove the obsolete forwarding declarations from Misc after call sites have been updated.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

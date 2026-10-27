@@ -1,0 +1,89 @@
+{
+  "id": 1,
+  "goal": "Reduce the number of general methods in CasConfiguration by relocating the CAS ticket-validator construction logic to the existing ticket-validator factory.",
+  "files": [
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildSAMLTicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Move the SAML ticket-validator construction method to CasTicketValidatorFactory, preserving its existing context parameter and validator return type.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.addPrivateKey(org.apereo.cas.client.validation.Cas20ServiceTicketValidator)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.addPrivateKey(org.apereo.cas.client.validation.Cas20ServiceTicketValidator)"
+      ],
+      "outputs": [],
+      "details": "Move private-key attachment logic to CasTicketValidatorFactory, where ticket-validator construction is already delegated.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildCas30ProxyTicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Move CAS 3.0 proxy ticket-validator construction to CasTicketValidatorFactory.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildCas30TicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Move CAS 3.0 ticket-validator construction to CasTicketValidatorFactory.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildCas20ProxyTicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Move CAS 2.0 proxy ticket-validator construction to CasTicketValidatorFactory.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildCas20TicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Move CAS 2.0 ticket-validator construction to CasTicketValidatorFactory.",
+      "risk": "medium"
+    },
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildCas10TicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Move CAS 1.0 ticket-validator construction to CasTicketValidatorFactory.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(org.pac4j.core.context.WebContext)",
+        "org.pac4j.cas.config.CasTicketValidatorFactory.buildSAMLTicketValidator(org.pac4j.core.context.WebContext)"
+      ],
+      "outputs": [],
+      "details": "Update internal and external callers to invoke the corresponding CasTicketValidatorFactory methods while preserving CasConfiguration.retrieveTicketValidator as the public entry point.",
+      "risk": "high"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.core.client.BaseClient",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive authentication-profile configuration API and state from BaseClient to reduce the number of public methods and simplify BaseClient.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientConfiguration"
+          ],
+          "details": "Create BaseClientConfiguration in the same package and move the cohesive configuration state and methods for customProperties, profileFactoryWhenNotAuthenticated, multiProfile, and saveProfileInSession: getCustomProperties(), setCustomProperties(Map<String,Object>), getProfileFactoryWhenNotAuthenticated(), setProfileFactoryWhenNotAuthenticated(ProfileFactory), isMultiProfile(WebContext,UserProfile), setMultiProfile(boolean), getSaveProfileInSession(WebContext,UserProfile), and setSaveProfileInSession(boolean). Update BaseClient to delegate required behavior to the extracted configuration object, including the profileFactoryWhenNotAuthenticated branch in getUserProfile(Credentials,WebContext,SessionStore) and the values rendered by toString(). Preserve the existing public behavior and warning logic associated with setProfileFactoryWhenNotAuthenticated(ProfileFactory).",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the cohesive authorization-generator API from BaseClient so authorization configuration is maintained outside the authentication workflow class.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorizationConfiguration"
+          ],
+          "details": "Create BaseClientAuthorizationConfiguration in the same package and move the authorization-generator management methods and state from BaseClient: getAuthorizationGenerators(), setAuthorizationGenerators(List<AuthorizationGenerator>), setAuthorizationGenerators(AuthorizationGenerator...), setAuthorizationGenerator(AuthorizationGenerator), addAuthorizationGenerator(AuthorizationGenerator), and addAuthorizationGenerators(List<AuthorizationGenerator>). Update BaseClient to delegate authorization generation in getUserProfile(Credentials,WebContext,SessionStore) and authorization-generator rendering in toString() through the extracted configuration object.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

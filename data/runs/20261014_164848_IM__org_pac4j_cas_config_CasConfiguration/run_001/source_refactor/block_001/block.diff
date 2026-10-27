@@ -1,0 +1,335 @@
+commit 50e24348768341c75711f6f8b490122265241949
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 16:51:32 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+index 387036740..909326d9c 100644
+--- a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+@@ -1,13 +1,11 @@
+ package org.pac4j.cas.config;
+ 
+-import org.apereo.cas.client.ssl.HttpURLConnectionFactory;
+ import org.apereo.cas.client.util.PrivateKeyUtils;
+ import org.apereo.cas.client.validation.*;
+ import org.pac4j.cas.client.CasProxyReceptor;
+ import org.pac4j.core.client.config.BaseClientConfiguration;
+ import org.pac4j.core.logout.handler.LogoutHandler;
+ import org.pac4j.core.logout.handler.DefaultLogoutHandler;
+-import org.pac4j.cas.store.ProxyGrantingTicketStore;
+ import org.pac4j.core.context.WebContext;
+ import org.pac4j.core.exception.TechnicalException;
+ import org.pac4j.core.http.url.DefaultUrlResolver;
+@@ -15,17 +13,13 @@ import org.pac4j.core.http.url.UrlResolver;
+ import org.pac4j.core.util.CommonHelper;
+ 
+ import javax.net.ssl.HostnameVerifier;
+-import javax.net.ssl.HttpsURLConnection;
+ import javax.net.ssl.SSLSocketFactory;
+-import java.net.HttpURLConnection;
+-import java.net.URLConnection;
+ import java.nio.charset.StandardCharsets;
+ import java.security.PrivateKey;
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+-import java.util.Optional;
+ 
+ /**
+  * CAS configuration.
+@@ -155,34 +149,11 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public TicketValidator retrieveTicketValidator(final WebContext context) {
+-        if (this.defaultTicketValidator != null) {
+-            return this.defaultTicketValidator;
+-        } else {
+-            if (this.protocol == CasProtocol.CAS10) {
+-                return buildCas10TicketValidator(context);
+-            } else if (this.protocol == CasProtocol.CAS20) {
+-                return buildCas20TicketValidator(context);
+-            } else if (this.protocol == CasProtocol.CAS20_PROXY) {
+-                return buildCas20ProxyTicketValidator(context);
+-            } else if (this.protocol == CasProtocol.CAS30) {
+-                return buildCas30TicketValidator(context);
+-            } else if (this.protocol == CasProtocol.CAS30_PROXY) {
+-                return buildCas30ProxyTicketValidator(context);
+-            } else if (this.protocol == CasProtocol.SAML) {
+-                return buildSAMLTicketValidator(context);
+-            } else {
+-                throw new TechnicalException("Unable to initialize the TicketValidator for protocol: " + this.protocol);
+-            }
+-        }
++        return new CasTicketValidatorFactory(this).retrieveTicketValidator(context);
+     }
+ 
+     protected TicketValidator buildSAMLTicketValidator(final WebContext context) {
+-        final var saml11TicketValidator = new Saml11TicketValidator(computeFinalPrefixUrl(context));
+-        saml11TicketValidator.setTolerance(getTimeTolerance());
+-        saml11TicketValidator.setEncoding(this.encoding);
+-        saml11TicketValidator.setRenew(this.renew);
+-        getHttpURLConnectionFactory().ifPresent(saml11TicketValidator::setURLConnectionFactory);
+-        return saml11TicketValidator;
++        return new CasTicketValidatorFactory(this).buildSAMLTicketValidator(context);
+     }
+ 
+     protected void addPrivateKey(final Cas20ServiceTicketValidator validator) {
+@@ -192,67 +163,23 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     protected TicketValidator buildCas30ProxyTicketValidator(final WebContext context) {
+-        final var cas30ProxyTicketValidator = new Cas30ProxyTicketValidator(computeFinalPrefixUrl(context));
+-        cas30ProxyTicketValidator.setEncoding(this.encoding);
+-        cas30ProxyTicketValidator.setRenew(this.renew);
+-        cas30ProxyTicketValidator.setAcceptAnyProxy(this.acceptAnyProxy);
+-        cas30ProxyTicketValidator.setAllowedProxyChains(this.allowedProxyChains);
+-        if (this.proxyReceptor != null) {
+-            cas30ProxyTicketValidator.setProxyCallbackUrl(this.proxyReceptor.computeFinalCallbackUrl(context));
+-            cas30ProxyTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(this.proxyReceptor.getStore()));
+-        }
+-        addPrivateKey(cas30ProxyTicketValidator);
+-        getHttpURLConnectionFactory().ifPresent(cas30ProxyTicketValidator::setURLConnectionFactory);
+-        return cas30ProxyTicketValidator;
++        return new CasTicketValidatorFactory(this).buildCas30ProxyTicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas30TicketValidator(final WebContext context) {
+-        final var cas30ServiceTicketValidator = new Cas30ServiceTicketValidator(computeFinalPrefixUrl(context));
+-        cas30ServiceTicketValidator.setEncoding(this.encoding);
+-        cas30ServiceTicketValidator.setRenew(this.renew);
+-        if (this.proxyReceptor != null) {
+-            cas30ServiceTicketValidator.setProxyCallbackUrl(this.proxyReceptor.computeFinalCallbackUrl(context));
+-            cas30ServiceTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(this.proxyReceptor.getStore()));
+-        }
+-        addPrivateKey(cas30ServiceTicketValidator);
+-        getHttpURLConnectionFactory().ifPresent(cas30ServiceTicketValidator::setURLConnectionFactory);
+-        return cas30ServiceTicketValidator;
++        return new CasTicketValidatorFactory(this).buildCas30TicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas20ProxyTicketValidator(final WebContext context) {
+-        final var cas20ProxyTicketValidator = new Cas20ProxyTicketValidator(computeFinalPrefixUrl(context));
+-        cas20ProxyTicketValidator.setEncoding(this.encoding);
+-        cas20ProxyTicketValidator.setRenew(this.renew);
+-        cas20ProxyTicketValidator.setAcceptAnyProxy(this.acceptAnyProxy);
+-        cas20ProxyTicketValidator.setAllowedProxyChains(this.allowedProxyChains);
+-        if (this.proxyReceptor != null) {
+-            cas20ProxyTicketValidator.setProxyCallbackUrl(this.proxyReceptor.computeFinalCallbackUrl(context));
+-            cas20ProxyTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(this.proxyReceptor.getStore()));
+-        }
+-        addPrivateKey(cas20ProxyTicketValidator);
+-        getHttpURLConnectionFactory().ifPresent(cas20ProxyTicketValidator::setURLConnectionFactory);
+-        return cas20ProxyTicketValidator;
++        return new CasTicketValidatorFactory(this).buildCas20ProxyTicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas20TicketValidator(final WebContext context) {
+-        final var cas20ServiceTicketValidator = new Cas20ServiceTicketValidator(computeFinalPrefixUrl(context));
+-        cas20ServiceTicketValidator.setEncoding(this.encoding);
+-        cas20ServiceTicketValidator.setRenew(this.renew);
+-        if (this.proxyReceptor != null) {
+-            cas20ServiceTicketValidator.setProxyCallbackUrl(this.proxyReceptor.computeFinalCallbackUrl(context));
+-            cas20ServiceTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(this.proxyReceptor.getStore()));
+-        }
+-        addPrivateKey(cas20ServiceTicketValidator);
+-        getHttpURLConnectionFactory().ifPresent(cas20ServiceTicketValidator::setURLConnectionFactory);
+-        return cas20ServiceTicketValidator;
++        return new CasTicketValidatorFactory(this).buildCas20TicketValidator(context);
+     }
+ 
+     protected TicketValidator buildCas10TicketValidator(final WebContext context) {
+-        final var cas10TicketValidator = new Cas10TicketValidator(computeFinalPrefixUrl(context));
+-        cas10TicketValidator.setEncoding(this.encoding);
+-        cas10TicketValidator.setRenew(this.renew);
+-        getHttpURLConnectionFactory().ifPresent(cas10TicketValidator::setURLConnectionFactory);
+-        return cas10TicketValidator;
++        return new CasTicketValidatorFactory(this).buildCas10TicketValidator(context);
+     }
+ 
+     public String getEncoding() {
+@@ -470,28 +397,4 @@ public class CasConfiguration extends BaseClientConfiguration {
+                 this.postLogoutUrlParameter, "defaultTicketValidator", this.defaultTicketValidator, "urlResolver", this.urlResolver,
+                 "method", this.method, "privateKeyPath", this.privateKeyPath, "privateKeyAlgorithm", this.privateKeyAlgorithm);
+     }
+-
+-    private Optional<HttpURLConnectionFactory> getHttpURLConnectionFactory() {
+-        if (this.sslSocketFactory == null && this.hostnameVerifier == null) {
+-            return Optional.empty();
+-        }
+-        var factory = new HttpURLConnectionFactory() {
+-            private static final long serialVersionUID = 7296708420276819683L;
+-
+-            @Override
+-            public HttpURLConnection buildHttpURLConnection(URLConnection conn) {
+-                if (conn instanceof HttpsURLConnection) {
+-                    var httpsConnection = (HttpsURLConnection) conn;
+-                    if (getSslSocketFactory() != null) {
+-                        httpsConnection.setSSLSocketFactory(getSslSocketFactory());
+-                    }
+-                    if (getHostnameVerifier() != null) {
+-                        httpsConnection.setHostnameVerifier(getHostnameVerifier());
+-                    }
+-                }
+-                return (HttpURLConnection) conn;
+-            }
+-        };
+-        return Optional.of(factory);
+-    }
+ }
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorFactory.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorFactory.java
+new file mode 100644
+index 000000000..b56edfca6
+--- /dev/null
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorFactory.java
+@@ -0,0 +1,148 @@
++package org.pac4j.cas.config;
++
++import org.apereo.cas.client.ssl.HttpURLConnectionFactory;
++import org.apereo.cas.client.validation.*;
++import org.pac4j.cas.client.CasProxyReceptor;
++import org.pac4j.cas.store.ProxyGrantingTicketStore;
++import org.pac4j.core.context.WebContext;
++import org.pac4j.core.exception.TechnicalException;
++
++import javax.net.ssl.HttpsURLConnection;
++import java.net.HttpURLConnection;
++import java.net.URLConnection;
++import java.util.Optional;
++
++/**
++ * Factory for CAS ticket validators and HTTP connection customization.
++ */
++public class CasTicketValidatorFactory {
++
++    private final CasConfiguration configuration;
++
++    public CasTicketValidatorFactory(final CasConfiguration configuration) {
++        this.configuration = configuration;
++    }
++
++    public TicketValidator retrieveTicketValidator(final WebContext context) {
++        final TicketValidator defaultTicketValidator = configuration.getDefaultTicketValidator();
++        if (defaultTicketValidator != null) {
++            return defaultTicketValidator;
++        }
++        if (configuration.getProtocol() == CasProtocol.CAS10) {
++            return buildCas10TicketValidator(context);
++        } else if (configuration.getProtocol() == CasProtocol.CAS20) {
++            return buildCas20TicketValidator(context);
++        } else if (configuration.getProtocol() == CasProtocol.CAS20_PROXY) {
++            return buildCas20ProxyTicketValidator(context);
++        } else if (configuration.getProtocol() == CasProtocol.CAS30) {
++            return buildCas30TicketValidator(context);
++        } else if (configuration.getProtocol() == CasProtocol.CAS30_PROXY) {
++            return buildCas30ProxyTicketValidator(context);
++        } else if (configuration.getProtocol() == CasProtocol.SAML) {
++            return buildSAMLTicketValidator(context);
++        } else {
++            throw new TechnicalException("Unable to initialize the TicketValidator for protocol: " + configuration.getProtocol());
++        }
++    }
++
++    public TicketValidator buildSAMLTicketValidator(final WebContext context) {
++        final var saml11TicketValidator = new Saml11TicketValidator(configuration.computeFinalPrefixUrl(context));
++        saml11TicketValidator.setTolerance(configuration.getTimeTolerance());
++        saml11TicketValidator.setEncoding(configuration.getEncoding());
++        saml11TicketValidator.setRenew(configuration.isRenew());
++        getHttpURLConnectionFactory().ifPresent(saml11TicketValidator::setURLConnectionFactory);
++        return saml11TicketValidator;
++    }
++
++    public TicketValidator buildCas30ProxyTicketValidator(final WebContext context) {
++        final var cas30ProxyTicketValidator = new Cas30ProxyTicketValidator(configuration.computeFinalPrefixUrl(context));
++        cas30ProxyTicketValidator.setEncoding(configuration.getEncoding());
++        cas30ProxyTicketValidator.setRenew(configuration.isRenew());
++        cas30ProxyTicketValidator.setAcceptAnyProxy(configuration.isAcceptAnyProxy());
++        cas30ProxyTicketValidator.setAllowedProxyChains(configuration.getAllowedProxyChains());
++        final CasProxyReceptor proxyReceptor = configuration.getProxyReceptor();
++        if (proxyReceptor != null) {
++            cas30ProxyTicketValidator.setProxyCallbackUrl(proxyReceptor.computeFinalCallbackUrl(context));
++            cas30ProxyTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(proxyReceptor.getStore()));
++        }
++        configuration.addPrivateKey(cas30ProxyTicketValidator);
++        getHttpURLConnectionFactory().ifPresent(cas30ProxyTicketValidator::setURLConnectionFactory);
++        return cas30ProxyTicketValidator;
++    }
++
++    public TicketValidator buildCas30TicketValidator(final WebContext context) {
++        final var cas30ServiceTicketValidator = new Cas30ServiceTicketValidator(configuration.computeFinalPrefixUrl(context));
++        cas30ServiceTicketValidator.setEncoding(configuration.getEncoding());
++        cas30ServiceTicketValidator.setRenew(configuration.isRenew());
++        final CasProxyReceptor proxyReceptor = configuration.getProxyReceptor();
++        if (proxyReceptor != null) {
++            cas30ServiceTicketValidator.setProxyCallbackUrl(proxyReceptor.computeFinalCallbackUrl(context));
++            cas30ServiceTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(proxyReceptor.getStore()));
++        }
++        configuration.addPrivateKey(cas30ServiceTicketValidator);
++        getHttpURLConnectionFactory().ifPresent(cas30ServiceTicketValidator::setURLConnectionFactory);
++        return cas30ServiceTicketValidator;
++    }
++
++    public TicketValidator buildCas20ProxyTicketValidator(final WebContext context) {
++        final var cas20ProxyTicketValidator = new Cas20ProxyTicketValidator(configuration.computeFinalPrefixUrl(context));
++        cas20ProxyTicketValidator.setEncoding(configuration.getEncoding());
++        cas20ProxyTicketValidator.setRenew(configuration.isRenew());
++        cas20ProxyTicketValidator.setAcceptAnyProxy(configuration.isAcceptAnyProxy());
++        cas20ProxyTicketValidator.setAllowedProxyChains(configuration.getAllowedProxyChains());
++        final CasProxyReceptor proxyReceptor = configuration.getProxyReceptor();
++        if (proxyReceptor != null) {
++            cas20ProxyTicketValidator.setProxyCallbackUrl(proxyReceptor.computeFinalCallbackUrl(context));
++            cas20ProxyTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(proxyReceptor.getStore()));
++        }
++        configuration.addPrivateKey(cas20ProxyTicketValidator);
++        getHttpURLConnectionFactory().ifPresent(cas20ProxyTicketValidator::setURLConnectionFactory);
++        return cas20ProxyTicketValidator;
++    }
++
++    public TicketValidator buildCas20TicketValidator(final WebContext context) {
++        final var cas20ServiceTicketValidator = new Cas20ServiceTicketValidator(configuration.computeFinalPrefixUrl(context));
++        cas20ServiceTicketValidator.setEncoding(configuration.getEncoding());
++        cas20ServiceTicketValidator.setRenew(configuration.isRenew());
++        final CasProxyReceptor proxyReceptor = configuration.getProxyReceptor();
++        if (proxyReceptor != null) {
++            cas20ServiceTicketValidator.setProxyCallbackUrl(proxyReceptor.computeFinalCallbackUrl(context));
++            cas20ServiceTicketValidator.setProxyGrantingTicketStorage(new ProxyGrantingTicketStore(proxyReceptor.getStore()));
++        }
++        configuration.addPrivateKey(cas20ServiceTicketValidator);
++        getHttpURLConnectionFactory().ifPresent(cas20ServiceTicketValidator::setURLConnectionFactory);
++        return cas20ServiceTicketValidator;
++    }
++
++    public TicketValidator buildCas10TicketValidator(final WebContext context) {
++        final var cas10TicketValidator = new Cas10TicketValidator(configuration.computeFinalPrefixUrl(context));
++        cas10TicketValidator.setEncoding(configuration.getEncoding());
++        cas10TicketValidator.setRenew(configuration.isRenew());
++        getHttpURLConnectionFactory().ifPresent(cas10TicketValidator::setURLConnectionFactory);
++        return cas10TicketValidator;
++    }
++
++    private Optional<HttpURLConnectionFactory> getHttpURLConnectionFactory() {
++        if (configuration.getSslSocketFactory() == null && configuration.getHostnameVerifier() == null) {
++            return Optional.empty();
++        }
++        final var factory = new HttpURLConnectionFactory() {
++            private static final long serialVersionUID = 7296708420276819683L;
++
++            @Override
++            public HttpURLConnection buildHttpURLConnection(final URLConnection conn) {
++                if (conn instanceof HttpsURLConnection) {
++                    final var httpsConnection = (HttpsURLConnection) conn;
++                    if (configuration.getSslSocketFactory() != null) {
++                        httpsConnection.setSSLSocketFactory(configuration.getSslSocketFactory());
++                    }
++                    if (configuration.getHostnameVerifier() != null) {
++                        httpsConnection.setHostnameVerifier(configuration.getHostnameVerifier());
++                    }
++                }
++                return (HttpURLConnection) conn;
++            }
++        };
++        return Optional.of(factory);
++    }
++}

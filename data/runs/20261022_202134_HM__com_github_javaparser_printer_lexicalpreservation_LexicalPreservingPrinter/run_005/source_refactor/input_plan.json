@@ -1,0 +1,72 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "package",
+  "target": "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter",
+  "selected_cluster": [
+    "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter",
+    "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator",
+    "com.github.javaparser.printer.lexicalpreservation.Difference"
+  ],
+  "destination_package": "com.github.javaparser.printer.lexicalpreservation.core",
+  "cluster_reason": "These classes form a tightly coupled lexical-preservation implementation cluster: LexicalPreservingPrinter directly coordinates LexicalDifferenceCalculator and Difference, while the latter two calculate and apply lexical changes used during AST transformations. Moving them together preserves their internal collaboration and limits package-private visibility adjustments to the implementation cluster.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the selected lexical-preservation implementation cluster together.",
+      "files": [
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalDifferenceCalculator.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/Difference.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "com.github.javaparser.printer.lexicalpreservation.core"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter"
+          ],
+          "outputs": [
+            "com.github.javaparser.printer.lexicalpreservation.core.LexicalPreservingPrinter"
+          ],
+          "details": "Move LexicalPreservingPrinter to the shared lexical-preservation implementation subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator"
+          ],
+          "outputs": [
+            "com.github.javaparser.printer.lexicalpreservation.core.LexicalDifferenceCalculator"
+          ],
+          "details": "Move LexicalDifferenceCalculator alongside the printer because it calculates the lexical differences consumed by the printer and Difference.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "com.github.javaparser.printer.lexicalpreservation.Difference"
+          ],
+          "outputs": [
+            "com.github.javaparser.printer.lexicalpreservation.core.Difference"
+          ],
+          "details": "Move Difference alongside the printer and lexical difference calculator because it applies the calculated lexical changes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

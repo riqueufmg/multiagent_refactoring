@@ -1,0 +1,47 @@
+mvp:
+  name: source_refactor
+  run_id: run_003
+input:
+  planner_contract: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async/run_003/planner/contract.json
+  planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async/run_003/planner/contract.json
+models:
+  executor: gpt-5.6-luna
+  repair: gpt-5.6-luna
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/system.md
+  execute_plan: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/execute_plan.md
+  repair_compile: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/repair_compile.md
+executor:
+  temperature: 0.0
+  timeout: 600
+  max_retries: 5
+  max_block_attempts: 5
+repair:
+  enabled: true
+  max_attempts: 5
+compile:
+  timeout: 900
+  command:
+  - /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/commits/cde1db55a6b9/build_mars.sh
+mechanical_tools:
+  openrewrite_enabled: true
+  openrewrite_timeout: 900
+  openrewrite_command:
+  - /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/commits/cde1db55a6b9/openrewrite_mars_online.sh
+tests:
+  update_tests: true
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async
+project:
+  name: jackson-core
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/repository
+target:
+  smell: GC
+  smell_name: God Component
+  target_type: package
+  target_name: tools.jackson.core.json.async
+planner_contract: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async/run_003/planner/contract.json
+planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async/run_003/planner/contract.json
+planner:
+  contract: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async/run_003/planner/contract.json
+  contract_path: /data/henrique/multiagent_refactoring/data/runs/20261019_170048_GC__tools_jackson_core_json_async/run_003/planner/contract.json

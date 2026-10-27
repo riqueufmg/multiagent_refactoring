@@ -1,0 +1,87 @@
+{
+  "id": 1,
+  "goal": "Extract general location, entity, randomization, and mod-name utilities from Misc to reduce its public API and implementation scope.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers",
+        "com.gmail.nossr50.util.Misc.isNear",
+        "com.gmail.nossr50.util.Misc.getBlockCenter",
+        "com.gmail.nossr50.util.Misc.getModName",
+        "com.gmail.nossr50.util.Misc.getLocationOffset",
+        "com.gmail.nossr50.util.Misc.getRandom",
+        "com.gmail.nossr50.util.Misc.isPartyLeader",
+        "com.gmail.nossr50.util.Misc.spawnExperienceOrb",
+        "com.gmail.nossr50.util.Misc.random",
+        "com.gmail.nossr50.util.Misc.modNames",
+        "com.gmail.nossr50.util.Misc.SpawnOrbTask"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscGeneralUtil",
+        "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java"
+      ],
+      "details": "Create MiscGeneralUtil in the same package and move the listed cohesive methods, fields, and the private SpawnOrbTask implementation into it. Preserve the existing static signatures and annotations. Remove the moved members from Misc.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java"
+      ],
+      "outputs": [
+        "src/main/java/com/gmail/nossr50/util/MiscGeneralUtil.java"
+      ],
+      "details": "Add the imports already required by the moved methods and fields, including Location, BlockState, EntityType, ExperienceOrb, McMMOPlayer, ImmutableSet, Random, Locale, NotNull, and Nullable.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers",
+        "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers",
+        "com.gmail.nossr50.util.Misc.isNear",
+        "com.gmail.nossr50.util.Misc.getBlockCenter",
+        "com.gmail.nossr50.util.Misc.getModName",
+        "com.gmail.nossr50.util.Misc.getLocationOffset",
+        "com.gmail.nossr50.util.Misc.getRandom",
+        "com.gmail.nossr50.util.Misc.isPartyLeader",
+        "com.gmail.nossr50.util.Misc.spawnExperienceOrb",
+        "com.gmail.nossr50.util.Misc.modNames"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.MiscGeneralUtil.isNPCEntityExcludingVillagers",
+        "com.gmail.nossr50.util.MiscGeneralUtil.isNPCIncludingVillagers",
+        "com.gmail.nossr50.util.MiscGeneralUtil.isNear",
+        "com.gmail.nossr50.util.MiscGeneralUtil.getBlockCenter",
+        "com.gmail.nossr50.util.MiscGeneralUtil.getModName",
+        "com.gmail.nossr50.util.MiscGeneralUtil.getLocationOffset",
+        "com.gmail.nossr50.util.MiscGeneralUtil.getRandom",
+        "com.gmail.nossr50.util.MiscGeneralUtil.isPartyLeader",
+        "com.gmail.nossr50.util.MiscGeneralUtil.spawnExperienceOrb",
+        "com.gmail.nossr50.util.MiscGeneralUtil.modNames"
+      ],
+      "details": "Update all production references from Misc to MiscGeneralUtil for the moved methods and field. Do not retain forwarding methods in Misc.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

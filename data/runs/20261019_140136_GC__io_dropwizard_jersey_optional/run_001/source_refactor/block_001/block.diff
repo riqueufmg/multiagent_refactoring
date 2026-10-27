@@ -1,0 +1,167 @@
+commit fe95367f2a3faa10b9370e2371f00629f2fe79df
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Oct 19 14:14:02 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/dropwizard-core/src/main/java/io/dropwizard/setup/ExceptionMapperBinder.java b/dropwizard-core/src/main/java/io/dropwizard/setup/ExceptionMapperBinder.java
+index c17ac91d1c..f379ff3f03 100644
+--- a/dropwizard-core/src/main/java/io/dropwizard/setup/ExceptionMapperBinder.java
++++ b/dropwizard-core/src/main/java/io/dropwizard/setup/ExceptionMapperBinder.java
+@@ -5,7 +5,7 @@ import io.dropwizard.jersey.errors.EofExceptionWriterInterceptor;
+ import io.dropwizard.jersey.errors.IllegalStateExceptionMapper;
+ import io.dropwizard.jersey.errors.LoggingExceptionMapper;
+ import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
+-import io.dropwizard.jersey.optional.EmptyOptionalExceptionMapper;
++import io.dropwizard.jersey.optional.exception.EmptyOptionalExceptionMapper;
+ import io.dropwizard.jersey.validation.JerseyViolationExceptionMapper;
+ import org.glassfish.jersey.internal.inject.AbstractBinder;
+ 
+diff --git a/dropwizard-e2e/src/main/java/com/example/app1/App1.java b/dropwizard-e2e/src/main/java/com/example/app1/App1.java
+index 1457898e79..e9a2217809 100644
+--- a/dropwizard-e2e/src/main/java/com/example/app1/App1.java
++++ b/dropwizard-e2e/src/main/java/com/example/app1/App1.java
+@@ -3,7 +3,7 @@ package com.example.app1;
+ import com.github.mustachejava.MustacheNotFoundException;
+ import io.dropwizard.Application;
+ import io.dropwizard.Configuration;
+-import io.dropwizard.jersey.optional.EmptyOptionalNoContentExceptionMapper;
++import io.dropwizard.jersey.optional.exception.EmptyOptionalNoContentExceptionMapper;
+ import io.dropwizard.setup.Bootstrap;
+ import io.dropwizard.setup.Environment;
+ import io.dropwizard.views.ViewBundle;
+diff --git a/dropwizard-hibernate/src/test/java/io/dropwizard/hibernate/JerseyIntegrationTest.java b/dropwizard-hibernate/src/test/java/io/dropwizard/hibernate/JerseyIntegrationTest.java
+index 406f0daff2..cc408e914f 100644
+--- a/dropwizard-hibernate/src/test/java/io/dropwizard/hibernate/JerseyIntegrationTest.java
++++ b/dropwizard-hibernate/src/test/java/io/dropwizard/hibernate/JerseyIntegrationTest.java
+@@ -6,7 +6,7 @@ import io.dropwizard.jackson.Jackson;
+ import io.dropwizard.jersey.DropwizardResourceConfig;
+ import io.dropwizard.jersey.errors.ErrorMessage;
+ import io.dropwizard.jersey.jackson.JacksonFeature;
+-import io.dropwizard.jersey.optional.EmptyOptionalExceptionMapper;
++import io.dropwizard.jersey.optional.exception.EmptyOptionalExceptionMapper;
+ import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
+ import io.dropwizard.logging.BootstrapLogging;
+ import io.dropwizard.setup.Environment;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/guava/OptionalMessageBodyWriter.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/guava/OptionalMessageBodyWriter.java
+index e59e1ec49b..8215a5783e 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/guava/OptionalMessageBodyWriter.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/guava/OptionalMessageBodyWriter.java
+@@ -1,7 +1,7 @@
+ package io.dropwizard.jersey.guava;
+ 
+ import com.google.common.base.Optional;
+-import io.dropwizard.jersey.optional.EmptyOptionalException;
++import io.dropwizard.jersey.optional.exception.EmptyOptionalException;
+ import org.glassfish.jersey.message.MessageBodyWorkers;
+ 
+ import javax.annotation.Nullable;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java
+index b9b65b7c24..182916352d 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java
+@@ -1,15 +1,8 @@
+ package io.dropwizard.jersey.optional;
+ 
+-import javax.ws.rs.core.Response;
+-import javax.ws.rs.ext.ExceptionMapper;
+-
+ /**
+- * The default response when an empty optional is returned, is to respond with
+- * a 404 NOT FOUND response.
++ * Compatibility mapper for the relocated optional exception mapper.
+  */
+-public class EmptyOptionalExceptionMapper implements ExceptionMapper<EmptyOptionalException> {
+-    @Override
+-    public Response toResponse(EmptyOptionalException exception) {
+-        return Response.status(Response.Status.NOT_FOUND).build();
+-    }
++public class EmptyOptionalExceptionMapper
++        extends io.dropwizard.jersey.optional.exception.EmptyOptionalExceptionMapper {
+ }
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleMessageBodyWriter.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleMessageBodyWriter.java
+index 9086d3fd77..e9f432e7b7 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleMessageBodyWriter.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleMessageBodyWriter.java
+@@ -1,5 +1,7 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.exception.EmptyOptionalException;
++
+ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.MultivaluedMap;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriter.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriter.java
+index 4d8a0f2597..e8dc61372b 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriter.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriter.java
+@@ -1,5 +1,7 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.exception.EmptyOptionalException;
++
+ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.MultivaluedMap;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongMessageBodyWriter.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongMessageBodyWriter.java
+index ba6887efda..3ad3dbd483 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongMessageBodyWriter.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongMessageBodyWriter.java
+@@ -1,5 +1,7 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.exception.EmptyOptionalException;
++
+ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.MultivaluedMap;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalMessageBodyWriter.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalMessageBodyWriter.java
+index d26a7685ab..59cd1a5949 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalMessageBodyWriter.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalMessageBodyWriter.java
+@@ -1,5 +1,6 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.exception.EmptyOptionalException;
+ import org.glassfish.jersey.message.MessageBodyWorkers;
+ 
+ import javax.annotation.Nullable;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalException.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalException.java
+similarity index 89%
+rename from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalException.java
+rename to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalException.java
+index 074a20014b..a0cc4e959c 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalException.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalException.java
+@@ -1,4 +1,4 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.exception;
+ 
+ /**
+  * An exception thrown when a resource endpoint attempts to write out an
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalExceptionMapper.java
+similarity index 90%
+copy from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java
+copy to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalExceptionMapper.java
+index b9b65b7c24..1dc6fbe461 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalExceptionMapper.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalExceptionMapper.java
+@@ -1,4 +1,4 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.exception;
+ 
+ import javax.ws.rs.core.Response;
+ import javax.ws.rs.ext.ExceptionMapper;
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalNoContentExceptionMapper.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalNoContentExceptionMapper.java
+similarity index 90%
+rename from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalNoContentExceptionMapper.java
+rename to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalNoContentExceptionMapper.java
+index a0e162b909..b1ed83fb61 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/EmptyOptionalNoContentExceptionMapper.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalNoContentExceptionMapper.java
+@@ -1,4 +1,4 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.exception;
+ 
+ import javax.ws.rs.core.Response;
+ import javax.ws.rs.ext.ExceptionMapper;

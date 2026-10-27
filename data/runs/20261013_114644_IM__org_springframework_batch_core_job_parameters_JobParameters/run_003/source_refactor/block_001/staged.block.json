@@ -1,0 +1,68 @@
+{
+  "id": 1,
+  "goal": "Centralize typed parameter access in the existing JobParameterTypedAccessors component and reduce the number of general responsibilities implemented by JobParameters.",
+  "files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, Date)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, LocalDate)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, LocalTime)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, LocalDateTime)"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.job.parameters.JobParameterTypedAccessors"
+      ],
+      "details": "Move the typed accessor behavior to JobParameterTypedAccessors, which already owns the corresponding typed access operations and receives the parameters map from JobParameters. Preserve the existing nullability and default-value behavior.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, Date)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, LocalDate)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, LocalTime)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, LocalDateTime)"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.job.parameters.JobParameterTypedAccessors"
+      ],
+      "details": "Update callers to use JobParameterTypedAccessors for typed parameter retrieval after the methods are moved. Retain JobParameters only for parameter storage, collection access, identity filtering, equality, hashing, and string representation.",
+      "risk": "high"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java"
+      ],
+      "outputs": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java"
+      ],
+      "details": "Remove imports used exclusively by the moved typed accessor methods, including LocalDate, LocalDateTime, LocalTime, and Date, if they are no longer required by the remaining JobParameters implementation.",
+      "risk": "low"
+    }
+  ]
+}

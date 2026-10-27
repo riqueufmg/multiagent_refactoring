@@ -1,0 +1,71 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "io.github.classgraph.base.internal.utils.AcceptReject",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the size and complexity of AcceptReject by extracting the cohesive whole-string acceptance and rejection implementation while retaining the existing nested API for compatibility.",
+      "files": [
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectWholeString.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.base.internal.utils.AcceptReject.AcceptRejectWholeString"
+          ],
+          "outputs": [
+            "io.github.classgraph.base.internal.utils.AcceptRejectWholeString"
+          ],
+          "details": "Extract the fields and implementation associated with exact-string and wildcard acceptance, rejection, prefix tracking, and wildcardIndex into a top-level AcceptRejectWholeString class in the same package. Keep the existing nested AcceptReject.AcceptRejectWholeString as a compatibility adapter extending or delegating to the extracted class, and preserve its constructor and public methods.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce the number of implementation methods in AcceptReject by extracting the cohesive prefix-based matching implementation while preserving existing callers.",
+      "files": [
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectPrefix.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.base.internal.utils.AcceptReject.AcceptRejectPrefix"
+          ],
+          "outputs": [
+            "io.github.classgraph.base.internal.utils.AcceptRejectPrefix"
+          ],
+          "details": "Extract the prefix-based addToAccept, addToReject, isAcceptedAndNotRejected, isAccepted, acceptHasPrefix, and isRejected implementations into a top-level AcceptRejectPrefix class in the same package. Keep the existing nested AcceptReject.AcceptRejectPrefix as a compatibility adapter with the same constructor and public API.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Remove leaf-name-specific behavior from the large target class by extracting it into a focused class.",
+      "files": [
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectWholeString.java",
+        "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectLeafname.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.base.internal.utils.AcceptReject.AcceptRejectLeafname"
+          ],
+          "outputs": [
+            "io.github.classgraph.base.internal.utils.AcceptRejectLeafname"
+          ],
+          "details": "Extract the leaf-name-specific overrides of addToAccept, addToReject, isAcceptedAndNotRejected, isAccepted, acceptHasPrefix, and isRejected into a top-level AcceptRejectLeafname class in the same package, extending the extracted AcceptRejectWholeString implementation. Keep the existing nested AcceptReject.AcceptRejectLeafname as a compatibility adapter with the same constructor and public API.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

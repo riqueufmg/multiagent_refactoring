@@ -1,0 +1,193 @@
+commit 62f5f4d16ab821869a1e1965f85d26256470eed0
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 15 13:22:40 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+index 33f82218f..6be505c3a 100644
+--- a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+@@ -1,6 +1,5 @@
+ package org.pac4j.cas.config;
+ 
+-import org.apereo.cas.client.util.PrivateKeyUtils;
+ import org.apereo.cas.client.validation.ProxyList;
+ import org.apereo.cas.client.validation.TicketValidator;
+ import org.pac4j.cas.client.CasProxyReceptor;
+@@ -65,15 +64,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private String method;
+ 
+-    private String privateKeyPath;
+-
+-    private String privateKeyAlgorithm;
+-
+-    private PrivateKey privateKey;
+-
+-    private HostnameVerifier hostnameVerifier;
+-
+-    private SSLSocketFactory sslSocketFactory;
++    private final CasSecurityConfiguration securityConfiguration = new CasSecurityConfiguration();
+ 
+     private final CasUrlConfiguration urlConfiguration = new CasUrlConfiguration();
+ 
+@@ -103,15 +94,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+         initializeLogoutHandler();
+ 
+-        if (privateKeyPath != null) {
+-            final String algo;
+-            if (privateKeyAlgorithm != null) {
+-                algo = privateKeyAlgorithm;
+-            } else {
+-                algo = "RSA";
+-            }
+-            this.privateKey = PrivateKeyUtils.createKey(privateKeyPath, algo);
+-        }
++        securityConfiguration.initializePrivateKey();
+     }
+ 
+     protected void initializeClientConfiguration() {
+@@ -157,7 +140,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     PrivateKey getPrivateKey() {
+-        return privateKey;
++        return securityConfiguration.getPrivateKey();
+     }
+ 
+     public String getEncoding() {
+@@ -197,19 +180,19 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public HostnameVerifier getHostnameVerifier() {
+-        return hostnameVerifier;
++        return securityConfiguration.getHostnameVerifier();
+     }
+ 
+     public void setHostnameVerifier(final HostnameVerifier hostnameVerifier) {
+-        this.hostnameVerifier = hostnameVerifier;
++        securityConfiguration.setHostnameVerifier(hostnameVerifier);
+     }
+ 
+     public SSLSocketFactory getSslSocketFactory() {
+-        return sslSocketFactory;
++        return securityConfiguration.getSslSocketFactory();
+     }
+ 
+     public void setSslSocketFactory(final SSLSocketFactory sslSocketFactory) {
+-        this.sslSocketFactory = sslSocketFactory;
++        securityConfiguration.setSslSocketFactory(sslSocketFactory);
+     }
+ 
+     public Map<String, String> getCustomParams() {
+@@ -351,19 +334,19 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public String getPrivateKeyPath() {
+-        return privateKeyPath;
++        return securityConfiguration.getPrivateKeyPath();
+     }
+ 
+     public void setPrivateKeyPath(final String privateKeyPath) {
+-        this.privateKeyPath = privateKeyPath;
++        securityConfiguration.setPrivateKeyPath(privateKeyPath);
+     }
+ 
+     public String getPrivateKeyAlgorithm() {
+-        return privateKeyAlgorithm;
++        return securityConfiguration.getPrivateKeyAlgorithm();
+     }
+ 
+     public void setPrivateKeyAlgorithm(final String privateKeyAlgorithm) {
+-        this.privateKeyAlgorithm = privateKeyAlgorithm;
++        securityConfiguration.setPrivateKeyAlgorithm(privateKeyAlgorithm);
+     }
+ 
+     @Override
+@@ -373,6 +356,6 @@ public class CasConfiguration extends BaseClientConfiguration {
+                 "logoutHandler", this.logoutHandler, "acceptAnyProxy", this.acceptAnyProxy, "allowedProxyChains", this.allowedProxyChains,
+                 "proxyReceptor", this.proxyReceptor, "timeTolerance", this.timeTolerance, "postLogoutUrlParameter",
+                 this.postLogoutUrlParameter, "defaultTicketValidator", this.defaultTicketValidator, "urlResolver", this.getUrlResolver(),
+-                "method", this.method, "privateKeyPath", this.privateKeyPath, "privateKeyAlgorithm", this.privateKeyAlgorithm);
++                "method", this.method, "privateKeyPath", this.getPrivateKeyPath(), "privateKeyAlgorithm", this.getPrivateKeyAlgorithm());
+     }
+ }
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java
+new file mode 100644
+index 000000000..79a270f0a
+--- /dev/null
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasSecurityConfiguration.java
+@@ -0,0 +1,71 @@
++package org.pac4j.cas.config;
++
++import org.apereo.cas.client.util.PrivateKeyUtils;
++
++import javax.net.ssl.HostnameVerifier;
++import javax.net.ssl.SSLSocketFactory;
++import java.security.PrivateKey;
++
++/**
++ * Security-related CAS configuration.
++ */
++public class CasSecurityConfiguration {
++
++    private String privateKeyPath;
++
++    private String privateKeyAlgorithm;
++
++    private PrivateKey privateKey;
++
++    private HostnameVerifier hostnameVerifier;
++
++    private SSLSocketFactory sslSocketFactory;
++
++    public HostnameVerifier getHostnameVerifier() {
++        return hostnameVerifier;
++    }
++
++    public void setHostnameVerifier(final HostnameVerifier hostnameVerifier) {
++        this.hostnameVerifier = hostnameVerifier;
++    }
++
++    public SSLSocketFactory getSslSocketFactory() {
++        return sslSocketFactory;
++    }
++
++    public void setSslSocketFactory(final SSLSocketFactory sslSocketFactory) {
++        this.sslSocketFactory = sslSocketFactory;
++    }
++
++    public String getPrivateKeyPath() {
++        return privateKeyPath;
++    }
++
++    public void setPrivateKeyPath(final String privateKeyPath) {
++        this.privateKeyPath = privateKeyPath;
++    }
++
++    public String getPrivateKeyAlgorithm() {
++        return privateKeyAlgorithm;
++    }
++
++    public void setPrivateKeyAlgorithm(final String privateKeyAlgorithm) {
++        this.privateKeyAlgorithm = privateKeyAlgorithm;
++    }
++
++    PrivateKey getPrivateKey() {
++        return privateKey;
++    }
++
++    void initializePrivateKey() {
++        if (privateKeyPath != null) {
++            final String algo;
++            if (privateKeyAlgorithm != null) {
++                algo = privateKeyAlgorithm;
++            } else {
++                algo = "RSA";
++            }
++            this.privateKey = PrivateKeyUtils.createKey(privateKeyPath, algo);
++        }
++    }
++}

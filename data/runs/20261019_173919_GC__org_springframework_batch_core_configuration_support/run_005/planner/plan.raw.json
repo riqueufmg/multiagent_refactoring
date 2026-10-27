@@ -1,0 +1,72 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.springframework.batch.core.configuration.support",
+  "selected_cluster": [
+    "org.springframework.batch.core.configuration.support.DefaultBatchConfiguration",
+    "org.springframework.batch.core.configuration.support.JdbcDefaultBatchConfiguration",
+    "org.springframework.batch.core.configuration.support.MongoDefaultBatchConfiguration"
+  ],
+  "destination_package": "org.springframework.batch.core.configuration.support.configuration",
+  "cluster_reason": "These three classes form a cohesive configuration family: DefaultBatchConfiguration provides the common batch infrastructure configuration, while JdbcDefaultBatchConfiguration and MongoDefaultBatchConfiguration provide database-specific variants. Moving them together preserves their conceptual grouping and avoids separating closely related configuration implementations.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive batch configuration class family into a dedicated configuration subpackage.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/DefaultBatchConfiguration.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JdbcDefaultBatchConfiguration.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/MongoDefaultBatchConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.configuration"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.configuration.support.DefaultBatchConfiguration"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.configuration.DefaultBatchConfiguration"
+          ],
+          "details": "Move the common batch configuration class to the dedicated configuration subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.configuration.support.JdbcDefaultBatchConfiguration"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.configuration.JdbcDefaultBatchConfiguration"
+          ],
+          "details": "Move the JDBC-specific batch configuration class to the same dedicated configuration subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.configuration.support.MongoDefaultBatchConfiguration"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.configuration.MongoDefaultBatchConfiguration"
+          ],
+          "details": "Move the MongoDB-specific batch configuration class to the same dedicated configuration subpackage.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

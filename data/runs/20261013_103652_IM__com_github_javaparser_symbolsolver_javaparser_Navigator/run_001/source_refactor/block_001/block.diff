@@ -1,0 +1,180 @@
+commit 2597b960eda6d40abe8a998727f6a4a31ce11b61
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 10:41:25 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index b0a46db2b..230cffea8 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -54,7 +54,7 @@ public final class Navigator {
+     }
+ 
+     public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit compilationUnit, String qualifiedName) {
+-        return findType(compilationUnit, qualifiedName)
++        return NavigatorTypeLookup.findType(compilationUnit, qualifiedName)
+             .map(res -> res.toClassOrInterfaceDeclaration().orElseThrow(() -> new IllegalStateException("Type is not a class or an interface, it is " + res.getClass().getCanonicalName())))
+             .orElseThrow(() -> new IllegalStateException("No type named '" + qualifiedName + "'found"));
+     }
+@@ -88,7 +88,7 @@ public final class Navigator {
+     }
+ 
+     public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
+-        Optional<TypeDeclaration<?>> res = findType(cu, qualifiedName);
++        Optional<TypeDeclaration<?>> res = NavigatorTypeLookup.findType(cu, qualifiedName);
+         if (!res.isPresent()) {
+             throw new IllegalStateException("No type found");
+         }
+@@ -210,18 +210,7 @@ public final class Navigator {
+      * then the qualifiedName that can be resolved are "C", "D", and "D.E".
+      */
+     public static Optional<TypeDeclaration<?>> findType(CompilationUnit cu, String qualifiedName) {
+-        if (cu.getTypes().isEmpty()) {
+-            return Optional.empty();
+-        }
+-
+-        final String typeName = getOuterTypeName(qualifiedName);
+-        Optional<TypeDeclaration<?>> type = cu.getTypes().stream().filter((t) -> t.getName().getId().equals(typeName)).findFirst();
+-
+-        final String innerTypeName = getInnerTypeName(qualifiedName);
+-        if (type.isPresent() && !innerTypeName.isEmpty()) {
+-            return findType(type.get(), innerTypeName);
+-        }
+-        return type;
++        return NavigatorTypeLookup.findType(cu, qualifiedName);
+     }
+ 
+     /**
+@@ -231,31 +220,7 @@ public final class Navigator {
+      * "D.E".
+      */
+     public static Optional<TypeDeclaration<?>> findType(TypeDeclaration<?> td, String qualifiedName) {
+-        final String typeName = getOuterTypeName(qualifiedName);
+-
+-        Optional<TypeDeclaration<?>> type = Optional.empty();
+-        for (Node n : td.getMembers()) {
+-            if (n instanceof TypeDeclaration && ((TypeDeclaration<?>) n).getName().getId().equals(typeName)) {
+-                type = Optional.of((TypeDeclaration<?>) n);
+-                break;
+-            }
+-        }
+-        final String innerTypeName = getInnerTypeName(qualifiedName);
+-        if (type.isPresent() && !innerTypeName.isEmpty()) {
+-            return findType(type.get(), innerTypeName);
+-        }
+-        return type;
+-    }
+-
+-    private static String getInnerTypeName(String qualifiedName) {
+-        if (qualifiedName.contains(".")) {
+-            return qualifiedName.split("\\.", 2)[1];
+-        }
+-        return "";
+-    }
+-
+-    private static String getOuterTypeName(String qualifiedName) {
+-        return qualifiedName.split("\\.", 2)[0];
++        return NavigatorTypeLookup.findType(td, qualifiedName);
+     }
+ 
+     /**
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java
+new file mode 100644
+index 000000000..8d460b653
+--- /dev/null
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorTypeLookup.java
+@@ -0,0 +1,93 @@
++/*
++ * Copyright (C) 2015-2016 Federico Tomassetti
++ * Copyright (C) 2017-2020 The JavaParser Team.
++ *
++ * This file is part of JavaParser.
++ *
++ * JavaParser can be used either under the terms of
++ * a) the GNU Lesser General Public License as published by
++ *     the Free Software Foundation, either version 3 of the License, or
++ *     (at your option) any later version.
++ * b) the terms of the Apache License
++ *
++ * You should have received a copy of both licenses in LICENCE.LGPL and
++ * LICENCE.APACHE. Please refer to those files for details.
++ *
++ * JavaParser is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ */
++
++package com.github.javaparser.symbolsolver.javaparser;
++
++import com.github.javaparser.ast.CompilationUnit;
++import com.github.javaparser.ast.Node;
++import com.github.javaparser.ast.body.TypeDeclaration;
++
++import java.util.Optional;
++
++/**
++ * Provides lookup operations for type declarations.
++ */
++public final class NavigatorTypeLookup {
++
++    private NavigatorTypeLookup() {
++        // prevent instantiation
++    }
++
++    /**
++     * Looks among the type declared in the Compilation Unit for one having the specified name.
++     * The name can be qualified with respect to the compilation unit. For example, if the compilation
++     * unit is in package a.b; and it contains two top level classes named C and D, with class E being defined inside D
++     * then the qualifiedName that can be resolved are "C", "D", and "D.E".
++     */
++    public static Optional<TypeDeclaration<?>> findType(CompilationUnit cu, String qualifiedName) {
++        if (cu.getTypes().isEmpty()) {
++            return Optional.empty();
++        }
++
++        final String typeName = getOuterTypeName(qualifiedName);
++        Optional<TypeDeclaration<?>> type = cu.getTypes().stream().filter((t) -> t.getName().getId().equals(typeName)).findFirst();
++
++        final String innerTypeName = getInnerTypeName(qualifiedName);
++        if (type.isPresent() && !innerTypeName.isEmpty()) {
++            return findType(type.get(), innerTypeName);
++        }
++        return type;
++    }
++
++    /**
++     * Looks among the type declared in the TypeDeclaration for one having the specified name.
++     * The name can be qualified with respect to the TypeDeclaration. For example, if the class declaration defines
++     * class D and class D contains an internal class named E then the qualifiedName that can be resolved are "D", and
++     * "D.E".
++     */
++    public static Optional<TypeDeclaration<?>> findType(TypeDeclaration<?> td, String qualifiedName) {
++        final String typeName = getOuterTypeName(qualifiedName);
++
++        Optional<TypeDeclaration<?>> type = Optional.empty();
++        for (Node n : td.getMembers()) {
++            if (n instanceof TypeDeclaration && ((TypeDeclaration<?>) n).getName().getId().equals(typeName)) {
++                type = Optional.of((TypeDeclaration<?>) n);
++                break;
++            }
++        }
++        final String innerTypeName = getInnerTypeName(qualifiedName);
++        if (type.isPresent() && !innerTypeName.isEmpty()) {
++            return findType(type.get(), innerTypeName);
++        }
++        return type;
++    }
++
++    private static String getInnerTypeName(String qualifiedName) {
++        if (qualifiedName.contains(".")) {
++            return qualifiedName.split("\\.", 2)[1];
++        }
++        return "";
++    }
++
++    private static String getOuterTypeName(String qualifiedName) {
++        return qualifiedName.split("\\.", 2)[0];
++    }
++}

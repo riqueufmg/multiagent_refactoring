@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Extract accept/reject criteria state management and related concrete behavior from the abstract API class, reducing its field count and implementation complexity while preserving the existing abstract matching contract and compatibility methods.",
+  "files": [
+    "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java",
+    "classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectCriteria.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.github.classgraph.base.internal.utils.AcceptReject",
+        "io.github.classgraph.base.internal.utils.AcceptRejectCriteria"
+      ],
+      "outputs": [
+        "io.github.classgraph.base.internal.utils.AcceptRejectCriteria"
+      ],
+      "details": "Extract the cohesive accept/reject state and concrete behavior represented by accept, reject, acceptPrefixesSet, acceptPrefixes, rejectPrefixes, acceptGlobs, rejectGlobs, acceptPatterns, acceptPrefixPatterns, rejectPatterns, acceptIsEmpty(), rejectIsEmpty(), acceptAndRejectAreEmpty(), isSpecificallyAcceptedAndNotRejected(String), isSpecificallyAccepted(String), sortPrefixes(), and toString(). Keep the abstract methods addToAccept(String), addToReject(String), isAcceptedAndNotRejected(String), isAccepted(String), acceptHasPrefix(String), and isRejected(String) in AcceptReject. Preserve the existing protected state access required by the existing AcceptRejectPrefix, AcceptRejectWholeString, and AcceptRejectLeafname implementations through the extraction-generated delegation or protected access bridge, so those classes continue to compile.",
+      "risk": "medium"
+    }
+  ]
+}

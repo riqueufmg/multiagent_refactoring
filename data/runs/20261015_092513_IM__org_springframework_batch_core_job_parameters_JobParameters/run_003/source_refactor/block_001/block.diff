@@ -1,0 +1,190 @@
+commit 2eae3342b786dde52ea0cff07ef687554597ef21
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 15 09:44:07 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java
+index a7a161a0a..1294f31c9 100644
+--- a/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java
+@@ -18,12 +18,11 @@ package org.springframework.batch.core.job.parameters;
+ 
+ import java.io.Serializable;
+ import java.util.ArrayList;
+-import java.util.Collections;
+-import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+ 
+-import org.springframework.util.Assert;
++import com.fasterxml.jackson.annotation.JsonCreator;
++import com.fasterxml.jackson.annotation.JsonProperty;
+ 
+ /**
+  * Value object representing runtime parameters to a batch job. Because the parameters
+@@ -44,7 +43,7 @@ import org.springframework.util.Assert;
+  */
+ public class JobParameters implements Serializable {
+ 
+-	private final Map<String, JobParameter<?>> parameters;
++	private final JobParametersStore parameterStore;
+ 
+ 	private final JobParametersTypedAccessors typedAccessors;
+ 
+@@ -52,8 +51,8 @@ public class JobParameters implements Serializable {
+ 	 * Default constructor.
+ 	 */
+ 	public JobParameters() {
+-		this.parameters = new HashMap<>();
+-		this.typedAccessors = new JobParametersTypedAccessors(this.parameters);
++		this.parameterStore = new JobParametersStore();
++		this.typedAccessors = new JobParametersTypedAccessors(this.parameterStore.getParameters());
+ 	}
+ 
+ 	/**
+@@ -62,9 +61,10 @@ public class JobParameters implements Serializable {
+ 	 * @param parameters The {@link Map} that contains a {@code String} key and a
+ 	 * {@link JobParameter} value.
+ 	 */
+-	public JobParameters(Map<String, JobParameter<?>> parameters) {
+-		this.parameters = new HashMap<>(parameters);
+-		this.typedAccessors = new JobParametersTypedAccessors(this.parameters);
++	@JsonCreator
++	public JobParameters(@JsonProperty("parameters") Map<String, JobParameter<?>> parameters) {
++		this.parameterStore = new JobParametersStore(parameters);
++		this.typedAccessors = new JobParametersTypedAccessors(this.parameterStore.getParameters());
+ 	}
+ 
+ 	public Long getLong(String key) {
+@@ -124,8 +124,7 @@ public class JobParameters implements Serializable {
+ 	}
+ 
+ 	public JobParameter<?> getParameter(String key) {
+-		Assert.notNull(key, "key must not be null");
+-		return parameters.get(key);
++		return this.parameterStore.getParameter(key);
+ 	}
+ 
+ 	/**
+@@ -133,7 +132,7 @@ public class JobParameters implements Serializable {
+ 	 * @return an unmodifiable map containing all parameters.
+ 	 */
+ 	public Map<String, JobParameter<?>> getParameters() {
+-		return Collections.unmodifiableMap(parameters);
++		return this.parameterStore.getParameters();
+ 	}
+ 
+ 	/**
+@@ -142,20 +141,14 @@ public class JobParameters implements Serializable {
+ 	 * @return an unmodifiable map containing identifying parameters.
+ 	 */
+ 	public Map<String, JobParameter<?>> getIdentifyingParameters() {
+-		Map<String, JobParameter<?>> identifyingParameters = new HashMap<>();
+-		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
+-			if (entry.getValue().isIdentifying()) {
+-				identifyingParameters.put(entry.getKey(), entry.getValue());
+-			}
+-		}
+-		return Collections.unmodifiableMap(identifyingParameters);
++		return this.parameterStore.getIdentifyingParameters();
+ 	}
+ 
+ 	/**
+ 	 * @return {@code true} if the parameters object is empty or {@code false} otherwise.
+ 	 */
+ 	public boolean isEmpty() {
+-		return parameters.isEmpty();
++		return this.parameterStore.isEmpty();
+ 	}
+ 
+ 	@Override
+@@ -168,18 +161,18 @@ public class JobParameters implements Serializable {
+ 			return true;
+ 		}
+ 
+-		return this.parameters.equals(rhs.parameters);
++		return this.getParameters().equals(rhs.getParameters());
+ 	}
+ 
+ 	@Override
+ 	public int hashCode() {
+-		return 17 + 23 * parameters.hashCode();
++		return 17 + 23 * this.getParameters().hashCode();
+ 	}
+ 
+ 	@Override
+ 	public String toString() {
+ 		List<String> parameters = new ArrayList<>();
+-		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
++		for (Map.Entry<String, JobParameter<?>> entry : this.getParameters().entrySet()) {
+ 			parameters.add(String.format("'%s':'%s'", entry.getKey(), entry.getValue()));
+ 		}
+ 		return "{" + String.join(",", parameters) + "}";
+diff --git a/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersStore.java b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersStore.java
+new file mode 100644
+index 000000000..3c5752ab9
+--- /dev/null
++++ b/spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersStore.java
+@@ -0,0 +1,61 @@
++/*
++ * Copyright 2006-2024 the original author or authors.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.springframework.batch.core.job.parameters;
++
++import java.io.Serializable;
++import java.util.Collections;
++import java.util.HashMap;
++import java.util.Map;
++
++import org.springframework.util.Assert;
++
++final class JobParametersStore implements Serializable {
++
++	private final Map<String, JobParameter<?>> parameters;
++
++	JobParametersStore() {
++		this.parameters = new HashMap<>();
++	}
++
++	JobParametersStore(Map<String, JobParameter<?>> parameters) {
++		this.parameters = new HashMap<>(parameters);
++	}
++
++	JobParameter<?> getParameter(String key) {
++		Assert.notNull(key, "key must not be null");
++		return this.parameters.get(key);
++	}
++
++	Map<String, JobParameter<?>> getParameters() {
++		return Collections.unmodifiableMap(this.parameters);
++	}
++
++	Map<String, JobParameter<?>> getIdentifyingParameters() {
++		Map<String, JobParameter<?>> identifyingParameters = new HashMap<>();
++		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
++			if (entry.getValue().isIdentifying()) {
++				identifyingParameters.put(entry.getKey(), entry.getValue());
++			}
++		}
++		return Collections.unmodifiableMap(identifyingParameters);
++	}
++
++	boolean isEmpty() {
++		return this.parameters.isEmpty();
++	}
++
++}

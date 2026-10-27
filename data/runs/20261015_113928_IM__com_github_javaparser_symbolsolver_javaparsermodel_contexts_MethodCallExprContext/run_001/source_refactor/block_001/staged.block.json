@@ -1,0 +1,36 @@
+{
+  "id": 1,
+  "goal": "Reduce the size and implementation complexity of MethodCallExprContext by extracting the cohesive generic type inference and method type-parameter resolution logic into a helper class while preserving the existing context API.",
+  "files": [
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/contexts/MethodCallExprContext.java",
+    "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/contexts/MethodCallExprContextTypeInference.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.MethodCallExprContext",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.MethodCallExprContextTypeInference"
+      ],
+      "outputs": [
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.MethodCallExprContext",
+        "com.github.javaparser.symbolsolver.javaparsermodel.contexts.MethodCallExprContextTypeInference"
+      ],
+      "details": "Create MethodCallExprContextTypeInference in the same package and move the cohesive private methods resolveMethodTypeParametersFromExplicitList(java.util.TypeSolver, com.github.javaparser.resolution.MethodUsage), resolveMethodTypeParameters(com.github.javaparser.resolution.MethodUsage, java.util.List), inferTypes(com.github.javaparser.resolution.types.ResolvedType, com.github.javaparser.resolution.types.ResolvedType, java.util.Map), replaceTypeParameter(com.github.javaparser.resolution.MethodUsage, java.util.Map), convertTypesParameters(java.util.Map, java.util.Map), groupResolvedTypeByTypeVariable(java.util.Map), findResolvedTypesByTypeVariable(java.lang.String, java.util.Map), reduceResolvedTypesByTypeVariable(java.util.Map), reduceResolvedTypesWithLub(java.util.Set), matchTypeParameters(com.github.javaparser.resolution.types.ResolvedType, com.github.javaparser.resolution.types.ResolvedType, java.util.Map), usingParameterTypesFromScope(com.github.javaparser.resolution.types.ResolvedType, com.github.javaparser.resolution.types.ResolvedType, java.util.Map), and applyInferredTypes(com.github.javaparser.resolution.types.ResolvedType, java.util.Map). The extracted class should receive the existing MethodCallExpr and TypeSolver through its constructor, retain the existing algorithms unchanged, and expose package-private operations needed by MethodCallExprContext. Replace the original private implementations with delegation from MethodCallExprContext so solveMethodAsUsage and its existing callers retain the same behavior and signatures.",
+      "risk": "high"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/contexts/MethodCallExprContext.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/contexts/MethodCallExprContextTypeInference.java"
+      ],
+      "outputs": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/contexts/MethodCallExprContext.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparsermodel/contexts/MethodCallExprContextTypeInference.java"
+      ],
+      "details": "Keep only imports still used by MethodCallExprContext and add the imports required by MethodCallExprContextTypeInference for MethodCallExpr, MethodUsage, TypeSolver, ResolvedType, ResolvedTypeParameterDeclaration, ResolvedTypeVariable, ResolvedReferenceType, ResolvedArrayType, ResolvedWildcard, ResolvedConstraint and related resolution types, Pair, LeastUpperBoundLogic, and the collection types used by the extracted methods.",
+      "risk": "medium"
+    }
+  ]
+}

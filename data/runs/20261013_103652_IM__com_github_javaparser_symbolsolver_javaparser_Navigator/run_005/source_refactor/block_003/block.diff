@@ -1,0 +1,54 @@
+commit 306fc9ae39a371e083f4cb6df52ca4c6b95a685e
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 11:34:09 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index 75f71c79e..6ee98dc27 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -41,9 +41,9 @@ import java.util.Optional;
+  * Compatibility facade for the AST navigation helpers.
+  *
+  * Node-oriented lookup is implemented by {@link NavigatorNodeLookup}; declaration-oriented
+- * lookup is implemented by {@link NavigatorDeclarationLookup}. This class preserves the
+- * public Navigator API while delegating those operations without duplicating traversal or
+- * search logic.
++ * lookup is implemented by {@link NavigatorDeclarationLookup}; type-oriented lookup is
++ * implemented by {@link NavigatorTypeLookup}. This class preserves the public Navigator API
++ * while delegating those operations without duplicating traversal or search logic.
+  *
+  * Note that methods with the prefix `demand` indicate that if the search value is not found, an exception will be thrown.
+  *
+@@ -143,18 +143,30 @@ public final class Navigator {
+         return NavigatorDeclarationLookup.demandMethod(cd, name);
+     }
+ 
++    /**
++     * Finds a class with the specified qualified name in the compilation unit.
++     */
+     public static ClassOrInterfaceDeclaration demandClass(CompilationUnit cu, String qualifiedName) {
+         return NavigatorTypeLookup.demandClass(cu, qualifiedName);
+     }
+ 
++    /**
++     * Finds a class or interface with the specified qualified name in the compilation unit.
++     */
+     public static ClassOrInterfaceDeclaration demandClassOrInterface(CompilationUnit cu, String qualifiedName) {
+         return NavigatorTypeLookup.demandClassOrInterface(cu, qualifiedName);
+     }
+ 
++    /**
++     * Finds an enum with the specified qualified name in the compilation unit.
++     */
+     public static EnumDeclaration demandEnum(CompilationUnit cu, String qualifiedName) {
+         return NavigatorTypeLookup.demandEnum(cu, qualifiedName);
+     }
+ 
++    /**
++     * Finds an interface with the specified qualified name in the compilation unit.
++     */
+     public static ClassOrInterfaceDeclaration demandInterface(CompilationUnit cu, String qualifiedName) {
+         return NavigatorTypeLookup.demandInterface(cu, qualifiedName);
+     }

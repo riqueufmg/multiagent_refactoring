@@ -1,0 +1,70 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive lexical text-element model cluster into a dedicated subpackage.",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/NodeText.java",
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TextElement.java",
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/TokenTextElement.java",
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/ChildTextElement.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.text"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "com.github.javaparser.printer.lexicalpreservation.NodeText"
+      ],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.text.NodeText"
+      ],
+      "details": "Move NodeText to the dedicated lexical text subpackage together with its element model.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "com.github.javaparser.printer.lexicalpreservation.TextElement"
+      ],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.text.TextElement"
+      ],
+      "details": "Move the common lexical text-element abstraction to the destination package.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "com.github.javaparser.printer.lexicalpreservation.TokenTextElement"
+      ],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.text.TokenTextElement"
+      ],
+      "details": "Move the token-backed lexical text element alongside NodeText and TextElement.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "com.github.javaparser.printer.lexicalpreservation.ChildTextElement"
+      ],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.text.ChildTextElement"
+      ],
+      "details": "Move the child-node-backed lexical text element alongside the rest of the text model.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

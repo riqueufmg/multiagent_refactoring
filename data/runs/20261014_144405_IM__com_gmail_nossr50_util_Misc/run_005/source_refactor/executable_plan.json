@@ -1,0 +1,126 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.gmail.nossr50.util.Misc",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Remove NPC-related public wrapper methods from Misc by consolidating them in the existing EntityUtil utility.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/EntityUtil.java",
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+            "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.EntityUtil.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+            "com.gmail.nossr50.util.EntityUtil.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+          ],
+          "details": "Move the two NPC-related public methods from Misc to the existing EntityUtil class, preserving their current behavior and annotations where applicable.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+            "com.gmail.nossr50.util.Misc.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.EntityUtil.isNPCEntityExcludingVillagers(org.bukkit.entity.Entity)",
+            "com.gmail.nossr50.util.EntityUtil.isNPCIncludingVillagers(org.bukkit.entity.Entity)"
+          ],
+          "details": "Update callers to use EntityUtil directly after removing the corresponding methods from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Remove the item-spawning public wrapper methods from Misc by consolidating them in the existing MiscItemSpawnUtil utility.",
+      "files": [
+        "src/main/java/com/gmail/nossr50/util/Misc.java",
+        "src/main/java/com/gmail/nossr50/util/MiscItemSpawnUtil.java",
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection(com.gmail.nossr50.datatypes.player.McMMOPlayer,org.bukkit.Location,java.util.Collection,com.gmail.nossr50.api.ItemSpawnReason)",
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection(org.bukkit.entity.Player,org.bukkit.Location,java.util.Collection,com.gmail.nossr50.api.ItemSpawnReason,int)",
+            "com.gmail.nossr50.util.Misc.spawnItem(java.util.Collection,com.gmail.nossr50.api.ItemSpawnReason,org.bukkit.Location,java.util.function.Predicate,org.bukkit.entity.Player)",
+            "com.gmail.nossr50.util.Misc.spawnItem(org.bukkit.inventory.ItemStack,com.gmail.nossr50.api.ItemSpawnReason,org.bukkit.Location,java.util.function.Predicate,org.bukkit.entity.Player)",
+            "com.gmail.nossr50.util.Misc.spawnItems(org.bukkit.entity.Player,org.bukkit.Location,org.bukkit.inventory.ItemStack,int,com.gmail.nossr50.api.ItemSpawnReason)",
+            "com.gmail.nossr50.util.Misc.spawnItem(org.bukkit.entity.Player,org.bukkit.Location,org.bukkit.inventory.ItemStack,com.gmail.nossr50.api.ItemSpawnReason)",
+            "com.gmail.nossr50.util.Misc.spawnItemNaturally(org.bukkit.entity.Player,org.bukkit.Location,org.bukkit.inventory.ItemStack,com.gmail.nossr50.api.ItemSpawnReason)",
+            "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation(org.bukkit.entity.Player,org.bukkit.Location,org.bukkit.Location,org.bukkit.inventory.ItemStack,int,double,com.gmail.nossr50.api.ItemSpawnReason)",
+            "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation(org.bukkit.entity.Player,org.bukkit.Location,org.bukkit.Location,org.bukkit.inventory.ItemStack,double,com.gmail.nossr50.api.ItemSpawnReason)"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItem",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItems",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemNaturally",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemTowardsLocation"
+          ],
+          "details": "Consolidate the item-spawning API in MiscItemSpawnUtil and remove the corresponding forwarding methods from Misc. Preserve overloads, nullability annotations, and existing delegation behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.gmail.nossr50.util.Misc.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.Misc.spawnItem",
+            "com.gmail.nossr50.util.Misc.spawnItems",
+            "com.gmail.nossr50.util.Misc.spawnItemNaturally",
+            "com.gmail.nossr50.util.Misc.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.Misc.spawnItemTowardsLocation"
+          ],
+          "outputs": [
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemsFromCollection",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItem",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItems",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemNaturally",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemsTowardsLocation",
+            "com.gmail.nossr50.util.MiscItemSpawnUtil.spawnItemTowardsLocation"
+          ],
+          "details": "Update callers to use MiscItemSpawnUtil directly after removing the item-spawning wrappers from Misc.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ]
+    }
+  ]
+}

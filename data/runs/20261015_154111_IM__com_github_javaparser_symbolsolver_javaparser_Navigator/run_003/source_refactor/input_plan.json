@@ -1,0 +1,71 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract AST node search and demand operations from Navigator into a cohesive node-focused utility class.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "details": "Extract demandNodeOfGivenClass(Node, Class), demandParentNode(Node), demandReturnStmt(MethodDeclaration), demandSwitch(Node), demandVariableDeclaration(Node, String), findMethodCall(Node, String), findNameExpression(Node, String), findNodeOfGivenClass(Node, Class), findReturnStmt(MethodDeclaration), findSimpleName(Node, String), findSwitch(Node), requireParentNode(Node), and the private findSwitchHelper(Node) method. Preserve static utility behavior and required imports.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+          ],
+          "details": "Remove imports used only by the extracted node-focused methods and retain imports still required by Navigator.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract type lookup and type-member demand operations from Navigator into a cohesive type-focused utility class.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.TypeNavigator"
+          ],
+          "details": "Extract demandClass(CompilationUnit, String), demandClassOrInterface(CompilationUnit, String), demandConstructor(TypeDeclaration<?>, int), demandEnum(CompilationUnit, String), demandField(ClassOrInterfaceDeclaration, String), demandInterface(CompilationUnit, String), demandMethod(TypeDeclaration<?>, String), findType(CompilationUnit, String), findType(TypeDeclaration<?>, String), getInnerTypeName(String), and getOuterTypeName(String). Preserve static utility behavior and required imports.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+          ],
+          "details": "Remove imports used only by the extracted type-focused methods and retain imports still required by Navigator.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

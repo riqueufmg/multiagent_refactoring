@@ -1,0 +1,26 @@
+project:
+  name: jackson-core
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/repository
+runs: 5
+target:
+  smell: GC
+  smell_name: God Component
+  target_type: package
+  target_name: tools.jackson.core.io
+planner:
+  base_config: /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/commits/cde1db55a6b9/planner_mars.yml
+source_refactor:
+  base_config: /data/henrique/multiagent_refactoring/mvp/source_refactor/config.yml
+  compile:
+    timeout: 900
+    command:
+    - /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/commits/cde1db55a6b9/build_mars.sh
+  mechanical_tools:
+    openrewrite_enabled: true
+    openrewrite_timeout: 900
+    openrewrite_command:
+    - /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/commits/cde1db55a6b9/openrewrite_mars_online.sh
+quality_checker:
+  base_config: /data/henrique/multiagent_refactoring/mvp/quality_checker/config.yml
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs

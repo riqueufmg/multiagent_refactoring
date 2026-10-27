@@ -1,0 +1,237 @@
+commit e19b4b9da0a685fd523e6b3648557d019fff81a5
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 16 11:06:41 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
+index 44df55546..beaab6480 100644
+--- a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
++++ b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
+@@ -7,7 +7,6 @@ package io.github.classgraph.base.internal.utils;
+ 
+ import java.util.ArrayList;
+ import java.util.Collection;
+-import java.util.HashSet;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.regex.Pattern;
+@@ -82,102 +81,11 @@ public abstract class AcceptReject {
+         AcceptRejectUtils.quoteList(coll, buf);
+     }
+ 
+-    public static class AcceptRejectPrefix extends AcceptReject {
++    /** Compatibility adapter for the extracted top-level implementation. */
++    public static class AcceptRejectPrefix extends io.github.classgraph.base.internal.utils.AcceptRejectPrefix {
+         public AcceptRejectPrefix(final char separatorChar) {
+             super(separatorChar);
+         }
+-
+-        @Override
+-        public void addToAccept(final String str) {
+-            if (AcceptRejectUtils.containsWildcard(str)) {
+-                if (acceptGlobs == null || acceptPatterns == null) {
+-                    acceptGlobs = new HashSet<>();
+-                    acceptPatterns = new ArrayList<>();
+-                }
+-                acceptGlobs.add(str);
+-                acceptPatterns.add(AcceptRejectUtils.globToPattern(str, separatorChar, true));
+-            } else {
+-                if (acceptPrefixesSet == null) {
+-                    acceptPrefixesSet = new HashSet<>();
+-                }
+-                acceptPrefixesSet.add(str);
+-            }
+-        }
+-
+-        @Override
+-        public void addToReject(final String str) {
+-            if (AcceptRejectUtils.containsWildcard(str)) {
+-                if (rejectGlobs == null || rejectPatterns == null) {
+-                    rejectGlobs = new HashSet<>();
+-                    rejectPatterns = new ArrayList<>();
+-                }
+-                rejectGlobs.add(str);
+-                rejectPatterns.add(AcceptRejectUtils.globToPattern(str, separatorChar, true));
+-            } else {
+-                if (rejectPrefixes == null) {
+-                    rejectPrefixes = new ArrayList<>();
+-                }
+-                rejectPrefixes.add(str);
+-            }
+-        }
+-
+-        @Override
+-        public boolean isAcceptedAndNotRejected(final String str) {
+-            var accepted = acceptPrefixes == null && acceptPatterns == null;
+-            if (!accepted && acceptPrefixes != null) {
+-                for (final String prefix : acceptPrefixes) {
+-                    if (str.startsWith(prefix)) {
+-                        accepted = true;
+-                        break;
+-                    }
+-                }
+-            }
+-            if (!accepted) {
+-                accepted = AcceptRejectUtils.matchesPatternList(str, acceptPatterns);
+-            }
+-            if (!accepted) {
+-                return false;
+-            }
+-            if (rejectPrefixes != null) {
+-                for (final String prefix : rejectPrefixes) {
+-                    if (str.startsWith(prefix)) {
+-                        return false;
+-                    }
+-                }
+-            }
+-            return !AcceptRejectUtils.matchesPatternList(str, rejectPatterns);
+-        }
+-
+-        @Override
+-        public boolean isAccepted(final String str) {
+-            var accepted = acceptPrefixes == null && acceptPatterns == null;
+-            if (!accepted && acceptPrefixes != null) {
+-                for (final String prefix : acceptPrefixes) {
+-                    if (str.startsWith(prefix)) {
+-                        accepted = true;
+-                        break;
+-                    }
+-                }
+-            }
+-            return accepted || AcceptRejectUtils.matchesPatternList(str, acceptPatterns);
+-        }
+-
+-        @Override
+-        public boolean acceptHasPrefix(final String str) {
+-            throw new IllegalArgumentException("Can only find prefixes of whole strings");
+-        }
+-
+-        @Override
+-        public boolean isRejected(final String str) {
+-            if (rejectPrefixes != null) {
+-                for (final String prefix : rejectPrefixes) {
+-                    if (str.startsWith(prefix)) {
+-                        return true;
+-                    }
+-                }
+-            }
+-            return AcceptRejectUtils.matchesPatternList(str, rejectPatterns);
+-        }
+     }
+ 
+     /** Compatibility adapter for the extracted top-level implementation. */
+diff --git a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectPrefix.java b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectPrefix.java
+new file mode 100644
+index 000000000..b63158ec0
+--- /dev/null
++++ b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectPrefix.java
+@@ -0,0 +1,108 @@
++/*
++ * This file is part of ClassGraph.
++ *
++ * The MIT License (MIT)
++ */
++package io.github.classgraph.base.internal.utils;
++
++import java.util.ArrayList;
++import java.util.HashSet;
++
++/** Prefix-based accept or reject criteria. */
++public class AcceptRejectPrefix extends AcceptReject {
++    public AcceptRejectPrefix(final char separatorChar) {
++        super(separatorChar);
++    }
++
++    @Override
++    public void addToAccept(final String str) {
++        if (AcceptRejectUtils.containsWildcard(str)) {
++            if (acceptGlobs == null || acceptPatterns == null) {
++                acceptGlobs = new HashSet<>();
++                acceptPatterns = new ArrayList<>();
++            }
++            acceptGlobs.add(str);
++            acceptPatterns.add(AcceptRejectUtils.globToPattern(str, separatorChar, true));
++        } else {
++            if (acceptPrefixesSet == null) {
++                acceptPrefixesSet = new HashSet<>();
++            }
++            acceptPrefixesSet.add(str);
++        }
++    }
++
++    @Override
++    public void addToReject(final String str) {
++        if (AcceptRejectUtils.containsWildcard(str)) {
++            if (rejectGlobs == null || rejectPatterns == null) {
++                rejectGlobs = new HashSet<>();
++                rejectPatterns = new ArrayList<>();
++            }
++            rejectGlobs.add(str);
++            rejectPatterns.add(AcceptRejectUtils.globToPattern(str, separatorChar, true));
++        } else {
++            if (rejectPrefixes == null) {
++                rejectPrefixes = new ArrayList<>();
++            }
++            rejectPrefixes.add(str);
++        }
++    }
++
++    @Override
++    public boolean isAcceptedAndNotRejected(final String str) {
++        var accepted = acceptPrefixes == null && acceptPatterns == null;
++        if (!accepted && acceptPrefixes != null) {
++            for (final String prefix : acceptPrefixes) {
++                if (str.startsWith(prefix)) {
++                    accepted = true;
++                    break;
++                }
++            }
++        }
++        if (!accepted) {
++            accepted = AcceptRejectUtils.matchesPatternList(str, acceptPatterns);
++        }
++        if (!accepted) {
++            return false;
++        }
++        if (rejectPrefixes != null) {
++            for (final String prefix : rejectPrefixes) {
++                if (str.startsWith(prefix)) {
++                    return false;
++                }
++            }
++        }
++        return !AcceptRejectUtils.matchesPatternList(str, rejectPatterns);
++    }
++
++    @Override
++    public boolean isAccepted(final String str) {
++        var accepted = acceptPrefixes == null && acceptPatterns == null;
++        if (!accepted && acceptPrefixes != null) {
++            for (final String prefix : acceptPrefixes) {
++                if (str.startsWith(prefix)) {
++                    accepted = true;
++                    break;
++                }
++            }
++        }
++        return accepted || AcceptRejectUtils.matchesPatternList(str, acceptPatterns);
++    }
++
++    @Override
++    public boolean acceptHasPrefix(final String str) {
++        throw new IllegalArgumentException("Can only find prefixes of whole strings");
++    }
++
++    @Override
++    public boolean isRejected(final String str) {
++        if (rejectPrefixes != null) {
++            for (final String prefix : rejectPrefixes) {
++                if (str.startsWith(prefix)) {
++                    return true;
++                }
++            }
++        }
++        return AcceptRejectUtils.matchesPatternList(str, rejectPatterns);
++    }
++}

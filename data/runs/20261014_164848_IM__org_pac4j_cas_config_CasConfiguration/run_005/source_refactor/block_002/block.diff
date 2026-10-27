@@ -1,0 +1,136 @@
+commit d282707b65f2d2eddb02d812a3d5e3cf55b378b6
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 14 17:09:57 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+index 6ba330a19..16f0e3987 100644
+--- a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java
+@@ -4,7 +4,6 @@ import org.apereo.cas.client.validation.*;
+ import org.pac4j.cas.client.CasProxyReceptor;
+ import org.pac4j.core.client.config.BaseClientConfiguration;
+ import org.pac4j.core.logout.handler.LogoutHandler;
+-import org.pac4j.core.logout.handler.DefaultLogoutHandler;
+ import org.pac4j.core.context.WebContext;
+ import org.pac4j.core.exception.TechnicalException;
+ import org.pac4j.core.http.url.UrlResolver;
+@@ -39,12 +38,10 @@ public class CasConfiguration extends BaseClientConfiguration {
+ 
+     private final CasProtocolConfiguration protocolConfiguration = new CasProtocolConfiguration();
+ 
+-    private LogoutHandler logoutHandler;
++    private final CasLogoutConfiguration logoutConfiguration = new CasLogoutConfiguration();
+ 
+     private CasProxyReceptor proxyReceptor;
+ 
+-    private String postLogoutUrlParameter = SERVICE_PARAMETER;
+-
+     /* Map containing user defined parameters */
+     private Map<String, String> customParams = new HashMap<>();
+ 
+@@ -90,9 +87,7 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     protected void initializeLogoutHandler() {
+-        if (this.logoutHandler == null) {
+-            this.logoutHandler = new DefaultLogoutHandler();
+-        }
++        logoutConfiguration.initializeLogoutHandler();
+     }
+ 
+     public TicketValidator retrieveTicketValidator(final WebContext context) {
+@@ -238,16 +233,16 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public LogoutHandler getLogoutHandler() {
+-        return logoutHandler;
++        return logoutConfiguration.getLogoutHandler();
+     }
+ 
+     public LogoutHandler findLogoutHandler() {
+         init();
+-        return logoutHandler;
++        return logoutConfiguration.findLogoutHandler();
+     }
+ 
+     public void setLogoutHandler(final LogoutHandler logoutHandler) {
+-        this.logoutHandler = logoutHandler;
++        logoutConfiguration.setLogoutHandler(logoutHandler);
+     }
+ 
+     public TicketValidator getDefaultTicketValidator() {
+@@ -267,11 +262,11 @@ public class CasConfiguration extends BaseClientConfiguration {
+     }
+ 
+     public String getPostLogoutUrlParameter() {
+-        return postLogoutUrlParameter;
++        return logoutConfiguration.getPostLogoutUrlParameter();
+     }
+ 
+     public void setPostLogoutUrlParameter(final String postLogoutUrlParameter) {
+-        this.postLogoutUrlParameter = postLogoutUrlParameter;
++        logoutConfiguration.setPostLogoutUrlParameter(postLogoutUrlParameter);
+     }
+ 
+     public String getRestUrl() {
+@@ -327,9 +322,9 @@ public class CasConfiguration extends BaseClientConfiguration {
+     public String toString() {
+         return CommonHelper.toNiceString(this.getClass(), "loginUrl", this.getLoginUrl(), "prefixUrl", this.getPrefixUrl(), "restUrl", this.getRestUrl(),
+                 "protocol", this.getProtocol(), "renew", this.isRenew(), "gateway", this.isGateway(), "encoding", this.encoding,
+-                "logoutHandler", this.logoutHandler, "acceptAnyProxy", this.isAcceptAnyProxy(), "allowedProxyChains", this.getAllowedProxyChains(),
++                "logoutHandler", this.getLogoutHandler(), "acceptAnyProxy", this.isAcceptAnyProxy(), "allowedProxyChains", this.getAllowedProxyChains(),
+                 "proxyReceptor", this.proxyReceptor, "timeTolerance", this.getTimeTolerance(), "postLogoutUrlParameter",
+-                this.postLogoutUrlParameter, "defaultTicketValidator", this.getDefaultTicketValidator(), "urlResolver", this.getUrlResolver(),
++                this.getPostLogoutUrlParameter(), "defaultTicketValidator", this.getDefaultTicketValidator(), "urlResolver", this.getUrlResolver(),
+                 "method", this.method, "privateKeyPath", this.getPrivateKeyPath(), "privateKeyAlgorithm", this.getPrivateKeyAlgorithm());
+     }
+ }
+diff --git a/pac4j-cas/src/main/java/org/pac4j/cas/config/CasLogoutConfiguration.java b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasLogoutConfiguration.java
+new file mode 100644
+index 000000000..4a38d260e
+--- /dev/null
++++ b/pac4j-cas/src/main/java/org/pac4j/cas/config/CasLogoutConfiguration.java
+@@ -0,0 +1,41 @@
++package org.pac4j.cas.config;
++
++import org.pac4j.core.logout.handler.DefaultLogoutHandler;
++import org.pac4j.core.logout.handler.LogoutHandler;
++
++/**
++ * CAS logout configuration.
++ */
++public class CasLogoutConfiguration {
++
++    private LogoutHandler logoutHandler;
++
++    private String postLogoutUrlParameter = CasConfiguration.SERVICE_PARAMETER;
++
++    protected void initializeLogoutHandler() {
++        if (this.logoutHandler == null) {
++            this.logoutHandler = new DefaultLogoutHandler();
++        }
++    }
++
++    public LogoutHandler getLogoutHandler() {
++        return logoutHandler;
++    }
++
++    public LogoutHandler findLogoutHandler() {
++        initializeLogoutHandler();
++        return logoutHandler;
++    }
++
++    public void setLogoutHandler(final LogoutHandler logoutHandler) {
++        this.logoutHandler = logoutHandler;
++    }
++
++    public String getPostLogoutUrlParameter() {
++        return postLogoutUrlParameter;
++    }
++
++    public void setPostLogoutUrlParameter(final String postLogoutUrlParameter) {
++        this.postLogoutUrlParameter = postLogoutUrlParameter;
++    }
++}

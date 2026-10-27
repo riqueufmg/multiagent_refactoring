@@ -1,0 +1,23 @@
+{
+  "id": 1,
+  "goal": "Separate CAS ticket-validator construction from the general configuration and reduce the implementation complexity of CasConfiguration while preserving its existing public and protected API.",
+  "files": [
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorFactory.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration",
+        "org.pac4j.cas.config.CasTicketValidatorFactory"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasConfiguration",
+        "org.pac4j.cas.config.CasTicketValidatorFactory"
+      ],
+      "details": "Extract the cohesive ticket-validator construction responsibilities into CasTicketValidatorFactory: retrieveTicketValidator(WebContext), buildSAMLTicketValidator(WebContext), buildCas30ProxyTicketValidator(WebContext), buildCas30TicketValidator(WebContext), buildCas20ProxyTicketValidator(WebContext), buildCas20TicketValidator(WebContext), buildCas10TicketValidator(WebContext), addPrivateKey(Cas20ServiceTicketValidator), and getHttpURLConnectionFactory(). The extracted class must use the existing CasConfiguration state required by these methods, including encoding, renew, protocol, acceptAnyProxy, allowedProxyChains, proxyReceptor, defaultTicketValidator, privateKey, sslSocketFactory, hostnameVerifier, and the existing URL resolution behavior. Keep CasConfiguration.retrieveTicketValidator(WebContext) and the existing protected builder methods as forwarding methods when necessary so subclasses and existing callers retain compatibility.",
+      "risk": "medium"
+    }
+  ]
+}

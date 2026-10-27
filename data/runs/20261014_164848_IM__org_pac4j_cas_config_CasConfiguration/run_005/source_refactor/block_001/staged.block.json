@@ -1,0 +1,49 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive ticket-validation configuration and factory delegation responsibilities from CasConfiguration while preserving its existing public and protected API through delegation methods.",
+  "files": [
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.retrieveTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.addPrivateKey(Cas20ServiceTicketValidator)",
+        "org.pac4j.cas.config.CasConfiguration.defaultTicketValidator"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasTicketValidatorConfiguration",
+        "org.pac4j.cas.config.CasConfiguration"
+      ],
+      "details": "Create CasTicketValidatorConfiguration in the same package. Move the ticket-validator methods and defaultTicketValidator state into the extracted class. Keep CasConfiguration methods with their existing signatures and visibility as delegating adapters so existing callers and CasTicketValidatorFactory interactions remain source-compatible. The extracted class should use the existing CasTicketValidatorFactory and CasSecurityConfiguration responsibilities rather than duplicating ticket-validation logic.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.retrieveTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.getDefaultTicketValidator()",
+        "org.pac4j.cas.config.CasConfiguration.setDefaultTicketValidator(TicketValidator)"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasConfiguration"
+      ],
+      "details": "Route the existing CasConfiguration ticket-validator methods and default-ticket-validator accessors through a CasTicketValidatorConfiguration instance. Preserve method signatures, visibility, and behavior so external callers do not need to change.",
+      "risk": "medium"
+    }
+  ]
+}

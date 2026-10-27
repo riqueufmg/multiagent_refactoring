@@ -1,0 +1,72 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive numeric parsing cluster into a dedicated subpackage.",
+  "files": [
+    "src/main/java/tools/jackson/core/io/BigDecimalParser.java",
+    "src/main/java/tools/jackson/core/io/BigIntegerParser.java",
+    "src/main/java/tools/jackson/core/io/NumberInput.java",
+    "src/main/java/tools/jackson/core/io/number/BigDecimalParser.java",
+    "src/main/java/tools/jackson/core/io/number/BigIntegerParser.java",
+    "src/main/java/tools/jackson/core/io/number/NumberInput.java"
+  ],
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "tools.jackson.core.io.number"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.io.NumberInput"
+      ],
+      "outputs": [
+        "tools.jackson.core.io.number.NumberInput"
+      ],
+      "details": "Move the shared numeric input utility to the destination package.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.io.BigDecimalParser"
+      ],
+      "outputs": [
+        "tools.jackson.core.io.number.BigDecimalParser"
+      ],
+      "details": "Move the BigDecimal parsing implementation to the destination package.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.io.BigIntegerParser"
+      ],
+      "outputs": [
+        "tools.jackson.core.io.number.BigIntegerParser"
+      ],
+      "details": "Move the BigInteger parsing implementation to the destination package.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "tools.jackson.core.io.number.BigDecimalParser",
+        "tools.jackson.core.io.number.BigIntegerParser",
+        "tools.jackson.core.io.number.NumberInput"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

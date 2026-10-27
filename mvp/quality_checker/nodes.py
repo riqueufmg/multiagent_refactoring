@@ -318,6 +318,7 @@ def run_refactoringminer_node(state: QualityCheckerState) -> QualityCheckerState
     ensure_file_exists(refactoringminer_bin, "tools.refactoringminer_bin")
 
     timeout = int(get_config_value(cfg, "refactoringminer.timeout", 600))
+    java_home = str(get_config_value(cfg, "refactoringminer.java_home", "")).strip()
 
     result = run_refactoringminer(
         refactoringminer_bin=refactoringminer_bin,
@@ -326,6 +327,7 @@ def run_refactoringminer_node(state: QualityCheckerState) -> QualityCheckerState
         after_commit=state["after_commit"],
         output_dir=out_dir,
         timeout=timeout,
+        java_home=java_home or None,
     )
 
     state["refactoringminer_ok"] = bool(result.get("ok", False))
@@ -333,6 +335,7 @@ def run_refactoringminer_node(state: QualityCheckerState) -> QualityCheckerState
     state["refactoring_types"] = result.get("types", {}) or {}
     state["refactoringminer_json_path"] = str(result.get("json_path", ""))
     state["refactoringminer_log_path"] = str(result.get("log_path", ""))
+    state["refactoringminer_java_home"] = str(result.get("java_home", ""))
 
     return state
 
@@ -472,6 +475,7 @@ def save_status_node(state: QualityCheckerState) -> QualityCheckerState:
         "refactoringminer": {
             "enabled": state.get("refactoringminer_enabled", False),
             "ok": state.get("refactoringminer_ok", False),
+            "java_home": state.get("refactoringminer_java_home", ""),
             "json_path": state.get("refactoringminer_json_path", ""),
             "log_path": state.get("refactoringminer_log_path", ""),
             "refactorings_count": state.get("refactorings_count", 0),

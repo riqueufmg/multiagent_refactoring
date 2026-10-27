@@ -1,0 +1,160 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the public API size of Navigator by migrating callers from deprecated declaration lookup methods to the existing NavigatorDeclarationLookup API.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Navigator.demandConstructor(TypeDeclaration, int)",
+            "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "Navigator.demandMethod(TypeDeclaration, String)"
+          ],
+          "outputs": [
+            "NavigatorDeclarationLookup.demandConstructor(TypeDeclaration, int)",
+            "NavigatorDeclarationLookup.demandField(ClassOrInterfaceDeclaration, String)",
+            "NavigatorDeclarationLookup.demandMethod(TypeDeclaration, String)"
+          ],
+          "details": "Replace calls to the deprecated Navigator declaration lookup methods with calls to the corresponding existing NavigatorDeclarationLookup methods before removing the forwarding methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "Navigator.demandConstructor(TypeDeclaration, int)",
+            "Navigator.demandField(ClassOrInterfaceDeclaration, String)",
+            "Navigator.demandMethod(TypeDeclaration, String)"
+          ],
+          "outputs": [
+            "NavigatorDeclarationLookup.demandConstructor(TypeDeclaration, int)",
+            "NavigatorDeclarationLookup.demandField(ClassOrInterfaceDeclaration, String)",
+            "NavigatorDeclarationLookup.demandMethod(TypeDeclaration, String)"
+          ],
+          "details": "Consolidate the deprecated declaration lookup forwarding methods into NavigatorDeclarationLookup and remove the redundant methods from Navigator. The destination methods already exist and must remain the single implementation.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce the public API size of Navigator by migrating callers from deprecated node lookup methods to the existing NavigatorNodeLookup API.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Navigator.findNodeOfGivenClass(Node, Class)",
+            "Navigator.findReturnStmt(MethodDeclaration)",
+            "Navigator.findSwitch(Node)",
+            "Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "NavigatorNodeLookup.findNodeOfGivenClass(Node, Class)",
+            "NavigatorNodeLookup.findReturnStmt(MethodDeclaration)",
+            "NavigatorNodeLookup.findSwitch(Node)",
+            "NavigatorNodeLookup.requireParentNode(Node)"
+          ],
+          "details": "Replace calls to the deprecated Navigator node lookup methods with calls to the corresponding existing NavigatorNodeLookup methods before removing the forwarding methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "Navigator.findNodeOfGivenClass(Node, Class)",
+            "Navigator.findReturnStmt(MethodDeclaration)",
+            "Navigator.findSwitch(Node)",
+            "Navigator.requireParentNode(Node)"
+          ],
+          "outputs": [
+            "NavigatorNodeLookup.findNodeOfGivenClass(Node, Class)",
+            "NavigatorNodeLookup.findReturnStmt(MethodDeclaration)",
+            "NavigatorNodeLookup.findSwitch(Node)",
+            "NavigatorNodeLookup.requireParentNode(Node)"
+          ],
+          "details": "Consolidate the deprecated node lookup forwarding methods into NavigatorNodeLookup and remove the redundant methods from Navigator. The destination methods already exist and must remain the single implementation.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Reduce Navigator's public method count by directing callers to the existing specialized lookup classes and removing redundant forwarding methods.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java"
+      ],
+      "ops": [
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "Navigator.demandNodeOfGivenClass(Node, Class)",
+            "Navigator.demandParentNode(Node)",
+            "Navigator.demandReturnStmt(MethodDeclaration)",
+            "Navigator.demandSwitch(Node)",
+            "Navigator.demandVariableDeclaration(Node, String)",
+            "Navigator.findMethodCall(Node, String)",
+            "Navigator.findNameExpression(Node, String)",
+            "Navigator.findSimpleName(Node, String)",
+            "Navigator.demandClass(CompilationUnit, String)",
+            "Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "Navigator.demandEnum(CompilationUnit, String)",
+            "Navigator.demandInterface(CompilationUnit, String)",
+            "Navigator.findType(CompilationUnit, String)",
+            "Navigator.findType(TypeDeclaration, String)"
+          ],
+          "outputs": [
+            "NavigatorNodeLookup.demandNodeOfGivenClass(Node, Class)",
+            "NavigatorNodeLookup.demandParentNode(Node)",
+            "NavigatorNodeLookup.demandReturnStmt(MethodDeclaration)",
+            "NavigatorNodeLookup.demandSwitch(Node)",
+            "NavigatorNodeLookup.demandVariableDeclaration(Node, String)",
+            "NavigatorNodeLookup.findMethodCall(Node, String)",
+            "NavigatorNodeLookup.findNameExpression(Node, String)",
+            "NavigatorNodeLookup.findSimpleName(Node, String)",
+            "NavigatorTypeLookup.demandClass(CompilationUnit, String)",
+            "NavigatorTypeLookup.demandClassOrInterface(CompilationUnit, String)",
+            "NavigatorTypeLookup.demandEnum(CompilationUnit, String)",
+            "NavigatorTypeLookup.demandInterface(CompilationUnit, String)",
+            "NavigatorTypeLookup.findType(CompilationUnit, String)",
+            "NavigatorTypeLookup.findType(TypeDeclaration, String)"
+          ],
+          "details": "Replace direct calls to Navigator's non-deprecated forwarding methods with calls to the corresponding specialized lookup classes.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "Navigator.demandNodeOfGivenClass(Node, Class)",
+            "Navigator.demandParentNode(Node)",
+            "Navigator.demandReturnStmt(MethodDeclaration)",
+            "Navigator.demandSwitch(Node)",
+            "Navigator.demandVariableDeclaration(Node, String)",
+            "Navigator.findMethodCall(Node, String)",
+            "Navigator.findNameExpression(Node, String)",
+            "Navigator.findSimpleName(Node, String)",
+            "Navigator.demandClass(CompilationUnit, String)",
+            "Navigator.demandClassOrInterface(CompilationUnit, String)",
+            "Navigator.demandEnum(CompilationUnit, String)",
+            "Navigator.demandInterface(CompilationUnit, String)",
+            "Navigator.findType(CompilationUnit, String)",
+            "Navigator.findType(TypeDeclaration, String)"
+          ],
+          "outputs": [
+            "NavigatorNodeLookup",
+            "NavigatorTypeLookup"
+          ],
+          "details": "Remove the redundant forwarding methods from Navigator after callers use NavigatorNodeLookup and NavigatorTypeLookup directly. Preserve the existing implementations and signatures in the specialized lookup classes.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

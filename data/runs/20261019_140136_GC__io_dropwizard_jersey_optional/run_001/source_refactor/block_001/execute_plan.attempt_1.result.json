@@ -1,0 +1,14 @@
+{
+  "files_to_write": [
+    {
+      "path": "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalExceptionMapper.java",
+      "content": "package io.dropwizard.jersey.optional.exception;\n\nimport javax.ws.rs.core.Response;\nimport javax.ws.rs.ext.ExceptionMapper;\n\n/**\n * The default response when an empty optional is returned, is to respond with\n * a 404 NOT FOUND response.\n */\npublic class EmptyOptionalExceptionMapper implements ExceptionMapper<EmptyOptionalException> {\n    @Override\n    public Response toResponse(EmptyOptionalException exception) {\n        return Response.status(Response.Status.NOT_FOUND).build();\n    }\n}\n"
+    },
+    {
+      "path": "dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/exception/EmptyOptionalNoContentExceptionMapper.java",
+      "content": "package io.dropwizard.jersey.optional.exception;\n\nimport javax.ws.rs.core.Response;\nimport javax.ws.rs.ext.ExceptionMapper;\nimport java.util.Optional;\n\n/**\n * Returns a 204 for {@link Optional#empty()}\n * {@link EmptyOptionalExceptionMapper} returns a 404 for {@link Optional#empty()}\n *\n * @since 2.0\n */\npublic class EmptyOptionalNoContentExceptionMapper implements ExceptionMapper<EmptyOptionalException> {\n    @Override\n    public Response toResponse(EmptyOptionalException exception) {\n        return Response.noContent().build();\n    }\n}\n"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "The exception-handling classes are already present in the destination subpackage. Removed redundant same-package imports from the moved mapper classes while preserving behavior."
+}

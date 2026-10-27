@@ -1,0 +1,66 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "tools.jackson.core.json.generator"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.JsonGeneratorBase"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.JsonGeneratorBase"
+      ],
+      "details": "Move the shared JSON generator base class to the destination package.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.UTF8JsonGenerator"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.UTF8JsonGenerator"
+      ],
+      "details": "Move the UTF-8 JSON generator implementation to the same destination package as its base class.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "tools.jackson.core.json.WriterBasedJsonGenerator"
+      ],
+      "outputs": [
+        "tools.jackson.core.json.generator.WriterBasedJsonGenerator"
+      ],
+      "details": "Move the writer-based JSON generator implementation to the same destination package as its base class.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "tools.jackson.core.json.JsonWriteFeature",
+        "tools.jackson.core.json.generator.JsonGeneratorBase",
+        "tools.jackson.core.json.generator.UTF8JsonGenerator",
+        "tools.jackson.core.json.generator.WriterBasedJsonGenerator"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

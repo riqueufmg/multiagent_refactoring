@@ -1,0 +1,63 @@
+mvp:
+  name: source_refactor
+  run_id: run_001
+input:
+  planner_contract: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc/run_001/planner/contract.json
+  planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc/run_001/planner/contract.json
+models:
+  executor: gpt-5.6-luna
+  repair: gpt-5.6-luna
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/system.md
+  execute_plan: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/execute_plan.md
+  repair_compile: /data/henrique/multiagent_refactoring/mvp/source_refactor/prompts/repair_compile.md
+executor:
+  temperature: 0.0
+  timeout: 600
+  max_retries: 5
+  max_block_attempts: 5
+repair:
+  enabled: true
+  max_attempts: 5
+compile:
+  timeout: 900
+  command:
+  - /data/henrique/raven-mars-interface/generated/mcmmo_IM_Misc_590b00a/build_mars.sh
+mechanical_tools:
+  openrewrite_enabled: true
+  openrewrite_timeout: 600
+  openrewrite_command:
+  - mvn
+  - -U
+  - -Dmaven.test.skip=true
+  - -DskipTests
+  - -DskipITs
+  - -Djapicmp.skip=true
+  - -Drat.skip=true
+  - -Dcheckstyle.skip=true
+  - -Dspotbugs.skip=true
+  - -Dpmd.skip=true
+  - -Danimal.sniffer.skip=true
+  - -Dforbiddenapis.skip=true
+  - -Denforcer.skip=true
+  - -Dlicense.skip=true
+  - -Dskip.npm=true
+  - -Dskip.yarn=true
+  - org.openrewrite.maven:rewrite-maven-plugin:runNoFork
+tests:
+  update_tests: true
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc
+project:
+  name: mcmmo
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/mcMMO/repository
+target:
+  smell: IM
+  smell_name: Insufficient Modularization
+  target_type: class
+  target_name: com.gmail.nossr50.util.Misc
+planner_contract: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc/run_001/planner/contract.json
+planner_contract_path: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc/run_001/planner/contract.json
+planner:
+  contract: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc/run_001/planner/contract.json
+  contract_path: /data/henrique/multiagent_refactoring/data/runs/20261014_151759_IM__com_gmail_nossr50_util_Misc/run_001/planner/contract.json

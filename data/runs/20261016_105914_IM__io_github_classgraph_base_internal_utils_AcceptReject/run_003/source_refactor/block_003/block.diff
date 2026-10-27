@@ -1,0 +1,102 @@
+commit 635e318511f90d1322610a6dfc5871ff8a1eecdb
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 16 11:07:23 2026 -0300
+
+    source_refactor: apply block 3
+
+diff --git a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
+index beaab6480..4fbb170cf 100644
+--- a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
++++ b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptReject.java
+@@ -96,40 +96,11 @@ public abstract class AcceptReject {
+         }
+     }
+ 
+-    public static class AcceptRejectLeafname extends AcceptRejectWholeString {
++    /** Compatibility adapter for the extracted top-level implementation. */
++    public static class AcceptRejectLeafname extends io.github.classgraph.base.internal.utils.AcceptRejectLeafname {
+         public AcceptRejectLeafname(final char separatorChar) {
+             super(separatorChar);
+         }
+-
+-        @Override
+-        public void addToAccept(final String str) {
+-            super.addToAccept(JarUtils.leafName(str));
+-        }
+-
+-        @Override
+-        public void addToReject(final String str) {
+-            super.addToReject(JarUtils.leafName(str));
+-        }
+-
+-        @Override
+-        public boolean isAcceptedAndNotRejected(final String str) {
+-            return super.isAcceptedAndNotRejected(JarUtils.leafName(str));
+-        }
+-
+-        @Override
+-        public boolean isAccepted(final String str) {
+-            return super.isAccepted(JarUtils.leafName(str));
+-        }
+-
+-        @Override
+-        public boolean acceptHasPrefix(final String str) {
+-            throw new IllegalArgumentException("Can only find prefixes of whole strings");
+-        }
+-
+-        @Override
+-        public boolean isRejected(final String str) {
+-            return super.isRejected(JarUtils.leafName(str));
+-        }
+     }
+ 
+     public abstract void addToAccept(String str);
+diff --git a/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectLeafname.java b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectLeafname.java
+new file mode 100644
+index 000000000..d4d80642f
+--- /dev/null
++++ b/classgraph-base/src/main/java/io/github/classgraph/base/internal/utils/AcceptRejectLeafname.java
+@@ -0,0 +1,43 @@
++/*
++ * This file is part of ClassGraph.
++ *
++ * The MIT License (MIT)
++ */
++package io.github.classgraph.base.internal.utils;
++
++/** Acceptance and rejection criteria for leaf names. */
++public class AcceptRejectLeafname extends AcceptRejectWholeString {
++    public AcceptRejectLeafname(final char separatorChar) {
++        super(separatorChar);
++    }
++
++    @Override
++    public void addToAccept(final String str) {
++        super.addToAccept(JarUtils.leafName(str));
++    }
++
++    @Override
++    public void addToReject(final String str) {
++        super.addToReject(JarUtils.leafName(str));
++    }
++
++    @Override
++    public boolean isAcceptedAndNotRejected(final String str) {
++        return super.isAcceptedAndNotRejected(JarUtils.leafName(str));
++    }
++
++    @Override
++    public boolean isAccepted(final String str) {
++        return super.isAccepted(JarUtils.leafName(str));
++    }
++
++    @Override
++    public boolean acceptHasPrefix(final String str) {
++        throw new IllegalArgumentException("Can only find prefixes of whole strings");
++    }
++
++    @Override
++    public boolean isRejected(final String str) {
++        return super.isRejected(JarUtils.leafName(str));
++    }
++}

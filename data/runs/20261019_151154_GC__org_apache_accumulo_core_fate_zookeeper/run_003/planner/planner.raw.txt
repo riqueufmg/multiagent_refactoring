@@ -1,0 +1,86 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.apache.accumulo.core.fate.zookeeper",
+  "selected_cluster": [
+    "org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter",
+    "org.apache.accumulo.core.fate.zookeeper.FateLock",
+    "org.apache.accumulo.core.fate.zookeeper.ZooReservation",
+    "org.apache.accumulo.core.fate.zookeeper.DistributedReadWriteLock"
+  ],
+  "destination_package": "org.apache.accumulo.core.fate.zookeeper.lock",
+  "cluster_reason": "These four classes form a cohesive ZooKeeper coordination and locking cluster: FateLock, ZooReservation, and DistributedReadWriteLock all represent lock or reservation mechanisms and are related to ZooReaderWriter through internal dependencies or shared coordination responsibilities. Moving them together preserves their close relationships and avoids separating dependent lock primitives from their shared ZooKeeper access component.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the selected ZooKeeper coordination and locking cluster to one cohesive subpackage.",
+      "files": [
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooReaderWriter.java",
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/FateLock.java",
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/ZooReservation.java",
+        "core/src/main/java/org/apache/accumulo/core/fate/zookeeper/DistributedReadWriteLock.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.lock"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.lock.ZooReaderWriter"
+          ],
+          "details": "Move ZooReaderWriter to the destination package.",
+          "risk": "high",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.FateLock"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.lock.FateLock"
+          ],
+          "details": "Move FateLock to the destination package with the related ZooKeeper coordination classes.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.ZooReservation"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.lock.ZooReservation"
+          ],
+          "details": "Move ZooReservation to the destination package with the related ZooKeeper coordination classes.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.apache.accumulo.core.fate.zookeeper.DistributedReadWriteLock"
+          ],
+          "outputs": [
+            "org.apache.accumulo.core.fate.zookeeper.lock.DistributedReadWriteLock"
+          ],
+          "details": "Move DistributedReadWriteLock to the destination package with the related ZooKeeper locking classes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

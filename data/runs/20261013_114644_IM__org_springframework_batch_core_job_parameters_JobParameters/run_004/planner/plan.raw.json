@@ -1,0 +1,37 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.springframework.batch.core.job.parameters.JobParameters",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive parameter-map management and value-object representation responsibilities from JobParameters while preserving its public API and typed accessor delegation.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersData.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters",
+            "parameters",
+            "getParameter(String)",
+            "getParameters()",
+            "getIdentifyingParameters()",
+            "isEmpty()",
+            "equals(Object)",
+            "hashCode()",
+            "toString()"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersData",
+            "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java"
+          ],
+          "details": "Create the package-private class JobParametersData in the same package. Move ownership of the parameters map and the map-oriented implementations of getParameter(String), getParameters(), getIdentifyingParameters(), isEmpty(), equals(Object), hashCode(), and toString() into JobParametersData. Update JobParameters to hold a JobParametersData instance, initialize it from the constructor map, and delegate its existing public methods to that instance. Keep JobParameters typedAccessors and its existing typed accessor methods unchanged, using the parameter map supplied by JobParametersData so the public API and serialization behavior remain compatible.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+mvp:
+  name: planner
+  run_id: run_004
+project:
+  name: jackson-core
+  repo_path: /data/henrique/historical-java-repro/benchmark/repositories/jackson-core/repository
+target:
+  smell: GC
+  smell_name: God Component
+  target_type: package
+  target_name: tools.jackson.core.json
+models:
+  planner: gpt-5.6-luna
+prompts:
+  system: /data/henrique/multiagent_refactoring/mvp/planner/prompts/system.md
+  smell: /data/henrique/multiagent_refactoring/mvp/planner/prompts/planner_GC.md
+planner:
+  temperature: 0.0
+  timeout: 120
+  max_retries: 5
+designite:
+  java_path: /usr/lib/jvm/jdk-22.0.2-oracle-x64/bin/java
+  jar_path: /data/henrique/multiagent_refactoring/tools/DesigniteJava.jar
+  smells_csv: ArchitectureSmells.csv
+output:
+  runs_dir: /data/henrique/multiagent_refactoring/data/runs/20261019_181949_GC__tools_jackson_core_json

@@ -1,0 +1,238 @@
+commit 13f57790bb2f3228ba065819ab8d9ce7b46b9578
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Tue Oct 13 10:43:40 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+index 230cffea8..8378696b0 100644
+--- a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java
+@@ -24,11 +24,6 @@ package com.github.javaparser.symbolsolver.javaparser;
+ import com.github.javaparser.ast.CompilationUnit;
+ import com.github.javaparser.ast.Node;
+ import com.github.javaparser.ast.body.*;
+-import com.github.javaparser.ast.expr.MethodCallExpr;
+-import com.github.javaparser.ast.expr.NameExpr;
+-import com.github.javaparser.ast.expr.SimpleName;
+-import com.github.javaparser.ast.stmt.ReturnStmt;
+-import com.github.javaparser.ast.stmt.SwitchStmt;
+ 
+ import java.util.Optional;
+ 
+@@ -140,31 +135,31 @@ public final class Navigator {
+     }
+ 
+     public static <N extends Node> N demandNodeOfGivenClass(Node node, Class<N> clazz) {
+-        return node.findFirst(clazz).orElseThrow(IllegalArgumentException::new);
++        return NavigatorNodeLookup.demandNodeOfGivenClass(node, clazz);
+     }
+ 
+     public static Node demandParentNode(Node node) {
+-        return node.getParentNode().orElseThrow(() -> new IllegalStateException("Parent not found, the node does not appear to be inserted in a correct AST"));
++        return NavigatorNodeLookup.demandParentNode(node);
+     }
+ 
+-    public static ReturnStmt demandReturnStmt(MethodDeclaration method) {
+-        return demandNodeOfGivenClass(method, ReturnStmt.class);
++    public static com.github.javaparser.ast.stmt.ReturnStmt demandReturnStmt(MethodDeclaration method) {
++        return NavigatorNodeLookup.demandReturnStmt(method);
+     }
+ 
+-    public static SwitchStmt demandSwitch(Node node) {
+-        return findSwitchHelper(node).orElseThrow(IllegalArgumentException::new);
++    public static com.github.javaparser.ast.stmt.SwitchStmt demandSwitch(Node node) {
++        return NavigatorNodeLookup.demandSwitch(node);
+     }
+ 
+     public static Optional<VariableDeclarator> demandVariableDeclaration(Node node, String name) {
+-        return node.findFirst(VariableDeclarator.class, n -> n.getNameAsString().equals(name));
++        return NavigatorNodeLookup.demandVariableDeclaration(node, name);
+     }
+ 
+-    public static Optional<MethodCallExpr> findMethodCall(Node node, String methodName) {
+-        return node.findFirst(MethodCallExpr.class, n -> n.getNameAsString().equals(methodName));
++    public static Optional<com.github.javaparser.ast.expr.MethodCallExpr> findMethodCall(Node node, String methodName) {
++        return NavigatorNodeLookup.findMethodCall(node, methodName);
+     }
+ 
+-    public static Optional<NameExpr> findNameExpression(Node node, String name) {
+-        return node.findFirst(NameExpr.class, n -> n.getNameAsString().equals(name));
++    public static Optional<com.github.javaparser.ast.expr.NameExpr> findNameExpression(Node node, String name) {
++        return NavigatorNodeLookup.findNameExpression(node, name);
+     }
+ 
+     /**
+@@ -172,35 +167,27 @@ public final class Navigator {
+      */
+     @Deprecated
+     public static <N extends Node> N findNodeOfGivenClass(Node node, Class<N> clazz) {
+-        return demandNodeOfGivenClass(node, clazz);
++        return NavigatorNodeLookup.findNodeOfGivenClass(node, clazz);
+     }
+ 
+     /**
+      * @deprecated Use {@link #demandReturnStmt(MethodDeclaration)}
+      */
+     @Deprecated
+-    public static ReturnStmt findReturnStmt(MethodDeclaration method) {
+-        return demandReturnStmt(method);
++    public static com.github.javaparser.ast.stmt.ReturnStmt findReturnStmt(MethodDeclaration method) {
++        return NavigatorNodeLookup.findReturnStmt(method);
+     }
+ 
+-    public static Optional<SimpleName> findSimpleName(Node node, String name) {
+-        return node.findFirst(SimpleName.class, n -> n.asString().equals(name));
++    public static Optional<com.github.javaparser.ast.expr.SimpleName> findSimpleName(Node node, String name) {
++        return NavigatorNodeLookup.findSimpleName(node, name);
+     }
+ 
+     /**
+      * @deprecated Use {@link #demandSwitch(Node)}
+      */
+     @Deprecated
+-    public static SwitchStmt findSwitch(Node node) {
+-        return demandSwitch(node);
+-    }
+-
+-    private static Optional<SwitchStmt> findSwitchHelper(Node node) {
+-        if (node instanceof SwitchStmt) {
+-            return Optional.of((SwitchStmt) node);
+-        }
+-
+-        return node.findFirst(SwitchStmt.class);
++    public static com.github.javaparser.ast.stmt.SwitchStmt findSwitch(Node node) {
++        return NavigatorNodeLookup.findSwitch(node);
+     }
+ 
+     /**
+@@ -228,7 +215,7 @@ public final class Navigator {
+      */
+     @Deprecated
+     public static Node requireParentNode(Node node) {
+-        return demandParentNode(node);
++        return NavigatorNodeLookup.requireParentNode(node);
+     }
+ 
+ }
+diff --git a/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java
+new file mode 100644
+index 000000000..e89b9f251
+--- /dev/null
++++ b/javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorNodeLookup.java
+@@ -0,0 +1,115 @@
++/*
++ * Copyright (C) 2015-2016 Federico Tomassetti
++ * Copyright (C) 2017-2020 The JavaParser Team.
++ *
++ * This file is part of JavaParser.
++ *
++ * JavaParser can be used either under the terms of
++ * a) the GNU Lesser General Public License as published by
++ *     the Free Software Foundation, either version 3 of the License, or
++ *     (at your option) any later version.
++ * b) the terms of the Apache License
++ *
++ * You should have received a copy of both licenses in LICENCE.LGPL and
++ * LICENCE.APACHE. Please refer to those files for details.
++ *
++ * JavaParser is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ */
++
++package com.github.javaparser.symbolsolver.javaparser;
++
++import com.github.javaparser.ast.Node;
++import com.github.javaparser.ast.body.MethodDeclaration;
++import com.github.javaparser.ast.body.VariableDeclarator;
++import com.github.javaparser.ast.expr.MethodCallExpr;
++import com.github.javaparser.ast.expr.NameExpr;
++import com.github.javaparser.ast.expr.SimpleName;
++import com.github.javaparser.ast.stmt.ReturnStmt;
++import com.github.javaparser.ast.stmt.SwitchStmt;
++
++import java.util.Optional;
++
++/**
++ * Utility methods for searching and demanding nodes in a JavaParser AST.
++ */
++public final class NavigatorNodeLookup {
++
++    private NavigatorNodeLookup() {
++        // prevent instantiation
++    }
++
++    public static <N extends Node> N demandNodeOfGivenClass(Node node, Class<N> clazz) {
++        return node.findFirst(clazz).orElseThrow(IllegalArgumentException::new);
++    }
++
++    public static Node demandParentNode(Node node) {
++        return node.getParentNode().orElseThrow(() -> new IllegalStateException("Parent not found, the node does not appear to be inserted in a correct AST"));
++    }
++
++    public static ReturnStmt demandReturnStmt(MethodDeclaration method) {
++        return demandNodeOfGivenClass(method, ReturnStmt.class);
++    }
++
++    public static SwitchStmt demandSwitch(Node node) {
++        return findSwitchHelper(node).orElseThrow(IllegalArgumentException::new);
++    }
++
++    public static Optional<VariableDeclarator> demandVariableDeclaration(Node node, String name) {
++        return node.findFirst(VariableDeclarator.class, n -> n.getNameAsString().equals(name));
++    }
++
++    public static Optional<MethodCallExpr> findMethodCall(Node node, String methodName) {
++        return node.findFirst(MethodCallExpr.class, n -> n.getNameAsString().equals(methodName));
++    }
++
++    public static Optional<NameExpr> findNameExpression(Node node, String name) {
++        return node.findFirst(NameExpr.class, n -> n.getNameAsString().equals(name));
++    }
++
++    /**
++     * @deprecated Use {@link #demandNodeOfGivenClass(Node, Class)}
++     */
++    @Deprecated
++    public static <N extends Node> N findNodeOfGivenClass(Node node, Class<N> clazz) {
++        return demandNodeOfGivenClass(node, clazz);
++    }
++
++    /**
++     * @deprecated Use {@link #demandReturnStmt(MethodDeclaration)}
++     */
++    @Deprecated
++    public static ReturnStmt findReturnStmt(MethodDeclaration method) {
++        return demandReturnStmt(method);
++    }
++
++    public static Optional<SimpleName> findSimpleName(Node node, String name) {
++        return node.findFirst(SimpleName.class, n -> n.asString().equals(name));
++    }
++
++    /**
++     * @deprecated Use {@link #demandSwitch(Node)}
++     */
++    @Deprecated
++    public static SwitchStmt findSwitch(Node node) {
++        return demandSwitch(node);
++    }
++
++    private static Optional<SwitchStmt> findSwitchHelper(Node node) {
++        if (node instanceof SwitchStmt) {
++            return Optional.of((SwitchStmt) node);
++        }
++
++        return node.findFirst(SwitchStmt.class);
++    }
++
++    /**
++     * @deprecated Use {@link #demandParentNode(Node)}
++     */
++    @Deprecated
++    public static Node requireParentNode(Node node) {
++        return demandParentNode(node);
++    }
++}

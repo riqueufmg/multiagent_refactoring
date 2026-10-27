@@ -1,0 +1,126 @@
+commit addc1b9014e6a1a515a202d2cd1d0e2d41843c93
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Mon Oct 19 14:24:51 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/DropwizardResourceConfig.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/DropwizardResourceConfig.java
+index eb2a6167f8..dbf360bd83 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/DropwizardResourceConfig.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/DropwizardResourceConfig.java
+@@ -6,6 +6,7 @@ import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListene
+ import com.fasterxml.classmate.ResolvedType;
+ import com.fasterxml.classmate.TypeResolver;
+ import io.dropwizard.jersey.caching.CacheControlledResponseFeature;
++import io.dropwizard.jersey.optional.param.OptionalParamBinder;
+ import io.dropwizard.jersey.params.AbstractParamConverterProvider;
+ import io.dropwizard.jersey.sessions.SessionFactoryProvider;
+ import io.dropwizard.jersey.validation.FuzzyEnumParamConverterProvider;
+@@ -77,7 +78,7 @@ public class DropwizardResourceConfig extends ResourceConfig {
+         register(io.dropwizard.jersey.optional.OptionalDoubleMessageBodyWriter.class);
+         register(io.dropwizard.jersey.optional.OptionalIntMessageBodyWriter.class);
+         register(io.dropwizard.jersey.optional.OptionalLongMessageBodyWriter.class);
+-        register(new io.dropwizard.jersey.optional.OptionalParamBinder());
++        register(new OptionalParamBinder());
+         register(AbstractParamConverterProvider.class);
+         register(new FuzzyEnumParamConverterProvider());
+         register(new SessionFactoryProvider.Binder());
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProvider.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalDoubleParamConverterProvider.java
+similarity index 98%
+rename from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProvider.java
+rename to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalDoubleParamConverterProvider.java
+index afc868d1d2..ac92eb6875 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProvider.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalDoubleParamConverterProvider.java
+@@ -1,4 +1,4 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.param;
+ 
+ import io.dropwizard.jersey.DefaultValueUtils;
+ 
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProvider.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalIntParamConverterProvider.java
+similarity index 98%
+rename from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProvider.java
+rename to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalIntParamConverterProvider.java
+index 5c33652b72..d34f236331 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProvider.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalIntParamConverterProvider.java
+@@ -1,4 +1,4 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.param;
+ 
+ import io.dropwizard.jersey.DefaultValueUtils;
+ 
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProvider.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalLongParamConverterProvider.java
+similarity index 98%
+rename from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProvider.java
+rename to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalLongParamConverterProvider.java
+index d655132f9b..98737f5ee4 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProvider.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalLongParamConverterProvider.java
+@@ -1,4 +1,4 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.param;
+ 
+ import io.dropwizard.jersey.DefaultValueUtils;
+ 
+diff --git a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalParamBinder.java b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalParamBinder.java
+similarity index 86%
+rename from dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalParamBinder.java
+rename to dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalParamBinder.java
+index 22ed556c82..454358cd31 100644
+--- a/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/OptionalParamBinder.java
++++ b/dropwizard-jersey/src/main/java/io/dropwizard/jersey/optional/param/OptionalParamBinder.java
+@@ -1,5 +1,6 @@
+-package io.dropwizard.jersey.optional;
++package io.dropwizard.jersey.optional.param;
+ 
++import io.dropwizard.jersey.optional.OptionalParamConverterProvider;
+ import org.glassfish.jersey.internal.inject.AbstractBinder;
+ 
+ import javax.inject.Singleton;
+diff --git a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProviderTest.java b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProviderTest.java
+index 6ddd56d377..27788436e6 100644
+--- a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProviderTest.java
++++ b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalDoubleParamConverterProviderTest.java
+@@ -1,5 +1,6 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.param.OptionalDoubleParamConverterProvider;
+ import org.junit.jupiter.api.Test;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
+diff --git a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriterTest.java b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriterTest.java
+index c14c37a28d..2aaed9e2ed 100644
+--- a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriterTest.java
++++ b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntMessageBodyWriterTest.java
+@@ -2,6 +2,7 @@ package io.dropwizard.jersey.optional;
+ 
+ import io.dropwizard.jersey.AbstractJerseyTest;
+ import io.dropwizard.jersey.DropwizardResourceConfig;
++import io.dropwizard.jersey.optional.param.OptionalIntParamConverterProvider;
+ import org.junit.jupiter.api.Test;
+ 
+ import javax.ws.rs.DefaultValue;
+diff --git a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProviderTest.java b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProviderTest.java
+index fb0a91cb3c..e0a90a96c8 100644
+--- a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProviderTest.java
++++ b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalIntParamConverterProviderTest.java
+@@ -1,5 +1,6 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.param.OptionalIntParamConverterProvider;
+ import org.junit.jupiter.api.Test;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
+diff --git a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProviderTest.java b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProviderTest.java
+index da82c46f67..44361c7e0b 100644
+--- a/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProviderTest.java
++++ b/dropwizard-jersey/src/test/java/io/dropwizard/jersey/optional/OptionalLongParamConverterProviderTest.java
+@@ -1,5 +1,6 @@
+ package io.dropwizard.jersey.optional;
+ 
++import io.dropwizard.jersey.optional.param.OptionalLongParamConverterProvider;
+ import org.junit.jupiter.api.Test;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;

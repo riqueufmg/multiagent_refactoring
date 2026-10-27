@@ -1,0 +1,52 @@
+{
+  "enabled": true,
+  "block_id": "1",
+  "block_index": 0,
+  "ops": [
+    {
+      "op": "CREATE_PACKAGE",
+      "inputs": [],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.cache"
+      ],
+      "details": "Create the destination subpackage if it does not exist.",
+      "risk": "low",
+      "api_change": false
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.ZooCache"
+      ],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.cache.ZooCache"
+      ],
+      "details": "Move ZooCache to the destination package together with its closely coupled ZcNode class.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "MOVE_CLASS",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.ZcNode"
+      ],
+      "outputs": [
+        "org.apache.accumulo.core.fate.zookeeper.cache.ZcNode"
+      ],
+      "details": "Move ZcNode to the same destination package as ZooCache to preserve their bidirectional internal relationship.",
+      "risk": "medium",
+      "api_change": true
+    },
+    {
+      "op": "UPDATE_VISIBILITY",
+      "inputs": [
+        "org.apache.accumulo.core.fate.zookeeper.cache.ZcNode",
+        "org.apache.accumulo.core.fate.zookeeper.cache.ZooCache"
+      ],
+      "outputs": [],
+      "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+      "risk": "medium",
+      "api_change": true
+    }
+  ]
+}

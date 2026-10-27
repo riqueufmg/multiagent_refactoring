@@ -1,0 +1,471 @@
+commit 123e2cddc29fbc9ab4343452063fc4928100d3a4
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Oct 16 10:36:05 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/cucumber-core/src/main/java/io/cucumber/core/plugin/ComparisonFailure.java b/cucumber-core/src/main/java/io/cucumber/core/plugin/ComparisonFailure.java
+new file mode 100644
+index 000000000..14fd67726
+--- /dev/null
++++ b/cucumber-core/src/main/java/io/cucumber/core/plugin/ComparisonFailure.java
+@@ -0,0 +1,59 @@
++package io.cucumber.core.plugin;
++
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
++
++import static java.util.Objects.requireNonNull;
++
++class ComparisonFailure {
++
++    private static final Pattern[] COMPARE_PATTERNS = new Pattern[] {
++            // Hamcrest 2 MatcherAssert.assertThat
++            Pattern.compile("expected: (.*)(?:\r\n|\r|\n) {5}but: was (.*)$",
++                Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
++            // AssertJ 3 ShouldBeEqual.smartErrorMessage
++            Pattern.compile("expected: (.*)(?:\r\n|\r|\n) but was: (.*)$", Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
++            // JUnit 5 AssertionFailureBuilder
++            Pattern.compile("expected: <(.*)> but was: <(.*)>$", Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
++            // JUnit 4 Assert.assertEquals
++            Pattern.compile("expected:\\s?<(.*)> but was:\\s?<(.*)>$", Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
++            // TestNG 7 Assert.assertEquals
++            Pattern.compile("expected \\[(.*)] but found \\[(.*)]\n$", Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
++    };
++
++    static ComparisonFailure parse(String message) {
++        for (Pattern pattern : COMPARE_PATTERNS) {
++            ComparisonFailure result = parse(message, pattern);
++            if (result != null) {
++                return result;
++            }
++        }
++        return null;
++    }
++
++    static ComparisonFailure parse(String message, Pattern pattern) {
++        final Matcher matcher = pattern.matcher(message);
++        if (!matcher.find()) {
++            return null;
++        }
++        String expected = matcher.group(1);
++        String actual = matcher.group(2);
++        return new ComparisonFailure(expected, actual);
++    }
++
++    private final String expected;
++    private final String actual;
++
++    ComparisonFailure(String expected, String actual) {
++        this.expected = requireNonNull(expected);
++        this.actual = requireNonNull(actual);
++    }
++
++    public String getExpected() {
++        return expected;
++    }
++
++    public String getActual() {
++        return actual;
++    }
++}
+diff --git a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
+index cc2f997a3..df4f3b8b1 100644
+--- a/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
++++ b/cucumber-core/src/main/java/io/cucumber/core/plugin/TeamCityPlugin.java
+@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
+ 
+ import static io.cucumber.core.exception.ExceptionUtils.printStackTrace;
+ import static java.util.Collections.emptyList;
+-import static java.util.Objects.requireNonNull;
+ import static java.util.stream.Collectors.joining;
+ 
+ /**
+@@ -58,41 +57,33 @@ import static java.util.stream.Collectors.joining;
+  *      - Service Messages</a>
+  */
+ public class TeamCityPlugin implements EventListener {
+-
+     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+-
+     private static final String TEAMCITY_PREFIX = "##teamcity";
+-
+     private static final String TEMPLATE_ENTER_THE_MATRIX = TEAMCITY_PREFIX + "[enteredTheMatrix timestamp = '%s']";
+     private static final String TEMPLATE_TEST_RUN_STARTED = TEAMCITY_PREFIX
+             + "[testSuiteStarted timestamp = '%s' name = 'Cucumber']";
+     private static final String TEMPLATE_TEST_RUN_FINISHED = TEAMCITY_PREFIX
+             + "[testSuiteFinished timestamp = '%s' name = 'Cucumber']";
+-
+     private static final String TEMPLATE_TEST_SUITE_STARTED = TEAMCITY_PREFIX
+             + "[testSuiteStarted timestamp = '%s' locationHint = '%s' name = '%s']";
+     private static final String TEMPLATE_TEST_SUITE_FINISHED = TEAMCITY_PREFIX
+             + "[testSuiteFinished timestamp = '%s' name = '%s']";
+-
+     private static final String TEMPLATE_TEST_STARTED = TEAMCITY_PREFIX
+             + "[testStarted timestamp = '%s' locationHint = '%s' captureStandardOutput = 'true' name = '%s']";
+     private static final String TEMPLATE_TEST_FINISHED = TEAMCITY_PREFIX
+             + "[testFinished timestamp = '%s' duration = '%s' name = '%s']";
+     private static final String TEMPLATE_TEST_FAILED = TEAMCITY_PREFIX
+             + "[testFailed timestamp = '%s' duration = '%s' message = '%s' details = '%s' name = '%s']";
+-
+     private static final String TEMPLATE_TEST_COMPARISON_FAILED = TEAMCITY_PREFIX
+             + "[testFailed timestamp = '%s' duration = '%s' message = '%s' details = '%s' expected = '%s' actual = '%s' name = '%s']";
+     private static final String TEMPLATE_TEST_IGNORED = TEAMCITY_PREFIX
+             + "[testIgnored timestamp = '%s' duration = '%s' message = '%s' name = '%s']";
+-
+     private static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED = TEAMCITY_PREFIX
+             + "[testStarted timestamp = '%s' name = '%s']";
+     private static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_FAILED = TEAMCITY_PREFIX
+             + "[testFailed timestamp = '%s' message = '%s' details = '%s' name = '%s']";
+     private static final String TEMPLATE_BEFORE_ALL_AFTER_ALL_FINISHED = TEAMCITY_PREFIX
+             + "[testFinished timestamp = '%s' name = '%s']";
+-
+     private static final String TEMPLATE_PROGRESS_COUNTING_STARTED = TEAMCITY_PREFIX
+             + "[customProgressStatus testsCategory = 'Scenarios' count = '0' timestamp = '%s']";
+     private static final String TEMPLATE_PROGRESS_COUNTING_FINISHED = TEAMCITY_PREFIX
+@@ -101,42 +92,18 @@ public class TeamCityPlugin implements EventListener {
+             + "[customProgressStatus type = 'testStarted' timestamp = '%s']";
+     private static final String TEMPLATE_PROGRESS_TEST_FINISHED = TEAMCITY_PREFIX
+             + "[customProgressStatus type = 'testFinished' timestamp = '%s']";
+-
+     private static final String TEMPLATE_ATTACH_WRITE_EVENT = TEAMCITY_PREFIX + "[message text='%s' status='NORMAL']";
+-
+     private static final Pattern ANNOTATION_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\([^:]*\\)");
+     private static final Pattern LAMBDA_GLUE_CODE_LOCATION_PATTERN = Pattern.compile("^(.*)\\.(.*)\\(.*:.*\\)");
+ 
+-    private static final Pattern[] COMPARE_PATTERNS = new Pattern[] {
+-            // Hamcrest 2 MatcherAssert.assertThat
+-            Pattern.compile("expected: (.*)(?:\r\n|\r|\n) {5}but: was (.*)$",
+-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
+-            // AssertJ 3 ShouldBeEqual.smartErrorMessage
+-            Pattern.compile("expected: (.*)(?:\r\n|\r|\n) but was: (.*)$",
+-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
+-            // JUnit 5 AssertionFailureBuilder
+-            Pattern.compile("expected: <(.*)> but was: <(.*)>$",
+-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
+-            // JUnit 4 Assert.assertEquals
+-            Pattern.compile("expected:\\s?<(.*)> but was:\\s?<(.*)>$",
+-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
+-            // TestNG 7 Assert.assertEquals
+-            Pattern.compile("expected \\[(.*)] but found \\[(.*)]\n$",
+-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE),
+-    };
+-
+     private final PrintStream out;
+     private final List<SnippetsSuggestedEvent> suggestions = new ArrayList<>();
+     private final Map<URI, Collection<Node>> parsedTestSources = new HashMap<>();
+     private List<Node> currentStack = new ArrayList<>();
+     private TestCase currentTestCase;
+ 
+-    @SuppressWarnings("unused") // Used by PluginFactory
++    @SuppressWarnings("unused")
+     public TeamCityPlugin() {
+-        // This plugin prints markers for Team City and IntelliJ IDEA that
+-        // allows them to associate the output to specific test cases. Printing
+-        // to system out - and potentially mixing with other formatters - is
+-        // intentional.
+         this(System.out);
+     }
+ 
+@@ -178,22 +145,14 @@ public class TeamCityPlugin implements EventListener {
+         TestCase testCase = event.getTestCase();
+         URI uri = testCase.getUri();
+         String timestamp = extractTimeStamp(event);
+-
+         Location location = testCase.getLocation();
+         Predicate<Node> withLocation = candidate -> location.equals(candidate.getLocation());
+-        List<Node> path = parsedTestSources.get(uri)
+-                .stream()
+-                .map(node -> node.findPathTo(withLocation))
+-                .filter(Optional::isPresent)
+-                .map(Optional::get)
+-                .findFirst()
+-                .orElse(emptyList());
+-
++        List<Node> path = parsedTestSources.get(uri).stream().map(node -> node.findPathTo(withLocation))
++                .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(emptyList());
+         poppedNodes(path).forEach(node -> finishNode(timestamp, node));
+         pushedNodes(path).forEach(node -> startNode(uri, timestamp, node));
+         this.currentStack = path;
+         this.currentTestCase = testCase;
+-
+         print(TEMPLATE_PROGRESS_TEST_STARTED, timestamp);
+     }
+ 
+@@ -218,25 +177,21 @@ public class TeamCityPlugin implements EventListener {
+ 
+     private List<Node> reversedPoppedNodes(List<Node> currentStack, List<Node> newStack) {
+         for (int i = 0; i < currentStack.size() && i < newStack.size(); i++) {
+-            if (!currentStack.get(i).equals(newStack.get(i))) {
++            if (!currentStack.get(i).equals(newStack.get(i)))
+                 return currentStack.subList(i, currentStack.size());
+-            }
+         }
+-        if (newStack.size() < currentStack.size()) {
++        if (newStack.size() < currentStack.size())
+             return currentStack.subList(newStack.size(), currentStack.size());
+-        }
+         return emptyList();
+     }
+ 
+     private List<Node> pushedNodes(List<Node> newStack) {
+         for (int i = 0; i < currentStack.size() && i < newStack.size(); i++) {
+-            if (!currentStack.get(i).equals(newStack.get(i))) {
++            if (!currentStack.get(i).equals(newStack.get(i)))
+                 return newStack.subList(i, newStack.size());
+-            }
+         }
+-        if (newStack.size() < currentStack.size()) {
++        if (newStack.size() < currentStack.size())
+             return emptyList();
+-        }
+         return newStack.subList(currentStack.size(), newStack.size());
+     }
+ 
+@@ -254,10 +209,7 @@ public class TeamCityPlugin implements EventListener {
+             return pickleStepTestStep.getUri() + ":" + pickleStepTestStep.getStep().getLine();
+         }
+         if (testStep instanceof HookTestStep) {
+-            return formatHookStepLocation(
+-                (HookTestStep) testStep,
+-                javaTestLocationUri(),
+-                TestStep::getCodeLocation);
++            return formatHookStepLocation((HookTestStep) testStep, javaTestLocationUri(), TestStep::getCodeLocation);
+         }
+         return testStep.getCodeLocation();
+     }
+@@ -272,21 +224,14 @@ public class TeamCityPlugin implements EventListener {
+             Function<HookTestStep, String> defaultHookName
+     ) {
+         Matcher javaMatcher = ANNOTATION_GLUE_CODE_LOCATION_PATTERN.matcher(hookTestStep.getCodeLocation());
+-        if (javaMatcher.matches()) {
+-            String fqDeclaringClassName = javaMatcher.group(1);
+-            String methodName = javaMatcher.group(2);
+-            return hookStepCase.apply(fqDeclaringClassName, methodName);
+-        }
++        if (javaMatcher.matches())
++            return hookStepCase.apply(javaMatcher.group(1), javaMatcher.group(2));
+         Matcher java8Matcher = LAMBDA_GLUE_CODE_LOCATION_PATTERN.matcher(hookTestStep.getCodeLocation());
+         if (java8Matcher.matches()) {
+             String fqDeclaringClassName = java8Matcher.group(1);
+-            String declaringClassName;
+             int indexOfPackageSeparator = fqDeclaringClassName.lastIndexOf(".");
+-            if (indexOfPackageSeparator != -1) {
+-                declaringClassName = fqDeclaringClassName.substring(indexOfPackageSeparator + 1);
+-            } else {
+-                declaringClassName = fqDeclaringClassName;
+-            }
++            String declaringClassName = indexOfPackageSeparator == -1 ? fqDeclaringClassName
++                    : fqDeclaringClassName.substring(indexOfPackageSeparator + 1);
+             return hookStepCase.apply(fqDeclaringClassName, declaringClassName);
+         }
+         return defaultHookName.apply(hookTestStep);
+@@ -296,27 +241,22 @@ public class TeamCityPlugin implements EventListener {
+         String timeStamp = extractTimeStamp(event);
+         long duration = extractDuration(event.getResult());
+         String name = extractName(event.getTestStep());
+-
+         Throwable error = event.getResult().getError();
+         Status status = event.getResult().getStatus();
+         switch (status) {
+-            case SKIPPED: {
+-                String message = error == null ? "Step skipped" : error.getMessage();
+-                print(TEMPLATE_TEST_IGNORED, timeStamp, duration, message, name);
++            case SKIPPED:
++                print(TEMPLATE_TEST_IGNORED, timeStamp, duration, error == null ? "Step skipped" : error.getMessage(),
++                    name);
+                 break;
+-            }
+-            case PENDING: {
+-                String details = error == null ? "" : error.getMessage();
+-                print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step pending", details, name);
++            case PENDING:
++                print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step pending",
++                    error == null ? "" : error.getMessage(), name);
+                 break;
+-            }
+-            case UNDEFINED: {
+-                String snippets = getSnippets(currentTestCase);
+-                print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step undefined", snippets, name);
++            case UNDEFINED:
++                print(TEMPLATE_TEST_FAILED, timeStamp, duration, "Step undefined", getSnippets(currentTestCase), name);
+                 break;
+-            }
+             case AMBIGUOUS:
+-            case FAILED: {
++            case FAILED:
+                 String details = printStackTrace(error);
+                 String message = error.getMessage();
+                 if (message == null) {
+@@ -331,7 +271,6 @@ public class TeamCityPlugin implements EventListener {
+                 print(TEMPLATE_TEST_COMPARISON_FAILED, timeStamp, duration, "Step failed", details,
+                     comparisonFailure.getExpected(), comparisonFailure.getActual(), name);
+                 break;
+-            }
+             default:
+                 break;
+         }
+@@ -339,8 +278,7 @@ public class TeamCityPlugin implements EventListener {
+     }
+ 
+     private String getHookName(HookTestStep hook) {
+-        HookType hookType = hook.getHookType();
+-        switch (hookType) {
++        switch (hook.getHookType()) {
+             case BEFORE:
+                 return "Before";
+             case AFTER:
+@@ -350,21 +288,16 @@ public class TeamCityPlugin implements EventListener {
+             case AFTER_STEP:
+                 return "AfterStep";
+             default:
+-                return hookType.name().toLowerCase(Locale.US);
++                return hook.getHookType().name().toLowerCase(Locale.US);
+         }
+     }
+ 
+     private String extractName(TestStep testStep) {
+-        if (testStep instanceof PickleStepTestStep) {
+-            PickleStepTestStep pickleStepTestStep = (PickleStepTestStep) testStep;
+-            return pickleStepTestStep.getStep().getText();
+-        }
++        if (testStep instanceof PickleStepTestStep)
++            return ((PickleStepTestStep) testStep).getStep().getText();
+         if (testStep instanceof HookTestStep) {
+             HookTestStep hookTestStep = (HookTestStep) testStep;
+-            return formatHookStepLocation(
+-                hookTestStep,
+-                hookNameFormat(hookTestStep),
+-                this::getHookName);
++            return formatHookStepLocation(hookTestStep, hookNameFormat(hookTestStep), this::getHookName);
+         }
+         return "Unknown step";
+     }
+@@ -378,29 +311,21 @@ public class TeamCityPlugin implements EventListener {
+         URI uri = testCase.getUri();
+         Location location = testCase.getLocation();
+         List<Suggestion> suggestionForTestCase = suggestions.stream()
+-                .filter(suggestion -> suggestion.getUri().equals(uri) &&
+-                        suggestion.getTestCaseLocation().equals(location))
+-                .map(SnippetsSuggestedEvent::getSuggestion)
+-                .collect(Collectors.toList());
++                .filter(
++                    suggestion -> suggestion.getUri().equals(uri) && suggestion.getTestCaseLocation().equals(location))
++                .map(SnippetsSuggestedEvent::getSuggestion).collect(Collectors.toList());
+         return createMessage(suggestionForTestCase);
+     }
+ 
+     private static String createMessage(Collection<Suggestion> suggestions) {
+-        if (suggestions.isEmpty()) {
++        if (suggestions.isEmpty())
+             return "";
+-        }
+         StringBuilder sb = new StringBuilder("You can implement this step");
+-        if (suggestions.size() > 1) {
++        if (suggestions.size() > 1)
+             sb.append(" and ").append(suggestions.size() - 1).append(" other step(s)");
+-        }
+         sb.append(" using the snippet(s) below:\n\n");
+-        String snippets = suggestions
+-                .stream()
+-                .map(Suggestion::getSnippets)
+-                .flatMap(Collection::stream)
+-                .distinct()
+-                .collect(joining("\n", "", "\n"));
+-        sb.append(snippets);
++        sb.append(suggestions.stream().map(Suggestion::getSnippets).flatMap(Collection::stream).distinct()
++                .collect(joining("\n", "", "\n")));
+         return sb.toString();
+     }
+ 
+@@ -418,21 +343,17 @@ public class TeamCityPlugin implements EventListener {
+     private void printTestRunFinished(TestRunFinished event) {
+         String timestamp = extractTimeStamp(event);
+         print(TEMPLATE_PROGRESS_COUNTING_FINISHED, timestamp);
+-
+         List<Node> emptyStack = new ArrayList<>();
+         poppedNodes(emptyStack).forEach(node -> finishNode(timestamp, node));
+         currentStack = emptyStack;
+-
+         printBeforeAfterAllResult(event, timestamp);
+         print(TEMPLATE_TEST_RUN_FINISHED, timestamp);
+     }
+ 
+     private void printBeforeAfterAllResult(TestRunFinished event, String timestamp) {
+         Throwable error = event.getResult().getError();
+-        if (error == null) {
++        if (error == null)
+             return;
+-        }
+-        // Use dummy test to display before all after all failures
+         String name = "Before All/After All";
+         print(TEMPLATE_BEFORE_ALL_AFTER_ALL_STARTED, timestamp, name);
+         String details = printStackTrace(error);
+@@ -460,64 +381,15 @@ public class TeamCityPlugin implements EventListener {
+ 
+     private String formatCommand(String command, Object... parameters) {
+         String[] escapedParameters = new String[parameters.length];
+-        for (int i = 0; i < escapedParameters.length; i++) {
++        for (int i = 0; i < escapedParameters.length; i++)
+             escapedParameters[i] = escape(parameters[i].toString());
+-        }
+-
+         return String.format(command, (Object[]) escapedParameters);
+     }
+ 
+     private String escape(String source) {
+-        if (source == null) {
++        if (source == null)
+             return "";
+-        }
+-        // https://www.jetbrains.com/help/teamcity/service-messages.html#Escaped+Values
+-        return source
+-                .replace("|", "||")
+-                .replace("'", "|'")
+-                .replace("\n", "|n")
+-                .replace("\r", "|r")
+-                .replace("[", "|[")
++        return source.replace("|", "||").replace("'", "|'").replace("\n", "|n").replace("\r", "|r").replace("[", "|[")
+                 .replace("]", "|]");
+     }
+-
+-    private static class ComparisonFailure {
+-
+-        static ComparisonFailure parse(String message) {
+-            for (Pattern pattern : COMPARE_PATTERNS) {
+-                ComparisonFailure result = parse(message, pattern);
+-                if (result != null) {
+-                    return result;
+-                }
+-            }
+-            return null;
+-        }
+-
+-        static ComparisonFailure parse(String message, Pattern pattern) {
+-            final Matcher matcher = pattern.matcher(message);
+-            if (!matcher.find()) {
+-                return null;
+-            }
+-            String expected = matcher.group(1);
+-            String actual = matcher.group(2);
+-            return new ComparisonFailure(expected, actual);
+-        }
+-
+-        private final String expected;
+-
+-        private final String actual;
+-
+-        ComparisonFailure(String expected, String actual) {
+-            this.expected = requireNonNull(expected);
+-            this.actual = requireNonNull(actual);
+-        }
+-
+-        public String getExpected() {
+-            return expected;
+-        }
+-
+-        public String getActual() {
+-            return actual;
+-        }
+-    }
+ }

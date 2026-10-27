@@ -1,0 +1,355 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.core.client.BaseClient",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Reduce the number of public methods in BaseClient by moving the cohesive authorization-generator API to BaseClientAuthorization.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+            "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()"
+          ],
+          "details": "Move the authorization-generator getter to the existing authorization component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(List<AuthorizationGenerator>)",
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(List<AuthorizationGenerator>)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(List<AuthorizationGenerator>)"
+          ],
+          "details": "Move the list-based authorization-generator setter to the existing authorization component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(AuthorizationGenerator...)",
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(AuthorizationGenerator...)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(AuthorizationGenerator...)"
+          ],
+          "details": "Move the varargs authorization-generator setter to the existing authorization component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(AuthorizationGenerator)",
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(AuthorizationGenerator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(AuthorizationGenerator)"
+          ],
+          "details": "Move the single authorization-generator setter to the existing authorization component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(AuthorizationGenerator)",
+            "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(AuthorizationGenerator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(AuthorizationGenerator)"
+          ],
+          "details": "Move the single authorization-generator addition method to the existing authorization component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(List<AuthorizationGenerator>)",
+            "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+          ],
+          "details": "Move the list-based authorization-generator addition method to the existing authorization component.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getAuthorizationGenerators()",
+            "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(List<AuthorizationGenerator>)",
+            "org.pac4j.core.client.BaseClient.setAuthorizationGenerators(AuthorizationGenerator...)",
+            "org.pac4j.core.client.BaseClient.setAuthorizationGenerator(AuthorizationGenerator)",
+            "org.pac4j.core.client.BaseClient.addAuthorizationGenerator(AuthorizationGenerator)",
+            "org.pac4j.core.client.BaseClient.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientAuthorization.getAuthorizationGenerators()",
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(List<AuthorizationGenerator>)",
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerators(AuthorizationGenerator...)",
+            "org.pac4j.core.client.BaseClientAuthorization.setAuthorizationGenerator(AuthorizationGenerator)",
+            "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerator(AuthorizationGenerator)",
+            "org.pac4j.core.client.BaseClientAuthorization.addAuthorizationGenerators(List<AuthorizationGenerator>)"
+          ],
+          "details": "Update callers to use the authorization component after the methods are moved.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Reduce the number of public and protected methods in BaseClient by moving the credentials and profile configuration API to BaseClientProfileConfiguration.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getCredentialsExtractor()",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getCredentialsExtractor()"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getCredentialsExtractor()"
+          ],
+          "details": "Move the credentials-extractor getter to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.defaultCredentialsExtractor(CredentialsExtractor)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultCredentialsExtractor(CredentialsExtractor)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultCredentialsExtractor(CredentialsExtractor)"
+          ],
+          "details": "Move the default credentials-extractor configuration method to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getAuthenticator()",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getAuthenticator()"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getAuthenticator()"
+          ],
+          "details": "Move the authenticator getter to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.defaultAuthenticator(Authenticator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultAuthenticator(Authenticator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultAuthenticator(Authenticator)"
+          ],
+          "details": "Move the default authenticator configuration method to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getProfileCreator()",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getProfileCreator()"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getProfileCreator()"
+          ],
+          "details": "Move the profile-creator getter to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.defaultProfileCreator(ProfileCreator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultProfileCreator(ProfileCreator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultProfileCreator(ProfileCreator)"
+          ],
+          "details": "Move the default profile-creator configuration method to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setCredentialsExtractor(CredentialsExtractor)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setCredentialsExtractor(CredentialsExtractor)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setCredentialsExtractor(CredentialsExtractor)"
+          ],
+          "details": "Move the credentials-extractor setter to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setAuthenticator(Authenticator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setAuthenticator(Authenticator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setAuthenticator(Authenticator)"
+          ],
+          "details": "Move the authenticator setter to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setProfileCreator(ProfileCreator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setProfileCreator(ProfileCreator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setProfileCreator(ProfileCreator)"
+          ],
+          "details": "Move the profile-creator setter to the existing profile configuration component.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getCredentialsExtractor()",
+            "org.pac4j.core.client.BaseClient.defaultCredentialsExtractor(CredentialsExtractor)",
+            "org.pac4j.core.client.BaseClient.getAuthenticator()",
+            "org.pac4j.core.client.BaseClient.defaultAuthenticator(Authenticator)",
+            "org.pac4j.core.client.BaseClient.getProfileCreator()",
+            "org.pac4j.core.client.BaseClient.defaultProfileCreator(ProfileCreator)",
+            "org.pac4j.core.client.BaseClient.setCredentialsExtractor(CredentialsExtractor)",
+            "org.pac4j.core.client.BaseClient.setAuthenticator(Authenticator)",
+            "org.pac4j.core.client.BaseClient.setProfileCreator(ProfileCreator)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getCredentialsExtractor()",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultCredentialsExtractor(CredentialsExtractor)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getAuthenticator()",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultAuthenticator(Authenticator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.getProfileCreator()",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.defaultProfileCreator(ProfileCreator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setCredentialsExtractor(CredentialsExtractor)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setAuthenticator(Authenticator)",
+            "org.pac4j.core.client.BaseClientProfileConfiguration.setProfileCreator(ProfileCreator)"
+          ],
+          "details": "Update callers to use the profile configuration component after the methods are moved.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Reduce the number of public methods in BaseClient by moving profile-option configuration methods to BaseClientProfileOptions.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/BaseClient.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getProfileFactoryWhenNotAuthenticated()",
+            "org.pac4j.core.client.BaseClientProfileOptions.getProfileFactoryWhenNotAuthenticated()"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.getProfileFactoryWhenNotAuthenticated()"
+          ],
+          "details": "Move the unauthenticated profile-factory getter to the existing profile options component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setProfileFactoryWhenNotAuthenticated(ProfileFactory)",
+            "org.pac4j.core.client.BaseClientProfileOptions.setProfileFactoryWhenNotAuthenticated(ProfileFactory)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.setProfileFactoryWhenNotAuthenticated(ProfileFactory)"
+          ],
+          "details": "Move the unauthenticated profile-factory setter to the existing profile options component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.isMultiProfile(WebContext, UserProfile)",
+            "org.pac4j.core.client.BaseClientProfileOptions.isMultiProfile(WebContext, UserProfile)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.isMultiProfile(WebContext, UserProfile)"
+          ],
+          "details": "Move the multi-profile query to the existing profile options component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setMultiProfile(boolean)",
+            "org.pac4j.core.client.BaseClientProfileOptions.setMultiProfile(boolean)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.setMultiProfile(boolean)"
+          ],
+          "details": "Move the multi-profile setter to the existing profile options component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getSaveProfileInSession(WebContext, UserProfile)",
+            "org.pac4j.core.client.BaseClientProfileOptions.getSaveProfileInSession(WebContext, UserProfile)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.getSaveProfileInSession(WebContext, UserProfile)"
+          ],
+          "details": "Move the save-profile-in-session query to the existing profile options component.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.setSaveProfileInSession(boolean)",
+            "org.pac4j.core.client.BaseClientProfileOptions.setSaveProfileInSession(boolean)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.setSaveProfileInSession(boolean)"
+          ],
+          "details": "Move the save-profile-in-session setter to the existing profile options component.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.pac4j.core.client.BaseClient.getProfileFactoryWhenNotAuthenticated()",
+            "org.pac4j.core.client.BaseClient.setProfileFactoryWhenNotAuthenticated(ProfileFactory)",
+            "org.pac4j.core.client.BaseClient.isMultiProfile(WebContext, UserProfile)",
+            "org.pac4j.core.client.BaseClient.setMultiProfile(boolean)",
+            "org.pac4j.core.client.BaseClient.getSaveProfileInSession(WebContext, UserProfile)",
+            "org.pac4j.core.client.BaseClient.setSaveProfileInSession(boolean)"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.BaseClientProfileOptions.getProfileFactoryWhenNotAuthenticated()",
+            "org.pac4j.core.client.BaseClientProfileOptions.setProfileFactoryWhenNotAuthenticated(ProfileFactory)",
+            "org.pac4j.core.client.BaseClientProfileOptions.isMultiProfile(WebContext, UserProfile)",
+            "org.pac4j.core.client.BaseClientProfileOptions.setMultiProfile(boolean)",
+            "org.pac4j.core.client.BaseClientProfileOptions.getSaveProfileInSession(WebContext, UserProfile)",
+            "org.pac4j.core.client.BaseClientProfileOptions.setSaveProfileInSession(boolean)"
+          ],
+          "details": "Update callers to use the profile options component after the methods are moved.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

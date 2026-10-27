@@ -1,0 +1,58 @@
+{
+  "id": 1,
+  "goal": "Extract CAS ticket-validator construction and HTTP connection customization from CasConfiguration into a cohesive same-package class while preserving the existing CasConfiguration API through delegating methods.",
+  "files": [
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+    "pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorFactory.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.retrieveTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.getHttpURLConnectionFactory()"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasTicketValidatorFactory"
+      ],
+      "details": "Create CasTicketValidatorFactory in org.pac4j.cas.config. Move the protocol selection logic, CAS10/CAS20/CAS20_PROXY/CAS30/CAS30_PROXY/SAML TicketValidator construction, and HTTP connection factory construction into the new class. Give the factory a CasConfiguration dependency and use the existing CasConfiguration getters, computeFinalPrefixUrl(WebContext), getHostnameVerifier(), getSslSocketFactory(), getTimeTolerance(), getEncoding(), isRenew(), isAcceptAnyProxy(), getAllowedProxyChains(), getProxyReceptor(), and getDefaultTicketValidator() methods. Keep private-key application delegated to the existing CasConfiguration.addPrivateKey(Cas20ServiceTicketValidator) method, which remains in CasConfiguration so privateKey remains encapsulated. Keep CasConfiguration.retrieveTicketValidator(WebContext) and the existing protected build methods as forwarding methods to CasTicketValidatorFactory to preserve the current public and protected method signatures.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration.retrieveTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildSAMLTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas30TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20ProxyTicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas20TicketValidator(WebContext)",
+        "org.pac4j.cas.config.CasConfiguration.buildCas10TicketValidator(WebContext)"
+      ],
+      "outputs": [
+        "org.pac4j.cas.config.CasConfiguration"
+      ],
+      "details": "Instantiate or obtain CasTicketValidatorFactory from CasConfiguration and replace the existing method bodies with delegations. Ensure each delegation passes the existing WebContext argument and that factory-created validators receive the same configuration values and proxy receptor behavior as before.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "org.pac4j.cas.config.CasConfiguration",
+        "org.pac4j.cas.config.CasTicketValidatorFactory"
+      ],
+      "outputs": [
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasConfiguration.java",
+        "pac4j-cas/src/main/java/org/pac4j/cas/config/CasTicketValidatorFactory.java"
+      ],
+      "details": "Move imports used exclusively by the extracted TicketValidator and HTTP connection factory implementations to CasTicketValidatorFactory, including HttpURLConnectionFactory, TicketValidator implementations, ProxyGrantingTicketStore, URL connection types, Optional, and related SSL types. Keep imports still required by CasConfiguration.",
+      "risk": "low"
+    }
+  ]
+}

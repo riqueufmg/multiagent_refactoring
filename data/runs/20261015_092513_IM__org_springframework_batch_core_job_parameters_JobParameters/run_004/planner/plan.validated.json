@@ -1,0 +1,281 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.springframework.batch.core.job.parameters.JobParameters",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive typed-parameter access API from JobParameters to the existing JobParametersTypedAccessors class.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersTypedAccessors.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String)"
+          ],
+          "details": "Move the typed long accessor implementation to JobParametersTypedAccessors and remove the corresponding public wrapper from JobParameters.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String, Long)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String, Long)"
+          ],
+          "details": "Move the typed long accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String)"
+          ],
+          "details": "Move the typed string accessor to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String, String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String, String)"
+          ],
+          "details": "Move the typed string accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String)"
+          ],
+          "details": "Move the typed double accessor to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String, Double)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String, Double)"
+          ],
+          "details": "Move the typed double accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String)"
+          ],
+          "details": "Move the typed date accessor to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, java.util.Date)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String, java.util.Date)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String, java.util.Date)"
+          ],
+          "details": "Move the typed date accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String)"
+          ],
+          "details": "Move the typed LocalDate accessor to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, java.time.LocalDate)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String, java.time.LocalDate)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String, java.time.LocalDate)"
+          ],
+          "details": "Move the typed LocalDate accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String)"
+          ],
+          "details": "Move the typed LocalTime accessor to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, java.time.LocalTime)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String, java.time.LocalTime)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String, java.time.LocalTime)"
+          ],
+          "details": "Move the typed LocalTime accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String)"
+          ],
+          "details": "Move the typed LocalDateTime accessor to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, java.time.LocalDateTime)",
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String, java.time.LocalDateTime)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String, java.time.LocalDateTime)"
+          ],
+          "details": "Move the typed LocalDateTime accessor with a default value to JobParametersTypedAccessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, java.util.Date)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, java.time.LocalDate)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, java.time.LocalTime)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, java.time.LocalDateTime)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors"
+          ],
+          "details": "Update callers to use the corresponding methods on JobParametersTypedAccessors after the typed accessor methods are moved.",
+          "risk": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move general parameter-query methods to the existing JobParametersStore class so JobParameters focuses on value-object identity and lifecycle.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersStore.java"
+      ],
+      "ops": [
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getParameter(String)",
+            "org.springframework.batch.core.job.parameters.JobParametersStore.getParameter(String)"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersStore.getParameter(String)"
+          ],
+          "details": "Move parameter lookup to JobParametersStore and remove the redundant wrapper from JobParameters.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getParameters()",
+            "org.springframework.batch.core.job.parameters.JobParametersStore.getParameters()"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersStore.getParameters()"
+          ],
+          "details": "Move retrieval of all parameters to JobParametersStore.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getIdentifyingParameters()",
+            "org.springframework.batch.core.job.parameters.JobParametersStore.getIdentifyingParameters()"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersStore.getIdentifyingParameters()"
+          ],
+          "details": "Move retrieval of identifying parameters to JobParametersStore.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_METHOD",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.isEmpty()",
+            "org.springframework.batch.core.job.parameters.JobParametersStore.isEmpty()"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersStore.isEmpty()"
+          ],
+          "details": "Move the empty-state query to JobParametersStore.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.springframework.batch.core.job.parameters.JobParameters.getParameter(String)",
+            "org.springframework.batch.core.job.parameters.JobParameters.getParameters()",
+            "org.springframework.batch.core.job.parameters.JobParameters.getIdentifyingParameters()",
+            "org.springframework.batch.core.job.parameters.JobParameters.isEmpty()"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.job.parameters.JobParametersStore"
+          ],
+          "details": "Update callers to use the corresponding methods on JobParametersStore after the general parameter-query methods are moved.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

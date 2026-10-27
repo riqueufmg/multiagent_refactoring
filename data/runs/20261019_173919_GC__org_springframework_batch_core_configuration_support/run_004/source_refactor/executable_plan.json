@@ -1,0 +1,71 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "org.springframework.batch.core.configuration.support",
+  "selected_cluster": [
+    "org.springframework.batch.core.configuration.support.JdbcDefaultBatchConfiguration",
+    "org.springframework.batch.core.configuration.support.MongoDefaultBatchConfiguration"
+  ],
+  "destination_package": "org.springframework.batch.core.configuration.support.database",
+  "cluster_reason": "These two classes form a cohesive cluster of database-specific batch configuration implementations. They have parallel responsibilities, depend on database-oriented repository infrastructure, and can be separated together without moving the central generic configuration or unrelated registry and scope components.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive database-specific batch configuration cluster to a dedicated subpackage.",
+      "files": [
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/JdbcDefaultBatchConfiguration.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/MongoDefaultBatchConfiguration.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/database/JdbcDefaultBatchConfiguration.java",
+        "spring-batch-core/src/main/java/org/springframework/batch/core/configuration/support/database/MongoDefaultBatchConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.database"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.configuration.support.JdbcDefaultBatchConfiguration"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.database.JdbcDefaultBatchConfiguration"
+          ],
+          "details": "Move the JDBC-specific batch configuration class to the database subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "org.springframework.batch.core.configuration.support.MongoDefaultBatchConfiguration"
+          ],
+          "outputs": [
+            "org.springframework.batch.core.configuration.support.database.MongoDefaultBatchConfiguration"
+          ],
+          "details": "Move the MongoDB-specific batch configuration class to the database subpackage.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "UPDATE_VISIBILITY",
+          "inputs": [
+            "org.springframework.batch.core.configuration.support.database.JdbcDefaultBatchConfiguration",
+            "org.springframework.batch.core.configuration.support.database.MongoDefaultBatchConfiguration"
+          ],
+          "outputs": [],
+          "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}

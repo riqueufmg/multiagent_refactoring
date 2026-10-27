@@ -1,0 +1,63 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive type-declaration navigation responsibilities from Navigator to reduce its number of public methods and isolate type lookup logic.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorType.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType"
+          ],
+          "details": "Extract the type-oriented public methods demandClass(CompilationUnit,String), demandClassOrInterface(CompilationUnit,String), demandEnum(CompilationUnit,String), demandInterface(CompilationUnit,String), findType(CompilationUnit,String), and findType(TypeDeclaration<?>,String), together with the private helper methods getInnerTypeName(String) and getOuterTypeName(String), into NavigatorType. Preserve the existing static behavior and method signatures in the extracted class.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorType.java"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NavigatorType.java"
+          ],
+          "details": "Ensure NavigatorType imports CompilationUnit, TypeDeclaration, ClassOrInterfaceDeclaration, EnumDeclaration, and Optional as required by the extracted methods. Remove imports from Navigator that are no longer used after extraction.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClass(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandClassOrInterface(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandEnum(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandInterface(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findType(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findType(TypeDeclaration<?>,String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType.demandClass(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType.demandClassOrInterface(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType.demandEnum(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType.demandInterface(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType.findType(CompilationUnit,String)",
+            "com.github.javaparser.symbolsolver.javaparser.NavigatorType.findType(TypeDeclaration<?>,String)"
+          ],
+          "details": "Update project call sites to invoke the extracted type-navigation methods on NavigatorType instead of Navigator, including internal references from the extracted methods.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

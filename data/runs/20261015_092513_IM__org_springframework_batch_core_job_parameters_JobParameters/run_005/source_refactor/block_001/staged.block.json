@@ -1,0 +1,84 @@
+{
+  "id": 1,
+  "goal": "Move the cohesive typed-accessor API out of JobParameters and consolidate it in the existing JobParametersTypedAccessors class.",
+  "files": [
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParameters.java",
+    "spring-batch-core/src/main/java/org/springframework/batch/core/job/parameters/JobParametersTypedAccessors.java"
+  ],
+  "ops": [
+    {
+      "op": "MOVE_METHOD",
+      "inputs": [
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, java.util.Date)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, java.time.LocalDate)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, java.time.LocalTime)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, java.time.LocalDateTime)"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String, Long)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String, String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String, Double)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String, java.util.Date)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String, java.time.LocalDate)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String, java.time.LocalTime)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String, java.time.LocalDateTime)"
+      ],
+      "details": "Consolidate the typed parameter lookup methods in JobParametersTypedAccessors, which already owns the typed-accessor behavior and is initialized from the parameter map by JobParameters. Remove the corresponding delegating methods from JobParameters after callers are migrated.",
+      "risk": "high"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLong(String, Long)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getString(String, String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDouble(String, Double)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getDate(String, java.util.Date)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDate(String, java.time.LocalDate)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalTime(String, java.time.LocalTime)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParameters.getLocalDateTime(String, java.time.LocalDateTime)"
+      ],
+      "outputs": [
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLong(String, Long)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getString(String, String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDouble(String, Double)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getDate(String, java.util.Date)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDate(String, java.time.LocalDate)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalTime(String, java.time.LocalTime)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String)",
+        "org.springframework.batch.core.job.parameters.JobParametersTypedAccessors.getLocalDateTime(String, java.time.LocalDateTime)"
+      ],
+      "details": "Update callers to obtain typed access through JobParametersTypedAccessors rather than JobParameters.",
+      "risk": "high"
+    }
+  ]
+}

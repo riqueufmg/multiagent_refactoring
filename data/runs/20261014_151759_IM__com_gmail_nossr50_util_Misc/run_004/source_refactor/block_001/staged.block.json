@@ -1,0 +1,49 @@
+{
+  "id": 1,
+  "goal": "Extract mod-name lookup data and behavior from the broadly scoped Misc utility class.",
+  "files": [
+    "src/main/java/com/gmail/nossr50/util/Misc.java",
+    "src/main/java/com/gmail/nossr50/util/ModUtil.java",
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.modNames",
+        "com.gmail.nossr50.util.Misc.getModName(String)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.ModUtil"
+      ],
+      "details": "Create a final utility class in com.gmail.nossr50.util containing modNames and getModName(String), preserving their current public static visibility and behavior. Remove the extracted field and method from Misc.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "com.gmail.nossr50.util.Misc.modNames",
+        "com.gmail.nossr50.util.Misc.getModName(String)"
+      ],
+      "outputs": [
+        "com.gmail.nossr50.util.ModUtil.modNames",
+        "com.gmail.nossr50.util.ModUtil.getModName(String)"
+      ],
+      "details": "Update all callers to use ModUtil instead of Misc for the extracted field and method.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/gmail/nossr50/MMOTestEnvironment.java"
+  ]
+}

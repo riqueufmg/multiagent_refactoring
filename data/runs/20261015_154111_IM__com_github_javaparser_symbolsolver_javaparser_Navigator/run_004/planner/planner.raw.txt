@@ -1,0 +1,136 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.symbolsolver.javaparser.Navigator",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive node traversal and node search functionality from Navigator into a dedicated same-package utility class, reducing the number of public methods and implementation responsibilities in Navigator.",
+      "files": [
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/Navigator.java",
+        "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NodeNavigator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator"
+          ],
+          "details": "Extract the static methods demandNodeOfGivenClass(Node, Class<N>), demandParentNode(Node), demandReturnStmt(MethodDeclaration), demandSwitch(Node), demandVariableDeclaration(Node, String), findMethodCall(Node, String), findNameExpression(Node, String), findNodeOfGivenClass(Node, Class<N>), findReturnStmt(MethodDeclaration), findSimpleName(Node, String), findSwitch(Node), and requireParentNode(Node), together with the private helper findSwitchHelper(Node), into NodeNavigator. Preserve method behavior, visibility, deprecation annotations, and the private constructor pattern.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NodeNavigator.java"
+          ],
+          "outputs": [
+            "javaparser-symbol-solver-core/src/main/java/com/github/javaparser/symbolsolver/javaparser/NodeNavigator.java"
+          ],
+          "details": "Add the imports required by the extracted methods, including Node, MethodDeclaration, MethodCallExpr, NameExpr, SimpleName, ReturnStmt, SwitchStmt, VariableDeclarator, and java.util.Optional.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandNodeOfGivenClass(Node, Class<N>)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandNodeOfGivenClass(Node, Class<N>)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandNodeOfGivenClass(Node, Class<N>)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.demandNodeOfGivenClass(Node, Class<N>). Update internal calls in the extracted deprecated findNodeOfGivenClass method as needed.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandParentNode(Node)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandParentNode(Node)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.demandParentNode(Node), including the extracted deprecated requireParentNode method.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandReturnStmt(MethodDeclaration)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandReturnStmt(MethodDeclaration)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandReturnStmt(MethodDeclaration)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.demandReturnStmt(MethodDeclaration), including the extracted deprecated findReturnStmt method.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandSwitch(Node)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandSwitch(Node)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandSwitch(Node)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.demandSwitch(Node), including the extracted deprecated findSwitch method and its call to findSwitchHelper(Node).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.demandVariableDeclaration(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandVariableDeclaration(Node, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.demandVariableDeclaration(Node, String)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.demandVariableDeclaration(Node, String).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findMethodCall(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findMethodCall(Node, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findMethodCall(Node, String)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.findMethodCall(Node, String).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findNameExpression(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findNameExpression(Node, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findNameExpression(Node, String)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.findNameExpression(Node, String).",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "com.github.javaparser.symbolsolver.javaparser.Navigator.findSimpleName(Node, String)",
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findSimpleName(Node, String)"
+          ],
+          "outputs": [
+            "com.github.javaparser.symbolsolver.javaparser.NodeNavigator.findSimpleName(Node, String)"
+          ],
+          "details": "Update all repository call sites and references to use NodeNavigator.findSimpleName(Node, String).",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

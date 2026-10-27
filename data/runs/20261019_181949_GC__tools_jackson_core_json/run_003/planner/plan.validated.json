@@ -1,0 +1,95 @@
+{
+  "smell_type": "God Component",
+  "target_level": "package",
+  "target": "tools.jackson.core.json",
+  "selected_cluster": [
+    "tools.jackson.core.json.JsonReadContext",
+    "tools.jackson.core.json.JsonWriteContext",
+    "tools.jackson.core.json.DupDetector"
+  ],
+  "destination_package": "tools.jackson.core.json.context",
+  "cluster_reason": "These classes form a cohesive stream-context and duplicate-detection support cluster: both JsonReadContext and JsonWriteContext depend on DupDetector, while the contexts encapsulate read/write nesting state around the same duplicate-name tracking concern. Moving them together preserves their strongest internal relationships and avoids relocating the more central parser, generator, or factory classes.",
+  "risk": "medium",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Move the cohesive stream-context and duplicate-detection cluster to a dedicated subpackage.",
+      "files": [
+        "src/main/java/tools/jackson/core/json/DupDetector.java",
+        "src/main/java/tools/jackson/core/json/JsonGeneratorBase.java",
+        "src/main/java/tools/jackson/core/json/JsonParserBase.java",
+        "src/main/java/tools/jackson/core/json/JsonReadContext.java",
+        "src/main/java/tools/jackson/core/json/JsonWriteContext.java",
+        "src/main/java/tools/jackson/core/json/UTF8JsonGenerator.java",
+        "src/main/java/tools/jackson/core/json/WriterBasedJsonGenerator.java",
+        "src/main/java/tools/jackson/core/json/context/DupDetector.java",
+        "src/main/java/tools/jackson/core/json/context/JsonReadContext.java",
+        "src/main/java/tools/jackson/core/json/context/JsonWriteContext.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [],
+          "outputs": [
+            "tools.jackson.core.json.context"
+          ],
+          "details": "Create the destination subpackage if it does not exist.",
+          "risk": "low",
+          "api_change": false
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.JsonReadContext"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.context.JsonReadContext"
+          ],
+          "details": "Move JsonReadContext to the destination package with the selected context-support cluster.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.JsonWriteContext"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.context.JsonWriteContext"
+          ],
+          "details": "Move JsonWriteContext to the destination package with the selected context-support cluster.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "MOVE_CLASS",
+          "inputs": [
+            "tools.jackson.core.json.DupDetector"
+          ],
+          "outputs": [
+            "tools.jackson.core.json.context.DupDetector"
+          ],
+          "details": "Move DupDetector to the destination package so the read and write contexts retain their cohesive duplicate-detection dependency.",
+          "risk": "medium",
+          "api_change": true
+        },
+        {
+          "op": "UPDATE_VISIBILITY",
+          "inputs": [
+            "tools.jackson.core.json.JsonGeneratorBase",
+            "tools.jackson.core.json.JsonParserBase",
+            "tools.jackson.core.json.UTF8JsonGenerator",
+            "tools.jackson.core.json.WriterBasedJsonGenerator",
+            "tools.jackson.core.json.context.DupDetector",
+            "tools.jackson.core.json.context.JsonReadContext",
+            "tools.jackson.core.json.context.JsonWriteContext"
+          ],
+          "outputs": [],
+          "details": "After moving the whole cluster to the destination package, update only the minimum required visibility in moved classes and related remaining classes so the project can compile. Do not change behavior. Do not move additional classes.",
+          "risk": "medium",
+          "api_change": true
+        }
+      ]
+    }
+  ]
+}
