@@ -1,0 +1,112 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive JSON serialization and deserialization responsibility from ScanResult while retaining its public fromJSON(String), toJSON(int), and toJSON() compatibility methods as delegating wrappers.",
+  "files": [
+    "src/main/java/io/github/classgraph/ScanResult.java",
+    "src/main/java/io/github/classgraph/ScanResultSerialization.java",
+    "src/test/java/com/xyz/MetaAnnotationTest.java",
+    "src/test/java/com/xyz/ScanEverything.java",
+    "src/test/java/io/github/classgraph/ClassGraphClassLoaderOverrideResourceTest.java",
+    "src/test/java/io/github/classgraph/ClassesWithAnnotationsNoArgsTest.java",
+    "src/test/java/io/github/classgraph/GetResourcesWithPathSanitizationTest.java",
+    "src/test/java/io/github/classgraph/NullArgumentTest.java",
+    "src/test/java/io/github/classgraph/issues/issue141/Issue141Test.java",
+    "src/test/java/io/github/classgraph/issues/issue310/Issue310Test.java",
+    "src/test/java/io/github/classgraph/issues/issue314/Issue314Test.java",
+    "src/test/java/io/github/classgraph/issues/issue431/Issue431Test.java",
+    "src/test/java/io/github/classgraph/issues/issue704/Issue704Test.java",
+    "src/test/java/io/github/classgraph/issues/issue735/Issue735Test.java",
+    "src/test/java/io/github/classgraph/issues/issue772/MethodOverrideOrderTest.java",
+    "src/test/java/io/github/classgraph/issues/issue804/Issue804Test.java",
+    "src/test/java/io/github/classgraph/issues/issue914/Issue914Test.java",
+    "src/test/java/io/github/classgraph/issues/issue916/Issue916Test.java",
+    "src/test/java/io/github/classgraph/issues/issue930/Issue930Test.java",
+    "src/test/java/io/github/classgraph/json/AnnotationDefaultVals.java",
+    "src/test/java/io/github/classgraph/json/JSONSerializationTest.java",
+    "src/test/java/io/github/classgraph/test/ClassInfoTest.java",
+    "src/test/java/io/github/classgraph/test/parameterannotation/RetentionPolicyForFunctionParameterAnnotationsTest.java",
+    "src/test/perf/io/github/classgraph/issues/issue400/Issue400.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.github.classgraph.ScanResult",
+        "io.github.classgraph.ScanResultSerialization"
+      ],
+      "outputs": [
+        "io.github.classgraph.ScanResultSerialization"
+      ],
+      "details": "Move the SerializationFormat holder and the implementation of ScanResult.fromJSON(String), ScanResult.toJSON(int), and ScanResult.toJSON() into ScanResultSerialization. Keep ScanResult's existing public static and instance methods with their original signatures and make them delegate to the extracted responsibility. The extracted implementation must preserve the existing deserialization flow, including JSONDeserializer.deserializeObject, creation of ClassGraph and AutoCloseableExecutorService, reconstruction of ScanResult state, and JSONSerializer.serializeObject. After extraction, ScanResult must no longer directly reference JSONDeserializer, JSONSerializer, or AutoCloseableExecutorService. The fromJSON implementation is also the only shown direct use of ClassGraph in ScanResult, so that dependency can disappear from ScanResult if no additional direct type usage remains after compilation. ScanResult will gain one direct dependency on the new ScanResultSerialization class; therefore the supported net Fan-Out reduction is at least two dependencies (JSONDeserializer, JSONSerializer, and AutoCloseableExecutorService removed versus one helper added), and potentially three if ClassGraph has no remaining direct usage. Pattern and CollectionUtils must remain because ScanResult still uses Pattern in the public resource-query API and CollectionUtils in annotation-related methods.",
+      "risk": "high"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/io/github/classgraph/ScanResult.java",
+        "src/main/java/io/github/classgraph/ScanResultSerialization.java"
+      ],
+      "outputs": [
+        "src/main/java/io/github/classgraph/ScanResult.java",
+        "src/main/java/io/github/classgraph/ScanResultSerialization.java"
+      ],
+      "details": "Move only the imports required by the extracted serialization implementation to ScanResultSerialization, including JSONDeserializer, JSONSerializer, and AutoCloseableExecutorService. Remove those imports from ScanResult only when no remaining direct reference exists. Do not claim removal of Pattern, CollectionUtils, or other dependencies that remain referenced by ScanResult fields, method signatures, or unrelated methods.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/com/xyz/MetaAnnotationTest.java",
+        "src/test/java/com/xyz/ScanEverything.java",
+        "src/test/java/io/github/classgraph/ClassGraphClassLoaderOverrideResourceTest.java",
+        "src/test/java/io/github/classgraph/ClassesWithAnnotationsNoArgsTest.java",
+        "src/test/java/io/github/classgraph/GetResourcesWithPathSanitizationTest.java",
+        "src/test/java/io/github/classgraph/NullArgumentTest.java",
+        "src/test/java/io/github/classgraph/issues/issue141/Issue141Test.java",
+        "src/test/java/io/github/classgraph/issues/issue310/Issue310Test.java",
+        "src/test/java/io/github/classgraph/issues/issue314/Issue314Test.java",
+        "src/test/java/io/github/classgraph/issues/issue431/Issue431Test.java",
+        "src/test/java/io/github/classgraph/issues/issue704/Issue704Test.java",
+        "src/test/java/io/github/classgraph/issues/issue735/Issue735Test.java",
+        "src/test/java/io/github/classgraph/issues/issue772/MethodOverrideOrderTest.java",
+        "src/test/java/io/github/classgraph/issues/issue804/Issue804Test.java",
+        "src/test/java/io/github/classgraph/issues/issue914/Issue914Test.java",
+        "src/test/java/io/github/classgraph/issues/issue916/Issue916Test.java",
+        "src/test/java/io/github/classgraph/issues/issue930/Issue930Test.java",
+        "src/test/java/io/github/classgraph/json/AnnotationDefaultVals.java",
+        "src/test/java/io/github/classgraph/json/JSONSerializationTest.java",
+        "src/test/java/io/github/classgraph/test/ClassInfoTest.java",
+        "src/test/java/io/github/classgraph/test/parameterannotation/RetentionPolicyForFunctionParameterAnnotationsTest.java",
+        "src/test/perf/io/github/classgraph/issues/issue400/Issue400.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/com/xyz/MetaAnnotationTest.java",
+    "src/test/java/com/xyz/ScanEverything.java",
+    "src/test/java/io/github/classgraph/ClassGraphClassLoaderOverrideResourceTest.java",
+    "src/test/java/io/github/classgraph/ClassesWithAnnotationsNoArgsTest.java",
+    "src/test/java/io/github/classgraph/GetResourcesWithPathSanitizationTest.java",
+    "src/test/java/io/github/classgraph/NullArgumentTest.java",
+    "src/test/java/io/github/classgraph/issues/issue141/Issue141Test.java",
+    "src/test/java/io/github/classgraph/issues/issue310/Issue310Test.java",
+    "src/test/java/io/github/classgraph/issues/issue314/Issue314Test.java",
+    "src/test/java/io/github/classgraph/issues/issue431/Issue431Test.java",
+    "src/test/java/io/github/classgraph/issues/issue704/Issue704Test.java",
+    "src/test/java/io/github/classgraph/issues/issue735/Issue735Test.java",
+    "src/test/java/io/github/classgraph/issues/issue772/MethodOverrideOrderTest.java",
+    "src/test/java/io/github/classgraph/issues/issue804/Issue804Test.java",
+    "src/test/java/io/github/classgraph/issues/issue914/Issue914Test.java",
+    "src/test/java/io/github/classgraph/issues/issue916/Issue916Test.java",
+    "src/test/java/io/github/classgraph/issues/issue930/Issue930Test.java",
+    "src/test/java/io/github/classgraph/json/AnnotationDefaultVals.java",
+    "src/test/java/io/github/classgraph/json/JSONSerializationTest.java",
+    "src/test/java/io/github/classgraph/test/ClassInfoTest.java",
+    "src/test/java/io/github/classgraph/test/parameterannotation/RetentionPolicyForFunctionParameterAnnotationsTest.java",
+    "src/test/perf/io/github/classgraph/issues/issue400/Issue400.java"
+  ]
+}

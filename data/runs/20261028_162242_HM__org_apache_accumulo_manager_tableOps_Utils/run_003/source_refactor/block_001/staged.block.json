@@ -1,0 +1,34 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive tablet-range widening responsibility while preserving the public Utils.widen methods as compatibility wrappers.",
+  "files": [
+    "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java",
+    "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsRangeWidening.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.accumulo.manager.tableOps.Utils",
+        "org.apache.accumulo.manager.tableOps.UtilsRangeWidening"
+      ],
+      "outputs": [
+        "org.apache.accumulo.manager.tableOps.UtilsRangeWidening"
+      ],
+      "details": "Move findContaining(org.apache.accumulo.core.metadata.schema.Ample, org.apache.accumulo.core.data.TableId, org.apache.hadoop.io.Text) and the two widen methods' implementation into UtilsRangeWidening. Keep Utils.widen(org.apache.accumulo.core.metadata.schema.Ample, org.apache.accumulo.core.dataImpl.KeyExtent) and Utils.widen(org.apache.accumulo.core.metadata.schema.Ample, org.apache.accumulo.core.data.TableId, org.apache.accumulo.core.fate.zookeeper.LockRange, org.apache.accumulo.core.clientImpl.thrift.TableOperation, boolean) with their existing signatures and delegate to UtilsRangeWidening. This removes Utils's direct references to org.apache.accumulo.core.data.Key, org.apache.accumulo.core.data.PartialKey, java.util.Objects, and com.google.common.collect.MoreCollectors. The target gains only the new UtilsRangeWidening dependency, for an expected net Fan-Out reduction of three removed dependencies minus one introduced dependency, or two. org.apache.accumulo.core.dataImpl.KeyExtent, org.apache.accumulo.core.metadata.schema.Ample, org.apache.accumulo.core.fate.zookeeper.LockRange, org.apache.hadoop.io.Text, and related public signature dependencies remain and are not counted as removed.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java",
+        "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsRangeWidening.java"
+      ],
+      "outputs": [
+        "Updated imports for the moved widening implementation and its compatibility wrappers"
+      ],
+      "details": "Remove imports used only by the moved implementation from Utils and add the UtilsRangeWidening reference. Preserve imports required by the existing public method signatures and by other Utils methods.",
+      "risk": "low"
+    }
+  ]
+}

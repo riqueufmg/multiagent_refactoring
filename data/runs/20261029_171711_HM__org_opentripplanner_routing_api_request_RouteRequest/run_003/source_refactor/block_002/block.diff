@@ -1,0 +1,47 @@
+commit 4dff7aa73cf1e26fa4861fafad4cc133b18f4ba8
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 17:37:57 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java
+new file mode 100644
+index 0000000000..10ce8b4b0c
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java
+@@ -0,0 +1,35 @@
++package org.opentripplanner.routing.api.request;
++
++import java.util.Comparator;
++import org.opentripplanner.routing.impl.DurationComparator;
++import org.opentripplanner.routing.impl.PathComparator;
++import org.opentripplanner.routing.spt.GraphPath;
++
++/**
++ * Selects the path comparator configured for a route request.
++ */
++public class RouteRequestPathComparator {
++
++  private String pathComparator;
++
++  public RouteRequestPathComparator() {}
++
++  public RouteRequestPathComparator(String pathComparator) {
++    this.pathComparator = pathComparator;
++  }
++
++  public String pathComparator() {
++    return pathComparator;
++  }
++
++  public void setPathComparator(String pathComparator) {
++    this.pathComparator = pathComparator;
++  }
++
++  public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {
++    if ("duration".equals(pathComparator)) {
++      return new DurationComparator();
++    }
++    return new PathComparator(compareStartTimes);
++  }
++}

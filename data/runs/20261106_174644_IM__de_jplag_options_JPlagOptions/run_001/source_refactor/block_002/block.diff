@@ -1,0 +1,295 @@
+commit b664c959d000a3e72224a275bc798c36097c8229
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 17:50:26 2026 -0400
+
+    source_refactor: apply block 2
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index bcf13d292..80d07d947 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -1,9 +1,7 @@
+ package de.jplag.options;
+ 
+-import java.io.File;
+ import java.nio.charset.Charset;
+ import java.nio.charset.StandardCharsets;
+-import java.util.Collections;
+ import java.util.List;
+ import java.util.Optional;
+ import java.util.Set;
+@@ -30,43 +28,13 @@ public class JPlagOptions {
+     private Language language;
+ 
+     private final JPlagComparisonOptions comparisonOptions = new JPlagComparisonOptions();
++    private final JPlagSubmissionOptions submissionOptions;
+ 
+     /**
+      * Array of file suffixes that should be included.
+      */
+     private String[] fileSuffixes;
+ 
+-    /**
+-     * Name of the file that contains the names of files to exclude from comparison.
+-     */
+-    private String exclusionFileName;
+-
+-    /**
+-     * Names of the excluded files.
+-     */
+-    private Set<String> excludedFiles = Collections.emptySet();
+-
+-    /**
+-     * Directories with new submissions. These must be checked for plagiarism.
+-     */
+-    private List<String> submissionDirectories;
+-
+-    /**
+-     * Directories with old submissions to check against.
+-     */
+-    private List<String> oldSubmissionDirectories;
+-
+-    /**
+-     * Path name of the directory containing the base code.
+-     */
+-    private String baseCodeSubmissionName = null;
+-
+-    /**
+-     * Example: If the subdirectoryName is 'src', only the code inside submissionDir/src of each submission will be used for
+-     * comparison.
+-     */
+-    private String subdirectoryName;
+-
+     /**
+      * Level of output verbosity.
+      */
+@@ -83,8 +51,7 @@ public class JPlagOptions {
+      * {@link #setLanguage(Language)} to set the language programmatically.
+      */
+     public JPlagOptions(List<String> submissionDirectories, List<String> oldSubmissionDirectories, String languageIdentifier) {
+-        this.submissionDirectories = submissionDirectories;
+-        this.oldSubmissionDirectories = oldSubmissionDirectories;
++        this.submissionOptions = new JPlagSubmissionOptions(submissionDirectories, oldSubmissionDirectories);
+         this.languageIdentifier = languageIdentifier;
+     }
+ 
+@@ -92,8 +59,12 @@ public class JPlagOptions {
+         return comparisonOptions;
+     }
+ 
++    public JPlagSubmissionOptions getSubmissionOptions() {
++        return submissionOptions;
++    }
++
+     public Optional<String> getBaseCodeSubmissionName() {
+-        return Optional.ofNullable(baseCodeSubmissionName);
++        return submissionOptions.getBaseCodeSubmissionName();
+     }
+ 
+     public ComparisonMode getComparisonMode() {
+@@ -101,11 +72,11 @@ public class JPlagOptions {
+     }
+ 
+     public Set<String> getExcludedFiles() {
+-        return excludedFiles;
++        return submissionOptions.getExcludedFiles();
+     }
+ 
+     public String getExclusionFileName() {
+-        return exclusionFileName;
++        return submissionOptions.getExclusionFileName();
+     }
+ 
+     public String[] getFileSuffixes() {
+@@ -129,11 +100,11 @@ public class JPlagOptions {
+     }
+ 
+     public List<String> getSubmissionDirectories() {
+-        return submissionDirectories;
++        return submissionOptions.getSubmissionDirectories();
+     }
+ 
+     public List<String> getOldSubmissionDirectories() {
+-        return oldSubmissionDirectories;
++        return submissionOptions.getOldSubmissionDirectories();
+     }
+ 
+     public SimilarityMetric getSimilarityMetric() {
+@@ -145,7 +116,7 @@ public class JPlagOptions {
+     }
+ 
+     public String getSubdirectoryName() {
+-        return subdirectoryName;
++        return submissionOptions.getSubdirectoryName();
+     }
+ 
+     public Verbosity getVerbosity() {
+@@ -153,7 +124,7 @@ public class JPlagOptions {
+     }
+ 
+     public boolean hasBaseCode() {
+-        return this.baseCodeSubmissionName != null;
++        return submissionOptions.hasBaseCode();
+     }
+ 
+     public boolean isDebugParser() {
+@@ -165,11 +136,7 @@ public class JPlagOptions {
+     }
+ 
+     public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {
+-        if (baseCodeSubmissionName == null || baseCodeSubmissionName.isEmpty()) {
+-            this.baseCodeSubmissionName = null;
+-        } else {
+-            this.baseCodeSubmissionName = baseCodeSubmissionName;
+-        }
++        submissionOptions.setBaseCodeSubmissionName(baseCodeSubmissionName);
+     }
+ 
+     public void setComparisonMode(ComparisonMode comparisonMode) {
+@@ -181,11 +148,11 @@ public class JPlagOptions {
+     }
+ 
+     public void setExcludedFiles(Set<String> excludedFiles) {
+-        this.excludedFiles = excludedFiles;
++        submissionOptions.setExcludedFiles(excludedFiles);
+     }
+ 
+     public void setExclusionFileName(String exclusionFileName) {
+-        this.exclusionFileName = exclusionFileName;
++        submissionOptions.setExclusionFileName(exclusionFileName);
+     }
+ 
+     public void setFileSuffixes(String[] fileSuffixes) {
+@@ -220,11 +187,11 @@ public class JPlagOptions {
+     }
+ 
+     public void setSubmissionDirectories(List<String> submissionDirectories) {
+-        this.submissionDirectories = submissionDirectories;
++        submissionOptions.setSubmissionDirectories(submissionDirectories);
+     }
+ 
+     public void setOldSubmissionDirectories(List<String> oldSubmissionDirectories) {
+-        this.oldSubmissionDirectories = oldSubmissionDirectories;
++        submissionOptions.setOldSubmissionDirectories(oldSubmissionDirectories);
+     }
+ 
+     public void setSimilarityMetric(SimilarityMetric similarityMetric) {
+@@ -236,8 +203,7 @@ public class JPlagOptions {
+     }
+ 
+     public void setSubdirectoryName(String subdirectoryName) {
+-        // Trim problematic file separators.
+-        this.subdirectoryName = (subdirectoryName == null) ? null : subdirectoryName.replace(File.separator, "");
++        submissionOptions.setSubdirectoryName(subdirectoryName);
+     }
+ 
+     public void setVerbosity(Verbosity verbosity) {
+diff --git a/core/src/main/java/de/jplag/options/JPlagSubmissionOptions.java b/core/src/main/java/de/jplag/options/JPlagSubmissionOptions.java
+new file mode 100644
+index 000000000..d1a5c37ff
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagSubmissionOptions.java
+@@ -0,0 +1,103 @@
++package de.jplag.options;
++
++import java.io.File;
++import java.util.Collections;
++import java.util.List;
++import java.util.Optional;
++import java.util.Set;
++
++public class JPlagSubmissionOptions {
++
++    /**
++     * Name of the file that contains the names of files to exclude from comparison.
++     */
++    private String exclusionFileName;
++
++    /**
++     * Names of the excluded files.
++     */
++    private Set<String> excludedFiles = Collections.emptySet();
++
++    /**
++     * Directories with new submissions. These must be checked for plagiarism.
++     */
++    private List<String> submissionDirectories;
++
++    /**
++     * Directories with old submissions to check against.
++     */
++    private List<String> oldSubmissionDirectories;
++
++    /**
++     * Path name of the directory containing the base code.
++     */
++    private String baseCodeSubmissionName = null;
++
++    /**
++     * Example: If the subdirectoryName is 'src', only the code inside submissionDir/src of each submission will be used for
++     * comparison.
++     */
++    private String subdirectoryName;
++
++    public JPlagSubmissionOptions(List<String> submissionDirectories, List<String> oldSubmissionDirectories) {
++        this.submissionDirectories = submissionDirectories;
++        this.oldSubmissionDirectories = oldSubmissionDirectories;
++    }
++
++    public Optional<String> getBaseCodeSubmissionName() {
++        return Optional.ofNullable(baseCodeSubmissionName);
++    }
++
++    public Set<String> getExcludedFiles() {
++        return excludedFiles;
++    }
++
++    public String getExclusionFileName() {
++        return exclusionFileName;
++    }
++
++    public List<String> getSubmissionDirectories() {
++        return submissionDirectories;
++    }
++
++    public List<String> getOldSubmissionDirectories() {
++        return oldSubmissionDirectories;
++    }
++
++    public String getSubdirectoryName() {
++        return subdirectoryName;
++    }
++
++    public boolean hasBaseCode() {
++        return this.baseCodeSubmissionName != null;
++    }
++
++    public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {
++        if (baseCodeSubmissionName == null || baseCodeSubmissionName.isEmpty()) {
++            this.baseCodeSubmissionName = null;
++        } else {
++            this.baseCodeSubmissionName = baseCodeSubmissionName;
++        }
++    }
++
++    public void setExcludedFiles(Set<String> excludedFiles) {
++        this.excludedFiles = excludedFiles;
++    }
++
++    public void setExclusionFileName(String exclusionFileName) {
++        this.exclusionFileName = exclusionFileName;
++    }
++
++    public void setSubmissionDirectories(List<String> submissionDirectories) {
++        this.submissionDirectories = submissionDirectories;
++    }
++
++    public void setOldSubmissionDirectories(List<String> oldSubmissionDirectories) {
++        this.oldSubmissionDirectories = oldSubmissionDirectories;
++    }
++
++    public void setSubdirectoryName(String subdirectoryName) {
++        // Trim problematic file separators.
++        this.subdirectoryName = (subdirectoryName == null) ? null : subdirectoryName.replace(File.separator, "");
++    }
++}

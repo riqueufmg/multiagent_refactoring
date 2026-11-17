@@ -1,0 +1,176 @@
+commit 91556fc63ab6d56743aea40aa0fc8fce34cb877e
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 16:24:31 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/io/github/classgraph/ClassMemberInfo.java b/src/main/java/io/github/classgraph/ClassMemberInfo.java
+index 78802e1a7..48ee2d28b 100644
+--- a/src/main/java/io/github/classgraph/ClassMemberInfo.java
++++ b/src/main/java/io/github/classgraph/ClassMemberInfo.java
+@@ -39,8 +39,8 @@ public abstract class ClassMemberInfo extends ScanResultObject implements HasNam
+     @Nullable
+     AnnotationInfoList annotationInfo;
+ 
+-    /** Annotation metadata access and query implementation. */
+-    private final ClassMemberAnnotationInfo annotationInfoMetadata;
++    /** Annotation metadata access and query facade. */
++    private final ClassMemberInfoAnnotations annotations;
+ 
+     ClassMemberInfo(final String definingClassName, final String memberName, final int modifiers,
+             final String typeDescriptorStr, final @Nullable String typeSignatureStr,
+@@ -52,7 +52,7 @@ public abstract class ClassMemberInfo extends ScanResultObject implements HasNam
+         this.typeDescriptorStr = typeDescriptorStr;
+         this.typeSignatureStr = typeSignatureStr;
+         this.annotationInfo = annotationInfo;
+-        this.annotationInfoMetadata = new ClassMemberAnnotationInfo(this, annotationInfo);
++        this.annotations = new ClassMemberInfoAnnotations(this, annotationInfo);
+     }
+ 
+     @Override
+@@ -119,50 +119,50 @@ public abstract class ClassMemberInfo extends ScanResultObject implements HasNam
+     }
+ 
+     public AnnotationInfoList getAllAnnotationInfo() {
+-        return annotationInfoMetadata.getAllAnnotationInfo();
++        return annotations.getAllAnnotationInfo();
+     }
+ 
+     public AnnotationInfoList getDirectAnnotationInfo() {
+-        return annotationInfoMetadata.getDirectAnnotationInfo();
++        return annotations.getDirectAnnotationInfo();
+     }
+ 
+     public @Nullable AnnotationInfo getAllAnnotationInfo(final Class<? extends Annotation> annotation) {
+-        return annotationInfoMetadata.getAllAnnotationInfo(annotation);
++        return annotations.getAllAnnotationInfo(annotation);
+     }
+ 
+     public @Nullable AnnotationInfo getAllAnnotationInfo(final String annotationName) {
+-        return annotationInfoMetadata.getAllAnnotationInfo(annotationName);
++        return annotations.getAllAnnotationInfo(annotationName);
+     }
+ 
+     public @Nullable AnnotationInfo getDirectAnnotationInfo(final Class<? extends Annotation> annotation) {
+-        return annotationInfoMetadata.getDirectAnnotationInfo(annotation);
++        return annotations.getDirectAnnotationInfo(annotation);
+     }
+ 
+     public @Nullable AnnotationInfo getDirectAnnotationInfo(final String annotationName) {
+-        return annotationInfoMetadata.getDirectAnnotationInfo(annotationName);
++        return annotations.getDirectAnnotationInfo(annotationName);
+     }
+ 
+     public AnnotationInfoList getAllAnnotationInfoRepeatable(final Class<? extends Annotation> annotation) {
+-        return annotationInfoMetadata.getAllAnnotationInfoRepeatable(annotation);
++        return annotations.getAllAnnotationInfoRepeatable(annotation);
+     }
+ 
+     public AnnotationInfoList getAllAnnotationInfoRepeatable(final String annotationName) {
+-        return annotationInfoMetadata.getAllAnnotationInfoRepeatable(annotationName);
++        return annotations.getAllAnnotationInfoRepeatable(annotationName);
+     }
+ 
+     public AnnotationInfoList getDirectAnnotationInfoRepeatable(final Class<? extends Annotation> annotation) {
+-        return annotationInfoMetadata.getDirectAnnotationInfoRepeatable(annotation);
++        return annotations.getDirectAnnotationInfoRepeatable(annotation);
+     }
+ 
+     public AnnotationInfoList getDirectAnnotationInfoRepeatable(final String annotationName) {
+-        return annotationInfoMetadata.getDirectAnnotationInfoRepeatable(annotationName);
++        return annotations.getDirectAnnotationInfoRepeatable(annotationName);
+     }
+ 
+     public boolean hasAnnotation(final Class<? extends Annotation> annotation) {
+-        return annotationInfoMetadata.hasAnnotation(annotation);
++        return annotations.hasAnnotation(annotation);
+     }
+ 
+     public boolean hasAnnotation(final String annotationName) {
+-        return annotationInfoMetadata.hasAnnotation(annotationName);
++        return annotations.hasAnnotation(annotationName);
+     }
+ }
+diff --git a/src/main/java/io/github/classgraph/ClassMemberInfoAnnotations.java b/src/main/java/io/github/classgraph/ClassMemberInfoAnnotations.java
+new file mode 100644
+index 000000000..561a8e8be
+--- /dev/null
++++ b/src/main/java/io/github/classgraph/ClassMemberInfoAnnotations.java
+@@ -0,0 +1,77 @@
++/*
++ * This file is part of ClassGraph.
++ *
++ * Author: Luke Hutchison
++ *
++ * Hosted at: https://github.com/classgraph/classgraph
++ *
++ * The MIT License (MIT)
++ */
++package io.github.classgraph;
++
++import java.lang.annotation.Annotation;
++
++import org.jspecify.annotations.Nullable;
++
++/** Annotation metadata access and query facade for a class member. */
++final class ClassMemberInfoAnnotations {
++    /** Annotation metadata access and query implementation. */
++    private final ClassMemberAnnotationInfo annotationInfoMetadata;
++
++    ClassMemberInfoAnnotations(final ClassMemberInfo classMemberInfo,
++            final @Nullable AnnotationInfoList annotationInfo) {
++        this.annotationInfoMetadata = new ClassMemberAnnotationInfo(classMemberInfo, annotationInfo);
++    }
++
++    AnnotationInfoList getAllAnnotationInfo() {
++        return annotationInfoMetadata.getAllAnnotationInfo();
++    }
++
++    AnnotationInfoList getDirectAnnotationInfo() {
++        return annotationInfoMetadata.getDirectAnnotationInfo();
++    }
++
++    @Nullable
++    AnnotationInfo getAllAnnotationInfo(final Class<? extends Annotation> annotation) {
++        return annotationInfoMetadata.getAllAnnotationInfo(annotation);
++    }
++
++    @Nullable
++    AnnotationInfo getAllAnnotationInfo(final String annotationName) {
++        return annotationInfoMetadata.getAllAnnotationInfo(annotationName);
++    }
++
++    @Nullable
++    AnnotationInfo getDirectAnnotationInfo(final Class<? extends Annotation> annotation) {
++        return annotationInfoMetadata.getDirectAnnotationInfo(annotation);
++    }
++
++    @Nullable
++    AnnotationInfo getDirectAnnotationInfo(final String annotationName) {
++        return annotationInfoMetadata.getDirectAnnotationInfo(annotationName);
++    }
++
++    AnnotationInfoList getAllAnnotationInfoRepeatable(final Class<? extends Annotation> annotation) {
++        return annotationInfoMetadata.getAllAnnotationInfoRepeatable(annotation);
++    }
++
++    AnnotationInfoList getAllAnnotationInfoRepeatable(final String annotationName) {
++        return annotationInfoMetadata.getAllAnnotationInfoRepeatable(annotationName);
++    }
++
++    AnnotationInfoList getDirectAnnotationInfoRepeatable(final Class<? extends Annotation> annotation) {
++        return annotationInfoMetadata.getDirectAnnotationInfoRepeatable(annotation);
++    }
++
++    AnnotationInfoList getDirectAnnotationInfoRepeatable(final String annotationName) {
++        return annotationInfoMetadata.getDirectAnnotationInfoRepeatable(annotationName);
++    }
++
++    boolean hasAnnotation(final Class<? extends Annotation> annotation) {
++        return annotationInfoMetadata.hasAnnotation(annotation);
++    }
++
++    boolean hasAnnotation(final String annotationName) {
++        return annotationInfoMetadata.hasAnnotation(annotationName);
++    }
++}

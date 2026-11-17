@@ -1,0 +1,42 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the start/end proximity and geographic envelope responsibility from RouteRequest while preserving isCloseToStartOrEnd(Vertex) behavior and public compatibility.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestLocationProximity"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestLocationProximity"
+          ],
+          "details": "Create RouteRequestLocationProximity in the same package and move the geographic-envelope responsibility currently implemented by the private fromEnvelope and toEnvelope fields and getEnvelope(Coordinate, int). The new class should provide an operation that accepts the existing GenericLocation start and end values and a Vertex, returns the same boolean result as isCloseToStartOrEnd(Vertex), and internally uses Coordinate, Envelope, and SphericalDistanceLibrary. Update RouteRequest.isCloseToStartOrEnd(Vertex) to delegate to this helper while retaining its existing public signature and null checks. Remove fromEnvelope, toEnvelope, getEnvelope(Coordinate, int), and all direct Coordinate, Envelope, and SphericalDistanceLibrary references from RouteRequest. RouteRequest will introduce only the new RouteRequestLocationProximity dependency; GenericLocation and Vertex must remain because they are still used by the public API and other target methods. The expected distinct outgoing dependencies removed from RouteRequest are Coordinate, Envelope, and SphericalDistanceLibrary; the new helper dependency reduces the estimated Fan-Out by two net dependencies.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java"
+          ],
+          "details": "Remove Coordinate, Envelope, and SphericalDistanceLibrary imports from RouteRequest after the extraction, and add the imports required by RouteRequestLocationProximity for Coordinate, Envelope, GenericLocation, SphericalDistanceLibrary, and Vertex. Do not remove Vertex or GenericLocation from RouteRequest because isCloseToStartOrEnd(Vertex), from(), to(), and related methods still reference them.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

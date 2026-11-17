@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Extract the authentication action strategy configuration from IndirectClient to reduce its public API and configuration responsibilities while preserving the existing IndirectClient API through delegation.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientActionConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.IndirectClient",
+        "org.pac4j.core.client.IndirectClientActionConfiguration"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.IndirectClientActionConfiguration"
+      ],
+      "details": "Extract the cohesive action-strategy state and operations consisting of ajaxRequestResolver, redirectionActionBuilder, logoutActionBuilder, getAjaxRequestResolver(), setAjaxRequestResolver(), getRedirectionActionBuilder(), defaultRedirectionActionBuilder(), setRedirectionActionBuilder(), getLogoutActionBuilder(), defaultLogoutActionBuilder(), setLogoutActionBuilder(), and the corresponding initialization and action-builder access used by getRedirectionAction(WebContext, SessionStore), getLogoutAction(WebContext, SessionStore, UserProfile, String), beforeInternalInit(boolean), and afterInternalInit(boolean). Keep the existing public methods on IndirectClient as delegating facade methods so callers do not need to change.",
+      "risk": "medium"
+    }
+  ]
+}

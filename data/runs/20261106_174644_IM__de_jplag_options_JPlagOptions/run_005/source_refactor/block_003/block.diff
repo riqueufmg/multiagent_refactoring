@@ -1,0 +1,213 @@
+commit 35f79b911f798b8d37e2946002bb59165806da70
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 18:07:02 2026 -0400
+
+    source_refactor: apply block 3
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagComparisonOptionAccess.java b/core/src/main/java/de/jplag/options/JPlagComparisonOptionAccess.java
+new file mode 100644
+index 000000000..3fa760261
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagComparisonOptionAccess.java
+@@ -0,0 +1,60 @@
++package de.jplag.options;
++
++import de.jplag.strategy.ComparisonMode;
++
++public class JPlagComparisonOptionAccess {
++
++    private final JPlagComparisonOptions comparisonOptions;
++
++    public JPlagComparisonOptionAccess(JPlagComparisonOptions comparisonOptions) {
++        this.comparisonOptions = comparisonOptions;
++    }
++
++    public ComparisonMode getComparisonMode() {
++        return comparisonOptions.getComparisonMode();
++    }
++
++    public int getMaximumNumberOfComparisons() {
++        return comparisonOptions.getMaximumNumberOfComparisons();
++    }
++
++    public Integer getMinimumTokenMatch() {
++        return comparisonOptions.getMinimumTokenMatch();
++    }
++
++    public SimilarityMetric getSimilarityMetric() {
++        return comparisonOptions.getSimilarityMetric();
++    }
++
++    public float getSimilarityThreshold() {
++        return comparisonOptions.getSimilarityThreshold();
++    }
++
++    public boolean isDebugParser() {
++        return comparisonOptions.isDebugParser();
++    }
++
++    public void setComparisonMode(ComparisonMode comparisonMode) {
++        comparisonOptions.setComparisonMode(comparisonMode);
++    }
++
++    public void setDebugParser(boolean debugParser) {
++        comparisonOptions.setDebugParser(debugParser);
++    }
++
++    public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
++        comparisonOptions.setMaximumNumberOfComparisons(maximumNumberOfComparisons);
++    }
++
++    public void setMinimumTokenMatch(Integer minimumTokenMatch) {
++        comparisonOptions.setMinimumTokenMatch(minimumTokenMatch);
++    }
++
++    public void setSimilarityMetric(SimilarityMetric similarityMetric) {
++        comparisonOptions.setSimilarityMetric(similarityMetric);
++    }
++
++    public void setSimilarityThreshold(float similarityThreshold) {
++        comparisonOptions.setSimilarityThreshold(similarityThreshold);
++    }
++}
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index 6f0782656..003abbc5e 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -18,6 +18,7 @@ public class JPlagOptions {
+     public static final Charset CHARSET = StandardCharsets.UTF_8;
+ 
+     private final JPlagComparisonOptions comparisonOptions = new JPlagComparisonOptions();
++    private final JPlagComparisonOptionAccess comparisonOptionAccess;
+     private final JPlagSubmissionOptions submissionOptions;
+     private final JPlagSubmissionOptionAccess submissionOptionAccess;
+     private final JPlagLanguageOptions languageOptions;
+@@ -32,6 +33,7 @@ public class JPlagOptions {
+     public JPlagOptions(List<String> submissionDirectories, List<String> oldSubmissionDirectories, String languageIdentifier) {
+         this.submissionOptions = new JPlagSubmissionOptions(submissionDirectories, oldSubmissionDirectories);
+         this.submissionOptionAccess = new JPlagSubmissionOptionAccess(submissionOptions);
++        this.comparisonOptionAccess = new JPlagComparisonOptionAccess(comparisonOptions);
+         this.languageOptions = new JPlagLanguageOptions(languageIdentifier, comparisonOptions);
+         this.languageOptionAccess = new JPlagLanguageOptionAccess(languageOptions);
+     }
+@@ -40,6 +42,58 @@ public class JPlagOptions {
+         return comparisonOptions;
+     }
+ 
++    public JPlagComparisonOptionAccess getComparisonOptionAccess() {
++        return comparisonOptionAccess;
++    }
++
++    public ComparisonMode getComparisonMode() {
++        return comparisonOptionAccess.getComparisonMode();
++    }
++
++    public int getMaximumNumberOfComparisons() {
++        return comparisonOptionAccess.getMaximumNumberOfComparisons();
++    }
++
++    public Integer getMinimumTokenMatch() {
++        return comparisonOptionAccess.getMinimumTokenMatch();
++    }
++
++    public SimilarityMetric getSimilarityMetric() {
++        return comparisonOptionAccess.getSimilarityMetric();
++    }
++
++    public float getSimilarityThreshold() {
++        return comparisonOptionAccess.getSimilarityThreshold();
++    }
++
++    public boolean isDebugParser() {
++        return comparisonOptionAccess.isDebugParser();
++    }
++
++    public void setComparisonMode(ComparisonMode comparisonMode) {
++        comparisonOptionAccess.setComparisonMode(comparisonMode);
++    }
++
++    public void setDebugParser(boolean debugParser) {
++        comparisonOptionAccess.setDebugParser(debugParser);
++    }
++
++    public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
++        comparisonOptionAccess.setMaximumNumberOfComparisons(maximumNumberOfComparisons);
++    }
++
++    public void setMinimumTokenMatch(Integer minimumTokenMatch) {
++        comparisonOptionAccess.setMinimumTokenMatch(minimumTokenMatch);
++    }
++
++    public void setSimilarityMetric(SimilarityMetric similarityMetric) {
++        comparisonOptionAccess.setSimilarityMetric(similarityMetric);
++    }
++
++    public void setSimilarityThreshold(float similarityThreshold) {
++        comparisonOptionAccess.setSimilarityThreshold(similarityThreshold);
++    }
++
+     public JPlagSubmissionOptions getSubmissionOptions() {
+         return submissionOptions;
+     }
+@@ -72,30 +126,6 @@ public class JPlagOptions {
+         return languageOptionAccess.getVerbosity();
+     }
+ 
+-    public ComparisonMode getComparisonMode() {
+-        return comparisonOptions.getComparisonMode();
+-    }
+-
+-    public int getMaximumNumberOfComparisons() {
+-        return comparisonOptions.getMaximumNumberOfComparisons();
+-    }
+-
+-    public Integer getMinimumTokenMatch() {
+-        return comparisonOptions.getMinimumTokenMatch();
+-    }
+-
+-    public SimilarityMetric getSimilarityMetric() {
+-        return comparisonOptions.getSimilarityMetric();
+-    }
+-
+-    public float getSimilarityThreshold() {
+-        return comparisonOptions.getSimilarityThreshold();
+-    }
+-
+-    public boolean isDebugParser() {
+-        return comparisonOptions.isDebugParser();
+-    }
+-
+     public ClusteringOptions getClusteringOptions() {
+         return clusteringOptions.getClusteringOptions();
+     }
+@@ -168,30 +198,6 @@ public class JPlagOptions {
+         languageOptionAccess.setVerbosity(verbosity);
+     }
+ 
+-    public void setComparisonMode(ComparisonMode comparisonMode) {
+-        comparisonOptions.setComparisonMode(comparisonMode);
+-    }
+-
+-    public void setDebugParser(boolean debugParser) {
+-        comparisonOptions.setDebugParser(debugParser);
+-    }
+-
+-    public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
+-        comparisonOptions.setMaximumNumberOfComparisons(maximumNumberOfComparisons);
+-    }
+-
+-    public void setMinimumTokenMatch(Integer minimumTokenMatch) {
+-        comparisonOptions.setMinimumTokenMatch(minimumTokenMatch);
+-    }
+-
+-    public void setSimilarityMetric(SimilarityMetric similarityMetric) {
+-        comparisonOptions.setSimilarityMetric(similarityMetric);
+-    }
+-
+-    public void setSimilarityThreshold(float similarityThreshold) {
+-        comparisonOptions.setSimilarityThreshold(similarityThreshold);
+-    }
+-
+     public void setClusteringOptions(ClusteringOptions clusteringOptions) {
+         this.clusteringOptions.setClusteringOptions(clusteringOptions);
+     }

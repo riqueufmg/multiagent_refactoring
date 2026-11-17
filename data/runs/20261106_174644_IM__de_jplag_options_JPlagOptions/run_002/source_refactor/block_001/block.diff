@@ -1,0 +1,223 @@
+commit dc455dc5ffcd6c4b37450967023f90310ce9ae57
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 17:53:30 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagLanguageOptions.java b/core/src/main/java/de/jplag/options/JPlagLanguageOptions.java
+new file mode 100644
+index 000000000..c065d0efb
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagLanguageOptions.java
+@@ -0,0 +1,83 @@
++package de.jplag.options;
++
++import de.jplag.Language;
++
++/**
++ * Options related to the language used to parse submissions.
++ */
++public class JPlagLanguageOptions {
++
++    /**
++     * The identifier of the language used to parse the submissions.
++     */
++    private final String languageIdentifier;
++
++    /**
++     * Language used to parse the submissions.
++     */
++    private Language language;
++
++    /**
++     * Array of file suffixes that should be included.
++     */
++    private String[] fileSuffixes;
++
++    /**
++     * Level of output verbosity.
++     */
++    private Verbosity verbosity;
++
++    private final JPlagComparisonOptions comparisonOptions;
++
++    public JPlagLanguageOptions(String languageIdentifier, JPlagComparisonOptions comparisonOptions) {
++        this.languageIdentifier = languageIdentifier;
++        this.comparisonOptions = comparisonOptions;
++    }
++
++    public String[] getFileSuffixes() {
++        return fileSuffixes;
++    }
++
++    public String getLanguageIdentifier() {
++        return languageIdentifier;
++    }
++
++    public Language getLanguage() {
++        return language;
++    }
++
++    public Verbosity getVerbosity() {
++        return verbosity;
++    }
++
++    public void setFileSuffixes(String[] fileSuffixes) {
++        this.fileSuffixes = fileSuffixes;
++    }
++
++    public void setLanguage(Language language) {
++        this.language = language;
++    }
++
++    /**
++     * After the selected language has been initialized, this method is called by JPlag to set default values for options
++     * not set by the user.
++     * @param language initialized language instance
++     */
++    public void setLanguageDefaults(Language language) {
++        if (!comparisonOptions.hasMinimumTokenMatch()) {
++            comparisonOptions.setMinimumTokenMatch(language.minimumTokenMatch());
++        }
++
++        if (!hasFileSuffixes()) {
++            fileSuffixes = language.suffixes();
++        }
++    }
++
++    public void setVerbosity(Verbosity verbosity) {
++        this.verbosity = verbosity;
++    }
++
++    private boolean hasFileSuffixes() {
++        return fileSuffixes != null && fileSuffixes.length > 0;
++    }
++}
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index 80d07d947..3b4a0971c 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -17,28 +17,9 @@ public class JPlagOptions {
+     public static final int DEFAULT_SHOWN_COMPARISONS = JPlagComparisonOptions.DEFAULT_SHOWN_COMPARISONS;
+     public static final Charset CHARSET = StandardCharsets.UTF_8;
+ 
+-    /**
+-     * The identifier of the language used to parse the submissions.
+-     */
+-    private final String languageIdentifier;
+-
+-    /**
+-     * Language used to parse the submissions.
+-     */
+-    private Language language;
+-
+     private final JPlagComparisonOptions comparisonOptions = new JPlagComparisonOptions();
+     private final JPlagSubmissionOptions submissionOptions;
+-
+-    /**
+-     * Array of file suffixes that should be included.
+-     */
+-    private String[] fileSuffixes;
+-
+-    /**
+-     * Level of output verbosity.
+-     */
+-    private Verbosity verbosity;
++    private final JPlagLanguageOptions languageOptions;
+ 
+     /**
+      * Clustering options
+@@ -52,7 +33,7 @@ public class JPlagOptions {
+      */
+     public JPlagOptions(List<String> submissionDirectories, List<String> oldSubmissionDirectories, String languageIdentifier) {
+         this.submissionOptions = new JPlagSubmissionOptions(submissionDirectories, oldSubmissionDirectories);
+-        this.languageIdentifier = languageIdentifier;
++        this.languageOptions = new JPlagLanguageOptions(languageIdentifier, comparisonOptions);
+     }
+ 
+     public JPlagComparisonOptions getComparisonOptions() {
+@@ -63,6 +44,10 @@ public class JPlagOptions {
+         return submissionOptions;
+     }
+ 
++    public JPlagLanguageOptions getLanguageOptions() {
++        return languageOptions;
++    }
++
+     public Optional<String> getBaseCodeSubmissionName() {
+         return submissionOptions.getBaseCodeSubmissionName();
+     }
+@@ -80,15 +65,15 @@ public class JPlagOptions {
+     }
+ 
+     public String[] getFileSuffixes() {
+-        return fileSuffixes;
++        return languageOptions.getFileSuffixes();
+     }
+ 
+     public String getLanguageIdentifier() {
+-        return languageIdentifier;
++        return languageOptions.getLanguageIdentifier();
+     }
+ 
+     public Language getLanguage() {
+-        return language;
++        return languageOptions.getLanguage();
+     }
+ 
+     public int getMaximumNumberOfComparisons() {
+@@ -120,7 +105,7 @@ public class JPlagOptions {
+     }
+ 
+     public Verbosity getVerbosity() {
+-        return verbosity;
++        return languageOptions.getVerbosity();
+     }
+ 
+     public boolean hasBaseCode() {
+@@ -156,26 +141,15 @@ public class JPlagOptions {
+     }
+ 
+     public void setFileSuffixes(String[] fileSuffixes) {
+-        this.fileSuffixes = fileSuffixes;
++        languageOptions.setFileSuffixes(fileSuffixes);
+     }
+ 
+     public void setLanguage(Language language) {
+-        this.language = language;
++        languageOptions.setLanguage(language);
+     }
+ 
+-    /**
+-     * After the selected language has been initialized, this method is called by JPlag to set default values for options
+-     * not set by the user.
+-     * @param language - initialized language instance
+-     */
+     public void setLanguageDefaults(Language language) {
+-        if (!comparisonOptions.hasMinimumTokenMatch()) {
+-            setMinimumTokenMatch(language.minimumTokenMatch());
+-        }
+-
+-        if (!hasFileSuffixes()) {
+-            fileSuffixes = language.suffixes();
+-        }
++        languageOptions.setLanguageDefaults(language);
+     }
+ 
+     public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
+@@ -207,14 +181,10 @@ public class JPlagOptions {
+     }
+ 
+     public void setVerbosity(Verbosity verbosity) {
+-        this.verbosity = verbosity;
++        languageOptions.setVerbosity(verbosity);
+     }
+ 
+     public void setClusteringOptions(ClusteringOptions clusteringOptions) {
+         this.clusteringOptions = clusteringOptions;
+     }
+-
+-    private boolean hasFileSuffixes() {
+-        return fileSuffixes != null && fileSuffixes.length > 0;
+-    }
+ }

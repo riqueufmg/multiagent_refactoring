@@ -1,0 +1,78 @@
+commit acd916df62781c34819e657ee675e9d81a278b35
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 16:55:56 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java
+new file mode 100644
+index 0000000000..2bdbc90a42
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java
+@@ -0,0 +1,66 @@
++package org.opentripplanner.routing.api.request;
++
++import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
++
++import java.time.Instant;
++import java.time.ZoneId;
++import java.time.ZonedDateTime;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.function.DoubleFunction;
++import org.opentripplanner.api.common.LocationStringParser;
++import org.opentripplanner.model.GenericLocation;
++import org.opentripplanner.util.time.DateUtils;
++
++/**
++ * Support for parsing request input values and configuring unpreferred route and agency costs.
++ */
++public final class RouteRequestInputSupport {
++
++  private RouteRequestInputSupport() {}
++
++  public static GenericLocation parseLocation(String location) {
++    return LocationStringParser.fromOldStyleString(location);
++  }
++
++  public static List<GenericLocation> parseIntermediatePlaces(List<String> places) {
++    var intermediatePlaces = new ArrayList<GenericLocation>(places.size());
++    for (String place : places) {
++      intermediatePlaces.add(parseLocation(place));
++    }
++    return intermediatePlaces;
++  }
++
++  public static Instant parseDateTime(String date, String time, ZoneId timeZone) {
++    ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, timeZone);
++    return dateObject == null ? Instant.now() : dateObject.toInstant();
++  }
++
++  public static DoubleFunction<Double> defaultUnpreferredCost() {
++    return RequestFunctions.createLinearFunction(0.0, DEFAULT_ROUTE_RELUCTANCE);
++  }
++
++  public static DoubleFunction<Double> parseUnpreferredCost(String costFunction) {
++    return RequestFunctions.parse(costFunction);
++  }
++
++  public static void setFromString(RouteRequest request, String from) {
++    request.setFrom(parseLocation(from));
++  }
++
++  public static void setToString(RouteRequest request, String to) {
++    request.setTo(parseLocation(to));
++  }
++
++  public static void setIntermediatePlacesFromStrings(RouteRequest request, List<String> places) {
++    request.intermediatePlaces = parseIntermediatePlaces(places);
++  }
++
++  public static void setDateTime(RouteRequest request, String date, String time, ZoneId timeZone) {
++    request.setDateTime(parseDateTime(date, time, timeZone));
++  }
++
++  public static void setUnpreferredCost(RouteRequest request, String costFunction) {
++    request.unpreferredCost = parseUnpreferredCost(costFunction);
++  }
++}

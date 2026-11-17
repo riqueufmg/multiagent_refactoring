@@ -1,0 +1,30 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "io.github.classgraph.ScanResult",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive JSON serialization and deserialization responsibility while preserving ScanResult.fromJSON(String), ScanResult.toJSON(int), and ScanResult.toJSON() compatibility wrappers.",
+      "files": [
+        "src/main/java/io/github/classgraph/ScanResult.java",
+        "src/main/java/io/github/classgraph/ScanResultSerialization.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.ScanResult",
+            "io.github.classgraph.ScanResultSerialization"
+          ],
+          "outputs": [
+            "io.github.classgraph.ScanResult",
+            "io.github.classgraph.ScanResultSerialization"
+          ],
+          "details": "Extract the existing serialization responsibility consisting of CURRENT_SERIALIZATION_FORMAT, the nested SerializationFormat data holder, fromJSON(String), toJSON(int), and toJSON(). Keep public and static ScanResult entry points as compatibility wrappers that delegate to ScanResultSerialization. Move the existing JSONDeserializer, JSONSerializer, AutoCloseableExecutorService, and ClassGraph construction used exclusively by fromJSON(String) into ScanResultSerialization, together with the required serialization-specific field access. After extraction, ScanResult should no longer directly reference JSONDeserializer, JSONSerializer, AutoCloseableExecutorService, or ClassGraph for this responsibility. CollectionUtils is not counted as removed because ScanResult still references it in annotation-query methods and other remaining code; ScanSpec, ClassInfo, PackageInfo, ModuleInfo, and the other scan-result state dependencies must remain. The target gains one distinct dependency on ScanResultSerialization while eliminating four distinct outgoing dependencies, for an estimated net Fan-Out reduction of three. Preserve all existing serialization behavior, deserialization initialization, and public method signatures.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

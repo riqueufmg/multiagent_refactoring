@@ -1,0 +1,49 @@
+commit 22360abafd8933ac9893a62979378a122a597c1b
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 18:13:53 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputParser.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputParser.java
+new file mode 100644
+index 0000000000..b996c037bd
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputParser.java
+@@ -0,0 +1,37 @@
++package org.opentripplanner.routing.api.request;
++
++import java.time.Instant;
++import java.time.ZoneId;
++import java.time.ZonedDateTime;
++import org.opentripplanner.api.common.LocationStringParser;
++import org.opentripplanner.model.GenericLocation;
++import org.opentripplanner.util.time.DateUtils;
++
++/**
++ * Parses request input values used by {@link RouteRequest}.
++ */
++public final class RouteRequestInputParser {
++
++  private RouteRequestInputParser() {}
++
++  public static GenericLocation parseLocation(String location) {
++    return LocationStringParser.fromOldStyleString(location);
++  }
++
++  public static Instant parseDateTime(String date, String time, ZoneId timeZone) {
++    ZonedDateTime dateTime = DateUtils.toZonedDateTime(date, time, timeZone);
++    return dateTime == null ? Instant.now() : dateTime.toInstant();
++  }
++
++  public static void setFromString(RouteRequest request, String from) {
++    request.setFrom(parseLocation(from));
++  }
++
++  public static void setToString(RouteRequest request, String to) {
++    request.setTo(parseLocation(to));
++  }
++
++  public static void setDateTime(RouteRequest request, String date, String time, ZoneId timeZone) {
++    request.setDateTime(parseDateTime(date, time, timeZone));
++  }
++}

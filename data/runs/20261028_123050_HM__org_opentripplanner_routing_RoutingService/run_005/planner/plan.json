@@ -1,0 +1,119 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.RoutingService",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the query, graph-index lookup, and route-worker responsibilities into one auxiliary class, removing the direct RoutingService dependencies on RoutingServiceQueryHelper, GraphIndex, and RoutingWorker while preserving the existing RoutingService public API through delegation.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/RoutingService.java",
+        "src/main/java/org/opentripplanner/routing/RoutingServiceOperations.java",
+        "src/test/java/org/opentripplanner/routing/algorithm/mapping/SnapshotTestBase.java",
+        "src/test/java/org/opentripplanner/routing/graphfinder/StreetGraphFinderTest.java",
+        "src/test/java/org/opentripplanner/routing/stoptimes/AlternativeLegsTest.java",
+        "src/test/java/org/opentripplanner/updater/GtfsRealtimeFuzzyTripMatcherTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService",
+            "org.opentripplanner.routing.RoutingServiceOperations"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceOperations"
+          ],
+          "details": "Create RoutingServiceOperations in the same package. Move the fields queryHelper and graphIndex, initialize them from Graph in the new class constructor, and move the methods route, stopTimesForStop, getStopTimesForStop, stopTimesForPatternAtStop, findClosestStops, findClosestPlaces, getTripOnServiceDateForTripAndDay(FeedScopedId, ServiceDate), getTripOnServiceDateById(FeedScopedId), getAgencyForId, getStopForId, getRouteForId, addRoutes, getRoutesForStop, getPatternsForStop(StopLocation), getPatternsForStop(StopLocation, TimetableSnapshot), getAllOperators, getOperatorForId, getAllStops, getTripForId, getAllRoutes, getStopVertexForStop, getPatternForTrip, getPatternsForFeedId, getPatternsForRoute, getMultiModalStationForStations, getStopSpatialIndex, getServiceCodesRunningForDate, getFlexIndex, getTripOnServiceDateForTripAndDay(), and getTripOnServiceDateById() into it. The moved query methods continue to accept RoutingService where their existing RoutingServiceQueryHelper calls require it. Preserve the original RoutingService methods as delegating wrappers so existing callers retain the original API.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService.queryHelper",
+            "org.opentripplanner.routing.RoutingServiceOperations.queryHelper",
+            "org.opentripplanner.routing.RoutingService.graphIndex",
+            "org.opentripplanner.routing.RoutingServiceOperations.graphIndex"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceOperations.queryHelper",
+            "org.opentripplanner.routing.RoutingServiceOperations.graphIndex"
+          ],
+          "details": "Move both auxiliary fields out of RoutingService. Construct RoutingServiceOperations from the existing Graph field and initialize queryHelper with that Graph and graphIndex from graph.index.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService.route()",
+            "org.opentripplanner.routing.RoutingService.stopTimesForStop()",
+            "org.opentripplanner.routing.RoutingService.getStopTimesForStop()",
+            "org.opentripplanner.routing.RoutingService.stopTimesForPatternAtStop()",
+            "org.opentripplanner.routing.RoutingService.findClosestStops()",
+            "org.opentripplanner.routing.RoutingService.findClosestPlaces()",
+            "org.opentripplanner.routing.RoutingService.getTripOnServiceDateForTripAndDay()",
+            "org.opentripplanner.routing.RoutingService.getTripOnServiceDateById()",
+            "org.opentripplanner.routing.RoutingService.getAgencyForId()",
+            "org.opentripplanner.routing.RoutingService.getStopForId()",
+            "org.opentripplanner.routing.RoutingService.getRouteForId()",
+            "org.opentripplanner.routing.RoutingService.addRoutes()",
+            "org.opentripplanner.routing.RoutingService.getRoutesForStop()",
+            "org.opentripplanner.routing.RoutingService.getPatternsForStop()",
+            "org.opentripplanner.routing.RoutingService.getAllOperators()",
+            "org.opentripplanner.routing.RoutingService.getOperatorForId()",
+            "org.opentripplanner.routing.RoutingService.getAllStops()",
+            "org.opentripplanner.routing.RoutingService.getTripForId()",
+            "org.opentripplanner.routing.RoutingService.getAllRoutes()",
+            "org.opentripplanner.routing.RoutingService.getStopVertexForStop()",
+            "org.opentripplanner.routing.RoutingService.getPatternForTrip()",
+            "org.opentripplanner.routing.RoutingService.getPatternsForFeedId()",
+            "org.opentripplanner.routing.RoutingService.getPatternsForRoute()",
+            "org.opentripplanner.routing.RoutingService.getMultiModalStationForStations()",
+            "org.opentripplanner.routing.RoutingService.getStopSpatialIndex()",
+            "org.opentripplanner.routing.RoutingService.getServiceCodesRunningForDate()",
+            "org.opentripplanner.routing.RoutingService.getFlexIndex()",
+            "org.opentripplanner.routing.RoutingService.getTripOnServiceDateForTripAndDay()",
+            "org.opentripplanner.routing.RoutingService.getTripOnServiceDateById()"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceOperations"
+          ],
+          "details": "Update the extracted method implementations and RoutingService wrappers to invoke RoutingServiceOperations. Keep public method names, parameters, return types, and the target class FQN unchanged.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/RoutingService.java",
+            "src/main/java/org/opentripplanner/routing/RoutingServiceOperations.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/RoutingService.java",
+            "src/main/java/org/opentripplanner/routing/RoutingServiceOperations.java"
+          ],
+          "details": "Add to RoutingServiceOperations the imports required by the moved method signatures and bodies, including RoutingWorker, RoutingServiceQueryHelper, GraphIndex, and the model, graph, query, and response types already used by the moved methods. Remove RoutingWorker and GraphIndex usage imports from RoutingService when no longer referenced there. Retain imports in RoutingService for types still present in its public method signatures.",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/org/opentripplanner/routing/algorithm/mapping/SnapshotTestBase.java",
+            "src/test/java/org/opentripplanner/routing/graphfinder/StreetGraphFinderTest.java",
+            "src/test/java/org/opentripplanner/routing/stoptimes/AlternativeLegsTest.java",
+            "src/test/java/org/opentripplanner/updater/GtfsRealtimeFuzzyTripMatcherTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/org/opentripplanner/routing/algorithm/mapping/SnapshotTestBase.java",
+        "src/test/java/org/opentripplanner/routing/graphfinder/StreetGraphFinderTest.java",
+        "src/test/java/org/opentripplanner/routing/stoptimes/AlternativeLegsTest.java",
+        "src/test/java/org/opentripplanner/updater/GtfsRealtimeFuzzyTripMatcherTest.java"
+      ]
+    }
+  ]
+}

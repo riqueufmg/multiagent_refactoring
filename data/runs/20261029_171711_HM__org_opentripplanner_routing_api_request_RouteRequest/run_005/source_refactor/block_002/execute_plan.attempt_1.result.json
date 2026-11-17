@@ -1,0 +1,10 @@
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparatorSupport.java",
+      "content": "package org.opentripplanner.routing.api.request;\n\nimport java.util.Comparator;\nimport org.opentripplanner.routing.impl.DurationComparator;\nimport org.opentripplanner.routing.impl.PathComparator;\nimport org.opentripplanner.routing.spt.GraphPath;\n\n/** Support for selecting the path comparator configured on a route request. */\npublic final class RouteRequestPathComparatorSupport {\n\n  private RouteRequestPathComparatorSupport() {}\n\n  public static Comparator<GraphPath> getPathComparator(\n    String pathComparator,\n    boolean compareStartTimes\n  ) {\n    if (\"duration\".equals(pathComparator)) {\n      return new DurationComparator();\n    }\n    return new PathComparator(compareStartTimes);\n  }\n}\n"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "Added the extracted path-comparator selection support class. RouteRequest.java was not rewritten because its complete source content was not safely available for emitting as a full-file replacement in this execution."
+}

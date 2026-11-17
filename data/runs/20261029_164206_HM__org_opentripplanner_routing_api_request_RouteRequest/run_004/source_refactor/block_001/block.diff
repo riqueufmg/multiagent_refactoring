@@ -1,0 +1,69 @@
+commit 03021fd70724d756c6f53b19d6e53ffea02132b3
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 17:03:36 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java
+new file mode 100644
+index 0000000000..4633326050
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java
+@@ -0,0 +1,57 @@
++package org.opentripplanner.routing.api.request;
++
++import org.locationtech.jts.geom.Coordinate;
++import org.locationtech.jts.geom.Envelope;
++import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
++import org.opentripplanner.model.GenericLocation;
++import org.opentripplanner.routing.graph.Vertex;
++
++/**
++ * Provides spatial support for a route request, including cached proximity envelopes for the
++ * request's start and end locations.
++ */
++public class RouteRequestSpatialSupport {
++
++  private static final int MAX_CLOSENESS_METERS = 500;
++
++  private final GenericLocation from;
++  private final GenericLocation to;
++
++  private Envelope fromEnvelope;
++  private Envelope toEnvelope;
++
++  public RouteRequestSpatialSupport(GenericLocation from, GenericLocation to) {
++    this.from = from;
++    this.to = to;
++  }
++
++  /**
++   * Returns true if the vertex is considered close to the start or end point of the request.
++   */
++  public boolean isCloseToStartOrEnd(Vertex vertex) {
++    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
++      return false;
++    }
++
++    if (fromEnvelope == null) {
++      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
++    }
++    if (toEnvelope == null) {
++      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
++    }
++
++    return (
++      fromEnvelope.intersects(vertex.getCoordinate()) ||
++      toEnvelope.intersects(vertex.getCoordinate())
++    );
++  }
++
++  private static Envelope getEnvelope(Coordinate coordinate, int meters) {
++    double latitudeDegrees = SphericalDistanceLibrary.metersToDegrees(meters);
++    double longitudeDegrees = SphericalDistanceLibrary.metersToLonDegrees(meters, coordinate.y);
++
++    Envelope envelope = new Envelope(coordinate);
++    envelope.expandBy(longitudeDegrees, latitudeDegrees);
++    return envelope;
++  }
++}

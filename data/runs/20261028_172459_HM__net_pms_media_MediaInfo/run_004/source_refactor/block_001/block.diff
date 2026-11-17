@@ -1,0 +1,111 @@
+commit ed38c9ae1272780f596635c7adcaedc05521d361
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 17:38:19 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/net/pms/media/MediaInfoAudioParser.java b/src/main/java/net/pms/media/MediaInfoAudioParser.java
+index 67306d80d..4811071fc 100644
+--- a/src/main/java/net/pms/media/MediaInfoAudioParser.java
++++ b/src/main/java/net/pms/media/MediaInfoAudioParser.java
+@@ -3,7 +3,6 @@ package net.pms.media;
+ import java.io.File;
+ import java.util.Locale;
+ import net.pms.PMS;
+-import net.pms.configuration.FormatConfiguration;
+ import net.pms.configuration.UmsConfiguration;
+ import net.pms.dlna.DLNAThumbnail;
+ import net.pms.dlna.InputFile;
+@@ -40,21 +39,13 @@ public final class MediaInfoAudioParser {
+ 		if (inputFile == null || (type != Format.AUDIO && !(format instanceof AudioAsVideo))) {
+ 			return false;
+ 		}
+-
+ 		File file = inputFile.getFile();
+ 		if (file == null) {
+ 			return false;
+ 		}
+-
+ 		MediaAudio audio = new MediaAudio();
+ 		try {
+-			AudioFile audioFile;
+-			if ("mp2".equalsIgnoreCase(FileUtil.getExtension(file))) {
+-				audioFile = AudioFileIO.readAs(file, "mp3");
+-			} else {
+-				audioFile = AudioFileIO.read(file);
+-			}
+-
++			AudioFile audioFile = read(file);
+ 			AudioHeader header = audioFile.getAudioHeader();
+ 			if (header != null) {
+ 				if (header.getEncodingType() != null && header.getEncodingType().toLowerCase(Locale.ROOT).contains("flac 24")) {
+@@ -80,14 +71,9 @@ public final class MediaInfoAudioParser {
+ 					audio.setCodecA(audio.getCodecA().substring(0, audio.getCodecA().indexOf("(windows media")).trim());
+ 				}
+ 			}
+-
+ 			Tag tag = audioFile.getTag();
+ 			if (tag != null) {
+-				if (!tag.getArtworkList().isEmpty()) {
+-					mediaInfo.setThumb(DLNAThumbnail.toThumbnail(tag.getArtworkList().get(0).getBinaryData(), 640, 480, net.pms.image.ImagesUtil.ScaleType.MAX, net.pms.image.ImageFormat.SOURCE, false));
+-				} else if (!CONFIGURATION.getAudioThumbnailMethod().equals(CoverSupplier.NONE)) {
+-					mediaInfo.setThumb(DLNAThumbnail.toThumbnail(CoverUtil.get().getThumbnail(tag), 640, 480, net.pms.image.ImagesUtil.ScaleType.MAX, net.pms.image.ImageFormat.SOURCE, false));
+-				}
++				setThumbnail(mediaInfo, tag);
+ 				audio.setAlbum(value(tag, FieldKey.ALBUM));
+ 				audio.setArtist(value(tag, FieldKey.ARTIST));
+ 				audio.setComposer(value(tag, FieldKey.COMPOSER));
+@@ -110,7 +96,6 @@ public final class MediaInfoAudioParser {
+ 		} catch (Exception ignored) {
+ 			return false;
+ 		}
+-
+ 		if (StringUtils.isBlank(audio.getSongname())) {
+ 			audio.setSongname(file.getName());
+ 		}
+@@ -129,23 +114,37 @@ public final class MediaInfoAudioParser {
+ 			return false;
+ 		}
+ 		try {
+-			File file = inputFile.getFile();
+-			AudioFile audioFile = "mp2".equalsIgnoreCase(FileUtil.getExtension(file)) ? AudioFileIO.readAs(file, "mp3") : AudioFileIO.read(file);
+-			Tag tag = audioFile.getTag();
++			Tag tag = read(inputFile.getFile()).getTag();
+ 			if (tag == null) {
+ 				return false;
+ 			}
+-			if (!tag.getArtworkList().isEmpty()) {
+-				mediaInfo.setThumb(DLNAThumbnail.toThumbnail(tag.getArtworkList().get(0).getBinaryData(), 640, 480, net.pms.image.ImagesUtil.ScaleType.MAX, net.pms.image.ImageFormat.SOURCE, false));
+-			} else if (!CONFIGURATION.getAudioThumbnailMethod().equals(CoverSupplier.NONE)) {
+-				mediaInfo.setThumb(DLNAThumbnail.toThumbnail(CoverUtil.get().getThumbnail(tag), 640, 480, net.pms.image.ImagesUtil.ScaleType.MAX, net.pms.image.ImageFormat.SOURCE, false));
+-			}
++			setThumbnail(mediaInfo, tag);
+ 			return mediaInfo.getThumb() != null;
+ 		} catch (Exception ignored) {
+ 			return false;
+ 		}
+ 	}
+ 
++	/**
++	 * Compatibility overload used by callers that also provide the thumbnail
++	 * resume flag. Audio artwork parsing does not use that flag.
++	 */
++	public static boolean parseThumbnailOnly(MediaInfo mediaInfo, InputFile inputFile, Format format, int type, boolean resume) {
++		return parseThumbnailOnly(mediaInfo, inputFile, format, type);
++	}
++
++	private static AudioFile read(File file) throws Exception {
++		return "mp2".equalsIgnoreCase(FileUtil.getExtension(file)) ? AudioFileIO.readAs(file, "mp3") : AudioFileIO.read(file);
++	}
++
++	private static void setThumbnail(MediaInfo mediaInfo, Tag tag) throws Exception {
++		if (!tag.getArtworkList().isEmpty()) {
++			mediaInfo.setThumb(DLNAThumbnail.toThumbnail(tag.getArtworkList().get(0).getBinaryData(), 640, 480, net.pms.image.ImagesUtil.ScaleType.MAX, net.pms.image.ImageFormat.SOURCE, false));
++		} else if (!CONFIGURATION.getAudioThumbnailMethod().equals(CoverSupplier.NONE)) {
++			mediaInfo.setThumb(DLNAThumbnail.toThumbnail(CoverUtil.get().getThumbnail(tag), 640, 480, net.pms.image.ImagesUtil.ScaleType.MAX, net.pms.image.ImageFormat.SOURCE, false));
++		}
++	}
++
+ 	private static String value(Tag tag, FieldKey key) {
+ 		try {
+ 			String value = tag.getFirst(key);

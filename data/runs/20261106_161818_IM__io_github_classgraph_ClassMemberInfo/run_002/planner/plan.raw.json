@@ -1,0 +1,41 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "io.github.classgraph.ClassMemberInfo",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive annotation metadata state and annotation-query API from ClassMemberInfo to reduce its number of public methods and implementation complexity while preserving the existing ClassMemberInfo API through delegation.",
+      "files": [
+        "src/main/java/io/github/classgraph/ClassMemberInfo.java",
+        "src/main/java/io/github/classgraph/ClassMemberAnnotationInfo.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.ClassMemberInfo.annotationInfo",
+            "io.github.classgraph.ClassMemberInfo.annotationInfoRef",
+            "io.github.classgraph.ClassMemberInfo.getAllAnnotationInfo()",
+            "io.github.classgraph.ClassMemberInfo.getDirectAnnotationInfo()",
+            "io.github.classgraph.ClassMemberInfo.getAllAnnotationInfo(java.lang.Class<? extends java.lang.annotation.Annotation>)",
+            "io.github.classgraph.ClassMemberInfo.getAllAnnotationInfo(java.lang.String)",
+            "io.github.classgraph.ClassMemberInfo.getDirectAnnotationInfo(java.lang.Class<? extends java.lang.annotation.Annotation>)",
+            "io.github.classgraph.ClassMemberInfo.getDirectAnnotationInfo(java.lang.String)",
+            "io.github.classgraph.ClassMemberInfo.getAllAnnotationInfoRepeatable(java.lang.Class<? extends java.lang.annotation.Annotation>)",
+            "io.github.classgraph.ClassMemberInfo.getAllAnnotationInfoRepeatable(java.lang.String)",
+            "io.github.classgraph.ClassMemberInfo.getDirectAnnotationInfoRepeatable(java.lang.Class<? extends java.lang.annotation.Annotation>)",
+            "io.github.classgraph.ClassMemberInfo.getDirectAnnotationInfoRepeatable(java.lang.String)",
+            "io.github.classgraph.ClassMemberInfo.hasAnnotation(java.lang.Class<? extends java.lang.annotation.Annotation>)",
+            "io.github.classgraph.ClassMemberInfo.hasAnnotation(java.lang.String)"
+          ],
+          "outputs": [
+            "io.github.classgraph.ClassMemberAnnotationInfo"
+          ],
+          "details": "Create ClassMemberAnnotationInfo in the same package and move the annotationInfo and annotationInfoRef state plus the cohesive annotation-query implementation into it. Preserve ClassMemberInfo's existing public methods as delegating methods so callers and the public API remain unchanged. Preserve synchronization, annotation validation, scan-result access, empty-list behavior, and indirect/direct annotation semantics.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

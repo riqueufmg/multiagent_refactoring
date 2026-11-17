@@ -1,0 +1,45 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive submission-related forwarding API from JPlagOptions so that submission configuration access is modularized separately.",
+  "files": [
+    "core/src/main/java/de/jplag/options/JPlagOptions.java",
+    "core/src/main/java/de/jplag/options/JPlagSubmissionOptionAccess.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "de.jplag.options.JPlagOptions",
+        "de.jplag.options.JPlagSubmissionOptionAccess"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagSubmissionOptionAccess"
+      ],
+      "details": "Extract the submission-related methods getBaseCodeSubmissionName(), getExcludedFiles(), getExclusionFileName(), getSubmissionDirectories(), getOldSubmissionDirectories(), getSubdirectoryName(), hasBaseCode(), setBaseCodeSubmissionName(String), setExcludedFiles(Set<String>), setExclusionFileName(String), setSubmissionDirectories(List<String>), setOldSubmissionDirectories(List<String>), and setSubdirectoryName(String), together with their required submissionOptions dependency.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "de.jplag.options.JPlagOptions.getBaseCodeSubmissionName()",
+        "de.jplag.options.JPlagOptions.getExcludedFiles()",
+        "de.jplag.options.JPlagOptions.getExclusionFileName()",
+        "de.jplag.options.JPlagOptions.getSubmissionDirectories()",
+        "de.jplag.options.JPlagOptions.getOldSubmissionDirectories()",
+        "de.jplag.options.JPlagOptions.getSubdirectoryName()",
+        "de.jplag.options.JPlagOptions.hasBaseCode()",
+        "de.jplag.options.JPlagOptions.setBaseCodeSubmissionName(String)",
+        "de.jplag.options.JPlagOptions.setExcludedFiles(Set<String>)",
+        "de.jplag.options.JPlagOptions.setExclusionFileName(String)",
+        "de.jplag.options.JPlagOptions.setSubmissionDirectories(List<String>)",
+        "de.jplag.options.JPlagOptions.setOldSubmissionDirectories(List<String>)",
+        "de.jplag.options.JPlagOptions.setSubdirectoryName(String)"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagSubmissionOptionAccess"
+      ],
+      "details": "Update callers to use the extracted submission option access class or the existing JPlagSubmissionOptions instance instead of the removed forwarding methods on JPlagOptions.",
+      "risk": "medium"
+    }
+  ]
+}

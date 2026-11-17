@@ -1,0 +1,46 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive start/end spatial-proximity responsibility while preserving the public RouteRequest.isCloseToStartOrEnd(Vertex) API.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestSpatialSupport",
+            "org.opentripplanner.routing.api.request.RouteRequest.fromEnvelope",
+            "org.opentripplanner.routing.api.request.RouteRequest.toEnvelope",
+            "org.opentripplanner.routing.api.request.RouteRequest.isCloseToStartOrEnd(org.opentripplanner.routing.graph.Vertex)",
+            "org.opentripplanner.routing.api.request.RouteRequest.getEnvelope(org.locationtech.jts.geom.Coordinate,int)"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestSpatialSupport"
+          ],
+          "details": "Create RouteRequestSpatialSupport in the same package and move the envelope caching and proximity calculation into it. The extracted responsibility receives the existing GenericLocation values and Vertex needed for the calculation, so behavior remains unchanged. Keep RouteRequest.isCloseToStartOrEnd(Vertex) as a compatibility method that delegates to the extracted support object. After extraction, RouteRequest no longer directly references Coordinate, Envelope, or SphericalDistanceLibrary: Coordinate is used only by getEnvelope, Envelope is used only by fromEnvelope, toEnvelope, and getEnvelope, and SphericalDistanceLibrary is used only by getEnvelope. RouteRequest gains one new outgoing dependency, RouteRequestSpatialSupport, while eliminating those three direct dependencies, for an expected net Fan-Out reduction of two.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java"
+          ],
+          "details": "Remove Coordinate, Envelope, and SphericalDistanceLibrary imports from RouteRequest after the extraction. Add the required GenericLocation, Vertex, Coordinate, Envelope, and SphericalDistanceLibrary imports to RouteRequestSpatialSupport. Do not remove the existing GenericLocation or Vertex dependencies from RouteRequest because they remain required by the public compatibility method and its request state.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

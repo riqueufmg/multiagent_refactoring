@@ -1,0 +1,34 @@
+{
+  "id": 4,
+  "goal": "Extract the clustering-related forwarding API from JPlagOptions so the target class retains only composition and construction responsibilities.",
+  "files": [
+    "core/src/main/java/de/jplag/options/JPlagOptions.java",
+    "core/src/main/java/de/jplag/options/JPlagClusteringOptionAccess.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "de.jplag.options.JPlagOptions",
+        "de.jplag.options.JPlagClusteringOptionAccess"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagClusteringOptionAccess"
+      ],
+      "details": "Extract getClusteringOptions() and setClusteringOptions(ClusteringOptions), together with their required clusteringOptions dependency.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "de.jplag.options.JPlagOptions.getClusteringOptions()",
+        "de.jplag.options.JPlagOptions.setClusteringOptions(ClusteringOptions)"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagClusteringOptionAccess"
+      ],
+      "details": "Update callers to use the extracted clustering option access class or the existing JPlagClusteringOptions instance.",
+      "risk": "low"
+    }
+  ]
+}

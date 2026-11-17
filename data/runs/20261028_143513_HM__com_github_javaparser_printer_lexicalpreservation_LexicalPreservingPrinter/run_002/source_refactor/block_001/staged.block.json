@@ -1,0 +1,35 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive node text formatting and pretty-printing responsibility from LexicalPreservingPrinter while preserving its existing setup and printing behavior.",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextNodeFormatter.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.prettyPrintingTextNode(Node, NodeText)",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.interpret(Node, CsmElement, NodeText)"
+      ],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingTextNodeFormatter"
+      ],
+      "details": "Create LexicalPreservingTextNodeFormatter in the same package and move the cohesive prettyPrintingTextNode and interpret implementation into it, including the recursive interpretation of CsmMix elements, indentation handling, comment insertion, primitive/comment/modifier handling, and VariableDeclarator array-bracket handling. Update LexicalPreservingPrinter.getOrCreateNodeText(Node) to invoke the extracted formatter while keeping getOrCreateNodeText package visibility and preserving all existing behavior. The target will still gain one direct dependency on LexicalPreservingTextNodeFormatter. The target can stop directly referencing ConcreteSyntaxModel, CsmElement, CsmIndent, CsmMix, CsmToken, CsmUnindent, PrimitiveType, Modifier, and NodeWithVariables because those types are used by the moved responsibility and have no remaining direct references in the target source. VariableDeclarator, Node, LexicalDifferenceCalculator, Difference, LineSeparator, and the observer-related dependencies remain because the target still references them elsewhere. The expected net Fan-Out change is at least 8 eliminated distinct dependencies minus 1 new formatter dependency, for a positive net reduction of at least 7.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextNodeFormatter.java"
+      ],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextNodeFormatter.java"
+      ],
+      "details": "Add the formatter reference required by LexicalPreservingPrinter and move the imports required exclusively by the extracted methods to LexicalPreservingTextNodeFormatter. Remove target imports for ConcreteSyntaxModel, CsmElement, CsmIndent, CsmMix, CsmToken, CsmUnindent, PrimitiveType, Modifier, and NodeWithVariables only after verifying that no other target code references them. Do not remove imports for dependencies still used by the target, including VariableDeclarator, Node, LexicalDifferenceCalculator, Difference, LineSeparator, and observer-related types.",
+      "risk": "low"
+    }
+  ]
+}

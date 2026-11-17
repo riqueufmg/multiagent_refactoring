@@ -1,0 +1,130 @@
+commit 5b63633e3f6a4c13b7a0501c048efc654beb3560
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 12:36:01 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/RoutingServiceTimetableHelper.java b/src/main/java/org/opentripplanner/routing/RoutingServiceTimetableHelper.java
+new file mode 100644
+index 0000000000..b2c945d9e1
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/RoutingServiceTimetableHelper.java
+@@ -0,0 +1,118 @@
++package org.opentripplanner.routing;
++
++import java.util.Calendar;
++import java.util.List;
++import java.util.Map;
++import org.opentripplanner.model.StopLocation;
++import org.opentripplanner.model.StopTimesInPattern;
++import org.opentripplanner.model.Timetable;
++import org.opentripplanner.model.TimetableSnapshot;
++import org.opentripplanner.model.TripIdAndServiceDate;
++import org.opentripplanner.model.TripOnServiceDate;
++import org.opentripplanner.model.TripPattern;
++import org.opentripplanner.model.TripTimeOnDate;
++import org.opentripplanner.model.calendar.ServiceDate;
++import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
++import org.opentripplanner.routing.stoptimes.StopTimesHelper;
++import org.opentripplanner.transit.model.basic.FeedScopedId;
++
++/**
++ * Provides timetable and dated-service-journey lookups for a routing request.
++ *
++ * <p>A helper instance is created together with a {@link RoutingService}, so the timetable snapshot
++ * is lazily initialized once and reused for the lifetime of that routing request.</p>
++ */
++public class RoutingServiceTimetableHelper {
++
++  private final RoutingService routingService;
++
++  private TimetableSnapshot timetableSnapshot;
++
++  public RoutingServiceTimetableHelper(RoutingService routingService) {
++    this.routingService = routingService;
++  }
++
++  public List<StopTimesInPattern> stopTimesForStop(
++    StopLocation stop,
++    long startTime,
++    int timeRange,
++    int numberOfDepartures,
++    ArrivalDeparture arrivalDeparture,
++    boolean includeCancelledTrips
++  ) {
++    return StopTimesHelper.stopTimesForStop(
++      routingService,
++      lazyGetTimeTableSnapShot(),
++      stop,
++      startTime,
++      timeRange,
++      numberOfDepartures,
++      arrivalDeparture,
++      includeCancelledTrips
++    );
++  }
++
++  public List<StopTimesInPattern> getStopTimesForStop(
++    StopLocation stop,
++    ServiceDate serviceDate,
++    ArrivalDeparture arrivalDeparture
++  ) {
++    return StopTimesHelper.stopTimesForStop(routingService, stop, serviceDate, arrivalDeparture);
++  }
++
++  public List<TripTimeOnDate> stopTimesForPatternAtStop(
++    StopLocation stop,
++    TripPattern pattern,
++    long startTime,
++    int timeRange,
++    int numberOfDepartures,
++    ArrivalDeparture arrivalDeparture
++  ) {
++    return StopTimesHelper.stopTimesForPatternAtStop(
++      routingService,
++      lazyGetTimeTableSnapShot(),
++      stop,
++      pattern,
++      startTime,
++      timeRange,
++      numberOfDepartures,
++      arrivalDeparture
++    );
++  }
++
++  public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
++    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
++    return timetableSnapshot != null
++      ? timetableSnapshot.resolve(
++        tripPattern,
++        serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
++      )
++      : tripPattern.getScheduledTimetable();
++  }
++
++  public TripOnServiceDate getTripOnServiceDateForTripAndDay(
++    FeedScopedId tripId,
++    ServiceDate serviceDate
++  ) {
++    return DatedServiceJourneyHelper.getTripOnServiceDate(routingService, tripId, serviceDate);
++  }
++
++  public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
++    return DatedServiceJourneyHelper.getTripOnServiceDate(routingService, datedServiceJourneyId);
++  }
++
++  public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
++    return routingService.getTripOnServiceDateForTripAndDay();
++  }
++
++  public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
++    return routingService.getTripOnServiceDateById();
++  }
++
++  private TimetableSnapshot lazyGetTimeTableSnapShot() {
++    if (timetableSnapshot == null) {
++      timetableSnapshot = routingService.getTimetableSnapshot();
++    }
++    return timetableSnapshot;
++  }
++}

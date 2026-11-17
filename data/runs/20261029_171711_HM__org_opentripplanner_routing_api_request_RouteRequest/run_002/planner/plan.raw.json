@@ -1,0 +1,30 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive start/end proximity and envelope-calculation responsibility while preserving the public RouteRequest.isCloseToStartOrEnd(Vertex) API.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestLocationSupport"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestLocationSupport"
+          ],
+          "details": "Move the private fromEnvelope and toEnvelope state, the getEnvelope(Coordinate, int) helper, and the isCloseToStartOrEnd(Vertex) implementation's envelope and intersection logic into RouteRequestLocationSupport. RouteRequest should retain its existing public isCloseToStartOrEnd(Vertex) method and delegate to the extracted responsibility, so callers and behavior remain compatible. After extraction, RouteRequest should no longer directly reference Coordinate, Envelope, or SphericalDistanceLibrary; those dependencies remain localized in RouteRequestLocationSupport. RouteRequest introduces one new dependency on RouteRequestLocationSupport while retaining the Vertex and GenericLocation references required by its public method and location state. Expected net Fan-Out reduction is two distinct dependencies: three removed direct dependencies minus one new helper dependency.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

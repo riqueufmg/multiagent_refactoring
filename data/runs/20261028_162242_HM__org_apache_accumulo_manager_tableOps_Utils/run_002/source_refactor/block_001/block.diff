@@ -1,0 +1,265 @@
+commit bef4e5ebb493b6e421229fe72ea189e174631ba1
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 16:35:29 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
+index 5b763dcb5b..993da153ec 100644
+--- a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
+@@ -27,15 +27,11 @@ import java.util.NoSuchElementException;
+ import java.util.Objects;
+ import java.util.SortedMap;
+ import java.util.SortedSet;
+-import java.util.TreeMap;
+-import java.util.TreeSet;
+ import java.util.function.Function;
+ 
+ import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.client.admin.TabletMergeability;
+ import org.apache.accumulo.core.clientImpl.AcceptableThriftTableOperationException;
+-import org.apache.accumulo.core.clientImpl.TableOperationsImpl;
+-import org.apache.accumulo.core.clientImpl.TabletMergeabilityUtil;
+ import org.apache.accumulo.core.clientImpl.thrift.TableOperation;
+ import org.apache.accumulo.core.clientImpl.thrift.TableOperationExceptionType;
+ import org.apache.accumulo.core.data.AbstractId;
+@@ -56,7 +52,6 @@ import org.apache.accumulo.core.metadata.schema.Ample;
+ import org.apache.accumulo.core.metadata.schema.TabletMetadata;
+ import org.apache.accumulo.manager.Manager;
+ import org.apache.accumulo.server.ServerContext;
+-import org.apache.hadoop.fs.FileSystem;
+ import org.apache.hadoop.fs.Path;
+ import org.apache.hadoop.io.Text;
+ import org.apache.zookeeper.KeeperException;
+@@ -104,15 +99,12 @@ public class Utils {
+     Text endRowOfEndRowTablet = extent.endRow();
+ 
+     if (extent.prevEndRow() != null) {
+-      // The startRow is not inclusive, so do not want to find the tablet containing startRow but
+-      // instead find the tablet that contains the next possible row after startRow
+       Text nextPossibleRow = new Key(extent.prevEndRow()).followingKey(PartialKey.ROW).getRow();
+       prevRowOfStartRowTablet =
+           findContaining(ample, extent.tableId(), nextPossibleRow).prevEndRow();
+     }
+ 
+     if (extent.endRow() != null) {
+-      // find the tablet containing endRow and use its endRow
+       endRowOfEndRowTablet = findContaining(ample, extent.tableId(), extent.endRow()).endRow();
+     }
+ 
+@@ -137,7 +129,6 @@ public class Utils {
+         return LockRange.infinite();
+       }
+     }
+-
+   }
+ 
+   public static long reserveTable(Manager env, TableId tableId, FateId fateId, LockType lockType,
+@@ -148,32 +139,9 @@ public class Utils {
+   public static long reserveTable(Manager env, TableId tableId, FateId fateId, LockType lockType,
+       boolean tableMustExist, TableOperation op, final LockRange range) throws Exception {
+     final LockRange widenedRange;
+-
+     boolean shouldWiden = lockType == LockType.WRITE || op == TableOperation.COMPACT;
+ 
+     if (shouldWiden) {
+-      /*
+-       * Write locks are widened to table split points to avoid non-overlapping ranges operating on
+-       * the same tablet. For example assume a table has splits at c,e and two fate operations need
+-       * write locks on ranges (a1,c2] and (d1,d9]. The fate ranges do not overlap, however both
+-       * will operate on the tablet (c,e]. When the ranges are widened, (a1,c2] turns into (null,e]
+-       * and (d1,d9] turns into (c,e]. The widened ranges for the fate operations overlap which
+-       * prevents both from operating on the same tablet.
+-       *
+-       * Widening is done for write locks because those need to work on mutually exclusive sets of
+-       * tablets w/ other write or read locks. Read locks do not need to be mutually exclusive w/
+-       * each other and it does not matter if they operate on the same tablet so widening is not
+-       * needed for that case. Widening write locks is sufficient for detecting overlap w/ any
+-       * tablets that read locks need to use. For example if a write locks is obtained on (a1,c2]
+-       * and it widens to (null,e] then a read lock on (d1,d9] would overlap with the widened range.
+-       *
+-       * Mostly widening for write locks is nice because fate operations that get read locks are
+-       * probably more frequent. So the work of widening is not done on most fate operations. Also
+-       * widening an infinite range is a quick operation, so create/delete table will not be slowed
+-       * down by widening.
+-       *
+-       * Widening is done for compactions because those operations widen their range.
+-       */
+       widenedRange = widen(env.getContext().getAmple(), tableId, range, op, tableMustExist);
+       log.debug("{} widened write lock range from {} to {}", fateId, range, widenedRange);
+     } else {
+@@ -182,25 +150,17 @@ public class Utils {
+ 
+     var lock = getLock(env.getContext(), tableId, fateId, lockType, widenedRange);
+     if (shouldWiden && !widenedRange.equals(lock.getRange())) {
+-      // It is possible the range changed since the lock entry was created. Pre existing locks are
+-      // found using the fate id and could have a different range.
+       lock.unlock();
+-      // This should be a rare event, log at info in case it happens a lot.
+       log.info(
+           "{} widened range {} differs from existing lock range {}, deleted lock and will retry",
+           fateId, widenedRange, lock.getRange());
+       return 100;
+     } else if (lockType == LockType.READ) {
+-      // Not expecting the lock range on a read lock to change.
+       Preconditions.checkState(widenedRange.equals(lock.getRange()));
+     }
+ 
+     if (lock.tryLock()) {
+       if (shouldWiden) {
+-        // Now that table lock is acquired see if the range still widens to the same thing. If not
+-        // it means the table splits changed so release the lock and try again later. The table
+-        // splits in this range can not change once the lock is acquired, so this recheck is done
+-        // after getting the lock.
+         var widenedRange2 = widen(env.getContext().getAmple(), tableId, range, op, tableMustExist);
+         if (!widenedRange.equals(widenedRange2)) {
+           lock.unlock();
+@@ -263,9 +223,7 @@ public class Utils {
+ 
+   public static long reserveHdfsDirectory(Manager env, String directory, FateId fateId)
+       throws KeeperException, InterruptedException {
+-
+     ZooReaderWriter zk = env.getContext().getZooSession().asReaderWriter();
+-
+     if (ZooReservation.attempt(zk, Constants.ZHDFS_RESERVATIONS + "/"
+         + Base64.getEncoder().encodeToString(directory.getBytes(UTF_8)), fateId, "")) {
+       log.trace("{} reserved bulk dir {}", fateId, directory);
+@@ -291,8 +249,6 @@ public class Utils {
+         FateLock.path(Constants.ZTABLE_LOCKS + "/" + id.canonical()));
+     DistributedLock lock = DistributedReadWriteLock.recoverLock(qlock, fateId);
+     if (lock != null) {
+-
+-      // Validate the recovered lock type
+       if (lock.getType() != lockType) {
+         throw new IllegalStateException(
+             "Unexpected lock type " + lock.getType() + " recovered for transaction " + fateId
+@@ -313,39 +269,14 @@ public class Utils {
+     return Utils.getLock(env.getContext(), id, fateId, LockType.READ, range);
+   }
+ 
+-  /**
+-   * Given a fully-qualified Path and a flag indicating if the file info is base64 encoded or not,
+-   * retrieve the data from a file on the file system. It is assumed that the file is textual and
+-   * not binary data.
+-   *
+-   * @param path the fully-qualified path
+-   */
+   public static SortedSet<Text> getSortedSetFromFile(Manager manager, Path path, boolean encoded)
+       throws IOException {
+-    FileSystem fs = path.getFileSystem(manager.getContext().getHadoopConf());
+-    var data = new TreeSet<Text>();
+-    try (var file = new java.util.Scanner(fs.open(path), UTF_8)) {
+-      while (file.hasNextLine()) {
+-        String line = file.nextLine();
+-        data.add(encoded ? new Text(Base64.getDecoder().decode(line)) : new Text(line));
+-      }
+-    }
+-    return data;
++    return UtilsFileParser.getSortedSetFromFile(manager, path, encoded);
+   }
+ 
+   public static SortedMap<Text,TabletMergeability> getSortedSplitsFromFile(ServerContext ctx,
+       Path path) throws IOException {
+-    FileSystem fs = path.getFileSystem(ctx.getHadoopConf());
+-    var data = new TreeMap<Text,TabletMergeability>();
+-    try (var file = new java.util.Scanner(fs.open(path), UTF_8)) {
+-      while (file.hasNextLine()) {
+-        String line = file.nextLine();
+-        log.trace("split line: {}", line);
+-        TableOperationsImpl.SplitMergeability splitTm = TabletMergeabilityUtil.decode(line);
+-        data.put(splitTm.split(), splitTm.mergeability());
+-      }
+-    }
+-    return data;
++    return UtilsFileParser.getSortedSplitsFromFile(ctx, path);
+   }
+ 
+ }
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsFileParser.java b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsFileParser.java
+new file mode 100644
+index 0000000000..187038f7ef
+--- /dev/null
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsFileParser.java
+@@ -0,0 +1,81 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++package org.apache.accumulo.manager.tableOps;
++
++import static java.nio.charset.StandardCharsets.UTF_8;
++
++import java.io.IOException;
++import java.util.Base64;
++import java.util.Scanner;
++import java.util.SortedMap;
++import java.util.SortedSet;
++import java.util.TreeMap;
++import java.util.TreeSet;
++
++import org.apache.accumulo.core.client.admin.TabletMergeability;
++import org.apache.accumulo.core.clientImpl.TableOperationsImpl;
++import org.apache.accumulo.core.clientImpl.TabletMergeabilityUtil;
++import org.apache.accumulo.manager.Manager;
++import org.apache.accumulo.server.ServerContext;
++import org.apache.hadoop.fs.FileSystem;
++import org.apache.hadoop.fs.Path;
++import org.apache.hadoop.io.Text;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++public class UtilsFileParser {
++  private static final Logger log = LoggerFactory.getLogger(UtilsFileParser.class);
++
++  private UtilsFileParser() {}
++
++  /**
++   * Given a fully-qualified Path and a flag indicating if the file info is base64 encoded or not,
++   * retrieve the data from a file on the file system. It is assumed that the file is textual and
++   * not binary data.
++   *
++   * @param path the fully-qualified path
++   */
++  public static SortedSet<Text> getSortedSetFromFile(Manager manager, Path path, boolean encoded)
++      throws IOException {
++    FileSystem fs = path.getFileSystem(manager.getContext().getHadoopConf());
++    var data = new TreeSet<Text>();
++    try (Scanner file = new Scanner(fs.open(path), UTF_8)) {
++      while (file.hasNextLine()) {
++        String line = file.nextLine();
++        data.add(encoded ? new Text(Base64.getDecoder().decode(line)) : new Text(line));
++      }
++    }
++    return data;
++  }
++
++  public static SortedMap<Text,TabletMergeability> getSortedSplitsFromFile(ServerContext ctx,
++      Path path) throws IOException {
++    FileSystem fs = path.getFileSystem(ctx.getHadoopConf());
++    var data = new TreeMap<Text,TabletMergeability>();
++    try (Scanner file = new Scanner(fs.open(path), UTF_8)) {
++      while (file.hasNextLine()) {
++        String line = file.nextLine();
++        log.trace("split line: {}", line);
++        TableOperationsImpl.SplitMergeability splitTm = TabletMergeabilityUtil.decode(line);
++        data.put(splitTm.split(), splitTm.mergeability());
++      }
++    }
++    return data;
++  }
++}

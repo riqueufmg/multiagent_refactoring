@@ -1,0 +1,22 @@
+{
+  "id": 2,
+  "goal": "Extract authentication-attempt tracking and session-attribute naming from IndirectClient to reduce implementation complexity and group related state-management behavior.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientAuthenticationState.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.IndirectClient",
+        "org.pac4j.core.client.IndirectClientAuthenticationState"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.IndirectClientAuthenticationState"
+      ],
+      "details": "Extract the cohesive authentication-attempt state and session-name operations consisting of STATE_SESSION_PARAMETER, NONCE_SESSION_PARAMETER, CODE_VERIFIER_SESSION_PARAMETER, checkAuthenticationAttempt, getStateSessionAttributeName(), getNonceSessionAttributeName(), getCodeVerifierSessionAttributeName(), isCheckAuthenticationAttempt(), setCheckAuthenticationAttempt(boolean), saveAttemptedAuthentication(WebContext, SessionStore), cleanAttemptedAuthentication(WebContext, SessionStore), and the attempted-authentication handling used by getRedirectionAction(WebContext, SessionStore) and getCredentials(WebContext, SessionStore, ProfileManagerFactory). Preserve the existing public methods on IndirectClient as delegating facade methods.",
+      "risk": "medium"
+    }
+  ]
+}

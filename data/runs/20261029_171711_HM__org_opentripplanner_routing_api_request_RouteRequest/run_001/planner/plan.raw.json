@@ -1,0 +1,42 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive location parsing and proximity-checking support from RouteRequest while preserving its public location-related methods.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestLocationSupport"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestLocationSupport"
+          ],
+          "details": "Extract the location-focused implementation used by setFromString(String), setToString(String), setIntermediatePlacesFromStrings(List<String>), isCloseToStartOrEnd(Vertex), and the private getEnvelope(Coordinate, int) helper into RouteRequestLocationSupport. Keep RouteRequest's existing public methods, from()/to() accessors, setFrom(GenericLocation), setTo(GenericLocation), and method signatures as compatibility-preserving wrappers or unchanged methods. The extracted support may receive the existing GenericLocation and Vertex values as arguments, so RouteRequest does not need to expose new public types or change its FQN. After extraction, RouteRequest should no longer directly reference LocationStringParser, SphericalDistanceLibrary, Coordinate, or Envelope; those dependencies remain localized to RouteRequestLocationSupport. RouteRequest gains only the new dependency RouteRequestLocationSupport, producing an expected net Fan-Out reduction of at least three distinct dependencies (four removed direct dependencies minus one new helper dependency). GenericLocation and Vertex must remain direct RouteRequest dependencies because they occur in existing public method signatures and accessors.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java"
+          ],
+          "details": "Add the same-package RouteRequestLocationSupport reference where RouteRequest delegates the extracted location behavior. Remove RouteRequest imports for LocationStringParser, SphericalDistanceLibrary, Coordinate, and Envelope only after confirming no direct references remain. Retain imports required by the unchanged public signatures and fields, including GenericLocation and Vertex. Add the extracted class imports for LocationStringParser, SphericalDistanceLibrary, Coordinate, Envelope, GenericLocation, Vertex, ArrayList, and List as needed by the moved implementation.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

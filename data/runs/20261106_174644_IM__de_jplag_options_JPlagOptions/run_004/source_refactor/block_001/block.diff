@@ -1,0 +1,62 @@
+commit 42fd7bdc333a76924ededab63dbd8701625bff8f
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 17:59:20 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagClusteringOptions.java b/core/src/main/java/de/jplag/options/JPlagClusteringOptions.java
+new file mode 100644
+index 000000000..37d53d68c
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagClusteringOptions.java
+@@ -0,0 +1,16 @@
++package de.jplag.options;
++
++import de.jplag.clustering.ClusteringOptions;
++
++public class JPlagClusteringOptions {
++
++    private ClusteringOptions clusteringOptions = new ClusteringOptions.Builder().build();
++
++    public ClusteringOptions getClusteringOptions() {
++        return this.clusteringOptions;
++    }
++
++    public void setClusteringOptions(ClusteringOptions clusteringOptions) {
++        this.clusteringOptions = clusteringOptions;
++    }
++}
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index 3b4a0971c..ed8f44380 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -20,11 +20,7 @@ public class JPlagOptions {
+     private final JPlagComparisonOptions comparisonOptions = new JPlagComparisonOptions();
+     private final JPlagSubmissionOptions submissionOptions;
+     private final JPlagLanguageOptions languageOptions;
+-
+-    /**
+-     * Clustering options
+-     */
+-    private ClusteringOptions clusteringOptions = new ClusteringOptions.Builder().build();
++    private final JPlagClusteringOptions clusteringOptions = new JPlagClusteringOptions();
+ 
+     /**
+      * Constructor with required attributes.
+@@ -117,7 +113,7 @@ public class JPlagOptions {
+     }
+ 
+     public ClusteringOptions getClusteringOptions() {
+-        return this.clusteringOptions;
++        return clusteringOptions.getClusteringOptions();
+     }
+ 
+     public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {
+@@ -185,6 +181,6 @@ public class JPlagOptions {
+     }
+ 
+     public void setClusteringOptions(ClusteringOptions clusteringOptions) {
+-        this.clusteringOptions = clusteringOptions;
++        this.clusteringOptions.setClusteringOptions(clusteringOptions);
+     }
+ }

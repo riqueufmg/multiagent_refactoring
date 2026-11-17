@@ -1,0 +1,174 @@
+## CONTEXT
+
+Hub-like Modularization (HM) is a class-level design smell that occurs when **both** the target class's Fan-In and Fan-Out are high. If either metric is medium or low, HM is absent.
+
+This refactoring targets **Fan-Out only**. Reducing the number of distinct outgoing class dependencies sufficiently to bring Fan-Out below the high category can remove HM even when Fan-In remains high. Do not optimize Fan-In as a substitute for reducing Fan-Out.
+
+## TASK
+
+The goal is to reduce the target class's Fan-Out while preserving its behavior, responsibilities' cohesion, and public compatibility. Aim to remove 2 to 4 net outgoing dependencies when feasible; the actual reduction needed to eliminate HM depends on the target's metrics and the detector's thresholds, if provided in the input.
+
+Based on the target class's code and its outgoing dependencies, follow this reasoning:
+- Identify coherent responsibilities implemented by methods and fields of the target class. Group elements by their behavior, shared state, and collaboration, **not** simply because they use the same dependency.
+- For each candidate responsibility, identify the distinct external classes it references and check whether those classes are also referenced elsewhere in the target class.
+- Favor changes that eliminate **all direct references** from the target class to several outgoing dependency classes. A dependency is not removed from Fan-Out if any direct reference to it remains in the target class.
+- Consider the effects of the target's fields, constructors, methods, inheritance, annotations, parameter and return types, and required compatibility wrappers. Do not assume that moving a method or deleting an import removes a dependency.
+- Select the most suitable combination of allowed refactorings. Extract Class is one possible strategy, not a mandatory one; moving cohesive methods or fields to an appropriate existing class may be better. Avoid unnecessary new classes, forwarding layers, circular dependencies, and dependency replacements that merely disguise coupling.
+- Account for **new outgoing dependencies** introduced into the target class (such as a newly extracted helper). Estimate the **net Fan-Out change** as the number of distinct outgoing dependencies genuinely eliminated minus the number of new distinct outgoing dependencies introduced.
+- Prefer a small, cohesive change with a credible positive net reduction over a larger refactoring that only redistributes code. Do not sacrifice behavior or design quality to force a numeric reduction.
+- Before producing the plan, verify for each proposed removed dependency why the target class will no longer reference it. Identify dependencies that must remain, and do not count them toward the expected reduction.
+- The plan must consist of 1 to 3 small blocks, each independently compilable. A block may prepare a transformation without immediately reducing Fan-Out, provided the overall plan has a credible net reduction.
+
+Observations:
+- Moving methods alone does not guarantee a Fan-Out reduction. The target class must stop referring to the outgoing dependency classes being counted as removed.
+- If the target class gains one new helper dependency, removing only one existing dependency gives **zero net reduction**. Removing two existing dependencies gives a net reduction of one, assuming no other changes.
+- A dependency is still present when the target class references it through fields, method signatures, local variables, object creation, static calls, annotations, inheritance, or other direct type usages. Imports alone are not evidence of a dependency, and removing an import alone does not establish a Fan-Out reduction.
+- Preserve necessary public APIs. If compatibility requirements leave the old dependencies in public signatures, account for them rather than claiming they were removed.
+- If the input does not provide enough evidence for a reliable reduction, do not invent methods, fields, or dependencies or claim that HM will be removed. Return an empty `blocks` array rather than an unjustified transformation.
+
+## ALLOWED REFACTORINGS
+
+A list of refactorings allowed in the refactoring plan is presented as following:
+- ADD_OR_UPDATE_IMPORTS(file): Adds, removes, or updates imports required by the refactoring.
+- CREATE_PACKAGE(pkgA.subpkg): Creates a new package under the current source root.
+- EXTRACT_CLASS(pkgA.C1, pkgA.C2): Extracts part of class C1 into a new class C2.
+- EXTRACT_INTERFACE(pkgA.C1, pkgA.I1): Extracts an interface I1 from class C1.
+- MOVE_CLASS(pkgA.C1, pkgB.C1): Moves class C1 from package A to package B.
+- MOVE_FIELD(pkgA.C1.field, pkgA.C2.field): Moves a field from class C1 to class C2.
+- MOVE_METHOD(pkgA.C1.m(), pkgA.C2.m()): Moves a method from class C1 to class C2.
+- REPLACE_DEPENDENCY(pkgA.C1, pkgA.C2): Replaces a direct dependency in C1 with a different dependency C2.
+- UPDATE_CALL_SITES(pkgA.C1.m(), pkgA.C2.m()): Updates callers to use the new method or class location.
+
+## INPUT
+
+{
+  "smell": "Hub-like Modularization",
+  "target_type": "class",
+  "target_name": "org.apache.accumulo.server.ServerContext",
+  "designite": {
+    "dir": "/data/henrique/multiagent_refactoring/data/runs/20261028_194120_HM__org_apache_accumulo_server_ServerContext/run_001/planner/designite",
+    "smells_csv": "DesignSmells.csv",
+    "target_has_smell": true
+  },
+  "target_file": "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+  "target_source_root": "server/base/src/main/java",
+  "target_code": "/*\n * Licensed to the Apache Software Foundation (ASF) under one\n * or more contributor license agreements.  See the NOTICE file\n * distributed with this work for additional information\n * regarding copyright ownership.  The ASF licenses this file\n * to you under the Apache License, Version 2.0 (the\n * \"License\"); you may not use this file except in compliance\n * with the License.  You may obtain a copy of the License at\n *\n *   https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing,\n * software distributed under the License is distributed on an\n * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n * KIND, either express or implied.  See the License for the\n * specific language governing permissions and limitations\n * under the License.\n */\npackage org.apache.accumulo.server;\n\nimport static com.google.common.base.Preconditions.checkArgument;\nimport static com.google.common.base.Suppliers.memoize;\nimport static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;\nimport static java.nio.charset.StandardCharsets.UTF_8;\nimport static java.util.concurrent.TimeUnit.MINUTES;\nimport static java.util.concurrent.TimeUnit.SECONDS;\n\nimport java.io.IOException;\nimport java.io.InputStream;\nimport java.io.UncheckedIOException;\nimport java.net.UnknownHostException;\nimport java.nio.file.Files;\nimport java.util.Arrays;\nimport java.util.Map;\nimport java.util.Set;\nimport java.util.TreeMap;\nimport java.util.concurrent.ScheduledFuture;\nimport java.util.concurrent.ScheduledThreadPoolExecutor;\nimport java.util.concurrent.TimeUnit;\nimport java.util.concurrent.atomic.AtomicBoolean;\nimport java.util.concurrent.atomic.AtomicReference;\nimport java.util.function.Supplier;\n\nimport org.apache.accumulo.core.Constants;\nimport org.apache.accumulo.core.client.ConditionalWriter;\nimport org.apache.accumulo.core.client.ConditionalWriterConfig;\nimport org.apache.accumulo.core.client.TableNotFoundException;\nimport org.apache.accumulo.core.clientImpl.ClientContext;\nimport org.apache.accumulo.core.clientImpl.ClientInfo;\nimport org.apache.accumulo.core.clientImpl.ThriftTransportPool;\nimport org.apache.accumulo.core.conf.AccumuloConfiguration;\nimport org.apache.accumulo.core.conf.DefaultConfiguration;\nimport org.apache.accumulo.core.conf.Property;\nimport org.apache.accumulo.core.conf.SiteConfiguration;\nimport org.apache.accumulo.core.crypto.CryptoFactoryLoader;\nimport org.apache.accumulo.core.data.InstanceId;\nimport org.apache.accumulo.core.data.NamespaceId;\nimport org.apache.accumulo.core.data.ResourceGroupId;\nimport org.apache.accumulo.core.data.TableId;\nimport org.apache.accumulo.core.lock.ServiceLock;\nimport org.apache.accumulo.core.metadata.schema.Ample;\nimport org.apache.accumulo.core.metadata.schema.Ample.DataLevel;\nimport org.apache.accumulo.core.metrics.MetricsInfo;\nimport org.apache.accumulo.core.rpc.SslConnectionParams;\nimport org.apache.accumulo.core.spi.crypto.CryptoServiceFactory;\nimport org.apache.accumulo.core.util.AddressUtil;\nimport org.apache.accumulo.core.util.threads.ThreadPools;\nimport org.apache.accumulo.core.util.threads.Threads;\nimport org.apache.accumulo.server.conf.NamespaceConfiguration;\nimport org.apache.accumulo.server.conf.ServerConfigurationFactory;\nimport org.apache.accumulo.server.conf.TableConfiguration;\nimport org.apache.accumulo.server.conf.store.PropStore;\nimport org.apache.accumulo.server.conf.store.impl.ZooPropStore;\nimport org.apache.accumulo.server.fs.VolumeManager;\nimport org.apache.accumulo.server.mem.LowMemoryDetector;\nimport org.apache.accumulo.server.metadata.ServerAmpleImpl;\nimport org.apache.accumulo.server.metrics.MetricsInfoImpl;\nimport org.apache.accumulo.server.rpc.SaslServerConnectionParams;\nimport org.apache.accumulo.server.rpc.ThriftServerType;\nimport org.apache.accumulo.server.security.AuditedSecurityOperation;\nimport org.apache.accumulo.server.security.SecurityOperation;\nimport org.apache.accumulo.server.security.SecurityUtil;\nimport org.apache.accumulo.server.security.delegation.AuthenticationTokenSecretManager;\nimport org.apache.accumulo.server.tables.TableManager;\nimport org.apache.accumulo.server.tablets.UniqueNameAllocator;\nimport org.apache.hadoop.fs.Path;\nimport org.apache.hadoop.security.UserGroupInformation;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\nimport com.google.common.base.Preconditions;\n\n/**\n * Provides a server context for Accumulo server components that operate with the system credentials\n * and have access to the system files and configuration.\n */\npublic class ServerContext extends ClientContext {\n  private static final Logger log = LoggerFactory.getLogger(ServerContext.class);\n\n  private final ServerInfo info;\n  private final ServerDirs serverDirs;\n  private final Supplier<ZooPropStore> propStore;\n\n  // lazily loaded resources, only loaded when needed\n  private final Supplier<TableManager> tableManager;\n  private final Supplier<UniqueNameAllocator> nameAllocator;\n  private final Supplier<ServerConfigurationFactory> serverConfFactory;\n  private final Supplier<AuthenticationTokenSecretManager> secretManager;\n  private final Supplier<ScheduledThreadPoolExecutor> sharedScheduledThreadPool;\n  private final Supplier<AuditedSecurityOperation> securityOperation;\n  private final Supplier<CryptoServiceFactory> cryptoFactorySupplier;\n  private final Supplier<LowMemoryDetector> lowMemoryDetector;\n  private final AtomicReference<ServiceLock> serverLock = new AtomicReference<>();\n  private final Supplier<MetricsInfo> metricsInfoSupplier;\n  private final Supplier<ConditionalWriter> sharedMetadataWriter;\n  private final Supplier<ConditionalWriter> sharedUserWriter;\n\n  private final AtomicBoolean metricsInfoCreated = new AtomicBoolean(false);\n  private final AtomicBoolean sharedSchedExecutorCreated = new AtomicBoolean(false);\n  private final AtomicBoolean sharedMetadataWriterCreated = new AtomicBoolean(false);\n  private final AtomicBoolean sharedUserWriterCreated = new AtomicBoolean(false);\n\n  public ServerContext(SiteConfiguration siteConfig) {\n    this(ServerInfo.fromServerConfig(siteConfig), ResourceGroupId.DEFAULT);\n  }\n\n  public ServerContext(SiteConfiguration siteConfig, ResourceGroupId rgid) {\n    this(ServerInfo.fromServerConfig(siteConfig), rgid);\n  }\n\n  private ServerContext(ServerInfo info, ResourceGroupId rgid) {\n    super(info, info.getSiteConfiguration(), Threads.UEH);\n    this.info = info;\n    serverDirs = info.getServerDirs();\n\n    // the PropStore shouldn't close the ZooKeeper, since ServerContext is responsible for that\n    @SuppressWarnings(\"resource\")\n    var tmpPropStore = memoize(() -> ZooPropStore.initialize(getZooSession()));\n    propStore = tmpPropStore;\n\n    tableManager = memoize(() -> new TableManager(this));\n    nameAllocator = memoize(() -> new UniqueNameAllocator(this));\n    serverConfFactory =\n        memoize(() -> new ServerConfigurationFactory(this, getSiteConfiguration(), rgid));\n    secretManager = memoize(() -> new AuthenticationTokenSecretManager(getInstanceID(),\n        getConfiguration().getTimeInMillis(Property.GENERAL_DELEGATION_TOKEN_LIFETIME)));\n    cryptoFactorySupplier = memoize(() -> CryptoFactoryLoader.newInstance(getConfiguration()));\n    sharedScheduledThreadPool = memoize(() -> ThreadPools.getServerThreadPools()\n        .createGeneralScheduledExecutorService(getConfiguration()));\n    securityOperation =\n        memoize(() -> new AuditedSecurityOperation(this, SecurityOperation.getAuthorizor(this),\n            SecurityOperation.getAuthenticator(this), SecurityOperation.getPermHandler(this)));\n    lowMemoryDetector = memoize(() -> new LowMemoryDetector());\n    metricsInfoSupplier = memoize(() -> new MetricsInfoImpl(this));\n\n    sharedMetadataWriter = memoize(() -> createSharedConditionalWriter(DataLevel.METADATA));\n    sharedUserWriter = memoize(() -> createSharedConditionalWriter(DataLevel.USER));\n  }\n\n  /**\n   * Used during initialization to set the instance name and ID.\n   */\n  public static ServerContext initialize(SiteConfiguration siteConfig, String instanceName,\n      InstanceId instanceID) {\n    return new ServerContext(ServerInfo.initialize(siteConfig, instanceName, instanceID),\n        ResourceGroupId.DEFAULT);\n  }\n\n  /**\n   * Used by server-side utilities that have a client configuration. The instance name is obtained\n   * from the client configuration, and the instanceId is looked up in ZooKeeper from the name.\n   */\n  public static ServerContext withClientInfo(SiteConfiguration siteConfig, ClientInfo info) {\n    return new ServerContext(ServerInfo.fromServerAndClientConfig(siteConfig, info),\n        ResourceGroupId.DEFAULT);\n  }\n\n  /**\n   * Override properties for testing\n   */\n  public static ServerContext forTesting(SiteConfiguration siteConfig, String instanceName,\n      String zooKeepers, int zkSessionTimeOut) {\n    return new ServerContext(\n        ServerInfo.forTesting(siteConfig, instanceName, zooKeepers, zkSessionTimeOut),\n        ResourceGroupId.DEFAULT);\n  }\n\n  public SiteConfiguration getSiteConfiguration() {\n    return info.getSiteConfiguration();\n  }\n\n  @Override\n  public AccumuloConfiguration getConfiguration() {\n    return serverConfFactory.get().getResourceGroupConfiguration();\n  }\n\n  public AccumuloConfiguration getSystemConfiguration() {\n    return serverConfFactory.get().getSystemConfiguration();\n  }\n\n  public TableConfiguration getTableConfiguration(TableId id) {\n    return serverConfFactory.get().getTableConfiguration(id);\n  }\n\n  public NamespaceConfiguration getNamespaceConfiguration(NamespaceId namespaceId) {\n    return serverConfFactory.get().getNamespaceConfiguration(namespaceId);\n  }\n\n  public DefaultConfiguration getDefaultConfiguration() {\n    return DefaultConfiguration.getInstance();\n  }\n\n  public ServerDirs getServerDirs() {\n    return serverDirs;\n  }\n\n  /**\n   * A \"client-side\" assertion for servers to validate that they are logged in as the expected user,\n   * per the configuration, before performing any RPC\n   */\n  // Should be private, but package-protected so EasyMock will work\n  void enforceKerberosLogin() {\n    final AccumuloConfiguration conf = getSiteConfiguration();\n    // Unwrap _HOST into the FQDN to make the kerberos principal we'll compare against\n    final String kerberosPrincipal =\n        SecurityUtil.getServerPrincipal(conf.get(Property.GENERAL_KERBEROS_PRINCIPAL));\n    UserGroupInformation loginUser;\n    try {\n      // The system user should be logged in via keytab when the process is started, not the\n      // currentUser() like KerberosToken\n      loginUser = UserGroupInformation.getLoginUser();\n    } catch (IOException e) {\n      throw new UncheckedIOException(\"Could not get login user\", e);\n    }\n\n    checkArgument(loginUser.hasKerberosCredentials(), \"Server does not have Kerberos credentials\");\n    checkArgument(kerberosPrincipal.equals(loginUser.getUserName()),\n        \"Expected login user to be \" + kerberosPrincipal + \" but was \" + loginUser.getUserName());\n  }\n\n  public VolumeManager getVolumeManager() {\n    return info.getVolumeManager();\n  }\n\n  /**\n   * Retrieve the SSL/TLS configuration for starting up a listening service\n   */\n  public SslConnectionParams getServerSslParams() {\n    return SslConnectionParams.forServer(getConfiguration());\n  }\n\n  @Override\n  public SaslServerConnectionParams getSaslParams() {\n    AccumuloConfiguration conf = getSiteConfiguration();\n    if (!conf.getBoolean(Property.INSTANCE_RPC_SASL_ENABLED)) {\n      return null;\n    }\n    return new SaslServerConnectionParams(conf, getCredentials().getToken(), getSecretManager());\n  }\n\n  /**\n   * Determine the type of Thrift server to instantiate given the server's configuration.\n   *\n   * @return A {@link ThriftServerType} value to denote the type of Thrift server to construct\n   */\n  public ThriftServerType getThriftServerType() {\n    AccumuloConfiguration conf = getConfiguration();\n    if (conf.getBoolean(Property.INSTANCE_RPC_SSL_ENABLED)) {\n      if (conf.getBoolean(Property.INSTANCE_RPC_SASL_ENABLED)) {\n        throw new IllegalStateException(\n            \"Cannot create a Thrift server capable of both SASL and SSL\");\n      }\n\n      return ThriftServerType.SSL;\n    } else if (conf.getBoolean(Property.INSTANCE_RPC_SASL_ENABLED)) {\n      if (conf.getBoolean(Property.INSTANCE_RPC_SSL_ENABLED)) {\n        throw new IllegalStateException(\n            \"Cannot create a Thrift server capable of both SASL and SSL\");\n      }\n\n      return ThriftServerType.SASL;\n    } else {\n      // Lets us control the type of Thrift server created, primarily for benchmarking purposes\n      String serverTypeName = conf.get(Property.GENERAL_RPC_SERVER_TYPE);\n      return ThriftServerType.get(serverTypeName);\n    }\n  }\n\n  public AuthenticationTokenSecretManager getSecretManager() {\n    return secretManager.get();\n  }\n\n  public TableManager getTableManager() {\n    return tableManager.get();\n  }\n\n  public UniqueNameAllocator getUniqueNameAllocator() {\n    return nameAllocator.get();\n  }\n\n  public CryptoServiceFactory getCryptoFactory() {\n    return cryptoFactorySupplier.get();\n  }\n\n  @Override\n  public Ample getAmple() {\n    return new ServerAmpleImpl(this);\n  }\n\n  public Set<String> getBaseUris() {\n    return serverDirs.getBaseUris();\n  }\n\n  public Map<Path,Path> getVolumeReplacements() {\n    return serverDirs.getVolumeReplacements();\n  }\n\n  public Set<String> getTablesDirs() {\n    return serverDirs.getTablesDirs();\n  }\n\n  public Set<String> getRecoveryDirs() {\n    return serverDirs.getRecoveryDirs();\n  }\n\n  /**\n   * Check to see if this version of Accumulo can run against or upgrade the passed in data version.\n   */\n  public static void ensureDataVersionCompatible(int dataVersion) {\n    if (!AccumuloDataVersion.CAN_RUN.contains(dataVersion)) {\n      throw new IllegalStateException(\"This version of accumulo (\" + Constants.VERSION\n          + \") is not compatible with files stored using data version \" + dataVersion\n          + \". Please upgrade from \" + AccumuloDataVersion.oldestUpgradeableVersionName()\n          + \" or later.\");\n    }\n  }\n\n  public void waitForZookeeperAndHdfs() {\n    log.info(\"Attempting to talk to zookeeper\");\n    // Next line blocks until connection is established\n    getZooSession();\n    log.info(\"ZooKeeper connected and initialized, attempting to talk to HDFS\");\n    long sleep = 1000;\n    int unknownHostTries = 3;\n    while (true) {\n      try {\n        if (getVolumeManager().isReady()) {\n          break;\n        }\n        log.warn(\"Waiting for the NameNode to leave safemode\");\n      } catch (IOException ex) {\n        log.warn(\"Unable to connect to HDFS\", ex);\n      } catch (IllegalArgumentException e) {\n        /* Unwrap the UnknownHostException so we can deal with it directly */\n        if (e.getCause() instanceof UnknownHostException) {\n          if (unknownHostTries > 0) {\n            log.warn(\"Unable to connect to HDFS, will retry. cause: \", e.getCause());\n            /*\n             * We need to make sure our sleep period is long enough to avoid getting a cached\n             * failure of the host lookup.\n             */\n            int ttl = AddressUtil.getAddressCacheNegativeTtl((UnknownHostException) e.getCause());\n            sleep = Math.max(sleep, (ttl + 1) * 1000L);\n          } else {\n            log.error(\"Unable to connect to HDFS and exceeded the maximum number of retries.\", e);\n            throw e;\n          }\n          unknownHostTries--;\n        } else {\n          throw e;\n        }\n      }\n      log.info(\"Backing off due to failure; current sleep period is {} seconds\", sleep / 1000.);\n      sleepUninterruptibly(sleep, TimeUnit.MILLISECONDS);\n      /* Back off to give transient failures more time to clear. */\n      sleep = Math.min(MINUTES.toMillis(1), sleep * 2);\n    }\n    log.info(\"Connected to HDFS\");\n  }\n\n  /**\n   * Wait for ZK and hdfs, check data version and some properties, and start thread to monitor\n   * swappiness. Should only be called once during server start up.\n   */\n  public void init(String application) {\n    final AccumuloConfiguration conf = getConfiguration();\n\n    log.info(\"{} starting\", application);\n    log.info(\"Instance {}\", getInstanceID());\n    // It doesn't matter which Volume is used as they should all have the data version stored\n    int dataVersion = serverDirs.getAccumuloPersistentVersion(getVolumeManager().getFirst());\n    log.info(\"Data Version {}\", dataVersion);\n    waitForZookeeperAndHdfs();\n\n    ensureDataVersionCompatible(dataVersion);\n\n    TreeMap<String,String> sortedProps = new TreeMap<>();\n    for (Map.Entry<String,String> entry : conf) {\n      sortedProps.put(entry.getKey(), entry.getValue());\n    }\n\n    for (Map.Entry<String,String> entry : sortedProps.entrySet()) {\n      String key = entry.getKey();\n      log.info(\"{} = {}\", key, (Property.isSensitive(key) ? \"<hidden>\" : entry.getValue()));\n      Property prop = Property.getPropertyByKey(key);\n      if (prop != null && conf.isPropertySet(prop)) {\n        if (prop.isDeprecated()) {\n          Property replacedBy = prop.replacedBy();\n          if (replacedBy != null) {\n            log.warn(\"{} is deprecated, use {} instead.\", prop.getKey(), replacedBy.getKey());\n          } else {\n            log.warn(\"{} is deprecated\", prop.getKey());\n          }\n        }\n      }\n    }\n\n    monitorSwappiness();\n\n    // Encourage users to configure TLS\n    final String SSL = \"SSL\";\n    for (Property sslProtocolProperty : Arrays.asList(Property.RPC_SSL_CLIENT_PROTOCOL,\n        Property.RPC_SSL_ENABLED_PROTOCOLS, Property.MONITOR_SSL_INCLUDE_PROTOCOLS)) {\n      String value = conf.get(sslProtocolProperty);\n      if (value.contains(SSL)) {\n        log.warn(\"It is recommended that {} only allow TLS\", sslProtocolProperty);\n      }\n    }\n  }\n\n  private void monitorSwappiness() {\n    ScheduledFuture<?> future = getScheduledExecutor().scheduleWithFixedDelay(() -> {\n      try {\n        String procFile = \"/proc/sys/vm/swappiness\";\n        java.nio.file.Path swappiness = java.nio.file.Path.of(procFile);\n        if (Files.exists(swappiness) && Files.isReadable(swappiness)) {\n          try (InputStream is = Files.newInputStream(swappiness)) {\n            byte[] buffer = new byte[10];\n            int bytes = is.read(buffer);\n            String setting = new String(buffer, 0, bytes, UTF_8);\n            setting = setting.trim();\n            if (bytes > 0 && Integer.parseInt(setting) > 10) {\n              log.warn(\"System swappiness setting is greater than ten ({})\"\n                  + \" which can cause time-sensitive operations to be delayed.\"\n                  + \" Accumulo is time sensitive because it needs to maintain\"\n                  + \" distributed lock agreement.\", setting);\n            }\n          }\n        }\n      } catch (Exception t) {\n        log.error(\"\", t);\n      }\n    }, SECONDS.toMillis(1), MINUTES.toMillis(10), TimeUnit.MILLISECONDS);\n    ThreadPools.watchNonCriticalScheduledTask(future);\n  }\n\n  public ScheduledThreadPoolExecutor getScheduledExecutor() {\n    sharedSchedExecutorCreated.set(true);\n    return sharedScheduledThreadPool.get();\n  }\n\n  public PropStore getPropStore() {\n    return propStore.get();\n  }\n\n  @Override\n  protected long getTransportPoolMaxAgeMillis() {\n    return getClientTimeoutInMillis();\n  }\n\n  @Override\n  public synchronized ThriftTransportPool getTransportPool() {\n    return getTransportPoolImpl(true);\n  }\n\n  public AuditedSecurityOperation getSecurityOperation() {\n    return securityOperation.get();\n  }\n\n  public LowMemoryDetector getLowMemoryDetector() {\n    return lowMemoryDetector.get();\n  }\n\n  public void setServiceLock(ServiceLock lock) {\n    if (!serverLock.compareAndSet(null, lock)) {\n      throw new IllegalStateException(\"ServiceLock already set on ServerContext\");\n    }\n  }\n\n  public ServiceLock getServiceLock() {\n    return serverLock.get();\n  }\n\n  /** Intended to be called from MiniAccumuloClusterImpl only as can be restarted **/\n  public void clearServiceLock() {\n    serverLock.set(null);\n  }\n\n  public MetricsInfo getMetricsInfo() {\n    metricsInfoCreated.set(true);\n    return metricsInfoSupplier.get();\n  }\n\n  private ConditionalWriter createSharedConditionalWriter(DataLevel level) {\n    try {\n      int maxThreads =\n          getConfiguration().getCount(Property.GENERAL_AMPLE_CONDITIONAL_WRITER_THREADS_MAX);\n      var config = new ConditionalWriterConfig().setMaxWriteThreads(maxThreads);\n      String tableName = level.metaTable();\n      log.info(\"Creating shared ConditionalWriter for DataLevel {} with max threads: {}\", level,\n          maxThreads);\n      if (level == DataLevel.METADATA) {\n        sharedMetadataWriterCreated.set(true);\n      } else if (level == DataLevel.USER) {\n        sharedUserWriterCreated.set(true);\n      }\n      return createConditionalWriter(tableName, config);\n    } catch (TableNotFoundException e) {\n      throw new RuntimeException(\"Failed to create shared ConditionalWriter for level \" + level, e);\n    }\n  }\n\n  public Supplier<ConditionalWriter> getSharedMetadataWriter() {\n    return sharedMetadataWriter;\n  }\n\n  public Supplier<ConditionalWriter> getSharedUserWriter() {\n    return sharedUserWriter;\n  }\n\n  @Override\n  public void close() {\n    Preconditions.checkState(!isClosed(), \"ServerContext.close was already called.\");\n    if (metricsInfoCreated.get()) {\n      getMetricsInfo().close();\n    }\n    if (sharedSchedExecutorCreated.get()) {\n      log.debug(\"Shutting down shared executor pool\");\n      getScheduledExecutor().shutdownNow();\n    }\n    if (sharedMetadataWriterCreated.get()) {\n      log.debug(\"Shutting down shared metadata conditional writer\");\n      try {\n        ConditionalWriter writer = sharedMetadataWriter.get();\n        if (writer != null) {\n          writer.close();\n        }\n      } catch (Exception e) {\n        log.warn(\"Error closing shared metadata ConditionalWriter\", e);\n      }\n    }\n    if (sharedUserWriterCreated.get()) {\n      log.debug(\"Shutting down shared user conditional writer\");\n      try {\n        ConditionalWriter writer = sharedUserWriter.get();\n        if (writer != null) {\n          writer.close();\n        }\n      } catch (Exception e) {\n        log.warn(\"Error closing shared user ConditionalWriter\", e);\n      }\n    }\n    super.close();\n  }\n}\n",
+  "observed_external_calls": {
+    "AccumuloDataVersion": [
+      "oldestUpgradeableVersionName"
+    ],
+    "AccumuloDataVersion.CAN_RUN": [
+      "contains"
+    ],
+    "AddressUtil": [
+      "getAddressCacheNegativeTtl"
+    ],
+    "Arrays": [
+      "asList"
+    ],
+    "CryptoFactoryLoader": [
+      "newInstance"
+    ],
+    "DefaultConfiguration": [
+      "getInstance"
+    ],
+    "Files": [
+      "exists",
+      "isReadable",
+      "newInputStream"
+    ],
+    "Integer": [
+      "parseInt"
+    ],
+    "LoggerFactory": [
+      "getLogger"
+    ],
+    "MINUTES": [
+      "toMillis"
+    ],
+    "Math": [
+      "max",
+      "min"
+    ],
+    "Preconditions": [
+      "checkState"
+    ],
+    "Property": [
+      "getPropertyByKey",
+      "isSensitive"
+    ],
+    "SECONDS": [
+      "toMillis"
+    ],
+    "SecurityOperation": [
+      "getAuthenticator",
+      "getAuthorizor",
+      "getPermHandler"
+    ],
+    "SecurityUtil": [
+      "getServerPrincipal"
+    ],
+    "ServerInfo": [
+      "forTesting",
+      "fromServerAndClientConfig",
+      "fromServerConfig",
+      "initialize"
+    ],
+    "SslConnectionParams": [
+      "forServer"
+    ],
+    "ThreadPools": [
+      "getServerThreadPools",
+      "watchNonCriticalScheduledTask"
+    ],
+    "ThriftServerType": [
+      "get"
+    ],
+    "UserGroupInformation": [
+      "getLoginUser"
+    ],
+    "ZooPropStore": [
+      "initialize"
+    ]
+  }
+}
+
+## OUTPUT
+
+The expected output format and constraints for that output are presented below.
+
+```json
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "<class FQN from input>",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "...",
+      "files": ["..."],
+      "ops": [
+        {
+          "op": "<allowed op>",
+          "inputs": ["..."],
+          "outputs": ["..."],
+          "details": "...",
+          "risk": "low|medium|high"
+        }
+      ]
+    }
+  ]
+}
+```
+
+For each planned block, use `goal` and `details` to explain the cohesive responsibility being redistributed, the **specific outgoing dependency classes expected to disappear from the target**, any newly introduced target dependencies, and why the expected **net Fan-Out change** is positive. Make these claims only when supported by the input. Do not add new JSON fields.
+
+## CONSTRAINTS
+
+- Reference only packages, classes, methods, and fields present in the input, except for names of new classes or packages explicitly created by the plan.
+- Each block must be small and independently compilable.
+- New classes must be placed in the same package as the target class unless the input clearly justifies otherwise.
+- The target class must retain its original fully qualified name (FQN) throughout the refactoring; MOVE_CLASS may be applied to other classes, but not to the target class.
+- Preserve behavior and required public interfaces. Do not change tests merely to conceal regressions.
+- Do not propose a package reorganization as the primary strategy for reducing class-level HM.
+- Never assert that HM has been removed solely from a predicted Fan-Out change; the actual result must be measured after the refactoring.

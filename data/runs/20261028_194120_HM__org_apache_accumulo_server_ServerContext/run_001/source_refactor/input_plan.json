@@ -1,0 +1,54 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.apache.accumulo.server.ServerContext",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive system-swappiness monitoring responsibility from ServerContext while preserving the existing init behavior and public API.",
+      "files": [
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+        "server/base/src/main/java/org/apache/accumulo/server/ServerRuntimeMonitor.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.apache.accumulo.server.ServerContext.monitorSwappiness()",
+            "org.apache.accumulo.server.ServerContext"
+          ],
+          "outputs": [
+            "org.apache.accumulo.server.ServerRuntimeMonitor"
+          ],
+          "details": "Create ServerRuntimeMonitor in the same package and move the swappiness-monitoring implementation currently contained in monitorSwappiness() into a static method that accepts the ScheduledThreadPoolExecutor obtained from ServerContext. Preserve the scheduling delays, file path, parsing, logging, exception handling, and ThreadPools.watchNonCriticalScheduledTask behavior. The extracted class should use the existing dependencies required by that implementation, without requiring ServerContext as a field or method parameter.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.apache.accumulo.server.ServerContext.init(java.lang.String)",
+            "org.apache.accumulo.server.ServerContext.monitorSwappiness()"
+          ],
+          "outputs": [
+            "org.apache.accumulo.server.ServerRuntimeMonitor"
+          ],
+          "details": "Replace the call to the private monitorSwappiness() method in ServerContext.init(java.lang.String) with a call to ServerRuntimeMonitor's extracted monitoring method, passing getScheduledExecutor(). Remove the now-unused monitorSwappiness() method from ServerContext. This removes ServerContext's direct references to Files, InputStream, ScheduledFuture, and the UTF_8 StandardCharsets member used only by swappiness monitoring. ServerContext gains one new outgoing dependency, ServerRuntimeMonitor, for a net reduction of at least three distinct outgoing dependencies. Existing references to ThreadPools, TimeUnit, IOException, and other classes used elsewhere in ServerContext remain and are not counted as removed.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+            "server/base/src/main/java/org/apache/accumulo/server/ServerRuntimeMonitor.java"
+          ],
+          "outputs": [
+            "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+            "server/base/src/main/java/org/apache/accumulo/server/ServerRuntimeMonitor.java"
+          ],
+          "details": "Remove from ServerContext the imports or static imports used only by swappiness monitoring: java.io.InputStream, java.nio.file.Files, java.nio.charset.StandardCharsets.UTF_8, and java.util.concurrent.ScheduledFuture. Add the corresponding imports to ServerRuntimeMonitor, together with any existing imports needed by the moved implementation. Do not remove imports still used by other ServerContext members.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

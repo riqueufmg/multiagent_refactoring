@@ -1,0 +1,112 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract request input parsing from RouteRequest while retaining the existing public setter signatures and behavior.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputParser.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestInputParser"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestInputParser"
+          ],
+          "details": "Extract the parsing logic used by setFromString(String), setToString(String), and setDateTime(String, String, ZoneId) into the new same-package helper. Keep the existing RouteRequest methods as compatibility wrappers that delegate to the helper, preserving their public signatures and behavior. After extraction, RouteRequest no longer directly references LocationStringParser or DateUtils; the new helper references those classes instead. RouteRequest gains one dependency on RouteRequestInputParser, so eliminating two direct dependencies introduces an estimated net Fan-Out reduction of one.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputParser.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputParser.java"
+          ],
+          "details": "Remove DateUtils and LocationStringParser imports from RouteRequest when no direct references remain, and add the required imports to RouteRequestInputParser. Keep ZoneId, Instant, and GenericLocation imports in RouteRequest because they remain in public method signatures or fields.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Move path-comparator selection out of RouteRequest without changing getPathComparator(boolean)'s public API.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestPathComparator"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestPathComparator"
+          ],
+          "details": "Extract the implementation of getPathComparator(boolean), including the selection between DurationComparator and PathComparator, into the new same-package helper. Retain getPathComparator(boolean) in RouteRequest as a compatibility wrapper and continue returning Comparator<GraphPath>. RouteRequest will no longer directly reference DurationComparator or PathComparator, while gaining one dependency on RouteRequestPathComparator. Removing two direct dependencies and adding one produces an estimated net Fan-Out reduction of one.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java"
+          ],
+          "details": "Remove DurationComparator and PathComparator imports from RouteRequest after delegation is established, and add them to RouteRequestPathComparator. Keep Comparator and GraphPath references in RouteRequest because they remain part of the public method signature.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "goal": "Extract the close-to-start-or-end geometry calculation and its envelope cache from RouteRequest.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestProximity.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestProximity"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestProximity"
+          ],
+          "details": "Move the fromEnvelope and toEnvelope fields, the getEnvelope(Coordinate, int) helper, and the isCloseToStartOrEnd(Vertex) geometry logic into the new same-package helper. Keep isCloseToStartOrEnd(Vertex) on RouteRequest as a compatibility wrapper delegating with the existing from and to locations. This removes RouteRequest's direct references to Coordinate, Envelope, and SphericalDistanceLibrary; those references remain in RouteRequestProximity. RouteRequest gains one dependency on RouteRequestProximity, giving an estimated net Fan-Out reduction of two.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestProximity.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestProximity.java"
+          ],
+          "details": "Remove Coordinate, Envelope, and SphericalDistanceLibrary imports from RouteRequest once the fields and geometry calculation are moved, and add them to RouteRequestProximity. Retain GenericLocation and Vertex references in RouteRequest because they are still used by the wrapper and existing public API.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

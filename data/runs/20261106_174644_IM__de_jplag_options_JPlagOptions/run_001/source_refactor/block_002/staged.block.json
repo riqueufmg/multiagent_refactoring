@@ -1,0 +1,56 @@
+{
+  "id": 2,
+  "goal": "Extract the cohesive submission and exclusion configuration API from JPlagOptions to further reduce its public API size and separate input-path concerns from comparison concerns.",
+  "files": [
+    "core/src/main/java/de/jplag/options/JPlagOptions.java",
+    "core/src/main/java/de/jplag/options/JPlagSubmissionOptions.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "de.jplag.options.JPlagOptions"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagSubmissionOptions"
+      ],
+      "details": "Extract submissionDirectories, oldSubmissionDirectories, baseCodeSubmissionName, exclusionFileName, excludedFiles, subdirectoryName, getBaseCodeSubmissionName(), getExcludedFiles(), getExclusionFileName(), getSubmissionDirectories(), getOldSubmissionDirectories(), getSubdirectoryName(), hasBaseCode(), setBaseCodeSubmissionName(String), setExcludedFiles(Set<String>), setExclusionFileName(String), setSubmissionDirectories(List<String>), setOldSubmissionDirectories(List<String>), and setSubdirectoryName(String) into JPlagSubmissionOptions in the same package. Preserve the existing null, empty-string, and file-separator handling behavior.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "de.jplag.options.JPlagOptions.getBaseCodeSubmissionName()",
+        "de.jplag.options.JPlagOptions.getExcludedFiles()",
+        "de.jplag.options.JPlagOptions.getExclusionFileName()",
+        "de.jplag.options.JPlagOptions.getSubmissionDirectories()",
+        "de.jplag.options.JPlagOptions.getOldSubmissionDirectories()",
+        "de.jplag.options.JPlagOptions.getSubdirectoryName()",
+        "de.jplag.options.JPlagOptions.hasBaseCode()",
+        "de.jplag.options.JPlagOptions.setBaseCodeSubmissionName(String)",
+        "de.jplag.options.JPlagOptions.setExcludedFiles(Set<String>)",
+        "de.jplag.options.JPlagOptions.setExclusionFileName(String)",
+        "de.jplag.options.JPlagOptions.setSubmissionDirectories(List<String>)",
+        "de.jplag.options.JPlagOptions.setOldSubmissionDirectories(List<String>)",
+        "de.jplag.options.JPlagOptions.setSubdirectoryName(String)"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagSubmissionOptions.getBaseCodeSubmissionName()",
+        "de.jplag.options.JPlagSubmissionOptions.getExcludedFiles()",
+        "de.jplag.options.JPlagSubmissionOptions.getExclusionFileName()",
+        "de.jplag.options.JPlagSubmissionOptions.getSubmissionDirectories()",
+        "de.jplag.options.JPlagSubmissionOptions.getOldSubmissionDirectories()",
+        "de.jplag.options.JPlagSubmissionOptions.getSubdirectoryName()",
+        "de.jplag.options.JPlagSubmissionOptions.hasBaseCode()",
+        "de.jplag.options.JPlagSubmissionOptions.setBaseCodeSubmissionName(String)",
+        "de.jplag.options.JPlagSubmissionOptions.setExcludedFiles(Set<String>)",
+        "de.jplag.options.JPlagSubmissionOptions.setExclusionFileName(String)",
+        "de.jplag.options.JPlagSubmissionOptions.setSubmissionDirectories(List<String>)",
+        "de.jplag.options.JPlagSubmissionOptions.setOldSubmissionDirectories(List<String>)",
+        "de.jplag.options.JPlagSubmissionOptions.setSubdirectoryName(String)"
+      ],
+      "details": "Update callers to use JPlagSubmissionOptions for submission directories, old submission directories, base-code selection, excluded files, exclusion file name, and subdirectory selection. Preserve the existing JPlagOptions construction flow and compatibility behavior while delegating or redirecting access to the extracted object.",
+      "risk": "medium"
+    }
+  ]
+}

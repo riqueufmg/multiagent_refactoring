@@ -1,0 +1,56 @@
+{
+  "id": 2,
+  "goal": "Extract compaction plugin configuration, selector execution, and compaction helper coordination into a cohesive class, reducing the general-purpose method count and implementation complexity of CompactableUtils.",
+  "files": [
+    "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java",
+    "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableCompactionUtils.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableUtils",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils"
+      ],
+      "outputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.computeOverrides(org.apache.accumulo.tserver.tablet.Tablet,java.util.Set)",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.computeOverrides(org.apache.accumulo.tserver.tablet.Tablet,java.util.Set,org.apache.accumulo.core.client.admin.PluginConfig)",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.newInstance(org.apache.accumulo.core.conf.AccumuloConfiguration,java.lang.String,java.lang.Class)",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.selectFiles(org.apache.accumulo.tserver.tablet.Tablet,java.util.SortedMap,org.apache.accumulo.core.client.admin.PluginConfig)",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.getHelper(org.apache.accumulo.core.spi.compaction.CompactionKind,org.apache.accumulo.tserver.tablet.Tablet,java.lang.Long,org.apache.accumulo.core.client.admin.CompactionConfig)",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.getOverrides(org.apache.accumulo.core.spi.compaction.CompactionKind,org.apache.accumulo.tserver.tablet.Tablet,org.apache.accumulo.tserver.tablet.CompactableImpl.CompactionHelper,java.util.Set)",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.TableCompactionHelper",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.UserCompactionHelper"
+      ],
+      "details": "Move the compaction selector and configurer methods, newInstance, getHelper, getOverrides, and both private CompactionHelper implementations together. Preserve package visibility for package-private methods and preserve the existing nested helper behavior. Update references from CompactableUtils.newInstance, CompactableUtils.selectFiles, and computeOverrides to the extracted class within the moved implementation.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableCompactionUtils.java",
+        "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java"
+      ],
+      "outputs": [],
+      "details": "Add all imports required by the extracted compaction plugin implementation, including plugin, compaction, summary, configuration, metadata, and Hadoop types. Remove imports from CompactableUtils that are no longer referenced after extraction.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableUtils.getHelper()",
+        "org.apache.accumulo.tserver.tablet.CompactableUtils.getOverrides()",
+        "org.apache.accumulo.tserver.tablet.CompactableUtils.selectFiles()",
+        "org.apache.accumulo.tserver.tablet.CompactableUtils.computeOverrides()"
+      ],
+      "outputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.getHelper()",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.getOverrides()",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.selectFiles()",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils.computeOverrides()"
+      ],
+      "details": "Update CompactableImpl and any other callers to use CompactableCompactionUtils. In CompactableUtils.compact, replace the call to getOverrides with CompactableCompactionUtils.getOverrides. Preserve method signatures and package-level accessibility.",
+      "risk": "medium"
+    }
+  ]
+}

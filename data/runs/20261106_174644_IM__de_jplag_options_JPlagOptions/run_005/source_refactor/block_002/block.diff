@@ -1,0 +1,171 @@
+commit bfc15245f23c69073fcc936bde8831bc8fa18f0c
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 18:05:04 2026 -0400
+
+    source_refactor: apply block 2
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagLanguageOptionAccess.java b/core/src/main/java/de/jplag/options/JPlagLanguageOptionAccess.java
+new file mode 100644
+index 000000000..5979e9267
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagLanguageOptionAccess.java
+@@ -0,0 +1,44 @@
++package de.jplag.options;
++
++import de.jplag.Language;
++
++public class JPlagLanguageOptionAccess {
++
++    private final JPlagLanguageOptions languageOptions;
++
++    public JPlagLanguageOptionAccess(JPlagLanguageOptions languageOptions) {
++        this.languageOptions = languageOptions;
++    }
++
++    public String[] getFileSuffixes() {
++        return languageOptions.getFileSuffixes();
++    }
++
++    public String getLanguageIdentifier() {
++        return languageOptions.getLanguageIdentifier();
++    }
++
++    public Language getLanguage() {
++        return languageOptions.getLanguage();
++    }
++
++    public Verbosity getVerbosity() {
++        return languageOptions.getVerbosity();
++    }
++
++    public void setFileSuffixes(String[] fileSuffixes) {
++        languageOptions.setFileSuffixes(fileSuffixes);
++    }
++
++    public void setLanguage(Language language) {
++        languageOptions.setLanguage(language);
++    }
++
++    public void setLanguageDefaults(Language language) {
++        languageOptions.setLanguageDefaults(language);
++    }
++
++    public void setVerbosity(Verbosity verbosity) {
++        languageOptions.setVerbosity(verbosity);
++    }
++}
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index 5ba57fb6c..6f0782656 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -21,6 +21,7 @@ public class JPlagOptions {
+     private final JPlagSubmissionOptions submissionOptions;
+     private final JPlagSubmissionOptionAccess submissionOptionAccess;
+     private final JPlagLanguageOptions languageOptions;
++    private final JPlagLanguageOptionAccess languageOptionAccess;
+     private final JPlagClusteringOptions clusteringOptions = new JPlagClusteringOptions();
+ 
+     /**
+@@ -32,6 +33,7 @@ public class JPlagOptions {
+         this.submissionOptions = new JPlagSubmissionOptions(submissionDirectories, oldSubmissionDirectories);
+         this.submissionOptionAccess = new JPlagSubmissionOptionAccess(submissionOptions);
+         this.languageOptions = new JPlagLanguageOptions(languageIdentifier, comparisonOptions);
++        this.languageOptionAccess = new JPlagLanguageOptionAccess(languageOptions);
+     }
+ 
+     public JPlagComparisonOptions getComparisonOptions() {
+@@ -50,20 +52,28 @@ public class JPlagOptions {
+         return languageOptions;
+     }
+ 
+-    public ComparisonMode getComparisonMode() {
+-        return comparisonOptions.getComparisonMode();
++    public JPlagLanguageOptionAccess getLanguageOptionAccess() {
++        return languageOptionAccess;
+     }
+ 
+     public String[] getFileSuffixes() {
+-        return languageOptions.getFileSuffixes();
++        return languageOptionAccess.getFileSuffixes();
+     }
+ 
+     public String getLanguageIdentifier() {
+-        return languageOptions.getLanguageIdentifier();
++        return languageOptionAccess.getLanguageIdentifier();
+     }
+ 
+     public Language getLanguage() {
+-        return languageOptions.getLanguage();
++        return languageOptionAccess.getLanguage();
++    }
++
++    public Verbosity getVerbosity() {
++        return languageOptionAccess.getVerbosity();
++    }
++
++    public ComparisonMode getComparisonMode() {
++        return comparisonOptions.getComparisonMode();
+     }
+ 
+     public int getMaximumNumberOfComparisons() {
+@@ -82,10 +92,6 @@ public class JPlagOptions {
+         return comparisonOptions.getSimilarityThreshold();
+     }
+ 
+-    public Verbosity getVerbosity() {
+-        return languageOptions.getVerbosity();
+-    }
+-
+     public boolean isDebugParser() {
+         return comparisonOptions.isDebugParser();
+     }
+@@ -146,24 +152,28 @@ public class JPlagOptions {
+         submissionOptionAccess.setSubdirectoryName(subdirectoryName);
+     }
+ 
+-    public void setComparisonMode(ComparisonMode comparisonMode) {
+-        comparisonOptions.setComparisonMode(comparisonMode);
++    public void setFileSuffixes(String[] fileSuffixes) {
++        languageOptionAccess.setFileSuffixes(fileSuffixes);
+     }
+ 
+-    public void setDebugParser(boolean debugParser) {
+-        comparisonOptions.setDebugParser(debugParser);
++    public void setLanguage(Language language) {
++        languageOptionAccess.setLanguage(language);
+     }
+ 
+-    public void setFileSuffixes(String[] fileSuffixes) {
+-        languageOptions.setFileSuffixes(fileSuffixes);
++    public void setLanguageDefaults(Language language) {
++        languageOptionAccess.setLanguageDefaults(language);
+     }
+ 
+-    public void setLanguage(Language language) {
+-        languageOptions.setLanguage(language);
++    public void setVerbosity(Verbosity verbosity) {
++        languageOptionAccess.setVerbosity(verbosity);
+     }
+ 
+-    public void setLanguageDefaults(Language language) {
+-        languageOptions.setLanguageDefaults(language);
++    public void setComparisonMode(ComparisonMode comparisonMode) {
++        comparisonOptions.setComparisonMode(comparisonMode);
++    }
++
++    public void setDebugParser(boolean debugParser) {
++        comparisonOptions.setDebugParser(debugParser);
+     }
+ 
+     public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
+@@ -182,10 +192,6 @@ public class JPlagOptions {
+         comparisonOptions.setSimilarityThreshold(similarityThreshold);
+     }
+ 
+-    public void setVerbosity(Verbosity verbosity) {
+-        languageOptions.setVerbosity(verbosity);
+-    }
+-
+     public void setClusteringOptions(ClusteringOptions clusteringOptions) {
+         this.clusteringOptions.setClusteringOptions(clusteringOptions);
+     }

@@ -1,0 +1,28 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive server-startup and connectivity-checking responsibility while preserving ServerContext's existing public and package-visible methods through delegation.",
+  "files": [
+    "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+    "server/base/src/main/java/org/apache/accumulo/server/ServerContextStartupSupport.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.accumulo.server.ServerContext",
+        "org.apache.accumulo.server.ServerContextStartupSupport",
+        "org.apache.accumulo.server.ServerContext.enforceKerberosLogin()",
+        "org.apache.accumulo.server.ServerContext.waitForZookeeperAndHdfs()",
+        "org.apache.accumulo.server.ServerContext.init(java.lang.String)"
+      ],
+      "outputs": [
+        "org.apache.accumulo.server.ServerContextStartupSupport",
+        "org.apache.accumulo.server.ServerContext.enforceKerberosLogin()",
+        "org.apache.accumulo.server.ServerContext.waitForZookeeperAndHdfs()",
+        "org.apache.accumulo.server.ServerContext.init(java.lang.String)"
+      ],
+      "details": "Create ServerContextStartupSupport in the same package, holding a reference to ServerContext and containing the implementation of enforceKerberosLogin(), waitForZookeeperAndHdfs(), and init(String). Keep the existing ServerContext methods and delegate them to the extracted support object so public and package-visible compatibility is preserved. The extracted implementation should continue to call ServerContext.getSiteConfiguration(), getVolumeManager(), getZooSession(), getScheduledExecutor(), getConfiguration(), getInstanceID(), and the existing static ServerContext.ensureDataVersionCompatible(int) rather than duplicating state. After extraction, ServerContext no longer directly references SecurityUtil, UserGroupInformation, AddressUtil, ServerRuntimeMonitor, Arrays, UnknownHostException, IOException, UncheckedIOException, Math, MINUTES, TimeUnit, or sleepUninterruptibly; those references remain only in ServerContextStartupSupport. ServerContext gains one new outgoing dependency, ServerContextStartupSupport, while eliminating these direct dependencies, for a positive net Fan-Out reduction. Remove only imports that become unused; retain dependencies still referenced elsewhere, including Property, ServerInfo, ServerConfigurationFactory, and the other existing ServerContext collaborators.",
+      "risk": "medium"
+    }
+  ]
+}

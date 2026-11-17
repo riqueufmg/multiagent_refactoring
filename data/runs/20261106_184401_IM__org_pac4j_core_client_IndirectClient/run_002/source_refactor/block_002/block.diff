@@ -1,0 +1,178 @@
+commit 55e10f986a426b438455ffeaf16075e484d9ce50
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 18:53:26 2026 -0400
+
+    source_refactor: apply block 2
+
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
+index 571f8a4b3..79adbdf2b 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
+@@ -30,10 +30,7 @@ import static org.pac4j.core.util.CommonHelper.*;
+  */
+ public abstract class IndirectClient extends BaseClient {
+ 
+-    public static final String ATTEMPTED_AUTHENTICATION_SUFFIX = "$attemptedAuthentication";
+-    private static final String STATE_SESSION_PARAMETER = "$stateSessionParameter";
+-    private static final String NONCE_SESSION_PARAMETER = "$nonceSessionParameter";
+-    private static final String CODE_VERIFIER_SESSION_PARAMETER = "$codeVerifierSessionParameter";
++    public static final String ATTEMPTED_AUTHENTICATION_SUFFIX = IndirectClientAuthenticationState.ATTEMPTED_AUTHENTICATION_SUFFIX;
+ 
+     protected String callbackUrl;
+ 
+@@ -43,7 +40,7 @@ public abstract class IndirectClient extends BaseClient {
+ 
+     private final IndirectClientActionConfiguration actionConfiguration = new IndirectClientActionConfiguration();
+ 
+-    private boolean checkAuthenticationAttempt = true;
++    private final IndirectClientAuthenticationState authenticationState = new IndirectClientAuthenticationState(this);
+ 
+     @Override
+     protected void beforeInternalInit(final boolean forceReinit) {
+@@ -92,10 +89,9 @@ public abstract class IndirectClient extends BaseClient {
+             throw httpAction;
+         }
+         // authentication has already been tried -> unauthorized
+-        final var attemptedAuth = sessionStore.get(context, getName() + ATTEMPTED_AUTHENTICATION_SUFFIX);
+-        if (attemptedAuth.isPresent() && !Pac4jConstants.EMPTY_STRING.equals(attemptedAuth.get())) {
++        if (authenticationState.isAuthenticationAttempted(context, sessionStore)) {
+             logger.debug("authentication already attempted -> 401");
+-            cleanAttemptedAuthentication(context, sessionStore);
++            authenticationState.cleanAttemptedAuthentication(context, sessionStore);
+             cleanRequestedUrl(context, sessionStore);
+             throw HttpActionHelper.buildUnauthenticatedAction(context);
+         }
+@@ -108,18 +104,6 @@ public abstract class IndirectClient extends BaseClient {
+         sessionStore.set(context, Pac4jConstants.REQUESTED_URL, null);
+     }
+ 
+-    private void cleanAttemptedAuthentication(final WebContext context, final SessionStore sessionStore) {
+-        logger.debug("clean authentication attempt from session");
+-        sessionStore.set(context, getName() + ATTEMPTED_AUTHENTICATION_SUFFIX, null);
+-    }
+-
+-    private void saveAttemptedAuthentication(final WebContext context, final SessionStore sessionStore) {
+-        if (checkAuthenticationAttempt) {
+-            logger.debug("save authentication attempt in session");
+-            sessionStore.set(context, getName() + ATTEMPTED_AUTHENTICATION_SUFFIX, "true");
+-        }
+-    }
+-
+     /**
+      * <p>Get the credentials from the web context. In some cases, a {@link HttpAction} may be thrown:</p>
+      * <ul>
+@@ -139,9 +123,9 @@ public abstract class IndirectClient extends BaseClient {
+         // no credentials and no profile returned -> save this authentication has already been tried and failed
+         if (!optCredentials.isPresent() && getProfileFactoryWhenNotAuthenticated() == null) {
+             logger.debug("no credentials and profile returned -> remember the authentication attempt");
+-            saveAttemptedAuthentication(context, sessionStore);
++            authenticationState.saveAttemptedAuthentication(context, sessionStore);
+         } else {
+-            cleanAttemptedAuthentication(context, sessionStore);
++            authenticationState.cleanAttemptedAuthentication(context, sessionStore);
+         }
+         return optCredentials;
+     }
+@@ -213,23 +197,23 @@ public abstract class IndirectClient extends BaseClient {
+     }
+ 
+     public String getStateSessionAttributeName() {
+-        return getName() + STATE_SESSION_PARAMETER;
++        return authenticationState.getStateSessionAttributeName();
+     }
+ 
+     public String getNonceSessionAttributeName() {
+-        return getName() + NONCE_SESSION_PARAMETER;
++        return authenticationState.getNonceSessionAttributeName();
+     }
+ 
+     public String getCodeVerifierSessionAttributeName() {
+-        return getName() + CODE_VERIFIER_SESSION_PARAMETER;
++        return authenticationState.getCodeVerifierSessionAttributeName();
+     }
+ 
+     public boolean isCheckAuthenticationAttempt() {
+-        return checkAuthenticationAttempt;
++        return authenticationState.isCheckAuthenticationAttempt();
+     }
+ 
+     public void setCheckAuthenticationAttempt(final boolean checkAuthenticationAttempt) {
+-        this.checkAuthenticationAttempt = checkAuthenticationAttempt;
++        authenticationState.setCheckAuthenticationAttempt(checkAuthenticationAttempt);
+     }
+ 
+     @Override
+@@ -239,6 +223,6 @@ public abstract class IndirectClient extends BaseClient {
+                 this.getAjaxRequestResolver(), "redirectionActionBuilder", this.getRedirectionActionBuilder(), "credentialsExtractor",
+                 getCredentialsExtractor(), "authenticator", getAuthenticator(), "profileCreator", getProfileCreator(),
+                 "logoutActionBuilder", this.getLogoutActionBuilder(), "authorizationGenerators", getAuthorizationGenerators(),
+-                "checkAuthenticationAttempt", checkAuthenticationAttempt);
++                "checkAuthenticationAttempt", isCheckAuthenticationAttempt());
+     }
+ }
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientAuthenticationState.java b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientAuthenticationState.java
+new file mode 100644
+index 000000000..19442431f
+--- /dev/null
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientAuthenticationState.java
+@@ -0,0 +1,60 @@
++package org.pac4j.core.client;
++
++import org.pac4j.core.context.WebContext;
++import org.pac4j.core.context.session.SessionStore;
++import org.pac4j.core.util.Pac4jConstants;
++
++/**
++ * Authentication-attempt state and session attribute naming for an indirect client.
++ */
++public class IndirectClientAuthenticationState {
++
++    public static final String ATTEMPTED_AUTHENTICATION_SUFFIX = "$attemptedAuthentication";
++    private static final String STATE_SESSION_PARAMETER = "$stateSessionParameter";
++    private static final String NONCE_SESSION_PARAMETER = "$nonceSessionParameter";
++    private static final String CODE_VERIFIER_SESSION_PARAMETER = "$codeVerifierSessionParameter";
++
++    private final IndirectClient client;
++    private boolean checkAuthenticationAttempt = true;
++
++    public IndirectClientAuthenticationState(final IndirectClient client) {
++        this.client = client;
++    }
++
++    public String getStateSessionAttributeName() {
++        return client.getName() + STATE_SESSION_PARAMETER;
++    }
++
++    public String getNonceSessionAttributeName() {
++        return client.getName() + NONCE_SESSION_PARAMETER;
++    }
++
++    public String getCodeVerifierSessionAttributeName() {
++        return client.getName() + CODE_VERIFIER_SESSION_PARAMETER;
++    }
++
++    public boolean isCheckAuthenticationAttempt() {
++        return checkAuthenticationAttempt;
++    }
++
++    public void setCheckAuthenticationAttempt(final boolean checkAuthenticationAttempt) {
++        this.checkAuthenticationAttempt = checkAuthenticationAttempt;
++    }
++
++    public boolean isAuthenticationAttempted(final WebContext context, final SessionStore sessionStore) {
++        final var attemptedAuth = sessionStore.get(context, client.getName() + ATTEMPTED_AUTHENTICATION_SUFFIX);
++        return attemptedAuth.isPresent() && !Pac4jConstants.EMPTY_STRING.equals(attemptedAuth.get());
++    }
++
++    public void saveAttemptedAuthentication(final WebContext context, final SessionStore sessionStore) {
++        if (checkAuthenticationAttempt) {
++            client.logger.debug("save authentication attempt in session");
++            sessionStore.set(context, client.getName() + ATTEMPTED_AUTHENTICATION_SUFFIX, "true");
++        }
++    }
++
++    public void cleanAttemptedAuthentication(final WebContext context, final SessionStore sessionStore) {
++        client.logger.debug("clean authentication attempt from session");
++        sessionStore.set(context, client.getName() + ATTEMPTED_AUTHENTICATION_SUFFIX, null);
++    }
++}

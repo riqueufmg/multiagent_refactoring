@@ -1,0 +1,79 @@
+{
+  "id": 1,
+  "goal": "Extract timetable-stop lookup and dated-service-journey lookup responsibilities so RoutingService no longer directly depends on StopTimesHelper and DatedServiceJourneyHelper. Preserve the per-request TimetableSnapshot caching behavior in the extracted class.",
+  "files": [
+    "src/main/java/org/opentripplanner/routing/RoutingService.java",
+    "src/main/java/org/opentripplanner/routing/RoutingServiceTimetableHelper.java",
+    "src/test/java/org/opentripplanner/routing/algorithm/mapping/SnapshotTestBase.java",
+    "src/test/java/org/opentripplanner/routing/graphfinder/StreetGraphFinderTest.java",
+    "src/test/java/org/opentripplanner/routing/stoptimes/AlternativeLegsTest.java",
+    "src/test/java/org/opentripplanner/updater/GtfsRealtimeFuzzyTripMatcherTest.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.opentripplanner.routing.RoutingService",
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper"
+      ],
+      "outputs": [
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper"
+      ],
+      "details": "Create RoutingServiceTimetableHelper in the same package. Move the cohesive timetable and dated-service-journey methods stopTimesForStop(StopLocation, long, int, int, ArrivalDeparture, boolean), getStopTimesForStop(StopLocation, ServiceDate, ArrivalDeparture), stopTimesForPatternAtStop(StopLocation, TripPattern, long, int, int, ArrivalDeparture), getTimetableForTripPattern(TripPattern, ServiceDate), getTripOnServiceDateForTripAndDay(FeedScopedId, ServiceDate), and getTripOnServiceDateById(FeedScopedId). Move lazyGetTimeTableSnapShot() with the timetableSnapshot field into the new class so the extracted stop-time methods retain the original request-scoped snapshot behavior. Give the new class a RoutingService reference for the helper calls that require the service facade.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.opentripplanner.routing.RoutingService.stopTimesForStop(StopLocation, long, int, int, ArrivalDeparture, boolean)",
+        "org.opentripplanner.routing.RoutingService.getStopTimesForStop(StopLocation, ServiceDate, ArrivalDeparture)",
+        "org.opentripplanner.routing.RoutingService.stopTimesForPatternAtStop(StopLocation, TripPattern, long, int, int, ArrivalDeparture)",
+        "org.opentripplanner.routing.RoutingService.getTimetableForTripPattern(TripPattern, ServiceDate)",
+        "org.opentripplanner.routing.RoutingService.getTripOnServiceDateForTripAndDay(FeedScopedId, ServiceDate)",
+        "org.opentripplanner.routing.RoutingService.getTripOnServiceDateById(FeedScopedId)"
+      ],
+      "outputs": [
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper.stopTimesForStop(StopLocation, long, int, int, ArrivalDeparture, boolean)",
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper.getStopTimesForStop(StopLocation, ServiceDate, ArrivalDeparture)",
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper.stopTimesForPatternAtStop(StopLocation, TripPattern, long, int, int, ArrivalDeparture)",
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper.getTimetableForTripPattern(TripPattern, ServiceDate)",
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper.getTripOnServiceDateForTripAndDay(FeedScopedId, ServiceDate)",
+        "org.opentripplanner.routing.RoutingServiceTimetableHelper.getTripOnServiceDateById(FeedScopedId)"
+      ],
+      "details": "Add a RoutingServiceTimetableHelper field initialized from the existing RoutingService instance. Keep the original public RoutingService methods as delegating compatibility methods, forwarding to the corresponding helper methods. Remove the moved timetableSnapshot field and lazyGetTimeTableSnapShot() from RoutingService after all internal references are redirected.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "src/main/java/org/opentripplanner/routing/RoutingService.java",
+        "src/main/java/org/opentripplanner/routing/RoutingServiceTimetableHelper.java"
+      ],
+      "outputs": [
+        "src/main/java/org/opentripplanner/routing/RoutingService.java",
+        "src/main/java/org/opentripplanner/routing/RoutingServiceTimetableHelper.java"
+      ],
+      "details": "Remove StopTimesHelper and DatedServiceJourneyHelper imports from RoutingService. Add the imports required by RoutingServiceTimetableHelper for StopTimesHelper, DatedServiceJourneyHelper, Calendar, TimetableSnapshot, StopLocation, TripPattern, ArrivalDeparture, ServiceDate, TripOnServiceDate, TripIdAndServiceDate, FeedScopedId, and the other types used by the moved method signatures and implementation.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_TESTS",
+      "inputs": [
+        "src/test/java/org/opentripplanner/routing/algorithm/mapping/SnapshotTestBase.java",
+        "src/test/java/org/opentripplanner/routing/graphfinder/StreetGraphFinderTest.java",
+        "src/test/java/org/opentripplanner/routing/stoptimes/AlternativeLegsTest.java",
+        "src/test/java/org/opentripplanner/updater/GtfsRealtimeFuzzyTripMatcherTest.java"
+      ],
+      "outputs": [],
+      "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+      "risk": "medium",
+      "api_change": false
+    }
+  ],
+  "test_files": [
+    "src/test/java/org/opentripplanner/routing/algorithm/mapping/SnapshotTestBase.java",
+    "src/test/java/org/opentripplanner/routing/graphfinder/StreetGraphFinderTest.java",
+    "src/test/java/org/opentripplanner/routing/stoptimes/AlternativeLegsTest.java",
+    "src/test/java/org/opentripplanner/updater/GtfsRealtimeFuzzyTripMatcherTest.java"
+  ]
+}

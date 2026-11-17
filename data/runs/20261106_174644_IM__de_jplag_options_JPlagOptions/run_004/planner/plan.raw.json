@@ -1,0 +1,29 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "de.jplag.options.JPlagOptions",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the clustering-specific state and accessors from JPlagOptions so the class focuses on coordinating the existing comparison, submission, and language option groups.",
+      "files": [
+        "core/src/main/java/de/jplag/options/JPlagOptions.java",
+        "core/src/main/java/de/jplag/options/JPlagClusteringOptions.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "de.jplag.options.JPlagOptions",
+            "de.jplag.options.JPlagClusteringOptions"
+          ],
+          "outputs": [
+            "de.jplag.options.JPlagClusteringOptions"
+          ],
+          "details": "Extract the clusteringOptions field, getClusteringOptions(), and setClusteringOptions(ClusteringOptions) into the new class in the same package. Keep JPlagOptions delegating these accessors to the extracted clustering option object so its existing public API remains available.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

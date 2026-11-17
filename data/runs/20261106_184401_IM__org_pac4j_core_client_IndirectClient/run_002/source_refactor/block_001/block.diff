@@ -1,0 +1,239 @@
+commit 6d77816cdaa7c69a5b469af4a7f0293feb7f8adf
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 18:50:35 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
+index 28090584d..571f8a4b3 100644
+--- a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java
+@@ -6,13 +6,11 @@ import org.pac4j.core.credentials.Credentials;
+ import org.pac4j.core.exception.http.HttpAction;
+ import org.pac4j.core.exception.http.RedirectionAction;
+ import org.pac4j.core.http.ajax.AjaxRequestResolver;
+-import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
+ import org.pac4j.core.http.callback.CallbackUrlResolver;
+ import org.pac4j.core.http.callback.QueryParameterCallbackUrlResolver;
+ import org.pac4j.core.http.url.DefaultUrlResolver;
+ import org.pac4j.core.http.url.UrlResolver;
+ import org.pac4j.core.logout.LogoutActionBuilder;
+-import org.pac4j.core.logout.NoLogoutActionBuilder;
+ import org.pac4j.core.profile.UserProfile;
+ import org.pac4j.core.profile.factory.ProfileManagerFactory;
+ import org.pac4j.core.redirect.RedirectionActionBuilder;
+@@ -43,11 +41,7 @@ public abstract class IndirectClient extends BaseClient {
+ 
+     protected CallbackUrlResolver callbackUrlResolver;
+ 
+-    private AjaxRequestResolver ajaxRequestResolver;
+-
+-    private RedirectionActionBuilder redirectionActionBuilder;
+-
+-    private LogoutActionBuilder logoutActionBuilder = NoLogoutActionBuilder.INSTANCE;
++    private final IndirectClientActionConfiguration actionConfiguration = new IndirectClientActionConfiguration();
+ 
+     private boolean checkAuthenticationAttempt = true;
+ 
+@@ -61,9 +55,7 @@ public abstract class IndirectClient extends BaseClient {
+         if (this.callbackUrlResolver == null) {
+             this.callbackUrlResolver = newDefaultCallbackUrlResolver();
+         }
+-        if (this.ajaxRequestResolver == null) {
+-            ajaxRequestResolver = new DefaultAjaxRequestResolver();
+-        }
++        actionConfiguration.init();
+         if (saveProfileInSession == null) {
+             saveProfileInSession = true;
+         }
+@@ -72,11 +64,10 @@ public abstract class IndirectClient extends BaseClient {
+     @Override
+     protected final void afterInternalInit(final boolean forceReinit) {
+         // ensures components have been properly initialized
+-        assertNotNull("redirectionActionBuilder", this.redirectionActionBuilder);
++        actionConfiguration.validate();
+         assertNotNull("credentialsExtractor", getCredentialsExtractor());
+         assertNotNull("authenticator", getAuthenticator());
+         assertNotNull("profileCreator", getProfileCreator());
+-        assertNotNull("logoutActionBuilder", this.logoutActionBuilder);
+     }
+ 
+     protected CallbackUrlResolver newDefaultCallbackUrlResolver() {
+@@ -94,8 +85,8 @@ public abstract class IndirectClient extends BaseClient {
+     public final Optional<RedirectionAction> getRedirectionAction(final WebContext context, final SessionStore sessionStore) {
+         init();
+         // it's an AJAX request -> appropriate action
+-        if (ajaxRequestResolver.isAjax(context, sessionStore)) {
+-            final var httpAction = ajaxRequestResolver.buildAjaxResponse(context, sessionStore, redirectionActionBuilder);
++        if (getAjaxRequestResolver().isAjax(context, sessionStore)) {
++            final var httpAction = getAjaxRequestResolver().buildAjaxResponse(context, sessionStore, getRedirectionActionBuilder());
+             logger.debug("AJAX request detected -> returning " + httpAction + " for " + context.getFullRequestURL());
+             cleanRequestedUrl(context, sessionStore);
+             throw httpAction;
+@@ -109,7 +100,7 @@ public abstract class IndirectClient extends BaseClient {
+             throw HttpActionHelper.buildUnauthenticatedAction(context);
+         }
+ 
+-        return redirectionActionBuilder.getRedirectionAction(context, sessionStore);
++        return getRedirectionActionBuilder().getRedirectionAction(context, sessionStore);
+     }
+ 
+     private void cleanRequestedUrl(final WebContext context, final SessionStore sessionStore) {
+@@ -159,7 +150,7 @@ public abstract class IndirectClient extends BaseClient {
+     public final Optional<RedirectionAction> getLogoutAction(final WebContext context, final SessionStore sessionStore,
+                                                              final UserProfile currentProfile, final String targetUrl) {
+         init();
+-        return logoutActionBuilder.getLogoutAction(context, sessionStore, currentProfile, targetUrl);
++        return getLogoutActionBuilder().getLogoutAction(context, sessionStore, currentProfile, targetUrl);
+     }
+ 
+     public String computeFinalCallbackUrl(final WebContext context) {
+@@ -190,39 +181,35 @@ public abstract class IndirectClient extends BaseClient {
+     }
+ 
+     public AjaxRequestResolver getAjaxRequestResolver() {
+-        return ajaxRequestResolver;
++        return actionConfiguration.getAjaxRequestResolver();
+     }
+ 
+     public void setAjaxRequestResolver(final AjaxRequestResolver ajaxRequestResolver) {
+-        this.ajaxRequestResolver = ajaxRequestResolver;
++        actionConfiguration.setAjaxRequestResolver(ajaxRequestResolver);
+     }
+ 
+     public RedirectionActionBuilder getRedirectionActionBuilder() {
+-        return redirectionActionBuilder;
++        return actionConfiguration.getRedirectionActionBuilder();
+     }
+ 
+     protected void defaultRedirectionActionBuilder(final RedirectionActionBuilder redirectActionBuilder) {
+-        if (this.redirectionActionBuilder == null) {
+-            this.redirectionActionBuilder = redirectActionBuilder;
+-        }
++        actionConfiguration.defaultRedirectionActionBuilder(redirectActionBuilder);
+     }
+ 
+     public LogoutActionBuilder getLogoutActionBuilder() {
+-        return logoutActionBuilder;
++        return actionConfiguration.getLogoutActionBuilder();
+     }
+ 
+     protected void defaultLogoutActionBuilder(final LogoutActionBuilder logoutActionBuilder) {
+-        if (this.logoutActionBuilder == null || this.logoutActionBuilder == NoLogoutActionBuilder.INSTANCE) {
+-            this.logoutActionBuilder = logoutActionBuilder;
+-        }
++        actionConfiguration.defaultLogoutActionBuilder(logoutActionBuilder);
+     }
+ 
+     public void setRedirectionActionBuilder(final RedirectionActionBuilder redirectionActionBuilder) {
+-        this.redirectionActionBuilder = redirectionActionBuilder;
++        actionConfiguration.setRedirectionActionBuilder(redirectionActionBuilder);
+     }
+ 
+     public void setLogoutActionBuilder(final LogoutActionBuilder logoutActionBuilder) {
+-        this.logoutActionBuilder = logoutActionBuilder;
++        actionConfiguration.setLogoutActionBuilder(logoutActionBuilder);
+     }
+ 
+     public String getStateSessionAttributeName() {
+@@ -249,9 +236,9 @@ public abstract class IndirectClient extends BaseClient {
+     public String toString() {
+         return toNiceString(this.getClass(), "name", getName(), "callbackUrl", this.callbackUrl,
+                 "urlResolver", this.urlResolver, "callbackUrlResolver", this.callbackUrlResolver, "ajaxRequestResolver",
+-                this.ajaxRequestResolver, "redirectionActionBuilder", this.redirectionActionBuilder, "credentialsExtractor",
++                this.getAjaxRequestResolver(), "redirectionActionBuilder", this.getRedirectionActionBuilder(), "credentialsExtractor",
+                 getCredentialsExtractor(), "authenticator", getAuthenticator(), "profileCreator", getProfileCreator(),
+-                "logoutActionBuilder", this.logoutActionBuilder, "authorizationGenerators", getAuthorizationGenerators(),
++                "logoutActionBuilder", this.getLogoutActionBuilder(), "authorizationGenerators", getAuthorizationGenerators(),
+                 "checkAuthenticationAttempt", checkAuthenticationAttempt);
+     }
+ }
+diff --git a/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientActionConfiguration.java b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientActionConfiguration.java
+new file mode 100644
+index 000000000..6dc07ad12
+--- /dev/null
++++ b/pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientActionConfiguration.java
+@@ -0,0 +1,83 @@
++package org.pac4j.core.client;
++
++import org.pac4j.core.context.WebContext;
++import org.pac4j.core.context.session.SessionStore;
++import org.pac4j.core.exception.http.RedirectionAction;
++import org.pac4j.core.http.ajax.AjaxRequestResolver;
++import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
++import org.pac4j.core.logout.LogoutActionBuilder;
++import org.pac4j.core.logout.NoLogoutActionBuilder;
++import org.pac4j.core.profile.UserProfile;
++import org.pac4j.core.redirect.RedirectionActionBuilder;
++
++import java.util.Optional;
++
++import static org.pac4j.core.util.CommonHelper.assertNotNull;
++
++/**
++ * Configuration of the authentication actions used by an indirect client.
++ */
++public class IndirectClientActionConfiguration {
++
++    private AjaxRequestResolver ajaxRequestResolver;
++
++    private RedirectionActionBuilder redirectionActionBuilder;
++
++    private LogoutActionBuilder logoutActionBuilder = NoLogoutActionBuilder.INSTANCE;
++
++    public void init() {
++        if (this.ajaxRequestResolver == null) {
++            this.ajaxRequestResolver = new DefaultAjaxRequestResolver();
++        }
++    }
++
++    public void validate() {
++        assertNotNull("redirectionActionBuilder", this.redirectionActionBuilder);
++        assertNotNull("logoutActionBuilder", this.logoutActionBuilder);
++    }
++
++    public AjaxRequestResolver getAjaxRequestResolver() {
++        return ajaxRequestResolver;
++    }
++
++    public void setAjaxRequestResolver(final AjaxRequestResolver ajaxRequestResolver) {
++        this.ajaxRequestResolver = ajaxRequestResolver;
++    }
++
++    public RedirectionActionBuilder getRedirectionActionBuilder() {
++        return redirectionActionBuilder;
++    }
++
++    public void defaultRedirectionActionBuilder(final RedirectionActionBuilder redirectActionBuilder) {
++        if (this.redirectionActionBuilder == null) {
++            this.redirectionActionBuilder = redirectActionBuilder;
++        }
++    }
++
++    public LogoutActionBuilder getLogoutActionBuilder() {
++        return logoutActionBuilder;
++    }
++
++    public void defaultLogoutActionBuilder(final LogoutActionBuilder logoutActionBuilder) {
++        if (this.logoutActionBuilder == null || this.logoutActionBuilder == NoLogoutActionBuilder.INSTANCE) {
++            this.logoutActionBuilder = logoutActionBuilder;
++        }
++    }
++
++    public void setRedirectionActionBuilder(final RedirectionActionBuilder redirectionActionBuilder) {
++        this.redirectionActionBuilder = redirectionActionBuilder;
++    }
++
++    public void setLogoutActionBuilder(final LogoutActionBuilder logoutActionBuilder) {
++        this.logoutActionBuilder = logoutActionBuilder;
++    }
++
++    public Optional<RedirectionAction> getRedirectionAction(final WebContext context, final SessionStore sessionStore) {
++        return redirectionActionBuilder.getRedirectionAction(context, sessionStore);
++    }
++
++    public Optional<RedirectionAction> getLogoutAction(final WebContext context, final SessionStore sessionStore,
++                                                       final UserProfile currentProfile, final String targetUrl) {
++        return logoutActionBuilder.getLogoutAction(context, sessionStore, currentProfile, targetUrl);
++    }
++}

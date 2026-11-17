@@ -1,0 +1,68 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "net.pms.media.MediaInfo",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive audio metadata and audio-thumbnail parsing responsibility while preserving the public parse and parseThumbnailOnly methods as compatibility entry points.",
+      "files": [
+        "src/main/java/net/pms/media/AudioMetadataParser.java",
+        "src/main/java/net/pms/media/MediaInfo.java",
+        "src/test/java/net/pms/dlna/MediaInfoTest.java",
+        "src/test/java/net/pms/formats/FormatsRegressionTest.java",
+        "src/test/java/net/pms/parsers/MediaInfoParserTest.java",
+        "src/test/java/net/pms/test/Issue1278.java",
+        "src/test/java/net/pms/test/formats/FormatRecognitionTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.AudioMetadataParser"
+          ],
+          "outputs": [
+            "net.pms.media.AudioMetadataParser"
+          ],
+          "details": "Extract the audio-specific branches from MediaInfo.parse(InputFile, Format, int, boolean) and MediaInfo.parseThumbnailOnly(InputFile, Format, int, boolean), together with extractAudioTagKeyValue(Tag, FieldKey) and extractAudioTagKeyIntegerValue(Tag, FieldKey, Integer), into the new same-package AudioMetadataParser. Keep MediaInfo.parse and MediaInfo.parseThumbnailOnly public and behaviorally compatible by delegating the extracted audio responsibility while retaining the existing image, video, FFmpeg, thumbnail, and post-parse logic in MediaInfo. The target should no longer directly reference AudioFileIO, AudioFile, AudioHeader, Tag, FieldKey, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, TagException, KeyNotFoundException, ErrorMessage, NumberUtils, StarRating, or CoverUtil. DLNAThumbnail, MediaAudio, InputFile, Format, and the configuration remain in MediaInfo because they are referenced by non-audio responsibilities or by the compatibility-facing methods. The target gains one new outgoing dependency, AudioMetadataParser; therefore the expected net Fan-Out reduction is positive if all listed audio-only dependencies are removed.",
+          "risk": "high"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/net/pms/media/MediaInfo.java",
+            "src/main/java/net/pms/media/AudioMetadataParser.java"
+          ],
+          "outputs": [
+            "src/main/java/net/pms/media/MediaInfo.java",
+            "src/main/java/net/pms/media/AudioMetadataParser.java"
+          ],
+          "details": "Remove from MediaInfo imports used only by the extracted audio responsibility, including AudioFileIO, AudioFile, AudioHeader, the jaudiotagger audio exceptions, ErrorMessage, FieldKey, Tag, StarRating, NumberUtils, and CoverUtil. Add to AudioMetadataParser the imports required by the extracted code and retain only the imports still directly used by MediaInfo. Do not remove DLNAThumbnail or other classes that remain directly referenced elsewhere in MediaInfo.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/net/pms/dlna/MediaInfoTest.java",
+            "src/test/java/net/pms/formats/FormatsRegressionTest.java",
+            "src/test/java/net/pms/parsers/MediaInfoParserTest.java",
+            "src/test/java/net/pms/test/Issue1278.java",
+            "src/test/java/net/pms/test/formats/FormatRecognitionTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/net/pms/dlna/MediaInfoTest.java",
+        "src/test/java/net/pms/formats/FormatsRegressionTest.java",
+        "src/test/java/net/pms/parsers/MediaInfoParserTest.java",
+        "src/test/java/net/pms/test/Issue1278.java",
+        "src/test/java/net/pms/test/formats/FormatRecognitionTest.java"
+      ]
+    }
+  ]
+}

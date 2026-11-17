@@ -1,0 +1,31 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive pretty-printing and concrete-syntax interpretation responsibility from LexicalPreservingPrinter while preserving its public API and behavior.",
+      "files": [
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinterTextHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter",
+            "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinterTextHelper",
+            "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.prettyPrintingTextNode(Node, NodeText)",
+            "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.interpret(Node, CsmElement, NodeText)"
+          ],
+          "outputs": [
+            "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinterTextHelper"
+          ],
+          "details": "Move prettyPrintingTextNode and interpret, including their concrete-syntax-model traversal and primitive/comment/modifier formatting logic, into the new same-package helper. Update LexicalPreservingPrinter.getOrCreateNodeText(Node) to delegate creation and formatting to the helper while continuing to expose the existing package-visible method and public NODE_TEXT_DATA field. Pass NODE_TEXT_DATA into the helper rather than changing the public field or introducing a dependency from the helper back to LexicalPreservingPrinter. The target no longer directly references ConcreteSyntaxModel, CsmElement, CsmIndent, CsmMix, CsmToken, CsmUnindent, or NodeWithVariables; these references are confined to the helper. LexicalDifferenceCalculator remains required by the target's Observer and existing field, while JavaToken, Node, NodeText, Difference, VariableDeclarator, and comment-related types remain required elsewhere in the target. The target gains one new outgoing dependency, LexicalPreservingPrinterTextHelper, while eliminating seven distinct direct dependencies, for an expected net Fan-Out reduction of six. Preserve all existing formatting branches and delegation behavior.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

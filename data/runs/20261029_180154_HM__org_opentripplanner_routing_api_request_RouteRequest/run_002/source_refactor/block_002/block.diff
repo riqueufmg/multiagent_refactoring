@@ -1,0 +1,36 @@
+commit 51816a6da2c8b806d04fd0c146f340e9f4f439d5
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 18:15:23 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java
+new file mode 100644
+index 0000000000..faf328d2b9
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparator.java
+@@ -0,0 +1,24 @@
++package org.opentripplanner.routing.api.request;
++
++import java.util.Comparator;
++import org.opentripplanner.routing.impl.DurationComparator;
++import org.opentripplanner.routing.impl.PathComparator;
++import org.opentripplanner.routing.spt.GraphPath;
++
++/**
++ * Selects the path comparator used for a route request.
++ */
++public final class RouteRequestPathComparator {
++
++  private RouteRequestPathComparator() {}
++
++  public static Comparator<GraphPath> getPathComparator(
++    String pathComparator,
++    boolean compareStartTimes
++  ) {
++    if ("duration".equals(pathComparator)) {
++      return new DurationComparator();
++    }
++    return new PathComparator(compareStartTimes);
++  }
++}

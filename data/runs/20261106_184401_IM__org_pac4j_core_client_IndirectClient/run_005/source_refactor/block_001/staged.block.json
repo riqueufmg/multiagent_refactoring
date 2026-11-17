@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive callback URL configuration responsibilities from IndirectClient to reduce the number of fields and public accessor methods in the target class while preserving its existing public API.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientCallbackConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.IndirectClient",
+        "org.pac4j.core.client.IndirectClientCallbackConfiguration"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.IndirectClientCallbackConfiguration"
+      ],
+      "details": "Extract the cohesive callback URL state and behavior consisting of callbackUrl, urlResolver, callbackUrlResolver, computeFinalCallbackUrl(WebContext), setCallbackUrl(String), getCallbackUrl(), getUrlResolver(), setUrlResolver(UrlResolver), getCallbackUrlResolver(), and setCallbackUrlResolver(CallbackUrlResolver). Keep the existing public methods on IndirectClient as delegating facade methods so subclass and external callers remain compatible. Move the corresponding initialization and default resolver handling from beforeInternalInit(boolean) into the extracted configuration while preserving the existing newDefaultCallbackUrlResolver() override behavior. Update toString() to obtain the values through the retained accessors.",
+      "risk": "medium"
+    }
+  ]
+}

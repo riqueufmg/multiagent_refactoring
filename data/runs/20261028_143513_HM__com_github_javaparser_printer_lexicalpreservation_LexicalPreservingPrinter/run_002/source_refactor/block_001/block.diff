@@ -1,0 +1,160 @@
+commit b8362a8963d9fccdfa3e51bcaeed0504e0521204
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 14:53:02 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextNodeFormatter.java b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextNodeFormatter.java
+new file mode 100644
+index 000000000..be75800e3
+--- /dev/null
++++ b/javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextNodeFormatter.java
+@@ -0,0 +1,148 @@
++/*
++ * Copyright (C) 2007-2010 Júlio Vilmar Gesser.
++ * Copyright (C) 2011, 2013-2023 The JavaParser Team.
++ *
++ * This file is part of JavaParser.
++ */
++package com.github.javaparser.printer.lexicalpreservation;
++
++import static com.github.javaparser.GeneratedJavaParserConstants.BOOLEAN;
++import static com.github.javaparser.GeneratedJavaParserConstants.BYTE;
++import static com.github.javaparser.GeneratedJavaParserConstants.CHAR;
++import static com.github.javaparser.GeneratedJavaParserConstants.DOUBLE;
++import static com.github.javaparser.GeneratedJavaParserConstants.FLOAT;
++import static com.github.javaparser.GeneratedJavaParserConstants.INT;
++import static com.github.javaparser.GeneratedJavaParserConstants.JAVADOC_COMMENT;
++import static com.github.javaparser.GeneratedJavaParserConstants.LBRACKET;
++import static com.github.javaparser.GeneratedJavaParserConstants.LONG;
++import static com.github.javaparser.GeneratedJavaParserConstants.MULTI_LINE_COMMENT;
++import static com.github.javaparser.GeneratedJavaParserConstants.RBRACKET;
++import static com.github.javaparser.GeneratedJavaParserConstants.SHORT;
++import static com.github.javaparser.GeneratedJavaParserConstants.SINGLE_LINE_COMMENT;
++import static com.github.javaparser.GeneratedJavaParserConstants.SPACE;
++import static com.github.javaparser.TokenTypes.eolTokenKind;
++
++import java.util.LinkedList;
++import java.util.List;
++
++import com.github.javaparser.ast.Modifier;
++import com.github.javaparser.ast.Node;
++import com.github.javaparser.ast.body.VariableDeclarator;
++import com.github.javaparser.ast.comments.BlockComment;
++import com.github.javaparser.ast.comments.Comment;
++import com.github.javaparser.ast.comments.JavadocComment;
++import com.github.javaparser.ast.comments.LineComment;
++import com.github.javaparser.ast.nodeTypes.NodeWithVariables;
++import com.github.javaparser.ast.type.PrimitiveType;
++import com.github.javaparser.printer.ConcreteSyntaxModel;
++import com.github.javaparser.printer.concretesyntaxmodel.CsmElement;
++import com.github.javaparser.printer.concretesyntaxmodel.CsmIndent;
++import com.github.javaparser.printer.concretesyntaxmodel.CsmMix;
++import com.github.javaparser.printer.concretesyntaxmodel.CsmToken;
++import com.github.javaparser.printer.concretesyntaxmodel.CsmUnindent;
++import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CsmChild;
++import com.github.javaparser.utils.LineSeparator;
++
++/** Formats the text representation of nodes used by the lexical preserving printer. */
++class LexicalPreservingTextNodeFormatter {
++
++    private LexicalPreservingTextNodeFormatter() {
++    }
++
++    static void format(Node node, NodeText nodeText) {
++        if (node instanceof PrimitiveType) {
++            PrimitiveType primitiveType = (PrimitiveType) node;
++            switch (primitiveType.getType()) {
++                case BOOLEAN: nodeText.addToken(BOOLEAN, node.toString()); break;
++                case CHAR: nodeText.addToken(CHAR, node.toString()); break;
++                case BYTE: nodeText.addToken(BYTE, node.toString()); break;
++                case SHORT: nodeText.addToken(SHORT, node.toString()); break;
++                case INT: nodeText.addToken(INT, node.toString()); break;
++                case LONG: nodeText.addToken(LONG, node.toString()); break;
++                case FLOAT: nodeText.addToken(FLOAT, node.toString()); break;
++                case DOUBLE: nodeText.addToken(DOUBLE, node.toString()); break;
++                default: throw new IllegalArgumentException();
++            }
++            return;
++        }
++        if (node instanceof JavadocComment) {
++            JavadocComment comment = (JavadocComment) node;
++            nodeText.addToken(JAVADOC_COMMENT, comment.getHeader() + comment.getContent() + comment.getFooter());
++            return;
++        }
++        if (node instanceof BlockComment) {
++            BlockComment comment = (BlockComment) node;
++            nodeText.addToken(MULTI_LINE_COMMENT, comment.getHeader() + comment.getContent() + comment.getFooter());
++            return;
++        }
++        if (node instanceof LineComment) {
++            LineComment comment = (LineComment) node;
++            nodeText.addToken(SINGLE_LINE_COMMENT, comment.getHeader() + comment.getContent());
++            return;
++        }
++        if (node instanceof Modifier) {
++            Modifier modifier = (Modifier) node;
++            nodeText.addToken(LexicalDifferenceCalculator.toToken(modifier), modifier.getKeyword().asString());
++            return;
++        }
++        interpret(node, ConcreteSyntaxModel.forClass(node.getClass()), nodeText);
++    }
++
++    private static NodeText interpret(Node node, CsmElement csm, NodeText nodeText) {
++        LexicalDifferenceCalculator.CalculatedSyntaxModel model =
++                new LexicalDifferenceCalculator().calculatedSyntaxModelForNode(csm, node);
++        List<TextElement> indentation = LexicalPreservingPrinter.findIndentation(node);
++        boolean pendingIndentation = false;
++        node.getComment().ifPresent(comment -> {
++            if (!comment.hasRange()) {
++                LineSeparator separator = node.getLineEndingStyleOrDefault(LineSeparator.SYSTEM);
++                model.elements.add(0, new CsmToken(eolTokenKind(separator), separator.asRawString()));
++                model.elements.add(0, new CsmChild(comment));
++            }
++        });
++        for (CsmElement element : model.elements) {
++            if (element instanceof CsmIndent) {
++                int index = model.elements.indexOf(element);
++                if (model.elements.size() > index + 1 && !(model.elements.get(index + 1) instanceof CsmUnindent)) {
++                    for (int i = 0; i < Difference.STANDARD_INDENTATION_SIZE; i++) {
++                        indentation.add(new TokenTextElement(SPACE, " "));
++                    }
++                }
++            } else if (element instanceof CsmUnindent) {
++                for (int i = 0; i < Difference.STANDARD_INDENTATION_SIZE && !indentation.isEmpty(); i++) {
++                    indentation.remove(indentation.size() - 1);
++                }
++            }
++            if (pendingIndentation && !(element instanceof CsmToken && ((CsmToken) element).isNewLine())) {
++                indentation.forEach(nodeText::addElement);
++            }
++            pendingIndentation = false;
++            if (element instanceof CsmChild) {
++                nodeText.addChild(((CsmChild) element).getChild());
++            } else if (element instanceof CsmToken) {
++                CsmToken token = (CsmToken) element;
++                nodeText.addToken(token.getTokenType(), token.getContent(node));
++                if (token.isNewLine()) {
++                    pendingIndentation = true;
++                }
++            } else if (element instanceof CsmMix) {
++                for (CsmElement child : ((CsmMix) element).getElements()) {
++                    interpret(node, child, nodeText);
++                }
++            } else if (!(element instanceof CsmIndent) && !(element instanceof CsmUnindent)) {
++                throw new UnsupportedOperationException(element.getClass().getSimpleName());
++            }
++        }
++        if (node instanceof VariableDeclarator) {
++            VariableDeclarator variable = (VariableDeclarator) node;
++            variable.getParentNode().ifPresent(parent -> ((NodeWithVariables<?>) parent).getMaximumCommonType().ifPresent(type -> {
++                int extraArrayLevels = variable.getType().getArrayLevel() - type.getArrayLevel();
++                for (int i = 0; i < extraArrayLevels; i++) {
++                    nodeText.addElement(new TokenTextElement(LBRACKET));
++                    nodeText.addElement(new TokenTextElement(RBRACKET));
++                }
++            }));
++        }
++        return nodeText;
++    }
++}

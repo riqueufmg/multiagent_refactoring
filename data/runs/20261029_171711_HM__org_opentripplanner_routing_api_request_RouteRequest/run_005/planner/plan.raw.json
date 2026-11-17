@@ -1,0 +1,77 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive spatial proximity responsibility used by isCloseToStartOrEnd(Vertex) while preserving the public RouteRequest method and its behavior.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestSpatialSupport"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestSpatialSupport"
+          ],
+          "details": "Move MAX_CLOSENESS_METERS, fromEnvelope, toEnvelope, getEnvelope(Coordinate, int), and the spatial calculation currently implemented by isCloseToStartOrEnd(Vertex) into RouteRequestSpatialSupport. Keep RouteRequest.isCloseToStartOrEnd(Vertex) as a compatibility method delegating to the extracted support class, passing its existing from, to, and Vertex values. After the move, RouteRequest no longer directly references Coordinate, Envelope, or SphericalDistanceLibrary; it introduces only the new RouteRequestSpatialSupport dependency. GenericLocation and Vertex remain direct dependencies because they are used by the retained public method and existing fields or APIs. The expected net Fan-Out reduction is two: three distinct dependencies are removed and one new helper dependency is introduced.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestSpatialSupport.java"
+          ],
+          "details": "Remove Coordinate, Envelope, and SphericalDistanceLibrary imports from RouteRequest after the spatial implementation is moved, and add the imports required by RouteRequestSpatialSupport for Coordinate, Envelope, GenericLocation, SphericalDistanceLibrary, and Vertex. Do not remove the Vertex or GenericLocation imports from RouteRequest because the public method and existing fields continue to use them.",
+          "risk": "low"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the path-comparator selection responsibility while retaining RouteRequest.getPathComparator(boolean) for public compatibility.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparatorSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestPathComparatorSupport"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestPathComparatorSupport"
+          ],
+          "details": "Move the implementation of getPathComparator(boolean), including the selection between DurationComparator and PathComparator, into RouteRequestPathComparatorSupport. Retain RouteRequest.getPathComparator(boolean) as a compatibility method delegating to the support class with the existing pathComparator value and compareStartTimes argument. Keep Comparator and GraphPath direct dependencies in RouteRequest because they remain in the public method signature. Remove the direct DurationComparator and PathComparator dependencies from RouteRequest and introduce only RouteRequestPathComparatorSupport, yielding an expected net Fan-Out reduction of one.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparatorSupport.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPathComparatorSupport.java"
+          ],
+          "details": "Remove DurationComparator and PathComparator imports from RouteRequest after delegation is introduced. Add the imports required by RouteRequestPathComparatorSupport for Comparator, GraphPath, DurationComparator, and PathComparator. Preserve the existing Comparator<GraphPath> return type in RouteRequest.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

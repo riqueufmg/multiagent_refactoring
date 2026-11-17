@@ -1,0 +1,359 @@
+commit aaed2868bf42cb79f33542cd17947357a50058e9
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 17:49:05 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagComparisonOptions.java b/core/src/main/java/de/jplag/options/JPlagComparisonOptions.java
+new file mode 100644
+index 000000000..008be1729
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagComparisonOptions.java
+@@ -0,0 +1,115 @@
++package de.jplag.options;
++
++import static de.jplag.strategy.ComparisonMode.NORMAL;
++
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import de.jplag.strategy.ComparisonMode;
++
++public class JPlagComparisonOptions {
++
++    private static final Logger logger = LoggerFactory.getLogger("JPlag");
++    public static final ComparisonMode DEFAULT_COMPARISON_MODE = NORMAL;
++    public static final float DEFAULT_SIMILARITY_THRESHOLD = 0;
++    public static final int DEFAULT_SHOWN_COMPARISONS = 30;
++
++    /**
++     * Determines which strategy to use for the comparison of submissions.
++     */
++    private ComparisonMode comparisonMode = DEFAULT_COMPARISON_MODE;
++
++    /**
++     * Percentage value (must be between 0 and 100). Comparisons (of submissions pairs) with a similarity below this
++     * threshold will be ignored. The default value of 0 allows all matches to be stored. This affects which comparisons are
++     * stored and thus make it into the result object.
++     */
++    private float similarityThreshold = DEFAULT_SIMILARITY_THRESHOLD;
++
++    /**
++     * The maximum number of comparisons that will be shown in the generated report. If set to -1 all comparisons will be
++     * shown.
++     */
++    private int maximumNumberOfComparisons = DEFAULT_SHOWN_COMPARISONS;
++
++    /**
++     * The similarity metric determines how the minimum similarity threshold required for a comparison (of two submissions)
++     * is calculated. This affects which comparisons are stored and thus make it into the result object.
++     */
++    private SimilarityMetric similarityMetric = SimilarityMetric.AVG;
++
++    /**
++     * Tunes the comparison sensitivity by adjusting the minimum token required to be counted as matching section. A smaller
++     * <n> increases the sensitivity but might lead to more false-positives.
++     */
++    private Integer minimumTokenMatch;
++
++    /**
++     * If true, submissions that cannot be parsed will be stored in a separate directory.
++     */
++    private boolean debugParser = false;
++
++    public ComparisonMode getComparisonMode() {
++        return comparisonMode;
++    }
++
++    public int getMaximumNumberOfComparisons() {
++        return maximumNumberOfComparisons;
++    }
++
++    public Integer getMinimumTokenMatch() {
++        return minimumTokenMatch;
++    }
++
++    public SimilarityMetric getSimilarityMetric() {
++        return similarityMetric;
++    }
++
++    public float getSimilarityThreshold() {
++        return similarityThreshold;
++    }
++
++    public boolean isDebugParser() {
++        return debugParser;
++    }
++
++    public void setComparisonMode(ComparisonMode comparisonMode) {
++        this.comparisonMode = comparisonMode;
++    }
++
++    public void setDebugParser(boolean debugParser) {
++        this.debugParser = debugParser;
++    }
++
++    public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
++        this.maximumNumberOfComparisons = Math.max(maximumNumberOfComparisons, -1);
++    }
++
++    public void setMinimumTokenMatch(Integer minimumTokenMatch) {
++        if (minimumTokenMatch != null && minimumTokenMatch < 1) {
++            this.minimumTokenMatch = 1;
++        } else {
++            this.minimumTokenMatch = minimumTokenMatch;
++        }
++    }
++
++    public void setSimilarityMetric(SimilarityMetric similarityMetric) {
++        this.similarityMetric = similarityMetric;
++    }
++
++    public void setSimilarityThreshold(float similarityThreshold) {
++        if (similarityThreshold > 100) {
++            logger.warn("Maximum threshold of 100 used instead of {}", similarityThreshold);
++            this.similarityThreshold = 100;
++        } else if (similarityThreshold < 0) {
++            logger.warn("Minimum threshold of 0 used instead of {}", similarityThreshold);
++            this.similarityThreshold = 0;
++        } else {
++            this.similarityThreshold = similarityThreshold;
++        }
++    }
++
++    public boolean hasMinimumTokenMatch() {
++        return minimumTokenMatch != null;
++    }
++}
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index 16ddd66a7..bcf13d292 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -1,7 +1,5 @@
+ package de.jplag.options;
+ 
+-import static de.jplag.strategy.ComparisonMode.NORMAL;
+-
+ import java.io.File;
+ import java.nio.charset.Charset;
+ import java.nio.charset.StandardCharsets;
+@@ -10,20 +8,15 @@ import java.util.List;
+ import java.util.Optional;
+ import java.util.Set;
+ 
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-
+ import de.jplag.Language;
+ import de.jplag.clustering.ClusteringOptions;
+ import de.jplag.strategy.ComparisonMode;
+ 
+ public class JPlagOptions {
+ 
+-    private static final Logger logger = LoggerFactory.getLogger("JPlag");
+-    public static final ComparisonMode DEFAULT_COMPARISON_MODE = NORMAL;
+-    public static final float DEFAULT_SIMILARITY_THRESHOLD = 0;
+-    public static final int DEFAULT_SHOWN_COMPARISONS = 30;
+-
++    public static final ComparisonMode DEFAULT_COMPARISON_MODE = JPlagComparisonOptions.DEFAULT_COMPARISON_MODE;
++    public static final float DEFAULT_SIMILARITY_THRESHOLD = JPlagComparisonOptions.DEFAULT_SIMILARITY_THRESHOLD;
++    public static final int DEFAULT_SHOWN_COMPARISONS = JPlagComparisonOptions.DEFAULT_SHOWN_COMPARISONS;
+     public static final Charset CHARSET = StandardCharsets.UTF_8;
+ 
+     /**
+@@ -36,48 +29,13 @@ public class JPlagOptions {
+      */
+     private Language language;
+ 
+-    /**
+-     * Determines which strategy to use for the comparison of submissions.
+-     */
+-    private ComparisonMode comparisonMode = DEFAULT_COMPARISON_MODE;
+-
+-    /**
+-     * If true, submissions that cannot be parsed will be stored in a separate directory.
+-     */
+-    private boolean debugParser = false;
++    private final JPlagComparisonOptions comparisonOptions = new JPlagComparisonOptions();
+ 
+     /**
+      * Array of file suffixes that should be included.
+      */
+     private String[] fileSuffixes;
+ 
+-    /**
+-     * Percentage value (must be between 0 and 100). Comparisons (of submissions pairs) with a similarity below this
+-     * threshold will be ignored. The default value of 0 allows all matches to be stored. This affects which comparisons are
+-     * stored and thus make it into the result object.
+-     * @see JPlagOptions#similarityMetric
+-     */
+-    private float similarityThreshold = DEFAULT_SIMILARITY_THRESHOLD;
+-
+-    /**
+-     * The maximum number of comparisons that will be shown in the generated report. If set to -1 all comparisons will be
+-     * shown.
+-     */
+-    private int maximumNumberOfComparisons = DEFAULT_SHOWN_COMPARISONS;
+-
+-    /**
+-     * The similarity metric determines how the minimum similarity threshold required for a comparison (of two submissions)
+-     * is calculated. This affects which comparisons are stored and thus make it into the result object.
+-     * @see JPlagOptions#similarityThreshold
+-     */
+-    private SimilarityMetric similarityMetric = SimilarityMetric.AVG;
+-
+-    /**
+-     * Tunes the comparison sensitivity by adjusting the minimum token required to be counted as matching section. A smaller
+-     * <n> increases the sensitivity but might lead to more false-positives.
+-     */
+-    private Integer minimumTokenMatch;
+-
+     /**
+      * Name of the file that contains the names of files to exclude from comparison.
+      */
+@@ -100,17 +58,6 @@ public class JPlagOptions {
+ 
+     /**
+      * Path name of the directory containing the base code.
+-     * <p>
+-     * For backwards compatibility it may also be a directory name inside the root directory. Condition for the latter is
+-     * <ul>
+-     * <li>Specified path does not exist.</li>
+-     * <li>Name has not have a separator character after trimming them from both ends (leaving at least a one-character
+-     * name).</li>
+-     * <li>A submission with the specified name exists in the root directory.</li>
+-     * </ul>
+-     * It's an error if a string has been provided but it is neither an existing path nor does it fulfill all the conditions
+-     * of the compatibility fallback listed above.
+-     * </p>
+      */
+     private String baseCodeSubmissionName = null;
+ 
+@@ -141,12 +88,16 @@ public class JPlagOptions {
+         this.languageIdentifier = languageIdentifier;
+     }
+ 
++    public JPlagComparisonOptions getComparisonOptions() {
++        return comparisonOptions;
++    }
++
+     public Optional<String> getBaseCodeSubmissionName() {
+         return Optional.ofNullable(baseCodeSubmissionName);
+     }
+ 
+     public ComparisonMode getComparisonMode() {
+-        return comparisonMode;
++        return comparisonOptions.getComparisonMode();
+     }
+ 
+     public Set<String> getExcludedFiles() {
+@@ -170,11 +121,11 @@ public class JPlagOptions {
+     }
+ 
+     public int getMaximumNumberOfComparisons() {
+-        return this.maximumNumberOfComparisons;
++        return comparisonOptions.getMaximumNumberOfComparisons();
+     }
+ 
+     public Integer getMinimumTokenMatch() {
+-        return minimumTokenMatch;
++        return comparisonOptions.getMinimumTokenMatch();
+     }
+ 
+     public List<String> getSubmissionDirectories() {
+@@ -186,11 +137,11 @@ public class JPlagOptions {
+     }
+ 
+     public SimilarityMetric getSimilarityMetric() {
+-        return similarityMetric;
++        return comparisonOptions.getSimilarityMetric();
+     }
+ 
+     public float getSimilarityThreshold() {
+-        return similarityThreshold;
++        return comparisonOptions.getSimilarityThreshold();
+     }
+ 
+     public String getSubdirectoryName() {
+@@ -206,7 +157,7 @@ public class JPlagOptions {
+     }
+ 
+     public boolean isDebugParser() {
+-        return debugParser;
++        return comparisonOptions.isDebugParser();
+     }
+ 
+     public ClusteringOptions getClusteringOptions() {
+@@ -222,11 +173,11 @@ public class JPlagOptions {
+     }
+ 
+     public void setComparisonMode(ComparisonMode comparisonMode) {
+-        this.comparisonMode = comparisonMode;
++        comparisonOptions.setComparisonMode(comparisonMode);
+     }
+ 
+     public void setDebugParser(boolean debugParser) {
+-        this.debugParser = debugParser;
++        comparisonOptions.setDebugParser(debugParser);
+     }
+ 
+     public void setExcludedFiles(Set<String> excludedFiles) {
+@@ -251,7 +202,7 @@ public class JPlagOptions {
+      * @param language - initialized language instance
+      */
+     public void setLanguageDefaults(Language language) {
+-        if (!hasMinimumTokenMatch()) {
++        if (!comparisonOptions.hasMinimumTokenMatch()) {
+             setMinimumTokenMatch(language.minimumTokenMatch());
+         }
+ 
+@@ -261,15 +212,11 @@ public class JPlagOptions {
+     }
+ 
+     public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {
+-        this.maximumNumberOfComparisons = Math.max(maximumNumberOfComparisons, -1);
++        comparisonOptions.setMaximumNumberOfComparisons(maximumNumberOfComparisons);
+     }
+ 
+     public void setMinimumTokenMatch(Integer minimumTokenMatch) {
+-        if (minimumTokenMatch != null && minimumTokenMatch < 1) {
+-            this.minimumTokenMatch = 1;
+-        } else {
+-            this.minimumTokenMatch = minimumTokenMatch;
+-        }
++        comparisonOptions.setMinimumTokenMatch(minimumTokenMatch);
+     }
+ 
+     public void setSubmissionDirectories(List<String> submissionDirectories) {
+@@ -281,19 +228,11 @@ public class JPlagOptions {
+     }
+ 
+     public void setSimilarityMetric(SimilarityMetric similarityMetric) {
+-        this.similarityMetric = similarityMetric;
++        comparisonOptions.setSimilarityMetric(similarityMetric);
+     }
+ 
+     public void setSimilarityThreshold(float similarityThreshold) {
+-        if (similarityThreshold > 100) {
+-            logger.warn("Maximum threshold of 100 used instead of {}", similarityThreshold);
+-            this.similarityThreshold = 100;
+-        } else if (similarityThreshold < 0) {
+-            logger.warn("Minimum threshold of 0 used instead of {}", similarityThreshold);
+-            this.similarityThreshold = 0;
+-        } else {
+-            this.similarityThreshold = similarityThreshold;
+-        }
++        comparisonOptions.setSimilarityThreshold(similarityThreshold);
+     }
+ 
+     public void setSubdirectoryName(String subdirectoryName) {
+@@ -312,9 +251,4 @@ public class JPlagOptions {
+     private boolean hasFileSuffixes() {
+         return fileSuffixes != null && fileSuffixes.length > 0;
+     }
+-
+-    private boolean hasMinimumTokenMatch() {
+-        return minimumTokenMatch != null;
+-    }
+-
+ }

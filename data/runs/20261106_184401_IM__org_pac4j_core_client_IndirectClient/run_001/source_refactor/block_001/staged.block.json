@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive callback and request-resolution configuration from IndirectClient to reduce its public API and implementation responsibility while preserving the existing IndirectClient configuration methods through delegation.",
+  "files": [
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java",
+    "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientConfiguration.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.pac4j.core.client.IndirectClient",
+        "org.pac4j.core.client.IndirectClientConfiguration"
+      ],
+      "outputs": [
+        "org.pac4j.core.client.IndirectClientConfiguration"
+      ],
+      "details": "Extract the cohesive callback and request-resolution state and behavior: callbackUrl, urlResolver, callbackUrlResolver, ajaxRequestResolver, getCallbackUrl(), setCallbackUrl(String), getUrlResolver(), setUrlResolver(UrlResolver), getCallbackUrlResolver(), setCallbackUrlResolver(CallbackUrlResolver), getAjaxRequestResolver(), setAjaxRequestResolver(AjaxRequestResolver), and the corresponding default initialization currently performed in beforeInternalInit(boolean). Keep IndirectClient's existing public accessors as delegating methods so existing subclasses and callers remain source-compatible. Update getRedirectionAction(WebContext, SessionStore), computeFinalCallbackUrl(WebContext), beforeInternalInit(boolean), and toString() to use the extracted configuration object.",
+      "risk": "medium"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.RoutingService",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract request lookup and timetable-query responsibilities so RoutingService no longer directly depends on GraphFinder, StopTimesHelper, DatedServiceJourneyHelper, or Calendar. The new helper dependency replaces four direct dependencies, reducing the target fan-out by three.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/RoutingService.java",
+        "src/main/java/org/opentripplanner/routing/RoutingServiceLookupHelper.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService",
+            "org.opentripplanner.routing.RoutingServiceLookupHelper"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceLookupHelper"
+          ],
+          "details": "Create RoutingServiceLookupHelper in the same package. Move the graphFinder field and its initialization responsibility into the new class. Move stopTimesForStop(StopLocation, long, int, int, ArrivalDeparture, boolean), getStopTimesForStop(StopLocation, ServiceDate, ArrivalDeparture), and stopTimesForPatternAtStop(StopLocation, TripPattern, long, int, int, ArrivalDeparture) because they use StopTimesHelper. Move findClosestStops(double, double, double) and findClosestPlaces(double, double, double, int, List<TransitMode>, List<PlaceType>, List<FeedScopedId>, List<FeedScopedId>, List<String>, List<String>, List<String>, RoutingService) because they use GraphFinder. Move getTripOnServiceDateForTripAndDay(FeedScopedId, ServiceDate) and getTripOnServiceDateById(FeedScopedId) because they use DatedServiceJourneyHelper. Move getTimetableForTripPattern(TripPattern, ServiceDate) together with the timetableSnapshot state needed by its lazy lookup because it uses Calendar and timetable snapshot resolution. The helper may receive Graph and RoutingService through its constructor or method parameters so the extracted methods preserve their existing behavior. Update RoutingService construction to retain a helper instance while removing the graphFinder field and the direct calls to the four extracted external dependencies.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService.stopTimesForStop()",
+            "org.opentripplanner.routing.RoutingService.getStopTimesForStop()",
+            "org.opentripplanner.routing.RoutingService.stopTimesForPatternAtStop()",
+            "org.opentripplanner.routing.RoutingService.findClosestStops()",
+            "org.opentripplanner.routing.RoutingService.findClosestPlaces()",
+            "org.opentripplanner.routing.RoutingService.getTripOnServiceDateForTripAndDay()",
+            "org.opentripplanner.routing.RoutingService.getTripOnServiceDateById()",
+            "org.opentripplanner.routing.RoutingService.getTimetableForTripPattern()"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceLookupHelper"
+          ],
+          "details": "Update callers to invoke the corresponding methods on RoutingServiceLookupHelper at the new location, passing the existing RoutingService instance where required by StopTimesHelper, DatedServiceJourneyHelper, or the findClosestPlaces signature. Remove the now-unused Calendar, GraphFinder, StopTimesHelper, and DatedServiceJourneyHelper imports from RoutingService and add only imports required by the extracted helper.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

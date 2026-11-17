@@ -1,0 +1,45 @@
+{
+  "id": 1,
+  "goal": "Extract file-boundary inspection and chop-file selection into a cohesive utility class, reducing the public API and unrelated responsibilities of CompactableUtils.",
+  "files": [
+    "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java",
+    "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableFileUtils.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableUtils",
+        "org.apache.accumulo.tserver.tablet.CompactableFileUtils"
+      ],
+      "outputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableFileUtils.getFirstAndLastKeys(org.apache.accumulo.tserver.tablet.Tablet,java.util.Set)",
+        "org.apache.accumulo.tserver.tablet.CompactableFileUtils.findChopFiles(org.apache.accumulo.core.dataImpl.KeyExtent,java.util.Map,java.util.Collection)"
+      ],
+      "details": "Move getFirstAndLastKeys and findChopFiles, preserving their signatures and visibility. The extracted class remains in the target package and retains the existing FileOperations, VolumeManager, TableConfiguration, CryptoService, FileSKVIterator, StoredTabletFile, Pair, Key, and KeyExtent dependencies.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableFileUtils.java"
+      ],
+      "outputs": [],
+      "details": "Add the imports required by the extracted getFirstAndLastKeys and findChopFiles implementations, and remove imports no longer used by CompactableUtils after extraction.",
+      "risk": "low"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableUtils.getFirstAndLastKeys()",
+        "org.apache.accumulo.tserver.tablet.CompactableUtils.findChopFiles()"
+      ],
+      "outputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableFileUtils.getFirstAndLastKeys()",
+        "org.apache.accumulo.tserver.tablet.CompactableFileUtils.findChopFiles()"
+      ],
+      "details": "Update all callers to use CompactableFileUtils while preserving arguments, return types, checked exceptions, and behavior.",
+      "risk": "medium"
+    }
+  ]
+}

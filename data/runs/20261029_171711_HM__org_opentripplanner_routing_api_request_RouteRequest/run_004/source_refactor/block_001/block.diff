@@ -1,0 +1,176 @@
+commit 9b0cb9df8abceb131e5f4880030876a3d178ee67
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 17:45:48 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPreferences.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPreferences.java
+new file mode 100644
+index 0000000000..38721a5d8c
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestPreferences.java
+@@ -0,0 +1,164 @@
++package org.opentripplanner.routing.api.request;
++
++import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
++
++import java.util.Collection;
++import java.util.HashSet;
++import java.util.List;
++import java.util.Set;
++import java.util.function.DoubleFunction;
++import org.opentripplanner.routing.core.RouteMatcher;
++import org.opentripplanner.transit.model.framework.FeedScopedId;
++import org.opentripplanner.transit.model.network.Route;
++
++/**
++ * Route, agency, and unpreferred-cost preferences for a routing request.
++ */
++public class RouteRequestPreferences {
++
++  private Set<FeedScopedId> bannedAgencies = Set.of();
++  private Set<FeedScopedId> whiteListedAgencies = Set.of();
++  private Set<FeedScopedId> preferredAgencies = Set.of();
++  private Set<FeedScopedId> unpreferredAgencies = Set.of();
++
++  private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
++  private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
++  private Set<FeedScopedId> unpreferredRoutes = Set.of();
++
++  public DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
++    0.0,
++    DEFAULT_ROUTE_RELUCTANCE
++  );
++
++  public void setPreferredAgencies(Collection<FeedScopedId> ids) {
++    if (ids != null) {
++      preferredAgencies = Set.copyOf(ids);
++    }
++  }
++
++  public void setPreferredAgenciesFromString(String value) {
++    if (!value.isEmpty()) {
++      preferredAgencies = FeedScopedId.parseSetOfIds(value);
++    }
++  }
++
++  public void setUnpreferredAgencies(Collection<FeedScopedId> ids) {
++    if (ids != null) {
++      unpreferredAgencies = Set.copyOf(ids);
++    }
++  }
++
++  public void setUnpreferredAgenciesFromString(String value) {
++    if (!value.isEmpty()) {
++      unpreferredAgencies = FeedScopedId.parseSetOfIds(value);
++    }
++  }
++
++  public void setUnpreferredCost(String function) {
++    unpreferredCost = RequestFunctions.parse(function);
++  }
++
++  public void setBannedAgencies(Collection<FeedScopedId> ids) {
++    if (ids != null) {
++      bannedAgencies = Set.copyOf(ids);
++    }
++  }
++
++  public void setBannedAgenciesFromSting(String value) {
++    if (!value.isEmpty()) {
++      bannedAgencies = FeedScopedId.parseSetOfIds(value);
++    }
++  }
++
++  public void setWhiteListedAgencies(Collection<FeedScopedId> ids) {
++    if (ids != null) {
++      whiteListedAgencies = Set.copyOf(ids);
++    }
++  }
++
++  public void setWhiteListedAgenciesFromSting(String value) {
++    if (!value.isEmpty()) {
++      whiteListedAgencies = FeedScopedId.parseSetOfIds(value);
++    }
++  }
++
++  public void setUnpreferredRoutes(Collection<FeedScopedId> routeIds) {
++    unpreferredRoutes = Set.copyOf(routeIds);
++  }
++
++  public void setUnpreferredRoutesFromString(String value) {
++    if (!value.isEmpty()) {
++      unpreferredRoutes = Set.copyOf(FeedScopedId.parseListOfIds(value));
++    } else {
++      unpreferredRoutes = Set.of();
++    }
++  }
++
++  public void setBannedRoutes(List<FeedScopedId> routeIds) {
++    bannedRoutes = RouteMatcher.idMatcher(routeIds);
++  }
++
++  public void setBannedRoutesFromString(String value) {
++    bannedRoutes = value.isEmpty() ? RouteMatcher.emptyMatcher() : RouteMatcher.parse(value);
++  }
++
++  public void setWhiteListedRoutesFromString(String value) {
++    whiteListedRoutes = value.isEmpty() ? RouteMatcher.emptyMatcher() : RouteMatcher.parse(value);
++  }
++
++  public void setWhiteListedRoutes(List<FeedScopedId> routeIds) {
++    whiteListedRoutes = RouteMatcher.idMatcher(routeIds);
++  }
++
++  public Set<FeedScopedId> getUnpreferredAgencies() {
++    return unpreferredAgencies;
++  }
++
++  public Set<FeedScopedId> getUnpreferredRoutes() {
++    return unpreferredRoutes;
++  }
++
++  public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
++    if (
++      bannedRoutes.isEmpty() &&
++      bannedAgencies.isEmpty() &&
++      whiteListedRoutes.isEmpty() &&
++      whiteListedAgencies.isEmpty()
++    ) {
++      return Set.of();
++    }
++
++    Set<FeedScopedId> result = new HashSet<>();
++    for (Route route : routes) {
++      if (routeIsBanned(route)) {
++        result.add(route.getId());
++      }
++    }
++    return result;
++  }
++
++  public boolean routeIsBanned(Route route) {
++    if (!bannedAgencies.isEmpty() && bannedAgencies.contains(route.getAgency().getId())) {
++      return true;
++    }
++
++    if (!bannedRoutes.isEmpty() && bannedRoutes.matches(route)) {
++      return true;
++    }
++
++    boolean whiteListed = false;
++    boolean whiteListInUse = false;
++
++    if (!whiteListedAgencies.isEmpty()) {
++      whiteListInUse = true;
++      whiteListed = whiteListedAgencies.contains(route.getAgency().getId());
++    }
++
++    if (!whiteListedRoutes.isEmpty()) {
++      whiteListInUse = true;
++      whiteListed = whiteListed || whiteListedRoutes.matches(route);
++    }
++
++    return whiteListInUse && !whiteListed;
++  }
++}

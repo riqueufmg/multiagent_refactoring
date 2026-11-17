@@ -1,0 +1,82 @@
+commit 7b9adbd3bd0767eed69e37841bef0ab9917a1220
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 17:21:27 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java
+new file mode 100644
+index 0000000000..7da9ca827a
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationSupport.java
+@@ -0,0 +1,70 @@
++package org.opentripplanner.routing.api.request;
++
++import java.util.ArrayList;
++import java.util.List;
++import org.locationtech.jts.geom.Coordinate;
++import org.locationtech.jts.geom.Envelope;
++import org.opentripplanner.api.common.LocationStringParser;
++import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
++import org.opentripplanner.model.GenericLocation;
++import org.opentripplanner.routing.graph.Vertex;
++
++/**
++ * Support for parsing request locations and checking whether a vertex is close to a request's
++ * origin or destination.
++ */
++public class RouteRequestLocationSupport {
++
++  private static final int MAX_CLOSENESS_METERS = 500;
++
++  private Envelope fromEnvelope;
++  private Envelope toEnvelope;
++
++  public GenericLocation parseFromString(String from) {
++    return LocationStringParser.fromOldStyleString(from);
++  }
++
++  public GenericLocation parseToString(String to) {
++    return LocationStringParser.fromOldStyleString(to);
++  }
++
++  public List<GenericLocation> parseIntermediatePlaces(List<String> intermediates) {
++    List<GenericLocation> locations = new ArrayList<>(intermediates.size());
++    for (String place : intermediates) {
++      locations.add(LocationStringParser.fromOldStyleString(place));
++    }
++    return locations;
++  }
++
++  public boolean isCloseToStartOrEnd(GenericLocation from, GenericLocation to, Vertex vertex) {
++    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
++      return false;
++    }
++
++    if (fromEnvelope == null) {
++      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
++    }
++    if (toEnvelope == null) {
++      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
++    }
++
++    return (
++      fromEnvelope.intersects(vertex.getCoordinate()) ||
++      toEnvelope.intersects(vertex.getCoordinate())
++    );
++  }
++
++  public void clearCachedEnvelopes() {
++    fromEnvelope = null;
++    toEnvelope = null;
++  }
++
++  private static Envelope getEnvelope(Coordinate coordinate, int meters) {
++    double lat = SphericalDistanceLibrary.metersToDegrees(meters);
++    double lon = SphericalDistanceLibrary.metersToLonDegrees(meters, coordinate.y);
++
++    Envelope envelope = new Envelope(coordinate);
++    envelope.expandBy(lon, lat);
++    return envelope;
++  }
++}

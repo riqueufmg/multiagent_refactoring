@@ -1,0 +1,43 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "net.pms.media.MediaInfo",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive audio-file metadata and audio-thumbnail parsing responsibility from MediaInfo while retaining MediaInfo's public parsing APIs and behavior.",
+      "files": [
+        "src/main/java/net/pms/media/MediaInfo.java",
+        "src/main/java/net/pms/media/MediaInfoAudioParser.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.MediaInfoAudioParser"
+          ],
+          "outputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.MediaInfoAudioParser"
+          ],
+          "details": "Extract the audio-specific branches from parse(InputFile, Format, int, boolean) and parseThumbnailOnly(InputFile, Format, int, boolean), together with extractAudioTagKeyValue(Tag, FieldKey) and extractAudioTagKeyIntegerValue(Tag, FieldKey, Integer), into MediaInfoAudioParser. Keep parse and parseThumbnailOnly on MediaInfo as compatibility-preserving entry points that delegate the same audio behavior. Preserve updates to MediaInfo duration, bitrate, container, thumbnail, thumbnail-ready state, and audioTracks through existing MediaInfo APIs or equivalent extraction access required for compilation. The target no longer directly references AudioFile, AudioFileIO, AudioHeader, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, ErrorMessage, FieldKey, KeyNotFoundException, Tag, TagException, NumberUtils, StarRating, or CoverUtil; these references remain only in MediaInfoAudioParser. MediaInfo still directly references MediaAudio, Format, AudioAsVideo, InputFile, DLNAThumbnail, and other non-audio responsibilities, so those dependencies are not counted as removed. The target gains one new direct dependency on MediaInfoAudioParser. Removing multiple distinct audio-parser dependencies while adding one helper dependency gives a positive net Fan-Out reduction, subject to measurement after compilation and detection.",
+          "risk": "high"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/net/pms/media/MediaInfo.java",
+            "src/main/java/net/pms/media/MediaInfoAudioParser.java"
+          ],
+          "outputs": [
+            "src/main/java/net/pms/media/MediaInfo.java",
+            "src/main/java/net/pms/media/MediaInfoAudioParser.java"
+          ],
+          "details": "Remove from MediaInfo the imports used exclusively by the extracted audio parsing and audio-thumbnail responsibility, including AudioFile, AudioFileIO, AudioHeader, the listed jaudiotagger exception and tag types, ErrorMessage, NumberUtils, StarRating, and CoverUtil. Add those imports to MediaInfoAudioParser, along with only the existing MediaInfo, InputFile, Format, AudioAsVideo, MediaAudio, DLNAThumbnail, configuration, and utility types required by the moved code. Do not remove imports still needed by MediaInfo's video parsing, image parsing, thumbnail generation, MIME mapping, or public method signatures.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

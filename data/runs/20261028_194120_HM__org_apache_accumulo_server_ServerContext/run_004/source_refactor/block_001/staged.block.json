@@ -1,0 +1,42 @@
+{
+  "id": 1,
+  "goal": "Extract the shared conditional-writer lifecycle responsibility while preserving ServerContext's public writer accessors and close behavior.",
+  "files": [
+    "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+    "server/base/src/main/java/org/apache/accumulo/server/ServerContextConditionalWriterSupport.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.accumulo.server.ServerContext",
+        "org.apache.accumulo.server.ServerContextConditionalWriterSupport",
+        "org.apache.accumulo.server.ServerContext.sharedMetadataWriter",
+        "org.apache.accumulo.server.ServerContext.sharedUserWriter",
+        "org.apache.accumulo.server.ServerContext.sharedMetadataWriterCreated",
+        "org.apache.accumulo.server.ServerContext.sharedUserWriterCreated",
+        "org.apache.accumulo.server.ServerContext.createSharedConditionalWriter(org.apache.accumulo.core.metadata.schema.Ample.DataLevel)",
+        "org.apache.accumulo.server.ServerContext.getSharedMetadataWriter()",
+        "org.apache.accumulo.server.ServerContext.getSharedUserWriter()"
+      ],
+      "outputs": [
+        "org.apache.accumulo.server.ServerContextConditionalWriterSupport"
+      ],
+      "details": "Move the shared metadata/user ConditionalWriter suppliers, creation flags, createSharedConditionalWriter method, and their close-time cleanup into ServerContextConditionalWriterSupport. Construct the helper with the existing org.apache.accumulo.core.clientImpl.ClientContext so it can use the inherited configuration and conditional-writer creation behavior without introducing a ServerContext-to-helper-to-ServerContext cycle. Keep ServerContext.getSharedMetadataWriter() and getSharedUserWriter() as compatibility-preserving delegating methods, and make ServerContext.close() delegate the extracted cleanup. After extraction, ServerContext no longer directly references org.apache.accumulo.core.client.ConditionalWriterConfig, org.apache.accumulo.core.client.TableNotFoundException, or org.apache.accumulo.core.metadata.schema.Ample.DataLevel. It still references ConditionalWriter and Supplier because those remain in the public accessor signatures. The target gains one direct dependency on ServerContextConditionalWriterSupport and removes three direct dependency classes, for an expected net Fan-Out reduction of two.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContextConditionalWriterSupport.java"
+      ],
+      "outputs": [
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContextConditionalWriterSupport.java"
+      ],
+      "details": "Remove ConditionalWriterConfig, TableNotFoundException, and Ample.DataLevel imports from ServerContext after extraction. Add the imports required by ServerContextConditionalWriterSupport for ConditionalWriterConfig, TableNotFoundException, Ample.DataLevel, ConditionalWriter, ClientContext, Supplier, and the existing logging types used by the moved lifecycle code.",
+      "risk": "low"
+    }
+  ]
+}

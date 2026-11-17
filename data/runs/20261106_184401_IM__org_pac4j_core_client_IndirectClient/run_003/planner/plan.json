@@ -1,0 +1,28 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.core.client.IndirectClient",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive callback URL configuration state and accessors from IndirectClient to reduce its public API size and implementation responsibilities.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.core.client.IndirectClient",
+            "org.pac4j.core.client.IndirectClientCallbackConfiguration"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.IndirectClientCallbackConfiguration"
+          ],
+          "details": "Extract callbackUrl, urlResolver, callbackUrlResolver, computeFinalCallbackUrl(WebContext), setCallbackUrl(String), getCallbackUrl(), getUrlResolver(), setUrlResolver(UrlResolver), getCallbackUrlResolver(), and setCallbackUrlResolver(CallbackUrlResolver) into IndirectClientCallbackConfiguration in the same package. Preserve IndirectClient's existing public methods as delegating compatibility methods where required, and keep newDefaultCallbackUrlResolver() in IndirectClient because it is an overridable factory method used during client initialization.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

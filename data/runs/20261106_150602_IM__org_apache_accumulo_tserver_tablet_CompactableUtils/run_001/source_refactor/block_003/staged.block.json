@@ -1,0 +1,28 @@
+{
+  "id": 3,
+  "goal": "Reduce the remaining orchestration responsibility of CompactableUtils by delegating compaction override resolution to the extracted compaction utility.",
+  "files": [
+    "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java"
+  ],
+  "ops": [
+    {
+      "op": "REPLACE_DEPENDENCY",
+      "inputs": [
+        "org.apache.accumulo.tserver.tablet.CompactableUtils",
+        "org.apache.accumulo.tserver.tablet.CompactableCompactionUtils"
+      ],
+      "outputs": [],
+      "details": "Replace the direct dependency on the extracted getOverrides implementation in CompactableUtils.compact with CompactableCompactionUtils.getOverrides, leaving CompactableUtils responsible only for FileCompactor construction, compaction execution, and bringing files online.",
+      "risk": "low"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java"
+      ],
+      "outputs": [],
+      "details": "Remove imports used exclusively by the extracted compaction plugin logic and retain only imports required by compact, bringOnline, and the remaining class members.",
+      "risk": "low"
+    }
+  ]
+}

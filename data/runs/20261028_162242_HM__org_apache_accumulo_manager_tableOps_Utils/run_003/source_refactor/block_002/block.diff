@@ -1,0 +1,148 @@
+commit af1f19754478e85dcad3c2109ce985adc07c9912
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 16:57:43 2026 -0300
+
+    source_refactor: apply block 2
+
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
+index b16fbe9f62..30e5c8a3cd 100644
+--- a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
+@@ -22,7 +22,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
+ 
+ import java.io.IOException;
+ import java.math.BigInteger;
+-import java.util.Base64;
+ import java.util.SortedMap;
+ import java.util.SortedSet;
+ import java.util.function.Function;
+@@ -43,7 +42,6 @@ import org.apache.accumulo.core.fate.zookeeper.DistributedReadWriteLock.LockType
+ import org.apache.accumulo.core.fate.zookeeper.FateLock;
+ import org.apache.accumulo.core.fate.zookeeper.LockRange;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+-import org.apache.accumulo.core.fate.zookeeper.ZooReservation;
+ import org.apache.accumulo.core.metadata.schema.Ample;
+ import org.apache.accumulo.manager.Manager;
+ import org.apache.accumulo.server.ServerContext;
+@@ -181,24 +179,12 @@ public class Utils {
+ 
+   public static long reserveHdfsDirectory(Manager env, String directory, FateId fateId)
+       throws KeeperException, InterruptedException {
+-    ZooReaderWriter zk = env.getContext().getZooSession().asReaderWriter();
+-    if (ZooReservation.attempt(zk, Constants.ZHDFS_RESERVATIONS + "/"
+-        + Base64.getEncoder().encodeToString(directory.getBytes(UTF_8)), fateId, "")) {
+-      log.trace("{} reserved bulk dir {}", fateId, directory);
+-      return 0;
+-    } else {
+-      log.trace("{} could not reserve bulk dir {} that is already reserved", fateId, directory);
+-      return 50;
+-    }
++    return UtilsHdfsReservation.reserveHdfsDirectory(env, directory, fateId);
+   }
+ 
+   public static void unreserveHdfsDirectory(Manager env, String directory, FateId fateId)
+       throws KeeperException, InterruptedException {
+-    ZooReservation.release(env.getContext().getZooSession().asReaderWriter(),
+-        Constants.ZHDFS_RESERVATIONS + "/"
+-            + Base64.getEncoder().encodeToString(directory.getBytes(UTF_8)),
+-        fateId);
+-    log.trace("{} unreserved bulk dir {}", fateId, directory);
++    UtilsHdfsReservation.unreserveHdfsDirectory(env, directory, fateId);
+   }
+ 
+   private static DistributedLock getLock(ServerContext context, AbstractId<?> id, FateId fateId,
+@@ -229,12 +215,12 @@ public class Utils {
+ 
+   public static SortedSet<Text> getSortedSetFromFile(Manager manager, Path path, boolean encoded)
+       throws IOException {
+-    return UtilsFileParser.getSortedSetFromFile(manager, path, encoded);
++    return UtilsHdfsReservation.getSortedSetFromFile(manager, path, encoded);
+   }
+ 
+   public static SortedMap<Text,TabletMergeability> getSortedSplitsFromFile(ServerContext ctx,
+       Path path) throws IOException {
+-    return UtilsFileParser.getSortedSplitsFromFile(ctx, path);
++    return UtilsHdfsReservation.getSortedSplitsFromFile(ctx, path);
+   }
+ 
+ }
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsHdfsReservation.java b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsHdfsReservation.java
+new file mode 100644
+index 0000000000..442dac1a11
+--- /dev/null
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsHdfsReservation.java
+@@ -0,0 +1,74 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++package org.apache.accumulo.manager.tableOps;
++
++import static java.nio.charset.StandardCharsets.UTF_8;
++
++import java.io.IOException;
++import java.util.Base64;
++import java.util.SortedMap;
++import java.util.SortedSet;
++
++import org.apache.accumulo.core.Constants;
++import org.apache.accumulo.core.client.admin.TabletMergeability;
++import org.apache.accumulo.core.fate.FateId;
++import org.apache.accumulo.core.fate.zookeeper.ZooReservation;
++import org.apache.accumulo.manager.Manager;
++import org.apache.accumulo.server.ServerContext;
++import org.apache.hadoop.fs.Path;
++import org.apache.hadoop.io.Text;
++import org.apache.zookeeper.KeeperException;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++public class UtilsHdfsReservation {
++  private static final Logger log = LoggerFactory.getLogger(UtilsHdfsReservation.class);
++
++  public static long reserveHdfsDirectory(Manager env, String directory, FateId fateId)
++      throws KeeperException, InterruptedException {
++    var zk = env.getContext().getZooSession().asReaderWriter();
++    if (ZooReservation.attempt(zk, Constants.ZHDFS_RESERVATIONS + "/"
++        + Base64.getEncoder().encodeToString(directory.getBytes(UTF_8)), fateId, "")) {
++      log.trace("{} reserved bulk dir {}", fateId, directory);
++      return 0;
++    } else {
++      log.trace("{} could not reserve bulk dir {} that is already reserved", fateId, directory);
++      return 50;
++    }
++  }
++
++  public static void unreserveHdfsDirectory(Manager env, String directory, FateId fateId)
++      throws KeeperException, InterruptedException {
++    ZooReservation.release(env.getContext().getZooSession().asReaderWriter(),
++        Constants.ZHDFS_RESERVATIONS + "/"
++            + Base64.getEncoder().encodeToString(directory.getBytes(UTF_8)),
++        fateId);
++    log.trace("{} unreserved bulk dir {}", fateId, directory);
++  }
++
++  public static SortedSet<Text> getSortedSetFromFile(Manager manager, Path path, boolean encoded)
++      throws IOException {
++    return UtilsFileParser.getSortedSetFromFile(manager, path, encoded);
++  }
++
++  public static SortedMap<Text,TabletMergeability> getSortedSplitsFromFile(ServerContext ctx,
++      Path path) throws IOException {
++    return UtilsFileParser.getSortedSplitsFromFile(ctx, path);
++  }
++}

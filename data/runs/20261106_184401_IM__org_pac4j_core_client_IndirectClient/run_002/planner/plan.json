@@ -1,0 +1,51 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "org.pac4j.core.client.IndirectClient",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the authentication action strategy configuration from IndirectClient to reduce its public API and configuration responsibilities while preserving the existing IndirectClient API through delegation.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java",
+        "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientActionConfiguration.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.core.client.IndirectClient",
+            "org.pac4j.core.client.IndirectClientActionConfiguration"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.IndirectClientActionConfiguration"
+          ],
+          "details": "Extract the cohesive action-strategy state and operations consisting of ajaxRequestResolver, redirectionActionBuilder, logoutActionBuilder, getAjaxRequestResolver(), setAjaxRequestResolver(), getRedirectionActionBuilder(), defaultRedirectionActionBuilder(), setRedirectionActionBuilder(), getLogoutActionBuilder(), defaultLogoutActionBuilder(), setLogoutActionBuilder(), and the corresponding initialization and action-builder access used by getRedirectionAction(WebContext, SessionStore), getLogoutAction(WebContext, SessionStore, UserProfile, String), beforeInternalInit(boolean), and afterInternalInit(boolean). Keep the existing public methods on IndirectClient as delegating facade methods so callers do not need to change.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract authentication-attempt tracking and session-attribute naming from IndirectClient to reduce implementation complexity and group related state-management behavior.",
+      "files": [
+        "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClient.java",
+        "pac4j-core/src/main/java/org/pac4j/core/client/IndirectClientAuthenticationState.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.pac4j.core.client.IndirectClient",
+            "org.pac4j.core.client.IndirectClientAuthenticationState"
+          ],
+          "outputs": [
+            "org.pac4j.core.client.IndirectClientAuthenticationState"
+          ],
+          "details": "Extract the cohesive authentication-attempt state and session-name operations consisting of STATE_SESSION_PARAMETER, NONCE_SESSION_PARAMETER, CODE_VERIFIER_SESSION_PARAMETER, checkAuthenticationAttempt, getStateSessionAttributeName(), getNonceSessionAttributeName(), getCodeVerifierSessionAttributeName(), isCheckAuthenticationAttempt(), setCheckAuthenticationAttempt(boolean), saveAttemptedAuthentication(WebContext, SessionStore), cleanAttemptedAuthentication(WebContext, SessionStore), and the attempted-authentication handling used by getRedirectionAction(WebContext, SessionStore) and getCredentials(WebContext, SessionStore, ProfileManagerFactory). Preserve the existing public methods on IndirectClient as delegating facade methods.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "net.pms.media.MediaInfo",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive audio-file metadata and audio-thumbnail parsing responsibility from MediaInfo while preserving the existing public MediaInfo API and parse behavior.",
+      "files": [
+        "src/main/java/net/pms/media/MediaInfo.java",
+        "src/main/java/net/pms/media/MediaInfoAudioParser.java",
+        "src/test/java/net/pms/dlna/MediaInfoTest.java",
+        "src/test/java/net/pms/formats/FormatsRegressionTest.java",
+        "src/test/java/net/pms/parsers/MediaInfoParserTest.java",
+        "src/test/java/net/pms/test/Issue1278.java",
+        "src/test/java/net/pms/test/formats/FormatRecognitionTest.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.MediaInfoAudioParser"
+          ],
+          "outputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.MediaInfoAudioParser"
+          ],
+          "details": "Create MediaInfoAudioParser in the same package and move the audio-specific parsing logic currently embedded in MediaInfo.parse and MediaInfo.parseThumbnailOnly, including AudioFileIO.read/readAs usage, AudioHeader interpretation, Tag and FieldKey extraction, audio thumbnail lookup through CoverUtil, StarRating conversion, NumberUtils year handling, and the private extractAudioTagKeyValue and extractAudioTagKeyIntegerValue helpers. Update MediaInfo so these paths delegate to MediaInfoAudioParser while retaining the existing public parse methods, MediaAudio population, duration, bitrate, container, thumbnail, and track-list behavior. The extracted code must communicate with MediaInfo through existing public methods such as setDuration, setBitrate, setThumb, getAudioTracksList, and setContainer, or through a narrowly scoped package-level collaboration required by the extraction; do not remove or rename MediaInfo public methods.",
+          "risk": "high"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/net/pms/media/MediaInfo.java",
+            "src/main/java/net/pms/media/MediaInfoAudioParser.java"
+          ],
+          "outputs": [
+            "src/main/java/net/pms/media/MediaInfo.java",
+            "src/main/java/net/pms/media/MediaInfoAudioParser.java"
+          ],
+          "details": "Move the jaudiotagger imports used only by the extracted audio responsibility from MediaInfo to MediaInfoAudioParser: AudioFile, AudioFileIO, AudioHeader, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, ErrorMessage, FieldKey, KeyNotFoundException, and Tag. Also move the audio-only direct dependencies used exclusively by those paths, including CoverUtil, CoverSupplier, StarRating, FileUtil, and NumberUtils, when their remaining references are absent after extraction. Keep imports in MediaInfo for dependencies still referenced by video, image, general metadata, public signatures, or other parsing responsibilities. MediaInfoAudioParser introduces one new direct dependency from MediaInfo, but the extracted responsibility removes the direct references from MediaInfo to the listed audio-parser dependency classes; the expected net Fan-Out reduction is positive because multiple distinct dependencies are eliminated for one new helper dependency.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_TESTS",
+          "inputs": [
+            "src/test/java/net/pms/dlna/MediaInfoTest.java",
+            "src/test/java/net/pms/formats/FormatsRegressionTest.java",
+            "src/test/java/net/pms/parsers/MediaInfoParserTest.java",
+            "src/test/java/net/pms/test/Issue1278.java",
+            "src/test/java/net/pms/test/formats/FormatRecognitionTest.java"
+          ],
+          "outputs": [],
+          "details": "Update related tests affected by this refactoring block so the configured build command passes. Adjust imports, package references, moved class references, constructors, and assertions only when required. Do not change production behavior through tests.",
+          "risk": "medium",
+          "api_change": false
+        }
+      ],
+      "test_files": [
+        "src/test/java/net/pms/dlna/MediaInfoTest.java",
+        "src/test/java/net/pms/formats/FormatsRegressionTest.java",
+        "src/test/java/net/pms/parsers/MediaInfoParserTest.java",
+        "src/test/java/net/pms/test/Issue1278.java",
+        "src/test/java/net/pms/test/formats/FormatRecognitionTest.java"
+      ]
+    }
+  ]
+}

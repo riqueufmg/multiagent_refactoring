@@ -1,0 +1,30 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "net.pms.media.MediaInfo",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive audio-file metadata and audio-thumbnail responsibility from MediaInfo into a same-package helper while preserving MediaInfo's existing parse and parseThumbnailOnly public APIs.",
+      "files": [
+        "src/main/java/net/pms/media/MediaInfo.java",
+        "src/main/java/net/pms/media/MediaAudioParser.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.MediaAudioParser"
+          ],
+          "outputs": [
+            "net.pms.media.MediaInfo",
+            "net.pms.media.MediaAudioParser"
+          ],
+          "details": "Extract the audio-specific branches of parse(InputFile, Format, int, boolean) and parseThumbnailOnly(InputFile, Format, int, boolean), including Jaudiotagger reads, audio tag extraction, audio thumbnail selection, audio codec/container assignment, and the associated exception handling. Keep MediaInfo's public methods and existing state semantics by having those methods delegate the extracted responsibility and apply the returned or updated audio results. The extracted class may reference the existing MediaInfo state through an explicit collaboration established by the extraction, but MediaInfo must no longer directly reference AudioFileIO, AudioFile, AudioHeader, Tag, FieldKey, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, TagException, KeyNotFoundException, ErrorMessage, StarRating, CoverUtil, CoverSupplier, FileUtil, NumberUtils, or AudioAsVideo. MediaInfo must retain dependencies required by its other responsibilities, including MediaAudio for its public audio-track API, DLNAThumbnail for video/image thumbnail handling and thumbnail accessors, Format for public parsing signatures, and the FFmpeg, image, renderer, configuration, and subtitle/chapter code. The new direct dependency on MediaAudioParser offsets the removed audio-specific dependencies; because multiple distinct dependencies are removed, the expected net Fan-Out change is positive. No public method or class name is changed.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

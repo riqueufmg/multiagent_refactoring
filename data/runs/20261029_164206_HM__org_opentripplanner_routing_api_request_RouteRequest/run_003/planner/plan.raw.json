@@ -1,0 +1,46 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive request-input parsing and unpreferred-cost configuration responsibility from RouteRequest while preserving its existing public methods and behavior.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS(org.opentripplanner.routing.api.request.RouteRequest, org.opentripplanner.routing.api.request.RouteRequestInputSupport)",
+          "inputs": [
+            "RouteRequest.setFromString(String)",
+            "RouteRequest.setToString(String)",
+            "RouteRequest.setIntermediatePlacesFromStrings(List<String>)",
+            "RouteRequest.setDateTime(String, String, ZoneId)",
+            "RouteRequest.unpreferredCost",
+            "RouteRequest.setUnpreferredCost(String)"
+          ],
+          "outputs": [
+            "RouteRequestInputSupport",
+            "RouteRequest public compatibility methods retained as delegating wrappers"
+          ],
+          "details": "Move the parsing and configuration logic that directly calls LocationStringParser, DateUtils, and RequestFunctions into the new same-package RouteRequestInputSupport class. Keep the existing RouteRequest methods and field behavior available through delegating wrappers so callers do not need to change. After extraction, RouteRequest must contain no direct references to LocationStringParser, DateUtils, or RequestFunctions; those dependencies remain only in RouteRequestInputSupport. The target gains one new distinct dependency, RouteRequestInputSupport, while three distinct outgoing dependencies disappear, for an expected net Fan-Out reduction of two. FeedScopedId, RouteMatcher, GenericLocation, and other dependencies remain in RouteRequest because they are referenced by fields, signatures, initialization, or unrelated methods and are not counted as removed.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS(src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java)",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestInputSupport"
+          ],
+          "outputs": [
+            "Imports required for the delegating wrappers",
+            "Unused LocationStringParser, DateUtils, and RequestFunctions imports removed from RouteRequest"
+          ],
+          "details": "Update imports only after extraction so RouteRequest compiles with the new support class and does not retain imports for dependencies that no longer have direct references. This operation introduces no additional distinct target dependency beyond RouteRequestInputSupport already introduced by the extraction.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

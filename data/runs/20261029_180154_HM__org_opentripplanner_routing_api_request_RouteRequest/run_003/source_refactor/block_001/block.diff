@@ -1,0 +1,58 @@
+commit 4133ab419f11cdf82a82f4b93bb02131e0030a4d
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 18:24:35 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java
+new file mode 100644
+index 0000000000..5366671e68
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java
+@@ -0,0 +1,46 @@
++package org.opentripplanner.routing.api.request;
++
++import java.time.Instant;
++import java.time.ZoneId;
++import java.time.ZonedDateTime;
++import java.util.ArrayList;
++import java.util.List;
++import org.opentripplanner.api.common.LocationStringParser;
++import org.opentripplanner.model.GenericLocation;
++import org.opentripplanner.util.time.DateUtils;
++
++/**
++ * Support for converting legacy request input values into routing request values.
++ */
++public final class RouteRequestInputSupport {
++
++  private RouteRequestInputSupport() {}
++
++  public static GenericLocation parseLocation(String value) {
++    return LocationStringParser.fromOldStyleString(value);
++  }
++
++  public static Instant parseDateTime(String date, String time, ZoneId timeZone) {
++    ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, timeZone);
++    return dateObject == null ? Instant.now() : dateObject.toInstant();
++  }
++
++  public static List<GenericLocation> parseIntermediatePlaces(List<String> places) {
++    List<GenericLocation> result = new ArrayList<>(places.size());
++    for (String place : places) {
++      result.add(parseLocation(place));
++    }
++    return result;
++  }
++
++  public static List<GenericLocation> addIntermediatePlace(
++    List<GenericLocation> intermediatePlaces,
++    GenericLocation location
++  ) {
++    if (intermediatePlaces == null) {
++      intermediatePlaces = new ArrayList<>();
++    }
++    intermediatePlaces.add(location);
++    return intermediatePlaces;
++  }
++}

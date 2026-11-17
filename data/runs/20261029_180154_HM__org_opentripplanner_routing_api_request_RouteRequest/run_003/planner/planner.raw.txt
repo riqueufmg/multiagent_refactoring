@@ -1,0 +1,42 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive legacy request-input conversion responsibility while retaining RouteRequest's public methods as compatibility wrappers.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestInputSupport"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestInputSupport"
+          ],
+          "details": "Extract the implementation used by setFromString(String), setToString(String), setDateTime(String, String, ZoneId), setIntermediatePlacesFromStrings(List<String>), and the intermediate-place initialization performed by addIntermediatePlace(GenericLocation) into the new same-package support class. Keep the existing public RouteRequest methods and intermediatePlaces field for compatibility; their implementations should delegate to the extracted support logic without changing behavior. The target should no longer directly reference LocationStringParser, DateUtils, ZonedDateTime, or ArrayList. RouteRequest gains one new direct dependency on RouteRequestInputSupport, so the expected net Fan-Out reduction is positive because four distinct existing dependencies are eliminated and one new helper dependency is introduced. GenericLocation, List, ZoneId, Instant, and the public RouteRequest method signatures remain in the target and are not counted as removed.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestInputSupport.java"
+          ],
+          "details": "Remove the RouteRequest imports for LocationStringParser, DateUtils, ZonedDateTime, and ArrayList after the extracted implementation no longer uses them there. Add only the imports required by RouteRequestInputSupport and preserve all imports needed by the unchanged public signatures and remaining behavior.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

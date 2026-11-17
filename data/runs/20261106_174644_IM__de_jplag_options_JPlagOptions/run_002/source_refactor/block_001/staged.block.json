@@ -1,0 +1,60 @@
+{
+  "id": 1,
+  "goal": "Extract language-related and output-related state and behavior from JPlagOptions into a cohesive options class, reducing the number of public methods and fields in the target class.",
+  "files": [
+    "core/src/main/java/de/jplag/options/JPlagOptions.java",
+    "core/src/main/java/de/jplag/options/JPlagLanguageOptions.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "de.jplag.options.JPlagOptions",
+        "de.jplag.options.JPlagLanguageOptions",
+        "de.jplag.options.JPlagOptions.languageIdentifier",
+        "de.jplag.options.JPlagOptions.language",
+        "de.jplag.options.JPlagOptions.fileSuffixes",
+        "de.jplag.options.JPlagOptions.verbosity",
+        "de.jplag.options.JPlagOptions.getFileSuffixes()",
+        "de.jplag.options.JPlagOptions.getLanguageIdentifier()",
+        "de.jplag.options.JPlagOptions.getLanguage()",
+        "de.jplag.options.JPlagOptions.getVerbosity()",
+        "de.jplag.options.JPlagOptions.setFileSuffixes(String[])",
+        "de.jplag.options.JPlagOptions.setLanguage(Language)",
+        "de.jplag.options.JPlagOptions.setLanguageDefaults(Language)",
+        "de.jplag.options.JPlagOptions.setVerbosity(Verbosity)",
+        "de.jplag.options.JPlagOptions.hasFileSuffixes()"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagLanguageOptions"
+      ],
+      "details": "Create JPlagLanguageOptions in the same package. Move the listed fields and methods into it. The extracted class should receive the existing languageIdentifier and JPlagComparisonOptions through its constructor so setLanguageDefaults(Language) can preserve the existing minimum-token-match behavior. Remove the moved fields and methods from JPlagOptions and initialize the extracted object from JPlagOptions' existing constructor.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "de.jplag.options.JPlagOptions.getFileSuffixes()",
+        "de.jplag.options.JPlagOptions.getLanguageIdentifier()",
+        "de.jplag.options.JPlagOptions.getLanguage()",
+        "de.jplag.options.JPlagOptions.getVerbosity()",
+        "de.jplag.options.JPlagOptions.setFileSuffixes(String[])",
+        "de.jplag.options.JPlagOptions.setLanguage(Language)",
+        "de.jplag.options.JPlagOptions.setLanguageDefaults(Language)",
+        "de.jplag.options.JPlagOptions.setVerbosity(Verbosity)"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagLanguageOptions.getFileSuffixes()",
+        "de.jplag.options.JPlagLanguageOptions.getLanguageIdentifier()",
+        "de.jplag.options.JPlagLanguageOptions.getLanguage()",
+        "de.jplag.options.JPlagLanguageOptions.getVerbosity()",
+        "de.jplag.options.JPlagLanguageOptions.setFileSuffixes(String[])",
+        "de.jplag.options.JPlagLanguageOptions.setLanguage(Language)",
+        "de.jplag.options.JPlagLanguageOptions.setLanguageDefaults(Language)",
+        "de.jplag.options.JPlagLanguageOptions.setVerbosity(Verbosity)"
+      ],
+      "details": "Update callers to obtain and use the extracted JPlagLanguageOptions instance instead of invoking the moved methods on JPlagOptions. Preserve the existing method arguments and behavior.",
+      "risk": "medium"
+    }
+  ]
+}

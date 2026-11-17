@@ -1,0 +1,225 @@
+commit 87d76ef1e1f03a7ff6ff39395a223c51fe2620e9
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 12:47:11 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/RoutingServiceLookup.java b/src/main/java/org/opentripplanner/routing/RoutingServiceLookup.java
+new file mode 100644
+index 0000000000..70e87745ac
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/RoutingServiceLookup.java
+@@ -0,0 +1,213 @@
++package org.opentripplanner.routing;
++
++import com.google.common.collect.Multimap;
++import gnu.trove.set.TIntSet;
++import java.util.Collection;
++import java.util.List;
++import java.util.Map;
++import java.util.Set;
++import org.opentripplanner.common.geometry.HashGridSpatialIndex;
++import org.opentripplanner.ext.flex.FlexIndex;
++import org.opentripplanner.model.MultiModalStation;
++import org.opentripplanner.model.Station;
++import org.opentripplanner.model.Stop;
++import org.opentripplanner.model.StopLocation;
++import org.opentripplanner.model.StopTimesInPattern;
++import org.opentripplanner.model.TimetableSnapshot;
++import org.opentripplanner.model.TripPattern;
++import org.opentripplanner.model.TripTimeOnDate;
++import org.opentripplanner.model.calendar.ServiceDate;
++import org.opentripplanner.routing.graph.Graph;
++import org.opentripplanner.routing.graph.GraphIndex;
++import org.opentripplanner.routing.graphfinder.GraphFinder;
++import org.opentripplanner.routing.graphfinder.NearbyStop;
++import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
++import org.opentripplanner.routing.graphfinder.PlaceType;
++import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
++import org.opentripplanner.routing.stoptimes.StopTimesHelper;
++import org.opentripplanner.routing.vertextype.TransitStopVertex;
++import org.opentripplanner.transit.model.basic.FeedScopedId;
++import org.opentripplanner.transit.model.network.Route;
++import org.opentripplanner.transit.model.network.TransitMode;
++import org.opentripplanner.transit.model.organization.Agency;
++import org.opentripplanner.transit.model.organization.Operator;
++import org.opentripplanner.transit.model.timetable.Trip;
++
++public class RoutingServiceLookup {
++
++  private final GraphIndex graphIndex;
++  private final GraphFinder graphFinder;
++
++  public RoutingServiceLookup(Graph graph, RoutingService routingService) {
++    this.graphIndex = graph.index;
++    this.graphFinder = GraphFinder.getInstance(graph);
++  }
++
++  public Agency getAgencyForId(FeedScopedId id) {
++    return graphIndex.getAgencyForId(id);
++  }
++
++  public StopLocation getStopForId(FeedScopedId id) {
++    return graphIndex.getStopForId(id);
++  }
++
++  public Route getRouteForId(FeedScopedId id) {
++    return graphIndex.getRouteForId(id);
++  }
++
++  public void addRoutes(Route route) {
++    graphIndex.addRoutes(route);
++  }
++
++  public Set<Route> getRoutesForStop(StopLocation stop) {
++    return graphIndex.getRoutesForStop(stop);
++  }
++
++  public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
++    return graphIndex.getPatternsForStop(stop);
++  }
++
++  public Collection<TripPattern> getPatternsForStop(
++    StopLocation stop,
++    TimetableSnapshot timetableSnapshot
++  ) {
++    return graphIndex.getPatternsForStop(stop, timetableSnapshot);
++  }
++
++  public Collection<Operator> getAllOperators() {
++    return graphIndex.getAllOperators();
++  }
++
++  public Map<FeedScopedId, Operator> getOperatorForId() {
++    return graphIndex.getOperatorForId();
++  }
++
++  public Collection<StopLocation> getAllStops() {
++    return graphIndex.getAllStops();
++  }
++
++  public Map<FeedScopedId, Trip> getTripForId() {
++    return graphIndex.getTripForId();
++  }
++
++  public Collection<Route> getAllRoutes() {
++    return graphIndex.getAllRoutes();
++  }
++
++  public Map<Stop, TransitStopVertex> getStopVertexForStop() {
++    return graphIndex.getStopVertexForStop();
++  }
++
++  public Map<Trip, TripPattern> getPatternForTrip() {
++    return graphIndex.getPatternForTrip();
++  }
++
++  public Multimap<String, TripPattern> getPatternsForFeedId() {
++    return graphIndex.getPatternsForFeedId();
++  }
++
++  public Multimap<Route, TripPattern> getPatternsForRoute() {
++    return graphIndex.getPatternsForRoute();
++  }
++
++  public Map<Station, MultiModalStation> getMultiModalStationForStations() {
++    return graphIndex.getMultiModalStationForStations();
++  }
++
++  public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
++    return graphIndex.getStopSpatialIndex();
++  }
++
++  public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
++    return graphIndex.getServiceCodesRunningForDate();
++  }
++
++  public FlexIndex getFlexIndex() {
++    return graphIndex.getFlexIndex();
++  }
++
++  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
++    return graphFinder.findClosestStops(lat, lon, radiusMeters);
++  }
++
++  public List<PlaceAtDistance> findClosestPlaces(
++    double lat,
++    double lon,
++    double radiusMeters,
++    int maxResults,
++    List<TransitMode> filterByModes,
++    List<PlaceType> filterByPlaceTypes,
++    List<FeedScopedId> filterByStops,
++    List<FeedScopedId> filterByRoutes,
++    List<String> filterByBikeRentalStations,
++    List<String> filterByBikeParks,
++    List<String> filterByCarParks,
++    RoutingService routingService
++  ) {
++    return graphFinder.findClosestPlaces(
++      lat,
++      lon,
++      radiusMeters,
++      maxResults,
++      filterByModes,
++      filterByPlaceTypes,
++      filterByStops,
++      filterByRoutes,
++      filterByBikeRentalStations,
++      routingService
++    );
++  }
++
++  public List<StopTimesInPattern> stopTimesForStop(
++    StopLocation stop,
++    long startTime,
++    int timeRange,
++    int numberOfDepartures,
++    ArrivalDeparture arrivalDeparture,
++    boolean includeCancelledTrips,
++    RoutingService routingService,
++    TimetableSnapshot timetableSnapshot
++  ) {
++    return StopTimesHelper.stopTimesForStop(
++      routingService,
++      timetableSnapshot,
++      stop,
++      startTime,
++      timeRange,
++      numberOfDepartures,
++      arrivalDeparture,
++      includeCancelledTrips
++    );
++  }
++
++  public List<StopTimesInPattern> getStopTimesForStop(
++    StopLocation stop,
++    ServiceDate serviceDate,
++    ArrivalDeparture arrivalDeparture,
++    RoutingService routingService
++  ) {
++    return StopTimesHelper.stopTimesForStop(routingService, stop, serviceDate, arrivalDeparture);
++  }
++
++  public List<TripTimeOnDate> stopTimesForPatternAtStop(
++    StopLocation stop,
++    TripPattern pattern,
++    long startTime,
++    int timeRange,
++    int numberOfDepartures,
++    ArrivalDeparture arrivalDeparture,
++    RoutingService routingService,
++    TimetableSnapshot timetableSnapshot
++  ) {
++    return StopTimesHelper.stopTimesForPatternAtStop(
++      routingService,
++      timetableSnapshot,
++      stop,
++      pattern,
++      startTime,
++      timeRange,
++      numberOfDepartures,
++      arrivalDeparture
++    );
++  }
++}

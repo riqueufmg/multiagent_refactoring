@@ -1,0 +1,34 @@
+commit b3b368d9e1aea898396fe5fd3e49bff538ca8646
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 15:37:17 2026 -0400
+
+    source_refactor: apply block 3
+
+diff --git a/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java b/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java
+index c80df1c3b4..b1ffdba4f1 100644
+--- a/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java
++++ b/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java
+@@ -64,6 +64,11 @@ public class CompactableUtils {
+     return CompactableCompactionUtils.computeOverrides(tablet, files, cfg);
+   }
+ 
++  static Map<String,String> getOverrides(CompactionKind kind, Tablet tablet,
++      CompactableImpl.CompactionHelper helper, Set<CompactableFile> files) {
++    return CompactableCompactionUtils.getOverrides(kind, tablet, helper, files);
++  }
++
+   static <T> T newInstance(AccumuloConfiguration tableConfig, String className,
+       Class<T> baseClass) {
+     return CompactableCompactionUtils.newInstance(tableConfig, className, baseClass);
+@@ -79,11 +84,6 @@ public class CompactableUtils {
+     return CompactableCompactionUtils.getHelper(kind, tablet, compactionId, compactionConfig);
+   }
+ 
+-  public static Map<String,String> getOverrides(CompactionKind kind, Tablet tablet,
+-      CompactableImpl.CompactionHelper driver, Set<CompactableFile> files) {
+-    return CompactableCompactionUtils.getOverrides(kind, tablet, driver, files);
+-  }
+-
+   private static AccumuloConfiguration getCompactionConfig(TableConfiguration tableConfiguration,
+       Map<String,String> overrides) {
+     if (overrides.isEmpty()) {

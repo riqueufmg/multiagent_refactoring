@@ -1,0 +1,29 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "io.github.classgraph.ScanResult",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive JSON serialization and deserialization responsibility while preserving ScanResult.fromJSON(String), ScanResult.toJSON(int), and ScanResult.toJSON() as compatibility wrappers.",
+      "files": [
+        "src/main/java/io/github/classgraph/ScanResult.java",
+        "src/main/java/io/github/classgraph/ScanResultSerialization.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.ScanResult",
+            "io.github.classgraph.ScanResultSerialization"
+          ],
+          "outputs": [
+            "io.github.classgraph.ScanResultSerialization"
+          ],
+          "details": "Extract the serialization-specific inner class SerializationFormat and the implementations of fromJSON(String), toJSON(int), and toJSON() into ScanResultSerialization. Keep the original public ScanResult methods and have them delegate to the extracted responsibility so the public API and behavior remain unchanged. After extraction, ScanResult should no longer directly reference JSONDeserializer, JSONSerializer, or AutoCloseableExecutorService; those dependencies belong only to ScanResultSerialization. The target gains one new direct dependency, ScanResultSerialization, while three distinct direct dependencies are removed, for an expected net Fan-Out reduction of two. ClassGraph, ScanResult, ScanSpec, and other dependencies used elsewhere by ScanResult are not counted as removed.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

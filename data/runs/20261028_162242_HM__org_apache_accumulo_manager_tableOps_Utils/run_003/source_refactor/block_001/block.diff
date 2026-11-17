@@ -1,0 +1,195 @@
+commit ca5b3114a5631a4499c4cee519af5e191ded29d1
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 16:51:36 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
+index 993da153ec..b16fbe9f62 100644
+--- a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java
+@@ -23,8 +23,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
+ import java.io.IOException;
+ import java.math.BigInteger;
+ import java.util.Base64;
+-import java.util.NoSuchElementException;
+-import java.util.Objects;
+ import java.util.SortedMap;
+ import java.util.SortedSet;
+ import java.util.function.Function;
+@@ -35,9 +33,7 @@ import org.apache.accumulo.core.clientImpl.AcceptableThriftTableOperationExcepti
+ import org.apache.accumulo.core.clientImpl.thrift.TableOperation;
+ import org.apache.accumulo.core.clientImpl.thrift.TableOperationExceptionType;
+ import org.apache.accumulo.core.data.AbstractId;
+-import org.apache.accumulo.core.data.Key;
+ import org.apache.accumulo.core.data.NamespaceId;
+-import org.apache.accumulo.core.data.PartialKey;
+ import org.apache.accumulo.core.data.TableId;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+ import org.apache.accumulo.core.fate.FateId;
+@@ -49,7 +45,6 @@ import org.apache.accumulo.core.fate.zookeeper.LockRange;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReaderWriter;
+ import org.apache.accumulo.core.fate.zookeeper.ZooReservation;
+ import org.apache.accumulo.core.metadata.schema.Ample;
+-import org.apache.accumulo.core.metadata.schema.TabletMetadata;
+ import org.apache.accumulo.manager.Manager;
+ import org.apache.accumulo.server.ServerContext;
+ import org.apache.hadoop.fs.Path;
+@@ -59,7 +54,6 @@ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+ import com.google.common.base.Preconditions;
+-import com.google.common.collect.MoreCollectors;
+ 
+ public class Utils {
+   private static final byte[] ZERO_BYTE = {'0'};
+@@ -82,53 +76,17 @@ public class Utils {
+     }
+   }
+ 
+-  private static KeyExtent findContaining(Ample ample, TableId tableId, Text row) {
+-    Objects.requireNonNull(row);
+-    try (var tablets = ample.readTablets().forTable(tableId).overlapping(row, true, row)
+-        .fetch(TabletMetadata.ColumnType.PREV_ROW).build()) {
+-      return tablets.stream().collect(MoreCollectors.onlyElement()).getExtent();
+-    }
+-  }
+-
+   /**
+    * Widen a range to the greatest table split that is before the range and least table split that
+    * is after the range.
+    */
+   public static KeyExtent widen(Ample ample, KeyExtent extent) {
+-    Text prevRowOfStartRowTablet = extent.prevEndRow();
+-    Text endRowOfEndRowTablet = extent.endRow();
+-
+-    if (extent.prevEndRow() != null) {
+-      Text nextPossibleRow = new Key(extent.prevEndRow()).followingKey(PartialKey.ROW).getRow();
+-      prevRowOfStartRowTablet =
+-          findContaining(ample, extent.tableId(), nextPossibleRow).prevEndRow();
+-    }
+-
+-    if (extent.endRow() != null) {
+-      endRowOfEndRowTablet = findContaining(ample, extent.tableId(), extent.endRow()).endRow();
+-    }
+-
+-    return new KeyExtent(extent.tableId(), endRowOfEndRowTablet, prevRowOfStartRowTablet);
++    return UtilsRangeWidening.widen(ample, extent);
+   }
+ 
+   public static LockRange widen(Ample ample, TableId tableId, LockRange range, TableOperation op,
+       boolean tableMustExists) throws AcceptableThriftTableOperationException {
+-    if (range.isInfinite()) {
+-      return range;
+-    }
+-    try {
+-      var wext = widen(ample, new KeyExtent(tableId, range.getEndRow(), range.getStartRow()));
+-      return LockRange.of(wext.prevEndRow(), wext.endRow());
+-    } catch (NoSuchElementException nse) {
+-      if (tableMustExists) {
+-        throw new AcceptableThriftTableOperationException(tableId.canonical(), "", op,
+-            TableOperationExceptionType.NOTFOUND, "Table does not exist");
+-      } else {
+-        log.debug("Attempted to widen range {} but no metadata entries found for table {}", range,
+-            tableId);
+-        return LockRange.infinite();
+-      }
+-    }
++    return UtilsRangeWidening.widen(ample, tableId, range, op, tableMustExists);
+   }
+ 
+   public static long reserveTable(Manager env, TableId tableId, FateId fateId, LockType lockType,
+diff --git a/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsRangeWidening.java b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsRangeWidening.java
+new file mode 100644
+index 0000000000..3482bc3676
+--- /dev/null
++++ b/server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsRangeWidening.java
+@@ -0,0 +1,88 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++package org.apache.accumulo.manager.tableOps;
++
++import java.util.NoSuchElementException;
++import java.util.Objects;
++
++import org.apache.accumulo.core.clientImpl.AcceptableThriftTableOperationException;
++import org.apache.accumulo.core.clientImpl.thrift.TableOperation;
++import org.apache.accumulo.core.clientImpl.thrift.TableOperationExceptionType;
++import org.apache.accumulo.core.data.Key;
++import org.apache.accumulo.core.data.PartialKey;
++import org.apache.accumulo.core.data.TableId;
++import org.apache.accumulo.core.dataImpl.KeyExtent;
++import org.apache.accumulo.core.fate.zookeeper.LockRange;
++import org.apache.accumulo.core.metadata.schema.Ample;
++import org.apache.accumulo.core.metadata.schema.TabletMetadata;
++import org.apache.hadoop.io.Text;
++
++import com.google.common.collect.MoreCollectors;
++
++final class UtilsRangeWidening {
++
++  private UtilsRangeWidening() {}
++
++  private static KeyExtent findContaining(Ample ample, TableId tableId, Text row) {
++    Objects.requireNonNull(row);
++    try (var tablets = ample.readTablets().forTable(tableId).overlapping(row, true, row)
++        .fetch(TabletMetadata.ColumnType.PREV_ROW).build()) {
++      return tablets.stream().collect(MoreCollectors.onlyElement()).getExtent();
++    }
++  }
++
++  /**
++   * Widen a range to the greatest table split that is before the range and least table split that
++   * is after the range.
++   */
++  public static KeyExtent widen(Ample ample, KeyExtent extent) {
++    Text prevRowOfStartRowTablet = extent.prevEndRow();
++    Text endRowOfEndRowTablet = extent.endRow();
++
++    if (extent.prevEndRow() != null) {
++      Text nextPossibleRow = new Key(extent.prevEndRow()).followingKey(PartialKey.ROW).getRow();
++      prevRowOfStartRowTablet =
++          findContaining(ample, extent.tableId(), nextPossibleRow).prevEndRow();
++    }
++
++    if (extent.endRow() != null) {
++      endRowOfEndRowTablet = findContaining(ample, extent.tableId(), extent.endRow()).endRow();
++    }
++
++    return new KeyExtent(extent.tableId(), endRowOfEndRowTablet, prevRowOfStartRowTablet);
++  }
++
++  public static LockRange widen(Ample ample, TableId tableId, LockRange range, TableOperation op,
++      boolean tableMustExists) throws AcceptableThriftTableOperationException {
++    if (range.isInfinite()) {
++      return range;
++    }
++    try {
++      var wext = widen(ample, new KeyExtent(tableId, range.getEndRow(), range.getStartRow()));
++      return LockRange.of(wext.prevEndRow(), wext.endRow());
++    } catch (NoSuchElementException nse) {
++      if (tableMustExists) {
++        throw new AcceptableThriftTableOperationException(tableId.canonical(), "", op,
++            TableOperationExceptionType.NOTFOUND, "Table does not exist");
++      } else {
++        return LockRange.infinite();
++      }
++    }
++  }
++}

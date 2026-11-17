@@ -1,0 +1,288 @@
+commit b2dcd14ee884b40ef4f9eef8b53dbe41f9e83594
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 15:18:34 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableFileUtils.java b/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableFileUtils.java
+new file mode 100644
+index 0000000000..76d11ebbc1
+--- /dev/null
++++ b/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableFileUtils.java
+@@ -0,0 +1,78 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++package org.apache.accumulo.tserver.tablet;
++
++import java.io.IOException;
++import java.util.Collection;
++import java.util.HashMap;
++import java.util.HashSet;
++import java.util.Map;
++import java.util.Set;
++
++import org.apache.accumulo.core.data.Key;
++import org.apache.accumulo.core.dataImpl.KeyExtent;
++import org.apache.accumulo.core.file.FileOperations;
++import org.apache.accumulo.core.file.FileSKVIterator;
++import org.apache.accumulo.core.metadata.StoredTabletFile;
++import org.apache.accumulo.core.spi.crypto.CryptoService;
++import org.apache.accumulo.core.util.Pair;
++import org.apache.accumulo.server.conf.TableConfiguration;
++import org.apache.accumulo.server.fs.VolumeManager;
++import org.apache.hadoop.fs.FileSystem;
++
++public class CompactableFileUtils {
++
++  public static Map<StoredTabletFile,Pair<Key,Key>> getFirstAndLastKeys(Tablet tablet,
++      Set<StoredTabletFile> allFiles) throws IOException {
++    final Map<StoredTabletFile,Pair<Key,Key>> result = new HashMap<>();
++    final FileOperations fileFactory = FileOperations.getInstance();
++    final VolumeManager fs = tablet.getTabletServer().getVolumeManager();
++    final TableConfiguration tableConf = tablet.getTableConfiguration();
++    final CryptoService cs = tableConf.getCryptoService();
++    for (StoredTabletFile file : allFiles) {
++      FileSystem ns = fs.getFileSystemByPath(file.getPath());
++      try (FileSKVIterator openReader =
++          fileFactory.newReaderBuilder().forFile(file, ns, ns.getConf(), cs)
++              .withTableConfiguration(tableConf).seekToBeginning().build()) {
++        Key first = openReader.getFirstKey();
++        Key last = openReader.getLastKey();
++        result.put(file, new Pair<>(first, last));
++      }
++    }
++    return result;
++  }
++
++  public static Set<StoredTabletFile> findChopFiles(KeyExtent extent,
++      Map<StoredTabletFile,Pair<Key,Key>> firstAndLastKeys, Collection<StoredTabletFile> allFiles) {
++    Set<StoredTabletFile> result = new HashSet<>();
++
++    for (StoredTabletFile file : allFiles) {
++      Pair<Key,Key> pair = firstAndLastKeys.get(file);
++      Key first = pair.getFirst();
++      Key last = pair.getSecond();
++      // If first and last are null, it's an empty file. Add it to the compact set so it goes
++      // away.
++      if ((first == null && last == null) || (first != null && !extent.contains(first.getRow()))
++          || (last != null && !extent.contains(last.getRow()))) {
++        result.add(file);
++      }
++    }
++    return result;
++  }
++}
+diff --git a/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java b/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java
+index d8cdcb37c6..620a7df6f8 100644
+--- a/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java
++++ b/server/tserver/src/main/java/org/apache/accumulo/tserver/tablet/CompactableUtils.java
+@@ -22,8 +22,6 @@ import java.io.IOException;
+ import java.io.UncheckedIOException;
+ import java.util.Collection;
+ import java.util.Collections;
+-import java.util.HashMap;
+-import java.util.HashSet;
+ import java.util.Map;
+ import java.util.Objects;
+ import java.util.Optional;
+@@ -55,7 +53,6 @@ import org.apache.accumulo.core.data.Value;
+ import org.apache.accumulo.core.dataImpl.KeyExtent;
+ import org.apache.accumulo.core.dataImpl.TabletIdImpl;
+ import org.apache.accumulo.core.file.FileOperations;
+-import org.apache.accumulo.core.file.FileSKVIterator;
+ import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
+ import org.apache.accumulo.core.metadata.CompactableFileImpl;
+ import org.apache.accumulo.core.metadata.ReferencedTabletFile;
+@@ -65,7 +62,6 @@ import org.apache.accumulo.core.sample.impl.SamplerConfigurationImpl;
+ import org.apache.accumulo.core.spi.common.ServiceEnvironment;
+ import org.apache.accumulo.core.spi.compaction.CompactionJob;
+ import org.apache.accumulo.core.spi.compaction.CompactionKind;
+-import org.apache.accumulo.core.spi.crypto.CryptoService;
+ import org.apache.accumulo.core.summary.Gatherer;
+ import org.apache.accumulo.core.summary.SummarizerFactory;
+ import org.apache.accumulo.core.summary.SummaryCollection;
+@@ -77,7 +73,6 @@ import org.apache.accumulo.server.compaction.FileCompactor;
+ import org.apache.accumulo.server.compaction.FileCompactor.CompactionCanceledException;
+ import org.apache.accumulo.server.compaction.FileCompactor.CompactionEnv;
+ import org.apache.accumulo.server.conf.TableConfiguration;
+-import org.apache.accumulo.server.fs.VolumeManager;
+ import org.apache.accumulo.server.util.MetadataTableUtil;
+ import org.apache.accumulo.tserver.tablet.CompactableImpl.CompactionHelper;
+ import org.apache.hadoop.conf.Configuration;
+@@ -88,43 +83,20 @@ import com.google.common.collect.Collections2;
+ 
+ public class CompactableUtils {
+ 
++  /**
++   * Compatibility delegation for callers not yet migrated to CompactableFileUtils.
++   */
+   public static Map<StoredTabletFile,Pair<Key,Key>> getFirstAndLastKeys(Tablet tablet,
+       Set<StoredTabletFile> allFiles) throws IOException {
+-    final Map<StoredTabletFile,Pair<Key,Key>> result = new HashMap<>();
+-    final FileOperations fileFactory = FileOperations.getInstance();
+-    final VolumeManager fs = tablet.getTabletServer().getVolumeManager();
+-    final TableConfiguration tableConf = tablet.getTableConfiguration();
+-    final CryptoService cs = tableConf.getCryptoService();
+-    for (StoredTabletFile file : allFiles) {
+-      FileSystem ns = fs.getFileSystemByPath(file.getPath());
+-      try (FileSKVIterator openReader =
+-          fileFactory.newReaderBuilder().forFile(file, ns, ns.getConf(), cs)
+-              .withTableConfiguration(tableConf).seekToBeginning().build()) {
+-        Key first = openReader.getFirstKey();
+-        Key last = openReader.getLastKey();
+-        result.put(file, new Pair<>(first, last));
+-      }
+-    }
+-    return result;
++    return CompactableFileUtils.getFirstAndLastKeys(tablet, allFiles);
+   }
+ 
++  /**
++   * Compatibility delegation for callers not yet migrated to CompactableFileUtils.
++   */
+   public static Set<StoredTabletFile> findChopFiles(KeyExtent extent,
+       Map<StoredTabletFile,Pair<Key,Key>> firstAndLastKeys, Collection<StoredTabletFile> allFiles) {
+-    Set<StoredTabletFile> result = new HashSet<>();
+-
+-    for (StoredTabletFile file : allFiles) {
+-      Pair<Key,Key> pair = firstAndLastKeys.get(file);
+-      Key first = pair.getFirst();
+-      Key last = pair.getSecond();
+-      // If first and last are null, it's an empty file. Add it to the compact set so it goes
+-      // away.
+-      if ((first == null && last == null) || (first != null && !extent.contains(first.getRow()))
+-          || (last != null && !extent.contains(last.getRow()))) {
+-        result.add(file);
+-      }
+-
+-    }
+-    return result;
++    return CompactableFileUtils.findChopFiles(extent, firstAndLastKeys, allFiles);
+   }
+ 
+   static Map<String,String> computeOverrides(Tablet tablet, Set<CompactableFile> files) {
+@@ -331,7 +303,6 @@ public class CompactableUtils {
+ 
+     @Override
+     public Set<StoredTabletFile> selectFiles(SortedMap<StoredTabletFile,DataFileValue> allFiles) {
+-
+       final Set<StoredTabletFile> selectedFiles;
+ 
+       if (!UserCompactionUtils.isDefault(compactionConfig.getSelector())) {
+@@ -344,7 +315,6 @@ public class CompactableUtils {
+       if (selectedFiles.isEmpty()) {
+         MetadataTableUtil.updateTabletCompactID(tablet.getExtent(), compactionId,
+             tablet.getTabletServer().getContext(), tablet.getTabletServer().getLock());
+-
+         tablet.setLastCompactionID(compactionId);
+       }
+ 
+@@ -356,7 +326,6 @@ public class CompactableUtils {
+       if (!UserCompactionUtils.isDefault(compactionConfig.getConfigurer())) {
+         return computeOverrides(tablet, files, compactionConfig.getConfigurer());
+       }
+-
+       return null;
+     }
+   }
+@@ -368,40 +337,31 @@ public class CompactableUtils {
+     } else if (kind == CompactionKind.SELECTOR) {
+       var tconf = tablet.getTableConfiguration();
+       var selectorClassName = tconf.get(Property.TABLE_COMPACTION_SELECTOR);
+-
+       PluginConfig cselCfg = null;
+-
+       if (selectorClassName != null && !selectorClassName.isBlank()) {
+         var opts =
+             tconf.getAllPropertiesWithPrefixStripped(Property.TABLE_COMPACTION_SELECTOR_OPTS);
+         cselCfg = new PluginConfig(selectorClassName, opts);
+       }
+-
+       if (cselCfg != null) {
+         return new TableCompactionHelper(cselCfg, tablet);
+       }
+     }
+-
+     return null;
+   }
+ 
+   public static Map<String,String> getOverrides(CompactionKind kind, Tablet tablet,
+       CompactionHelper driver, Set<CompactableFile> files) {
+-
+     Map<String,String> overrides = null;
+-
+     if (kind == CompactionKind.USER || kind == CompactionKind.SELECTOR) {
+       overrides = driver.getConfigOverrides(files);
+     }
+-
+     if (overrides == null) {
+       overrides = computeOverrides(tablet, files);
+     }
+-
+     if (overrides == null) {
+       return Map.of();
+     }
+-
+     return overrides;
+   }
+ 
+@@ -410,43 +370,30 @@ public class CompactableUtils {
+     if (overrides.isEmpty()) {
+       return tableConfiguration;
+     }
+-
+     ConfigurationCopy copy = new ConfigurationCopy(tableConfiguration);
+     overrides.forEach((k, v) -> copy.set(k, v));
+-
+     return copy;
+   }
+ 
+-  /**
+-   * Create the FileCompactor and finally call compact. Returns the Major CompactionStats.
+-   */
+   static CompactionStats compact(Tablet tablet, CompactionJob job,
+       CompactableImpl.CompactionInfo cInfo, CompactionEnv cenv,
+       Map<StoredTabletFile,DataFileValue> compactFiles, ReferencedTabletFile tmpFileName)
+       throws IOException, CompactionCanceledException {
+     TableConfiguration tableConf = tablet.getTableConfiguration();
+-
+     AccumuloConfiguration compactionConfig = getCompactionConfig(tableConf,
+         getOverrides(job.getKind(), tablet, cInfo.localHelper, job.getFiles()));
+-
+     FileCompactor compactor = new FileCompactor(tablet.getContext(), tablet.getExtent(),
+         compactFiles, tmpFileName, cInfo.propagateDeletes, cenv, cInfo.iters, compactionConfig,
+         tableConf.getCryptoService(), tablet.getPausedCompactionMetrics());
+-
+     return compactor.call();
+   }
+ 
+-  /**
+-   * Finish major compaction by bringing the new file online and returning the completed file.
+-   */
+   static Optional<StoredTabletFile> bringOnline(DatafileManager datafileManager,
+       CompactableImpl.CompactionInfo cInfo, CompactionStats stats,
+       Map<StoredTabletFile,DataFileValue> compactFiles, ReferencedTabletFile compactTmpName)
+       throws IOException {
+-
+     var dfv = new DataFileValue(stats.getFileSize(), stats.getEntriesWritten());
+     return datafileManager.bringMajorCompactionOnline(compactFiles.keySet(), compactTmpName,
+         cInfo.checkCompactionId, cInfo.selectedFiles, dfv, Optional.empty());
+   }
+-
+ }

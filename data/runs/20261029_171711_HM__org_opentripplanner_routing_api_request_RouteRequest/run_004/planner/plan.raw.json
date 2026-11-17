@@ -1,0 +1,42 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.api.request.RouteRequest",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive route, agency, and unpreferred-cost preference responsibility while preserving RouteRequest's public API and removing direct references to RouteMatcher and RequestFunctions.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+        "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPreferences.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.api.request.RouteRequest",
+            "org.opentripplanner.routing.api.request.RouteRequestPreferences"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.api.request.RouteRequestPreferences"
+          ],
+          "details": "Extract the private route and agency preference state and behavior from RouteRequest: bannedAgencies, whiteListedAgencies, preferredAgencies, unpreferredAgencies, bannedRoutes, whiteListedRoutes, unpreferredRoutes, the existing route and agency setter methods, getBannedRoutes(Collection<Route>), getUnpreferredAgencies(), getUnpreferredRoutes(), routeIsBanned(Route), and the existing unpreferred-cost initialization and setUnpreferredCost(String) behavior using RequestFunctions. Keep RouteRequest's existing public methods and public unpreferredCost field as compatibility wrappers or synchronized accessors, so callers retain the original API. After extraction, RouteRequest must no longer declare or directly use RouteMatcher or RequestFunctions. FeedScopedId and Route must remain direct dependencies of RouteRequest because they are still used by other public fields, methods, and signatures, including getBannedRoutes(Collection<Route>). The target gains one distinct dependency, RouteRequestPreferences, while eliminating two distinct dependencies, RouteMatcher and RequestFunctions, for an expected net Fan-Out reduction of one. The extracted class itself may continue to reference RouteMatcher, RequestFunctions, FeedScopedId, Route, Collection, Set, and DoubleFunction; those dependencies are not counted toward RouteRequest's Fan-Out.",
+          "risk": "high"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPreferences.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java",
+            "src/main/java/org/opentripplanner/routing/api/request/RouteRequestPreferences.java"
+          ],
+          "details": "Remove RouteMatcher and RequestFunctions imports from RouteRequest only if no direct references remain after extraction, and add the same-package RouteRequestPreferences reference as required by the delegated compatibility methods and state. Do not remove FeedScopedId or Route imports from RouteRequest because the class still uses them in fields and public signatures.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": 3,
+  "goal": "Extract the cohesive comparison-related forwarding API from JPlagOptions and leave comparison configuration in a dedicated component.",
+  "files": [
+    "core/src/main/java/de/jplag/options/JPlagOptions.java",
+    "core/src/main/java/de/jplag/options/JPlagComparisonOptionAccess.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "de.jplag.options.JPlagOptions",
+        "de.jplag.options.JPlagComparisonOptionAccess"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagComparisonOptionAccess"
+      ],
+      "details": "Extract getComparisonMode(), getMaximumNumberOfComparisons(), getMinimumTokenMatch(), getSimilarityMetric(), getSimilarityThreshold(), isDebugParser(), setComparisonMode(ComparisonMode), setDebugParser(boolean), setMaximumNumberOfComparisons(int), setMinimumTokenMatch(Integer), setSimilarityMetric(SimilarityMetric), and setSimilarityThreshold(float), together with their required comparisonOptions dependency.",
+      "risk": "medium"
+    },
+    {
+      "op": "UPDATE_CALL_SITES",
+      "inputs": [
+        "de.jplag.options.JPlagOptions.getComparisonMode()",
+        "de.jplag.options.JPlagOptions.getMaximumNumberOfComparisons()",
+        "de.jplag.options.JPlagOptions.getMinimumTokenMatch()",
+        "de.jplag.options.JPlagOptions.getSimilarityMetric()",
+        "de.jplag.options.JPlagOptions.getSimilarityThreshold()",
+        "de.jplag.options.JPlagOptions.isDebugParser()",
+        "de.jplag.options.JPlagOptions.setComparisonMode(ComparisonMode)",
+        "de.jplag.options.JPlagOptions.setDebugParser(boolean)",
+        "de.jplag.options.JPlagOptions.setMaximumNumberOfComparisons(int)",
+        "de.jplag.options.JPlagOptions.setMinimumTokenMatch(Integer)",
+        "de.jplag.options.JPlagOptions.setSimilarityMetric(SimilarityMetric)",
+        "de.jplag.options.JPlagOptions.setSimilarityThreshold(float)"
+      ],
+      "outputs": [
+        "de.jplag.options.JPlagComparisonOptionAccess"
+      ],
+      "details": "Update callers to use the extracted comparison option access class or the existing JPlagComparisonOptions instance.",
+      "risk": "medium"
+    }
+  ]
+}

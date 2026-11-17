@@ -1,0 +1,29 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "io.github.classgraph.ScanResult",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive JSON serialization and deserialization responsibility from ScanResult while preserving the public fromJSON(String), toJSON(int), and toJSON() APIs as delegating wrappers.",
+      "files": [
+        "src/main/java/io/github/classgraph/ScanResult.java",
+        "src/main/java/io/github/classgraph/ScanResultSerializationSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "io.github.classgraph.ScanResult",
+            "io.github.classgraph.ScanResultSerializationSupport"
+          ],
+          "outputs": [
+            "io.github.classgraph.ScanResultSerializationSupport"
+          ],
+          "details": "Move the private SerializationFormat data holder and the implementation of ScanResult.fromJSON(String), ScanResult.toJSON(int), and ScanResult.toJSON() into ScanResultSerializationSupport. Keep the original public and static methods in ScanResult as compatibility-preserving delegates. The extracted implementation must retain access to the existing ScanResult state and constructor behavior needed by deserialization, without changing ScanResult's fully qualified name. After extraction, remove all direct references from ScanResult to JSONDeserializer, JSONSerializer, AutoCloseableExecutorService, and ClassGraph that are used only by the serialization/deserialization implementation. ScanResultSerializationSupport becomes one new outgoing dependency of ScanResult through the compatibility delegates. CollectionUtils remains in ScanResult because it is also used by annotation-query methods, and Pattern, Assert, and other dependencies used outside serialization remain. The expected Fan-Out change is at least three eliminated dependencies minus one new helper dependency, for a positive net reduction of at least two; this should be verified with the detector after compilation.",
+          "risk": "high"
+        }
+      ]
+    }
+  ]
+}

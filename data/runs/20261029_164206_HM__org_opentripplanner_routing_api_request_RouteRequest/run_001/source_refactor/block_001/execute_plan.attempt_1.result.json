@@ -1,0 +1,10 @@
+{
+  "files_to_write": [
+    {
+      "path": "src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java",
+      "content": "package org.opentripplanner.routing.api.request;\n\nimport org.locationtech.jts.geom.Coordinate;\nimport org.locationtech.jts.geom.Envelope;\nimport org.opentripplanner.common.geometry.SphericalDistanceLibrary;\nimport org.opentripplanner.model.GenericLocation;\nimport org.opentripplanner.routing.graph.Vertex;\n\n/**\n * Calculates whether a vertex is close to the start or end locations of a route request.\n */\npublic class RouteRequestLocationProximity {\n\n  private static final int MAX_CLOSENESS_METERS = 500;\n\n  private final GenericLocation from;\n  private final GenericLocation to;\n\n  private Envelope fromEnvelope;\n  private Envelope toEnvelope;\n\n  public RouteRequestLocationProximity(GenericLocation from, GenericLocation to) {\n    this.from = from;\n    this.to = to;\n  }\n\n  public boolean isCloseToStartOrEnd(Vertex vertex) {\n    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {\n      return false;\n    }\n\n    if (fromEnvelope == null) {\n      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);\n    }\n    if (toEnvelope == null) {\n      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);\n    }\n\n    return fromEnvelope.intersects(vertex.getCoordinate()) || toEnvelope.intersects(vertex.getCoordinate());\n  }\n\n  private static Envelope getEnvelope(Coordinate coordinate, int meters) {\n    double latitude = SphericalDistanceLibrary.metersToDegrees(meters);\n    double longitude = SphericalDistanceLibrary.metersToLonDegrees(meters, coordinate.y);\n\n    Envelope envelope = new Envelope(coordinate);\n    envelope.expandBy(longitude, latitude);\n    return envelope;\n  }\n}\n"
+    }
+  ],
+  "files_to_delete": [],
+  "notes": "Added the extracted proximity calculation class with cached start/end envelopes. RouteRequest remains unchanged because its full source content was not safely available for a complete delegating update."
+}

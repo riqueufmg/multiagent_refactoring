@@ -1,0 +1,67 @@
+commit 963dab3c29e150b2524a5cf26ce6c217f9460b02
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 18:25:28 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/io/github/classgraph/ScanResultSerialization.java b/src/main/java/io/github/classgraph/ScanResultSerialization.java
+new file mode 100644
+index 000000000..77dcefd22
+--- /dev/null
++++ b/src/main/java/io/github/classgraph/ScanResultSerialization.java
+@@ -0,0 +1,55 @@
++/*
++ * This file is part of ClassGraph.
++ *
++ * Author: Luke Hutchison
++ *
++ * Hosted at: https://github.com/classgraph/classgraph
++ *
++ * --
++ *
++ * The MIT License (MIT)
++ */
++package io.github.classgraph;
++
++/**
++ * Serialization compatibility facade for {@link ScanResult}.
++ *
++ * <p>This package-private class centralizes access to the JSON serialization
++ * operations without changing the public {@link ScanResult} API.</p>
++ */
++final class ScanResultSerialization {
++    /** Do not instantiate. */
++    private ScanResultSerialization() {
++    }
++
++    /**
++     * Deserialize a scan result from JSON.
++     *
++     * @param json the serialized scan result
++     * @return the deserialized scan result
++     */
++    static ScanResult fromJSON(final String json) {
++        return ScanResult.fromJSON(json);
++    }
++
++    /**
++     * Serialize a scan result to JSON.
++     *
++     * @param scanResult the scan result
++     * @param indentWidth the indentation width
++     * @return the serialized scan result
++     */
++    static String toJSON(final ScanResult scanResult, final int indentWidth) {
++        return scanResult.toJSON(indentWidth);
++    }
++
++    /**
++     * Serialize a scan result to minified JSON.
++     *
++     * @param scanResult the scan result
++     * @return the serialized scan result
++     */
++    static String toJSON(final ScanResult scanResult) {
++        return scanResult.toJSON();
++    }
++}

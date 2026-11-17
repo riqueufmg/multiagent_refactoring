@@ -1,0 +1,65 @@
+commit 2680ba355ee7aec013b4f263cb4a08bbd92560a4
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Thu Oct 29 16:46:12 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java
+new file mode 100644
+index 0000000000..eb86e60cc5
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/api/request/RouteRequestLocationProximity.java
+@@ -0,0 +1,53 @@
++package org.opentripplanner.routing.api.request;
++
++import org.locationtech.jts.geom.Coordinate;
++import org.locationtech.jts.geom.Envelope;
++import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
++import org.opentripplanner.model.GenericLocation;
++import org.opentripplanner.routing.graph.Vertex;
++
++/**
++ * Calculates whether a vertex is close to the start or end locations of a route request.
++ */
++public class RouteRequestLocationProximity {
++
++  private static final int MAX_CLOSENESS_METERS = 500;
++
++  private final GenericLocation from;
++  private final GenericLocation to;
++
++  private Envelope fromEnvelope;
++  private Envelope toEnvelope;
++
++  public RouteRequestLocationProximity(GenericLocation from, GenericLocation to) {
++    this.from = from;
++    this.to = to;
++  }
++
++  public boolean isCloseToStartOrEnd(Vertex vertex) {
++    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
++      return false;
++    }
++
++    if (fromEnvelope == null) {
++      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
++    }
++    if (toEnvelope == null) {
++      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
++    }
++
++    return (
++      fromEnvelope.intersects(vertex.getCoordinate()) ||
++      toEnvelope.intersects(vertex.getCoordinate())
++    );
++  }
++
++  private static Envelope getEnvelope(Coordinate coordinate, int meters) {
++    double latitude = SphericalDistanceLibrary.metersToDegrees(meters);
++    double longitude = SphericalDistanceLibrary.metersToLonDegrees(meters, coordinate.y);
++
++    Envelope envelope = new Envelope(coordinate);
++    envelope.expandBy(longitude, latitude);
++    return envelope;
++  }
++}

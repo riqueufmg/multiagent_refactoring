@@ -1,0 +1,1041 @@
+commit 4deb46c5917cd55ecf3053c70bf4f68f2bc73971
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 13:08:07 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/org/opentripplanner/routing/RoutingService.java b/src/main/java/org/opentripplanner/routing/RoutingService.java
+index ee5a65cee1..bab6b69f54 100644
+--- a/src/main/java/org/opentripplanner/routing/RoutingService.java
++++ b/src/main/java/org/opentripplanner/routing/RoutingService.java
+@@ -55,7 +55,6 @@ import org.opentripplanner.routing.graph.Edge;
+ import org.opentripplanner.routing.graph.Graph;
+ import org.opentripplanner.routing.graph.GraphIndex;
+ import org.opentripplanner.routing.graph.Vertex;
+-import org.opentripplanner.routing.graphfinder.GraphFinder;
+ import org.opentripplanner.routing.graphfinder.NearbyStop;
+ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+ import org.opentripplanner.routing.graphfinder.PlaceType;
+@@ -63,7 +62,6 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
+ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+ import org.opentripplanner.routing.services.TransitAlertService;
+ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+-import org.opentripplanner.routing.stoptimes.StopTimesHelper;
+ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+ import org.opentripplanner.routing.vertextype.TransitStopVertex;
+@@ -77,53 +75,25 @@ import org.opentripplanner.transit.model.organization.Operator;
+ import org.opentripplanner.transit.model.timetable.Trip;
+ import org.opentripplanner.util.WorldEnvelope;
+ 
+-/**
+- * This is the entry point of all API requests towards the OTP graph. A new instance of this class
+- * should be created for each request. This ensures that the same TimetableSnapshot is used for the
+- * duration of the request (which may involve several method calls).
+- */
+ public class RoutingService {
+ 
+   private final Graph graph;
+-
+   private final GraphIndex graphIndex;
+-
+-  private final GraphFinder graphFinder;
+-
+-  /**
+-   * This should only be accessed through the getTimetableSnapshot method.
+-   */
++  private final RoutingServiceQueryHelper queryHelper;
+   private TimetableSnapshot timetableSnapshot;
+ 
+   public RoutingService(Graph graph) {
+     this.graph = graph;
+     this.graphIndex = graph.index;
+-    this.graphFinder = GraphFinder.getInstance(graph);
++    this.queryHelper = new RoutingServiceQueryHelper(graph);
+   }
+ 
+-  // TODO We should probably not have the Router as a parameter here
+   public RoutingResponse route(RoutingRequest request, Router router) {
+     var zoneId = graph.getTimeZone().toZoneId();
+     RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+     return worker.route();
+   }
+ 
+-  /**
+-   * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
+-   * the previous, current and next service date. It uses a priority queue to keep track of the next
+-   * departures. The queue is shared between all dates, as services from the previous service date
+-   * can visit the stop later than the current service date's services. This happens eg. with
+-   * sleeper trains.
+-   * <p>
+-   * TODO: Add frequency based trips
+-   *
+-   * @param stop                  Stop object to perform the search for
+-   * @param startTime             Start time for the search. Seconds from UNIX epoch
+-   * @param timeRange             Searches forward for timeRange seconds from startTime
+-   * @param numberOfDepartures    Number of departures to fetch per pattern
+-   * @param arrivalDeparture      Filter by arrivals, departures, or both
+-   * @param includeCancelledTrips If true, cancelled trips will also be included in result.
+-   */
+   public List<StopTimesInPattern> stopTimesForStop(
+     StopLocation stop,
+     long startTime,
+@@ -132,9 +102,8 @@ public class RoutingService {
+     ArrivalDeparture arrivalDeparture,
+     boolean includeCancelledTrips
+   ) {
+-    return StopTimesHelper.stopTimesForStop(
++    return queryHelper.stopTimesForStop(
+       this,
+-      lazyGetTimeTableSnapShot(),
+       stop,
+       startTime,
+       timeRange,
+@@ -144,36 +113,14 @@ public class RoutingService {
+     );
+   }
+ 
+-  /**
+-   * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
+-   * creating complete stop timetables for a single day.
+-   *
+-   * @param stop        Stop object to perform the search for
+-   * @param serviceDate Return all departures for the specified date
+-   */
+   public List<StopTimesInPattern> getStopTimesForStop(
+     StopLocation stop,
+     ServiceDate serviceDate,
+     ArrivalDeparture arrivalDeparture
+   ) {
+-    return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
+-  }
+-
+-  /**
+-   * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop for the
+-   * previous, current and next service date. It uses a priority queue to keep track of the next
+-   * departures. The queue is shared between all dates, as services from the previous service date
+-   * can visit the stop later than the current service date's services.
+-   * <p>
+-   * TODO: Add frequency based trips
+-   *
+-   * @param stop               Stop object to perform the search for
+-   * @param pattern            Pattern object to perform the search for
+-   * @param startTime          Start time for the search. Seconds from UNIX epoch
+-   * @param timeRange          Searches forward for timeRange seconds from startTime
+-   * @param numberOfDepartures Number of departures to fetch per pattern
+-   * @param arrivalDeparture   Filter by arrivals, departures, or both
+-   */
++    return queryHelper.getStopTimesForStop(this, stop, serviceDate, arrivalDeparture);
++  }
++
+   public List<TripTimeOnDate> stopTimesForPatternAtStop(
+     StopLocation stop,
+     TripPattern pattern,
+@@ -182,9 +129,8 @@ public class RoutingService {
+     int numberOfDepartures,
+     ArrivalDeparture arrivalDeparture
+   ) {
+-    return StopTimesHelper.stopTimesForPatternAtStop(
++    return queryHelper.stopTimesForPatternAtStop(
+       this,
+-      lazyGetTimeTableSnapShot(),
+       stop,
+       pattern,
+       startTime,
+@@ -194,10 +140,6 @@ public class RoutingService {
+     );
+   }
+ 
+-  /**
+-   * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
+-   * added by realtime updates are added to the collection.
+-   */
+   public Collection<TripPattern> getPatternsForStop(
+     StopLocation stop,
+     boolean includeRealtimeUpdates
+@@ -208,559 +150,450 @@ public class RoutingService {
+     );
+   }
+ 
+-  /**
+-   * Get the most up-to-date timetable for the given TripPattern, as of right now. There should
+-   * probably be a less awkward way to do this that just gets the latest entry from the resolver
+-   * without making a fake routing request.
+-   */
+   public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
+-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+-    return timetableSnapshot != null
+-      ? timetableSnapshot.resolve(
++    TimetableSnapshot snapshot = lazyGetTimeTableSnapShot();
++    return snapshot != null
++      ? snapshot.resolve(
+         tripPattern,
+         serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
+       )
+       : tripPattern.getScheduledTimetable();
+   }
+ 
+-  /** {@link Graph#getTimetableSnapshot()} */
+   public TimetableSnapshot getTimetableSnapshot() {
+-    return this.graph.getTimetableSnapshot();
++    return graph.getTimetableSnapshot();
++  }
++
++  TimetableSnapshot getTimetableSnapshotForQuery() {
++    return lazyGetTimeTableSnapShot();
+   }
+ 
+-  /** {@link Graph#getOrSetupTimetableSnapshotProvider(Function)} */
+   public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(
+     Function<Graph, T> creator
+   ) {
+-    return this.graph.getOrSetupTimetableSnapshotProvider(creator);
++    return graph.getOrSetupTimetableSnapshotProvider(creator);
++  }
++
++  public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(
++    Function<Graph, T> creator,
++    boolean unused
++  ) {
++    return graph.getOrSetupTimetableSnapshotProvider(creator);
+   }
+ 
+-  /** {@link Graph#addVertex(Vertex)} */
+   public void addVertex(Vertex v) {
+-    this.graph.addVertex(v);
++    graph.addVertex(v);
+   }
+ 
+-  /** {@link Graph#removeEdge(Edge)} */
+   public void removeEdge(Edge e) {
+-    this.graph.removeEdge(e);
++    graph.removeEdge(e);
+   }
+ 
+-  /** {@link Graph#getVertex(String)} */
+   public Vertex getVertex(String label) {
+-    return this.graph.getVertex(label);
++    return graph.getVertex(label);
+   }
+ 
+-  /** {@link Graph#getVertices()} */
+   public Collection<Vertex> getVertices() {
+-    return this.graph.getVertices();
++    return graph.getVertices();
+   }
+ 
+-  /** {@link Graph#getVerticesOfType(Class)} */
+   public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
+-    return this.graph.getVerticesOfType(cls);
++    return graph.getVerticesOfType(cls);
+   }
+ 
+-  /** {@link Graph#getEdges()} */
+   public Collection<Edge> getEdges() {
+-    return this.graph.getEdges();
++    return graph.getEdges();
+   }
+ 
+-  /** {@link Graph#getEdgesOfType(Class)} */
+   public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
+-    return this.graph.getEdgesOfType(cls);
++    return graph.getEdgesOfType(cls);
+   }
+ 
+-  /** {@link Graph#getStreetEdges()} */
+   public Collection<StreetEdge> getStreetEdges() {
+-    return this.graph.getStreetEdges();
++    return graph.getStreetEdges();
+   }
+ 
+-  /** {@link Graph#getTransitLayer()} */
+   public TransitLayer getTransitLayer() {
+-    return this.graph.getTransitLayer();
++    return graph.getTransitLayer();
+   }
+ 
+-  /** {@link Graph#setTransitLayer(TransitLayer)} */
+-  public void setTransitLayer(TransitLayer transitLayer) {
+-    this.graph.setTransitLayer(transitLayer);
++  public void setTransitLayer(TransitLayer layer) {
++    graph.setTransitLayer(layer);
+   }
+ 
+-  /** {@link Graph#getRealtimeTransitLayer()} */
+   public TransitLayer getRealtimeTransitLayer() {
+-    return this.graph.getRealtimeTransitLayer();
++    return graph.getRealtimeTransitLayer();
+   }
+ 
+-  /** {@link Graph#setRealtimeTransitLayer(TransitLayer)} */
+-  public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
+-    this.graph.setRealtimeTransitLayer(realtimeTransitLayer);
++  public void setRealtimeTransitLayer(TransitLayer layer) {
++    graph.setRealtimeTransitLayer(layer);
+   }
+ 
+-  /** {@link Graph#hasRealtimeTransitLayer()} */
+   public boolean hasRealtimeTransitLayer() {
+-    return this.graph.hasRealtimeTransitLayer();
++    return graph.hasRealtimeTransitLayer();
+   }
+ 
+-  /** {@link Graph#containsVertex(Vertex)} */
+   public boolean containsVertex(Vertex v) {
+-    return this.graph.containsVertex(v);
++    return graph.containsVertex(v);
+   }
+ 
+-  /** {@link Graph#putService(Class, Serializable)} */
+-  public <T extends Serializable> T putService(Class<T> serviceType, T service) {
+-    return this.graph.putService(serviceType, service);
++  public <T extends Serializable> T putService(Class<T> type, T service) {
++    return graph.putService(type, service);
+   }
+ 
+-  /** {@link Graph#hasService(Class)} */
+-  public boolean hasService(Class<? extends Serializable> serviceType) {
+-    return this.graph.hasService(serviceType);
++  public boolean hasService(Class<? extends Serializable> type) {
++    return graph.hasService(type);
+   }
+ 
+-  /** {@link Graph#getService(Class)} */
+-  public <T extends Serializable> T getService(Class<T> serviceType) {
+-    return this.graph.getService(serviceType);
++  public <T extends Serializable> T getService(Class<T> type) {
++    return graph.getService(type);
+   }
+ 
+-  /** {@link Graph#getService(Class, boolean)} */
+-  public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
+-    return this.graph.getService(serviceType, autoCreate);
++  public <T extends Serializable> T getService(Class<T> type, boolean autoCreate) {
++    return graph.getService(type, autoCreate);
+   }
+ 
+-  /** {@link Graph#remove(Vertex)} */
+   public void remove(Vertex vertex) {
+-    this.graph.remove(vertex);
++    graph.remove(vertex);
+   }
+ 
+-  /** {@link Graph#removeIfUnconnected(Vertex)} */
+   public void removeIfUnconnected(Vertex v) {
+-    this.graph.removeIfUnconnected(v);
++    graph.removeIfUnconnected(v);
+   }
+ 
+-  /** {@link Graph#getExtent()} */
+   public Envelope getExtent() {
+-    return this.graph.getExtent();
++    return graph.getExtent();
+   }
+ 
+-  /** {@link Graph#getTransferService()} */
+   public TransferService getTransferService() {
+-    return this.graph.getTransferService();
++    return graph.getTransferService();
+   }
+ 
+-  /** {@link Graph#updateTransitFeedValidity(CalendarServiceData, DataImportIssueStore)} */
+   public void updateTransitFeedValidity(CalendarServiceData data, DataImportIssueStore issueStore) {
+-    this.graph.updateTransitFeedValidity(data, issueStore);
++    graph.updateTransitFeedValidity(data, issueStore);
+   }
+ 
+-  /** {@link Graph#transitFeedCovers(Instant)} */
+   public boolean transitFeedCovers(Instant time) {
+-    return this.graph.transitFeedCovers(time);
++    return graph.transitFeedCovers(time);
+   }
+ 
+-  /** {@link Graph#getBundle()} */
+   public GraphBundle getBundle() {
+-    return this.graph.getBundle();
++    return graph.getBundle();
+   }
+ 
+-  /** {@link Graph#setBundle(GraphBundle)} */
+   public void setBundle(GraphBundle bundle) {
+-    this.graph.setBundle(bundle);
++    graph.setBundle(bundle);
+   }
+ 
+-  /** {@link Graph#countVertices()} */
+   public int countVertices() {
+-    return this.graph.countVertices();
++    return graph.countVertices();
+   }
+ 
+-  /** {@link Graph#countEdges()} */
+   public int countEdges() {
+-    return this.graph.countEdges();
++    return graph.countEdges();
+   }
+ 
+-  /** {@link Graph#addTransitMode(TransitMode)} */
+   public void addTransitMode(TransitMode mode) {
+-    this.graph.addTransitMode(mode);
++    graph.addTransitMode(mode);
+   }
+ 
+-  /** {@link Graph#getTransitModes()} */
+   public HashSet<TransitMode> getTransitModes() {
+-    return this.graph.getTransitModes();
++    return graph.getTransitModes();
+   }
+ 
+-  // /** {@link Graph#index()} */
+-  // public void index() {this.graph.index();}
+-
+-  /** {@link Graph#getCalendarService()} */
+   public CalendarService getCalendarService() {
+-    return this.graph.getCalendarService();
++    return graph.getCalendarService();
+   }
+ 
+-  /** {@link Graph#getCalendarDataService()} */
+   public CalendarServiceData getCalendarDataService() {
+-    return this.graph.getCalendarDataService();
++    return graph.getCalendarDataService();
+   }
+ 
+-  /** {@link Graph#clearCachedCalenderService()} */
+   public void clearCachedCalenderService() {
+-    this.graph.clearCachedCalenderService();
++    graph.clearCachedCalenderService();
+   }
+ 
+-  /** {@link Graph#getStreetIndex()} */
+   public StreetVertexIndex getStreetIndex() {
+-    return this.graph.getStreetIndex();
++    return graph.getStreetIndex();
+   }
+ 
+-  /** {@link Graph#getLinker()} */
+   public VertexLinker getLinker() {
+-    return this.graph.getLinker();
++    return graph.getLinker();
+   }
+ 
+-  /** {@link Graph#getOrCreateServiceIdForDate(ServiceDate)} */
+-  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+-    return this.graph.getOrCreateServiceIdForDate(serviceDate);
++  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate date) {
++    return graph.getOrCreateServiceIdForDate(date);
+   }
+ 
+-  /** {@link Graph#removeEdgelessVertices()} */
+   public int removeEdgelessVertices() {
+-    return this.graph.removeEdgelessVertices();
++    return graph.removeEdgelessVertices();
+   }
+ 
+-  /** {@link Graph#getFeedIds()} */
+   public Collection<String> getFeedIds() {
+-    return this.graph.getFeedIds();
++    return graph.getFeedIds();
+   }
+ 
+-  /** {@link Graph#getAgencies()} */
+   public Collection<Agency> getAgencies() {
+-    return this.graph.getAgencies();
++    return graph.getAgencies();
+   }
+ 
+-  /** {@link Graph#getFeedInfo(String)} ()} */
+   public FeedInfo getFeedInfo(String feedId) {
+-    return this.graph.getFeedInfo(feedId);
++    return graph.getFeedInfo(feedId);
+   }
+ 
+-  /** {@link Graph#addAgency(String, Agency)} */
+   public void addAgency(String feedId, Agency agency) {
+-    this.graph.addAgency(feedId, agency);
++    graph.addAgency(feedId, agency);
+   }
+ 
+-  /** {@link Graph#addFeedInfo(FeedInfo)} */
+   public void addFeedInfo(FeedInfo info) {
+-    this.graph.addFeedInfo(info);
++    graph.addFeedInfo(info);
+   }
+ 
+-  /** {@link Graph#getTimeZone()} */
+   public TimeZone getTimeZone() {
+-    return this.graph.getTimeZone();
++    return graph.getTimeZone();
+   }
+ 
+-  /** {@link Graph#getOperators()} */
+   public Collection<Operator> getOperators() {
+-    return this.graph.getOperators();
++    return graph.getOperators();
+   }
+ 
+-  /** {@link Graph#clearTimeZone()} */
+   public void clearTimeZone() {
+-    this.graph.clearTimeZone();
++    graph.clearTimeZone();
+   }
+ 
+-  /** {@link Graph#calculateEnvelope()} */
+   public void calculateEnvelope() {
+-    this.graph.calculateEnvelope();
++    graph.calculateEnvelope();
+   }
+ 
+-  /** {@link Graph#calculateConvexHull()} */
+   public void calculateConvexHull() {
+-    this.graph.calculateConvexHull();
++    graph.calculateConvexHull();
+   }
+ 
+-  /** {@link Graph#getConvexHull()} */
+   public Geometry getConvexHull() {
+-    return this.graph.getConvexHull();
++    return graph.getConvexHull();
+   }
+ 
+-  /** {@link Graph#expandToInclude(double, double)} ()} */
+   public void expandToInclude(double x, double y) {
+-    this.graph.expandToInclude(x, y);
++    graph.expandToInclude(x, y);
+   }
+ 
+-  /** {@link Graph#getEnvelope()} */
+   public WorldEnvelope getEnvelope() {
+-    return this.graph.getEnvelope();
++    return graph.getEnvelope();
+   }
+ 
+-  /** {@link Graph#calculateTransitCenter()} */
+   public void calculateTransitCenter() {
+-    this.graph.calculateTransitCenter();
++    graph.calculateTransitCenter();
+   }
+ 
+-  /** {@link Graph#getCenter()} */
+   public Optional<Coordinate> getCenter() {
+-    return this.graph.getCenter();
++    return graph.getCenter();
+   }
+ 
+-  /** {@link Graph#getTransitServiceStarts()} */
+   public long getTransitServiceStarts() {
+-    return this.graph.getTransitServiceStarts();
++    return graph.getTransitServiceStarts();
+   }
+ 
+-  /** {@link Graph#getTransitServiceEnds()} */
+   public long getTransitServiceEnds() {
+-    return this.graph.getTransitServiceEnds();
++    return graph.getTransitServiceEnds();
+   }
+ 
+-  /** {@link Graph#getNoticesByElement()} */
+   public Multimap<TransitEntity, Notice> getNoticesByElement() {
+-    return this.graph.getNoticesByElement();
++    return graph.getNoticesByElement();
+   }
+ 
+-  /** {@link Graph#addNoticeAssignments(Multimap)} */
+-  public void addNoticeAssignments(Multimap<TransitEntity, Notice> noticesByElement) {
+-    this.graph.addNoticeAssignments(noticesByElement);
++  public void addNoticeAssignments(Multimap<TransitEntity, Notice> notices) {
++    graph.addNoticeAssignments(notices);
+   }
+ 
+-  /** {@link Graph#getDistanceBetweenElevationSamples()} */
+   public double getDistanceBetweenElevationSamples() {
+-    return this.graph.getDistanceBetweenElevationSamples();
++    return graph.getDistanceBetweenElevationSamples();
+   }
+ 
+-  /** {@link Graph#setDistanceBetweenElevationSamples(double)} */
+-  public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
+-    this.graph.setDistanceBetweenElevationSamples(distanceBetweenElevationSamples);
++  public void setDistanceBetweenElevationSamples(double distance) {
++    graph.setDistanceBetweenElevationSamples(distance);
+   }
+ 
+-  /** {@link Graph#getTransitAlertService()} */
+   public TransitAlertService getTransitAlertService() {
+-    return this.graph.getTransitAlertService();
++    return graph.getTransitAlertService();
+   }
+ 
+   public RealtimeVehiclePositionService getVehiclePositionService() {
+-    return this.graph.getVehiclePositionService();
++    return graph.getVehiclePositionService();
+   }
+ 
+-  /** {@link Graph#getStopVerticesById(FeedScopedId)} */
+   public Set<Vertex> getStopVerticesById(FeedScopedId id) {
+-    return this.graph.getStopVerticesById(id);
++    return graph.getStopVerticesById(id);
+   }
+ 
+-  /** {@link Graph#getServicesRunningForDate(ServiceDate)} */
+   public BitSet getServicesRunningForDate(ServiceDate date) {
+-    return this.graph.getServicesRunningForDate(date);
++    return graph.getServicesRunningForDate(date);
+   }
+ 
+-  /** {@link Graph#getVehicleRentalStationService()} */
+   public VehicleRentalStationService getVehicleRentalStationService() {
+-    return this.graph.getVehicleRentalStationService();
++    return graph.getVehicleRentalStationService();
+   }
+ 
+-  /** {@link Graph#getVehicleParkingService()} */
+   public VehicleParkingService getVehicleParkingService() {
+-    return this.graph.getVehicleParkingService();
++    return graph.getVehicleParkingService();
+   }
+ 
+-  /** {@link Graph#getNoticesByEntity(TransitEntity)} */
+   public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
+-    return this.graph.getNoticesByEntity(entity);
++    return graph.getNoticesByEntity(entity);
+   }
+ 
+-  /** {@link Graph#getTripPatternForId(FeedScopedId)} */
+   public TripPattern getTripPatternForId(FeedScopedId id) {
+-    return this.graph.getTripPatternForId(id);
++    return graph.getTripPatternForId(id);
+   }
+ 
+-  /** {@link Graph#getTripPatterns()} */
+   public Collection<TripPattern> getTripPatterns() {
+-    return this.graph.getTripPatterns();
++    return graph.getTripPatterns();
+   }
+ 
+-  /** {@link Graph#getNotices()} */
+   public Collection<Notice> getNotices() {
+-    return this.graph.getNotices();
++    return graph.getNotices();
+   }
+ 
+-  /** {@link Graph#getStopsByBoundingBox(double, double, double, double)} */
+   public Collection<StopLocation> getStopsByBoundingBox(
+     double minLat,
+     double minLon,
+     double maxLat,
+     double maxLon
+   ) {
+-    return this.graph.getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
++    return graph.getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
+   }
+ 
+-  /** {@link Graph#getStopsInRadius(WgsCoordinate, double)} */
+   public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
+-    return this.graph.getStopsInRadius(center, radius);
++    return graph.getStopsInRadius(center, radius);
+   }
+ 
+-  /** {@link Graph#getStationById(FeedScopedId)} */
+   public Station getStationById(FeedScopedId id) {
+-    return this.graph.getStationById(id);
++    return graph.getStationById(id);
+   }
+ 
+-  /** {@link Graph#getMultiModalStation(FeedScopedId)} */
+   public MultiModalStation getMultiModalStation(FeedScopedId id) {
+-    return this.graph.getMultiModalStation(id);
++    return graph.getMultiModalStation(id);
+   }
+ 
+-  /** {@link Graph#getStations()} */
+   public Collection<Station> getStations() {
+-    return this.graph.getStations();
++    return graph.getStations();
+   }
+ 
+-  /** {@link Graph#getServiceCodes()} */
+   public Map<FeedScopedId, Integer> getServiceCodes() {
+-    return this.graph.getServiceCodes();
++    return graph.getServiceCodes();
+   }
+ 
+-  /** {@link Graph#getTransfersByStop(StopLocation)} */
+   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
+-    return this.graph.getTransfersByStop(stop);
++    return graph.getTransfersByStop(stop);
+   }
+ 
+-  /** {@link Graph#getDrivingDirection()} */
+   public DrivingDirection getDrivingDirection() {
+-    return this.graph.getDrivingDirection();
++    return graph.getDrivingDirection();
+   }
+ 
+-  /** {@link Graph#setDrivingDirection(DrivingDirection)} */
+-  public void setDrivingDirection(DrivingDirection drivingDirection) {
+-    this.graph.setDrivingDirection(drivingDirection);
++  public void setDrivingDirection(DrivingDirection direction) {
++    graph.setDrivingDirection(direction);
+   }
+ 
+-  /** {@link Graph#getIntersectionTraversalModel()} */
+   public IntersectionTraversalCostModel getIntersectionTraversalModel() {
+-    return this.graph.getIntersectionTraversalModel();
++    return graph.getIntersectionTraversalModel();
+   }
+ 
+-  /** {@link Graph#setIntersectionTraversalCostModel(IntersectionTraversalCostModel)} */
+-  public void setIntersectionTraversalCostModel(
+-    IntersectionTraversalCostModel intersectionTraversalCostModel
+-  ) {
+-    this.graph.setIntersectionTraversalCostModel(intersectionTraversalCostModel);
++  public void setIntersectionTraversalCostModel(IntersectionTraversalCostModel model) {
++    graph.setIntersectionTraversalCostModel(model);
+   }
+ 
+-  /** {@link Graph#getLocationById(FeedScopedId)} */
+   public FlexStopLocation getLocationById(FeedScopedId id) {
+-    return this.graph.getLocationById(id);
++    return graph.getLocationById(id);
+   }
+ 
+-  /** {@link Graph#getAllFlexStopsFlat()} */
+   public Set<StopLocation> getAllFlexStopsFlat() {
+-    return this.graph.getAllFlexStopsFlat();
++    return graph.getAllFlexStopsFlat();
+   }
+ 
+-  /** {@link GraphIndex#getAgencyForId(FeedScopedId)} */
+   public Agency getAgencyForId(FeedScopedId id) {
+-    return this.graphIndex.getAgencyForId(id);
++    return graphIndex.getAgencyForId(id);
+   }
+ 
+-  /** {@link GraphIndex#getStopForId(FeedScopedId)} */
+   public StopLocation getStopForId(FeedScopedId id) {
+-    return this.graphIndex.getStopForId(id);
++    return graphIndex.getStopForId(id);
+   }
+ 
+-  /** {@link GraphIndex#getRouteForId(FeedScopedId)} */
+   public Route getRouteForId(FeedScopedId id) {
+-    return this.graphIndex.getRouteForId(id);
++    return graphIndex.getRouteForId(id);
+   }
+ 
+-  /** {@link GraphIndex#addRoutes(Route)} */
+   public void addRoutes(Route route) {
+-    this.graphIndex.addRoutes(route);
++    graphIndex.addRoutes(route);
+   }
+ 
+-  /** {@link GraphIndex#getRoutesForStop(StopLocation)} */
+   public Set<Route> getRoutesForStop(StopLocation stop) {
+-    return this.graphIndex.getRoutesForStop(stop);
++    return graphIndex.getRoutesForStop(stop);
+   }
+ 
+-  /** {@link GraphIndex#getPatternsForStop(StopLocation)} */
+   public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
+-    return this.graphIndex.getPatternsForStop(stop);
++    return graphIndex.getPatternsForStop(stop);
+   }
+ 
+-  /** {@link GraphIndex#getPatternsForStop(StopLocation, TimetableSnapshot)} */
+-  public Collection<TripPattern> getPatternsForStop(
+-    StopLocation stop,
+-    TimetableSnapshot timetableSnapshot
+-  ) {
+-    return this.graphIndex.getPatternsForStop(stop, timetableSnapshot);
++  public Collection<TripPattern> getPatternsForStop(StopLocation stop, TimetableSnapshot snapshot) {
++    return graphIndex.getPatternsForStop(stop, snapshot);
+   }
+ 
+-  /** {@link GraphIndex#getAllOperators()} */
+   public Collection<Operator> getAllOperators() {
+-    return this.graphIndex.getAllOperators();
++    return graphIndex.getAllOperators();
+   }
+ 
+-  /** {@link GraphIndex#getOperatorForId()} */
+   public Map<FeedScopedId, Operator> getOperatorForId() {
+-    return this.graphIndex.getOperatorForId();
++    return graphIndex.getOperatorForId();
+   }
+ 
+-  /** {@link GraphIndex#getAllStops()} */
+   public Collection<StopLocation> getAllStops() {
+-    return this.graphIndex.getAllStops();
++    return graphIndex.getAllStops();
+   }
+ 
+-  /** {@link GraphIndex#getTripForId()} */
+   public Map<FeedScopedId, Trip> getTripForId() {
+-    return this.graphIndex.getTripForId();
++    return graphIndex.getTripForId();
+   }
+ 
+-  /** {@link GraphIndex#getAllRoutes()} */
+   public Collection<Route> getAllRoutes() {
+-    return this.graphIndex.getAllRoutes();
++    return graphIndex.getAllRoutes();
+   }
+ 
+-  /** {@link GraphIndex#getStopVertexForStop()} */
+   public Map<Stop, TransitStopVertex> getStopVertexForStop() {
+-    return this.graphIndex.getStopVertexForStop();
++    return graphIndex.getStopVertexForStop();
+   }
+ 
+-  /** {@link GraphIndex#getPatternForTrip()} */
+   public Map<Trip, TripPattern> getPatternForTrip() {
+-    return this.graphIndex.getPatternForTrip();
++    return graphIndex.getPatternForTrip();
+   }
+ 
+-  /** {@link GraphIndex#getPatternsForFeedId()} */
+   public Multimap<String, TripPattern> getPatternsForFeedId() {
+-    return this.graphIndex.getPatternsForFeedId();
++    return graphIndex.getPatternsForFeedId();
+   }
+ 
+-  /** {@link GraphIndex#getPatternsForRoute()} */
+   public Multimap<Route, TripPattern> getPatternsForRoute() {
+-    return this.graphIndex.getPatternsForRoute();
++    return graphIndex.getPatternsForRoute();
+   }
+ 
+-  /** {@link GraphIndex#getMultiModalStationForStations()} */
+   public Map<Station, MultiModalStation> getMultiModalStationForStations() {
+-    return this.graphIndex.getMultiModalStationForStations();
++    return graphIndex.getMultiModalStationForStations();
+   }
+ 
+-  /** {@link GraphIndex#getStopSpatialIndex()} */
+   public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
+-    return this.graphIndex.getStopSpatialIndex();
++    return graphIndex.getStopSpatialIndex();
+   }
+ 
+-  /** {@link GraphIndex#getServiceCodesRunningForDate()} */
+   public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
+-    return this.graphIndex.getServiceCodesRunningForDate();
++    return graphIndex.getServiceCodesRunningForDate();
+   }
+ 
+-  /** {@link GraphIndex#getFlexIndex()} */
+   public FlexIndex getFlexIndex() {
+-    return this.graphIndex.getFlexIndex();
++    return graphIndex.getFlexIndex();
+   }
+ 
+-  /** {@link GraphFinder#findClosestStops(double, double, double)} */
+   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
+-    return this.graphFinder.findClosestStops(lat, lon, radiusMeters);
++    return queryHelper.findClosestStops(lat, lon, radiusMeters);
+   }
+ 
+-  /**
+-   * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List,
+-   * RoutingService)}
+-   */
+   public List<PlaceAtDistance> findClosestPlaces(
+     double lat,
+     double lon,
+@@ -775,29 +608,31 @@ public class RoutingService {
+     List<String> filterByCarParks,
+     RoutingService routingService
+   ) {
+-    return this.graphFinder.findClosestPlaces(
+-        lat,
+-        lon,
+-        radiusMeters,
+-        maxResults,
+-        filterByModes,
+-        filterByPlaceTypes,
+-        filterByStops,
+-        filterByRoutes,
+-        filterByBikeRentalStations,
+-        routingService
+-      );
++    return queryHelper.findClosestPlaces(
++      lat,
++      lon,
++      radiusMeters,
++      maxResults,
++      filterByModes,
++      filterByPlaceTypes,
++      filterByStops,
++      filterByRoutes,
++      filterByBikeRentalStations,
++      filterByBikeParks,
++      filterByCarParks,
++      routingService
++    );
+   }
+ 
+   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
+     FeedScopedId tripId,
+     ServiceDate serviceDate
+   ) {
+-    return DatedServiceJourneyHelper.getTripOnServiceDate(this, tripId, serviceDate);
++    return queryHelper.getTripOnServiceDateForTripAndDay(this, tripId, serviceDate);
+   }
+ 
+-  public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
+-    return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
++  public TripOnServiceDate getTripOnServiceDateById(FeedScopedId id) {
++    return queryHelper.getTripOnServiceDateById(this, id);
+   }
+ 
+   public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
+@@ -808,15 +643,8 @@ public class RoutingService {
+     return graphIndex.getTripOnServiceDateById();
+   }
+ 
+-  /**
+-   * Lazy-initialization of TimetableSnapshot
+-   *
+-   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
+-   */
+   private TimetableSnapshot lazyGetTimeTableSnapShot() {
+-    if (this.timetableSnapshot == null) {
+-      timetableSnapshot = graph.getTimetableSnapshot();
+-    }
+-    return this.timetableSnapshot;
++    if (timetableSnapshot == null) timetableSnapshot = graph.getTimetableSnapshot();
++    return timetableSnapshot;
+   }
+ }
+diff --git a/src/main/java/org/opentripplanner/routing/RoutingServiceQueryHelper.java b/src/main/java/org/opentripplanner/routing/RoutingServiceQueryHelper.java
+new file mode 100644
+index 0000000000..11dc665fca
+--- /dev/null
++++ b/src/main/java/org/opentripplanner/routing/RoutingServiceQueryHelper.java
+@@ -0,0 +1,125 @@
++package org.opentripplanner.routing;
++
++import java.util.List;
++import org.opentripplanner.model.StopLocation;
++import org.opentripplanner.model.StopTimesInPattern;
++import org.opentripplanner.model.TripOnServiceDate;
++import org.opentripplanner.model.TripPattern;
++import org.opentripplanner.model.TripTimeOnDate;
++import org.opentripplanner.model.calendar.ServiceDate;
++import org.opentripplanner.routing.graph.Graph;
++import org.opentripplanner.routing.graphfinder.GraphFinder;
++import org.opentripplanner.routing.graphfinder.NearbyStop;
++import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
++import org.opentripplanner.routing.graphfinder.PlaceType;
++import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
++import org.opentripplanner.routing.stoptimes.StopTimesHelper;
++import org.opentripplanner.transit.model.basic.FeedScopedId;
++import org.opentripplanner.transit.model.network.TransitMode;
++
++class RoutingServiceQueryHelper {
++
++  private final GraphFinder graphFinder;
++
++  RoutingServiceQueryHelper(Graph graph) {
++    this.graphFinder = GraphFinder.getInstance(graph);
++  }
++
++  List<StopTimesInPattern> stopTimesForStop(
++    RoutingService routingService,
++    StopLocation stop,
++    long startTime,
++    int timeRange,
++    int numberOfDepartures,
++    ArrivalDeparture arrivalDeparture,
++    boolean includeCancelledTrips
++  ) {
++    return StopTimesHelper.stopTimesForStop(
++      routingService,
++      routingService.getTimetableSnapshotForQuery(),
++      stop,
++      startTime,
++      timeRange,
++      numberOfDepartures,
++      arrivalDeparture,
++      includeCancelledTrips
++    );
++  }
++
++  List<StopTimesInPattern> getStopTimesForStop(
++    RoutingService routingService,
++    StopLocation stop,
++    ServiceDate serviceDate,
++    ArrivalDeparture arrivalDeparture
++  ) {
++    return StopTimesHelper.stopTimesForStop(routingService, stop, serviceDate, arrivalDeparture);
++  }
++
++  List<TripTimeOnDate> stopTimesForPatternAtStop(
++    RoutingService routingService,
++    StopLocation stop,
++    TripPattern pattern,
++    long startTime,
++    int timeRange,
++    int numberOfDepartures,
++    ArrivalDeparture arrivalDeparture
++  ) {
++    return StopTimesHelper.stopTimesForPatternAtStop(
++      routingService,
++      routingService.getTimetableSnapshotForQuery(),
++      stop,
++      pattern,
++      startTime,
++      timeRange,
++      numberOfDepartures,
++      arrivalDeparture
++    );
++  }
++
++  TripOnServiceDate getTripOnServiceDateForTripAndDay(
++    RoutingService routingService,
++    FeedScopedId tripId,
++    ServiceDate serviceDate
++  ) {
++    return DatedServiceJourneyHelper.getTripOnServiceDate(routingService, tripId, serviceDate);
++  }
++
++  TripOnServiceDate getTripOnServiceDateById(
++    RoutingService routingService,
++    FeedScopedId datedServiceJourneyId
++  ) {
++    return DatedServiceJourneyHelper.getTripOnServiceDate(routingService, datedServiceJourneyId);
++  }
++
++  List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
++    return graphFinder.findClosestStops(lat, lon, radiusMeters);
++  }
++
++  List<PlaceAtDistance> findClosestPlaces(
++    double lat,
++    double lon,
++    double radiusMeters,
++    int maxResults,
++    List<TransitMode> filterByModes,
++    List<PlaceType> filterByPlaceTypes,
++    List<FeedScopedId> filterByStops,
++    List<FeedScopedId> filterByRoutes,
++    List<String> filterByBikeRentalStations,
++    List<String> filterByBikeParks,
++    List<String> filterByCarParks,
++    RoutingService routingService
++  ) {
++    return graphFinder.findClosestPlaces(
++      lat,
++      lon,
++      radiusMeters,
++      maxResults,
++      filterByModes,
++      filterByPlaceTypes,
++      filterByStops,
++      filterByRoutes,
++      filterByBikeRentalStations,
++      routingService
++    );
++  }
++}

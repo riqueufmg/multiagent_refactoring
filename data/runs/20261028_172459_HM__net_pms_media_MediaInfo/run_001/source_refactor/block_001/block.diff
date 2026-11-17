@@ -1,0 +1,223 @@
+commit ed92b7f838e493c996bfef2995736dd92e342b75
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 17:27:20 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/src/main/java/net/pms/media/AudioMetadataParser.java b/src/main/java/net/pms/media/AudioMetadataParser.java
+new file mode 100644
+index 000000000..934282814
+--- /dev/null
++++ b/src/main/java/net/pms/media/AudioMetadataParser.java
+@@ -0,0 +1,211 @@
++/*
++ * This file is part of Universal Media Server, based on PS3 Media Server.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; version 2 of the License only.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
++ * details.
++ */
++package net.pms.media;
++
++import java.io.File;
++import java.io.IOException;
++import java.util.Locale;
++import net.pms.configuration.UmsConfiguration;
++import net.pms.dlna.DLNAThumbnail;
++import net.pms.dlna.InputFile;
++import net.pms.formats.Format;
++import net.pms.image.ImageFormat;
++import net.pms.image.ImagesUtil.ScaleType;
++import net.pms.media.audio.MediaAudio;
++import net.pms.network.mediaserver.handlers.api.starrating.StarRating;
++import net.pms.util.CoverSupplier;
++import net.pms.util.CoverUtil;
++import net.pms.util.FileUtil;
++import org.apache.commons.lang3.StringUtils;
++import org.apache.commons.lang3.math.NumberUtils;
++import org.jaudiotagger.audio.AudioFile;
++import org.jaudiotagger.audio.AudioFileIO;
++import org.jaudiotagger.audio.AudioHeader;
++import org.jaudiotagger.audio.exceptions.CannotReadException;
++import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
++import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
++import org.jaudiotagger.tag.FieldKey;
++import org.jaudiotagger.tag.KeyNotFoundException;
++import org.jaudiotagger.tag.Tag;
++import org.jaudiotagger.tag.TagException;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++/**
++ * Parses audio stream properties, tags and embedded audio artwork.
++ */
++public final class AudioMetadataParser {
++	private static final Logger LOGGER = LoggerFactory.getLogger(AudioMetadataParser.class);
++
++	private AudioMetadataParser() {
++	}
++
++	/**
++	 * Parses audio metadata and returns the parsed track and optional artwork.
++	 */
++	public static Result parse(InputFile inputFile, Format format, UmsConfiguration configuration) {
++		Result result = new Result();
++		if (inputFile == null || inputFile.getFile() == null) {
++			return result;
++		}
++		File file = inputFile.getFile();
++
++		try {
++			AudioFile audioFile = read(file);
++			AudioHeader audioHeader = audioFile.getAudioHeader();
++			MediaAudio audio = new MediaAudio();
++
++			if (audioHeader != null) {
++				int length = audioHeader.getTrackLength();
++				int sampleRate = audioHeader.getSampleRateAsNumber();
++				if (audioHeader.getEncodingType() != null && audioHeader.getEncodingType().toLowerCase(Locale.ROOT).contains("flac 24")) {
++					audio.setBitsperSample(24);
++				}
++				audio.setSampleFrequency(Integer.toString(sampleRate));
++				result.duration = (double) length;
++				result.bitrate = (int) audioHeader.getBitRateAsNumber();
++				audio.getAudioProperties().setNumberOfChannels(2);
++				String channels = audioHeader.getChannels();
++				if (StringUtils.isNotBlank(channels)) {
++					channels = channels.toLowerCase(Locale.ROOT);
++					if (channels.equals("1") || channels.contains("mono")) {
++						audio.getAudioProperties().setNumberOfChannels(1);
++					} else if (!(channels.equals("2") || channels.equals("0") || channels.contains("stereo"))) {
++						try {
++							audio.getAudioProperties().setNumberOfChannels(Integer.parseInt(channels));
++						} catch (IllegalArgumentException e) {
++							LOGGER.debug("Could not parse number of audio channels from \"{}\"", channels);
++						}
++					}
++				}
++				if (StringUtils.isNotBlank(audioHeader.getEncodingType())) {
++					audio.setCodecA(audioHeader.getEncodingType());
++				}
++				if (audio.getCodecA() != null && audio.getCodecA().contains("(windows media")) {
++					audio.setCodecA(audio.getCodecA().substring(0, audio.getCodecA().indexOf("(windows media")).trim());
++				}
++			}
++
++			Tag tag = audioFile.getTag();
++			if (tag != null) {
++				if (!tag.getArtworkList().isEmpty()) {
++					result.thumbnail = DLNAThumbnail.toThumbnail(tag.getArtworkList().get(0).getBinaryData(), 640, 480, ScaleType.MAX, ImageFormat.SOURCE, false);
++				} else if (configuration != null && !configuration.getAudioThumbnailMethod().equals(CoverSupplier.NONE)) {
++					result.thumbnail = DLNAThumbnail.toThumbnail(CoverUtil.get().getThumbnail(tag), 640, 480, ScaleType.MAX, ImageFormat.SOURCE, false);
++				}
++				audio.setAlbum(extractAudioTagKeyValue(tag, FieldKey.ALBUM));
++				audio.setArtist(extractAudioTagKeyValue(tag, FieldKey.ARTIST));
++				audio.setComposer(extractAudioTagKeyValue(tag, FieldKey.COMPOSER));
++				audio.setConductor(extractAudioTagKeyValue(tag, FieldKey.CONDUCTOR));
++				audio.setSongname(extractAudioTagKeyValue(tag, FieldKey.TITLE));
++				audio.setMbidRecord(extractAudioTagKeyValue(tag, FieldKey.MUSICBRAINZ_RELEASEID));
++				audio.setMbidTrack(extractAudioTagKeyValue(tag, FieldKey.MUSICBRAINZ_TRACK_ID));
++				audio.setRating(StarRating.convertTagRatingToStar(tag));
++				audio.setGenre(extractAudioTagKeyValue(tag, FieldKey.GENRE));
++				String year = extractAudioTagKeyValue(tag, FieldKey.YEAR);
++				if (year != null) {
++					if (year.length() > 4) {
++						year = year.substring(0, 4);
++					}
++					if (NumberUtils.isParsable(year)) {
++						audio.setYear(Integer.parseInt(year));
++					}
++				}
++				audio.setTrack(extractAudioTagKeyIntegerValue(tag, FieldKey.TRACK, 1));
++			}
++			if (StringUtils.isBlank(audio.getSongname())) {
++				audio.setSongname(file.getName());
++			}
++			result.audio = audio;
++		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | NumberFormatException | KeyNotFoundException e) {
++			LOGGER.debug("Error parsing audio file tag for \"{}\": {}", file.getName(), e.getMessage());
++			LOGGER.trace("", e);
++		}
++		return result;
++	}
++
++	/**
++	 * Parses only embedded audio artwork.
++	 */
++	public static DLNAThumbnail parseThumbnailOnly(InputFile inputFile, Format format, UmsConfiguration configuration) {
++		if (inputFile == null || inputFile.getFile() == null) {
++			return null;
++		}
++		File file = inputFile.getFile();
++		try {
++			Tag tag = read(file).getTag();
++			if (tag == null) {
++				return null;
++			}
++			if (!tag.getArtworkList().isEmpty()) {
++				return DLNAThumbnail.toThumbnail(tag.getArtworkList().get(0).getBinaryData(), 640, 480, ScaleType.MAX, ImageFormat.SOURCE, false);
++			}
++			if (configuration != null && !configuration.getAudioThumbnailMethod().equals(CoverSupplier.NONE)) {
++				return DLNAThumbnail.toThumbnail(CoverUtil.get().getThumbnail(tag), 640, 480, ScaleType.MAX, ImageFormat.SOURCE, false);
++			}
++		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | KeyNotFoundException e) {
++			LOGGER.debug("Error parsing audio thumbnail for \"{}\": {}", file.getName(), e.getMessage());
++			LOGGER.trace("", e);
++		}
++		return null;
++	}
++
++	private static AudioFile read(File file) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
++		return "mp2".equalsIgnoreCase(FileUtil.getExtension(file)) ? AudioFileIO.readAs(file, "mp3") : AudioFileIO.read(file);
++	}
++
++	public static String extractAudioTagKeyValue(Tag tag, FieldKey key) {
++		try {
++			String value = tag.getFirst(key);
++			return StringUtils.isAllBlank(value) ? null : value;
++		} catch (KeyNotFoundException e) {
++			LOGGER.trace("Tag field not found", e);
++			return null;
++		}
++	}
++
++	public static Integer extractAudioTagKeyIntegerValue(Tag tag, FieldKey key, Integer defaultValue) {
++		String value = extractAudioTagKeyValue(tag, key);
++		if (value != null) {
++			try {
++				return Integer.valueOf(value);
++			} catch (NumberFormatException e) {
++				LOGGER.trace("No integer value available for tag field", e);
++			}
++		}
++		return defaultValue;
++	}
++
++	public static final class Result {
++		private MediaAudio audio;
++		private DLNAThumbnail thumbnail;
++		private Double duration;
++		private int bitrate;
++
++		public MediaAudio getAudio() {
++			return audio;
++		}
++
++		public DLNAThumbnail getThumbnail() {
++			return thumbnail;
++		}
++
++		public Double getDuration() {
++			return duration;
++		}
++
++		public int getBitrate() {
++			return bitrate;
++		}
++	}
++}

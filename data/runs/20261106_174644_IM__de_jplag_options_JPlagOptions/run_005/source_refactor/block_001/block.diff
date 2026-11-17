@@ -1,0 +1,262 @@
+commit 4a2543ba74fce903aecd8770bb555c087da2c508
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Fri Nov 6 18:03:01 2026 -0400
+
+    source_refactor: apply block 1
+
+diff --git a/core/src/main/java/de/jplag/options/JPlagOptions.java b/core/src/main/java/de/jplag/options/JPlagOptions.java
+index ed8f44380..5ba57fb6c 100644
+--- a/core/src/main/java/de/jplag/options/JPlagOptions.java
++++ b/core/src/main/java/de/jplag/options/JPlagOptions.java
+@@ -19,6 +19,7 @@ public class JPlagOptions {
+ 
+     private final JPlagComparisonOptions comparisonOptions = new JPlagComparisonOptions();
+     private final JPlagSubmissionOptions submissionOptions;
++    private final JPlagSubmissionOptionAccess submissionOptionAccess;
+     private final JPlagLanguageOptions languageOptions;
+     private final JPlagClusteringOptions clusteringOptions = new JPlagClusteringOptions();
+ 
+@@ -29,6 +30,7 @@ public class JPlagOptions {
+      */
+     public JPlagOptions(List<String> submissionDirectories, List<String> oldSubmissionDirectories, String languageIdentifier) {
+         this.submissionOptions = new JPlagSubmissionOptions(submissionDirectories, oldSubmissionDirectories);
++        this.submissionOptionAccess = new JPlagSubmissionOptionAccess(submissionOptions);
+         this.languageOptions = new JPlagLanguageOptions(languageIdentifier, comparisonOptions);
+     }
+ 
+@@ -40,26 +42,18 @@ public class JPlagOptions {
+         return submissionOptions;
+     }
+ 
+-    public JPlagLanguageOptions getLanguageOptions() {
+-        return languageOptions;
++    public JPlagSubmissionOptionAccess getSubmissionOptionAccess() {
++        return submissionOptionAccess;
+     }
+ 
+-    public Optional<String> getBaseCodeSubmissionName() {
+-        return submissionOptions.getBaseCodeSubmissionName();
++    public JPlagLanguageOptions getLanguageOptions() {
++        return languageOptions;
+     }
+ 
+     public ComparisonMode getComparisonMode() {
+         return comparisonOptions.getComparisonMode();
+     }
+ 
+-    public Set<String> getExcludedFiles() {
+-        return submissionOptions.getExcludedFiles();
+-    }
+-
+-    public String getExclusionFileName() {
+-        return submissionOptions.getExclusionFileName();
+-    }
+-
+     public String[] getFileSuffixes() {
+         return languageOptions.getFileSuffixes();
+     }
+@@ -80,14 +74,6 @@ public class JPlagOptions {
+         return comparisonOptions.getMinimumTokenMatch();
+     }
+ 
+-    public List<String> getSubmissionDirectories() {
+-        return submissionOptions.getSubmissionDirectories();
+-    }
+-
+-    public List<String> getOldSubmissionDirectories() {
+-        return submissionOptions.getOldSubmissionDirectories();
+-    }
+-
+     public SimilarityMetric getSimilarityMetric() {
+         return comparisonOptions.getSimilarityMetric();
+     }
+@@ -96,18 +82,10 @@ public class JPlagOptions {
+         return comparisonOptions.getSimilarityThreshold();
+     }
+ 
+-    public String getSubdirectoryName() {
+-        return submissionOptions.getSubdirectoryName();
+-    }
+-
+     public Verbosity getVerbosity() {
+         return languageOptions.getVerbosity();
+     }
+ 
+-    public boolean hasBaseCode() {
+-        return submissionOptions.hasBaseCode();
+-    }
+-
+     public boolean isDebugParser() {
+         return comparisonOptions.isDebugParser();
+     }
+@@ -116,24 +94,64 @@ public class JPlagOptions {
+         return clusteringOptions.getClusteringOptions();
+     }
+ 
+-    public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {
+-        submissionOptions.setBaseCodeSubmissionName(baseCodeSubmissionName);
++    public Optional<String> getBaseCodeSubmissionName() {
++        return submissionOptionAccess.getBaseCodeSubmissionName();
+     }
+ 
+-    public void setComparisonMode(ComparisonMode comparisonMode) {
+-        comparisonOptions.setComparisonMode(comparisonMode);
++    public Set<String> getExcludedFiles() {
++        return submissionOptionAccess.getExcludedFiles();
+     }
+ 
+-    public void setDebugParser(boolean debugParser) {
+-        comparisonOptions.setDebugParser(debugParser);
++    public String getExclusionFileName() {
++        return submissionOptionAccess.getExclusionFileName();
++    }
++
++    public List<String> getSubmissionDirectories() {
++        return submissionOptionAccess.getSubmissionDirectories();
++    }
++
++    public List<String> getOldSubmissionDirectories() {
++        return submissionOptionAccess.getOldSubmissionDirectories();
++    }
++
++    public String getSubdirectoryName() {
++        return submissionOptionAccess.getSubdirectoryName();
++    }
++
++    public boolean hasBaseCode() {
++        return submissionOptionAccess.hasBaseCode();
++    }
++
++    public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {
++        submissionOptionAccess.setBaseCodeSubmissionName(baseCodeSubmissionName);
+     }
+ 
+     public void setExcludedFiles(Set<String> excludedFiles) {
+-        submissionOptions.setExcludedFiles(excludedFiles);
++        submissionOptionAccess.setExcludedFiles(excludedFiles);
+     }
+ 
+     public void setExclusionFileName(String exclusionFileName) {
+-        submissionOptions.setExclusionFileName(exclusionFileName);
++        submissionOptionAccess.setExclusionFileName(exclusionFileName);
++    }
++
++    public void setSubmissionDirectories(List<String> submissionDirectories) {
++        submissionOptionAccess.setSubmissionDirectories(submissionDirectories);
++    }
++
++    public void setOldSubmissionDirectories(List<String> oldSubmissionDirectories) {
++        submissionOptionAccess.setOldSubmissionDirectories(oldSubmissionDirectories);
++    }
++
++    public void setSubdirectoryName(String subdirectoryName) {
++        submissionOptionAccess.setSubdirectoryName(subdirectoryName);
++    }
++
++    public void setComparisonMode(ComparisonMode comparisonMode) {
++        comparisonOptions.setComparisonMode(comparisonMode);
++    }
++
++    public void setDebugParser(boolean debugParser) {
++        comparisonOptions.setDebugParser(debugParser);
+     }
+ 
+     public void setFileSuffixes(String[] fileSuffixes) {
+@@ -156,14 +174,6 @@ public class JPlagOptions {
+         comparisonOptions.setMinimumTokenMatch(minimumTokenMatch);
+     }
+ 
+-    public void setSubmissionDirectories(List<String> submissionDirectories) {
+-        submissionOptions.setSubmissionDirectories(submissionDirectories);
+-    }
+-
+-    public void setOldSubmissionDirectories(List<String> oldSubmissionDirectories) {
+-        submissionOptions.setOldSubmissionDirectories(oldSubmissionDirectories);
+-    }
+-
+     public void setSimilarityMetric(SimilarityMetric similarityMetric) {
+         comparisonOptions.setSimilarityMetric(similarityMetric);
+     }
+@@ -172,10 +182,6 @@ public class JPlagOptions {
+         comparisonOptions.setSimilarityThreshold(similarityThreshold);
+     }
+ 
+-    public void setSubdirectoryName(String subdirectoryName) {
+-        submissionOptions.setSubdirectoryName(subdirectoryName);
+-    }
+-
+     public void setVerbosity(Verbosity verbosity) {
+         languageOptions.setVerbosity(verbosity);
+     }
+diff --git a/core/src/main/java/de/jplag/options/JPlagSubmissionOptionAccess.java b/core/src/main/java/de/jplag/options/JPlagSubmissionOptionAccess.java
+new file mode 100644
+index 000000000..50fcf9674
+--- /dev/null
++++ b/core/src/main/java/de/jplag/options/JPlagSubmissionOptionAccess.java
+@@ -0,0 +1,66 @@
++package de.jplag.options;
++
++import java.util.List;
++import java.util.Optional;
++import java.util.Set;
++
++public class JPlagSubmissionOptionAccess {
++
++    private final JPlagSubmissionOptions submissionOptions;
++
++    public JPlagSubmissionOptionAccess(JPlagSubmissionOptions submissionOptions) {
++        this.submissionOptions = submissionOptions;
++    }
++
++    public Optional<String> getBaseCodeSubmissionName() {
++        return submissionOptions.getBaseCodeSubmissionName();
++    }
++
++    public Set<String> getExcludedFiles() {
++        return submissionOptions.getExcludedFiles();
++    }
++
++    public String getExclusionFileName() {
++        return submissionOptions.getExclusionFileName();
++    }
++
++    public List<String> getSubmissionDirectories() {
++        return submissionOptions.getSubmissionDirectories();
++    }
++
++    public List<String> getOldSubmissionDirectories() {
++        return submissionOptions.getOldSubmissionDirectories();
++    }
++
++    public String getSubdirectoryName() {
++        return submissionOptions.getSubdirectoryName();
++    }
++
++    public boolean hasBaseCode() {
++        return submissionOptions.hasBaseCode();
++    }
++
++    public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {
++        submissionOptions.setBaseCodeSubmissionName(baseCodeSubmissionName);
++    }
++
++    public void setExcludedFiles(Set<String> excludedFiles) {
++        submissionOptions.setExcludedFiles(excludedFiles);
++    }
++
++    public void setExclusionFileName(String exclusionFileName) {
++        submissionOptions.setExclusionFileName(exclusionFileName);
++    }
++
++    public void setSubmissionDirectories(List<String> submissionDirectories) {
++        submissionOptions.setSubmissionDirectories(submissionDirectories);
++    }
++
++    public void setOldSubmissionDirectories(List<String> oldSubmissionDirectories) {
++        submissionOptions.setOldSubmissionDirectories(oldSubmissionDirectories);
++    }
++
++    public void setSubdirectoryName(String subdirectoryName) {
++        submissionOptions.setSubdirectoryName(subdirectoryName);
++    }
++}

@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "goal": "Reduce the public API and implementation size of ClassMemberInfo by extracting its cohesive annotation-query facade into a dedicated class while preserving the existing annotation metadata behavior.",
+  "files": [
+    "src/main/java/io/github/classgraph/ClassMemberInfo.java",
+    "src/main/java/io/github/classgraph/ClassMemberInfoAnnotations.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "io.github.classgraph.ClassMemberInfo"
+      ],
+      "outputs": [
+        "io.github.classgraph.ClassMemberInfoAnnotations"
+      ],
+      "details": "Extract the annotation-query methods getAllAnnotationInfo(), getDirectAnnotationInfo(), getAllAnnotationInfo(Class<? extends Annotation>), getAllAnnotationInfo(String), getDirectAnnotationInfo(Class<? extends Annotation>), getDirectAnnotationInfo(String), getAllAnnotationInfoRepeatable(Class<? extends Annotation>), getAllAnnotationInfoRepeatable(String), getDirectAnnotationInfoRepeatable(Class<? extends Annotation>), getDirectAnnotationInfoRepeatable(String), hasAnnotation(Class<? extends Annotation>), and hasAnnotation(String), together with the required annotationInfoMetadata dependency. Keep ClassMemberInfo delegating these public operations to the extracted class so existing callers remain compatible.",
+      "risk": "medium"
+    }
+  ],
+  "test_files": []
+}

@@ -1,0 +1,73 @@
+commit 70a03329512da7cee7b76e404c8a48b223112640
+Author: Henrique Nunes <rique@face.ufmg.br>
+Date:   Wed Oct 28 20:46:35 2026 -0300
+
+    source_refactor: apply block 1
+
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/ServerContext.java b/server/base/src/main/java/org/apache/accumulo/server/ServerContext.java
+index 69091f4f37..9e27eadc75 100644
+--- a/server/base/src/main/java/org/apache/accumulo/server/ServerContext.java
++++ b/server/base/src/main/java/org/apache/accumulo/server/ServerContext.java
+@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
+ import java.util.concurrent.atomic.AtomicReference;
+ import java.util.function.Supplier;
+ 
+-import org.apache.accumulo.core.Constants;
+ import org.apache.accumulo.core.client.ConditionalWriter;
+ import org.apache.accumulo.core.clientImpl.ClientContext;
+ import org.apache.accumulo.core.clientImpl.ClientInfo;
+@@ -253,12 +252,7 @@ public class ServerContext extends ClientContext {
+   }
+ 
+   public static void ensureDataVersionCompatible(int dataVersion) {
+-    if (!AccumuloDataVersion.CAN_RUN.contains(dataVersion)) {
+-      throw new IllegalStateException("This version of accumulo (" + Constants.VERSION
+-          + ") is not compatible with files stored using data version " + dataVersion
+-          + ". Please upgrade from " + AccumuloDataVersion.oldestUpgradeableVersionName()
+-          + " or later.");
+-    }
++    ServerContextDataVersionSupport.ensureDataVersionCompatible(dataVersion);
+   }
+ 
+   public void waitForZookeeperAndHdfs() {
+diff --git a/server/base/src/main/java/org/apache/accumulo/server/ServerContextDataVersionSupport.java b/server/base/src/main/java/org/apache/accumulo/server/ServerContextDataVersionSupport.java
+new file mode 100644
+index 0000000000..542055f678
+--- /dev/null
++++ b/server/base/src/main/java/org/apache/accumulo/server/ServerContextDataVersionSupport.java
+@@ -0,0 +1,35 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   https://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++package org.apache.accumulo.server;
++
++import org.apache.accumulo.core.Constants;
++
++final class ServerContextDataVersionSupport {
++
++  private ServerContextDataVersionSupport() {}
++
++  static void ensureDataVersionCompatible(int dataVersion) {
++    if (!AccumuloDataVersion.CAN_RUN.contains(dataVersion)) {
++      throw new IllegalStateException("This version of accumulo (" + Constants.VERSION
++          + ") is not compatible with files stored using data version " + dataVersion
++          + ". Please upgrade from " + AccumuloDataVersion.oldestUpgradeableVersionName()
++          + " or later.");
++    }
++  }
++}

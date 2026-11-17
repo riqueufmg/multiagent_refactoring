@@ -1,0 +1,76 @@
+## CONTEXT
+
+Insufficient Modularization is a design smell that occurs when a class exists that has not been completely decomposed, and a further decomposition could reduce its size, implementation complexity, or both.
+
+The factors that characterize Insufficient Modularization are considered in the following priority order:
+- Too many public methods (poorly cohesive API).
+- Too many general methods.
+- Overly complex methods.
+
+## TASK
+
+Evaluate the input elements and create a plan in JSON format with the goal of removing (or reducing) Insufficient Modularization.
+
+Strategy:
+- Reduce the size and complexity of the class by grouping cohesive attributes and methods.
+- MOVE and CREATE refactorings are only allowed at the same level as the entry or at a sub-level.
+- When the smell is caused by too many public methods, prefer plans that move a cohesive group of public and private methods out of the target class.
+- Test refactoring does not need to be included, as this will be done later.
+
+## ALLOWED REFACTORINGS
+A list of refactorings allowed in the refactoring plan is presented as following:
+- ADD_OR_UPDATE_IMPORTS(file): Adds, removes, or updates imports required by the refactoring.
+- CREATE_PACKAGE(pkgA.subpkg): Creates a new package under the current source root.
+- EXTRACT_CLASS(pkgA.C1, pkgA.C2): Extracts part of class C1 into a new class C2.
+- EXTRACT_INTERFACE(pkgA.C1, pkgA.I1): Extracts an interface I1 from class C1.
+- MOVE_CLASS(pkgA.C1, pkgB.C1): Moves class C1 from package A to package B.
+- MOVE_FIELD(pkgA.C1.field, pkgA.C2.field): Moves a field from class C1 to class C2.
+- MOVE_METHOD(pkgA.C1.m(), pkgA.C2.m()): Moves a method from class C1 to class C2.
+- REPLACE_DEPENDENCY(pkgA.C1, pkgA.C2): Replaces a direct dependency in C1 with a different dependency C2.
+- UPDATE_CALL_SITES(pkgA.C1.m(), pkgA.C2.m()): Updates callers to use the new method or class location.
+
+## INPUT
+{
+  "smell": "Insufficient Modularization",
+  "target_type": "class",
+  "target_name": "de.jplag.options.JPlagOptions",
+  "designite": {
+    "dir": "/data/henrique/multiagent_refactoring/data/runs/20261106_174644_IM__de_jplag_options_JPlagOptions/run_001/planner/designite",
+    "smells_csv": "DesignSmells.csv",
+    "target_has_smell": true
+  },
+  "target_file": "core/src/main/java/de/jplag/options/JPlagOptions.java",
+  "target_source_root": "core/src/main/java",
+  "target_code": "package de.jplag.options;\n\nimport static de.jplag.strategy.ComparisonMode.NORMAL;\n\nimport java.io.File;\nimport java.nio.charset.Charset;\nimport java.nio.charset.StandardCharsets;\nimport java.util.Collections;\nimport java.util.List;\nimport java.util.Optional;\nimport java.util.Set;\n\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\nimport de.jplag.Language;\nimport de.jplag.clustering.ClusteringOptions;\nimport de.jplag.strategy.ComparisonMode;\n\npublic class JPlagOptions {\n\n    private static final Logger logger = LoggerFactory.getLogger(\"JPlag\");\n    public static final ComparisonMode DEFAULT_COMPARISON_MODE = NORMAL;\n    public static final float DEFAULT_SIMILARITY_THRESHOLD = 0;\n    public static final int DEFAULT_SHOWN_COMPARISONS = 30;\n\n    public static final Charset CHARSET = StandardCharsets.UTF_8;\n\n    /**\n     * The identifier of the language used to parse the submissions.\n     */\n    private final String languageIdentifier;\n\n    /**\n     * Language used to parse the submissions.\n     */\n    private Language language;\n\n    /**\n     * Determines which strategy to use for the comparison of submissions.\n     */\n    private ComparisonMode comparisonMode = DEFAULT_COMPARISON_MODE;\n\n    /**\n     * If true, submissions that cannot be parsed will be stored in a separate directory.\n     */\n    private boolean debugParser = false;\n\n    /**\n     * Array of file suffixes that should be included.\n     */\n    private String[] fileSuffixes;\n\n    /**\n     * Percentage value (must be between 0 and 100). Comparisons (of submissions pairs) with a similarity below this\n     * threshold will be ignored. The default value of 0 allows all matches to be stored. This affects which comparisons are\n     * stored and thus make it into the result object.\n     * @see JPlagOptions#similarityMetric\n     */\n    private float similarityThreshold = DEFAULT_SIMILARITY_THRESHOLD;\n\n    /**\n     * The maximum number of comparisons that will be shown in the generated report. If set to -1 all comparisons will be\n     * shown.\n     */\n    private int maximumNumberOfComparisons = DEFAULT_SHOWN_COMPARISONS;\n\n    /**\n     * The similarity metric determines how the minimum similarity threshold required for a comparison (of two submissions)\n     * is calculated. This affects which comparisons are stored and thus make it into the result object.\n     * @see JPlagOptions#similarityThreshold\n     */\n    private SimilarityMetric similarityMetric = SimilarityMetric.AVG;\n\n    /**\n     * Tunes the comparison sensitivity by adjusting the minimum token required to be counted as matching section. A smaller\n     * <n> increases the sensitivity but might lead to more false-positives.\n     */\n    private Integer minimumTokenMatch;\n\n    /**\n     * Name of the file that contains the names of files to exclude from comparison.\n     */\n    private String exclusionFileName;\n\n    /**\n     * Names of the excluded files.\n     */\n    private Set<String> excludedFiles = Collections.emptySet();\n\n    /**\n     * Directories with new submissions. These must be checked for plagiarism.\n     */\n    private List<String> submissionDirectories;\n\n    /**\n     * Directories with old submissions to check against.\n     */\n    private List<String> oldSubmissionDirectories;\n\n    /**\n     * Path name of the directory containing the base code.\n     * <p>\n     * For backwards compatibility it may also be a directory name inside the root directory. Condition for the latter is\n     * <ul>\n     * <li>Specified path does not exist.</li>\n     * <li>Name has not have a separator character after trimming them from both ends (leaving at least a one-character\n     * name).</li>\n     * <li>A submission with the specified name exists in the root directory.</li>\n     * </ul>\n     * It's an error if a string has been provided but it is neither an existing path nor does it fulfill all the conditions\n     * of the compatibility fallback listed above.\n     * </p>\n     */\n    private String baseCodeSubmissionName = null;\n\n    /**\n     * Example: If the subdirectoryName is 'src', only the code inside submissionDir/src of each submission will be used for\n     * comparison.\n     */\n    private String subdirectoryName;\n\n    /**\n     * Level of output verbosity.\n     */\n    private Verbosity verbosity;\n\n    /**\n     * Clustering options\n     */\n    private ClusteringOptions clusteringOptions = new ClusteringOptions.Builder().build();\n\n    /**\n     * Constructor with required attributes.\n     * @param languageIdentifier the identifier of the language to use. If set to {@code null} you have to use\n     * {@link #setLanguage(Language)} to set the language programmatically.\n     */\n    public JPlagOptions(List<String> submissionDirectories, List<String> oldSubmissionDirectories, String languageIdentifier) {\n        this.submissionDirectories = submissionDirectories;\n        this.oldSubmissionDirectories = oldSubmissionDirectories;\n        this.languageIdentifier = languageIdentifier;\n    }\n\n    public Optional<String> getBaseCodeSubmissionName() {\n        return Optional.ofNullable(baseCodeSubmissionName);\n    }\n\n    public ComparisonMode getComparisonMode() {\n        return comparisonMode;\n    }\n\n    public Set<String> getExcludedFiles() {\n        return excludedFiles;\n    }\n\n    public String getExclusionFileName() {\n        return exclusionFileName;\n    }\n\n    public String[] getFileSuffixes() {\n        return fileSuffixes;\n    }\n\n    public String getLanguageIdentifier() {\n        return languageIdentifier;\n    }\n\n    public Language getLanguage() {\n        return language;\n    }\n\n    public int getMaximumNumberOfComparisons() {\n        return this.maximumNumberOfComparisons;\n    }\n\n    public Integer getMinimumTokenMatch() {\n        return minimumTokenMatch;\n    }\n\n    public List<String> getSubmissionDirectories() {\n        return submissionDirectories;\n    }\n\n    public List<String> getOldSubmissionDirectories() {\n        return oldSubmissionDirectories;\n    }\n\n    public SimilarityMetric getSimilarityMetric() {\n        return similarityMetric;\n    }\n\n    public float getSimilarityThreshold() {\n        return similarityThreshold;\n    }\n\n    public String getSubdirectoryName() {\n        return subdirectoryName;\n    }\n\n    public Verbosity getVerbosity() {\n        return verbosity;\n    }\n\n    public boolean hasBaseCode() {\n        return this.baseCodeSubmissionName != null;\n    }\n\n    public boolean isDebugParser() {\n        return debugParser;\n    }\n\n    public ClusteringOptions getClusteringOptions() {\n        return this.clusteringOptions;\n    }\n\n    public void setBaseCodeSubmissionName(String baseCodeSubmissionName) {\n        if (baseCodeSubmissionName == null || baseCodeSubmissionName.isEmpty()) {\n            this.baseCodeSubmissionName = null;\n        } else {\n            this.baseCodeSubmissionName = baseCodeSubmissionName;\n        }\n    }\n\n    public void setComparisonMode(ComparisonMode comparisonMode) {\n        this.comparisonMode = comparisonMode;\n    }\n\n    public void setDebugParser(boolean debugParser) {\n        this.debugParser = debugParser;\n    }\n\n    public void setExcludedFiles(Set<String> excludedFiles) {\n        this.excludedFiles = excludedFiles;\n    }\n\n    public void setExclusionFileName(String exclusionFileName) {\n        this.exclusionFileName = exclusionFileName;\n    }\n\n    public void setFileSuffixes(String[] fileSuffixes) {\n        this.fileSuffixes = fileSuffixes;\n    }\n\n    public void setLanguage(Language language) {\n        this.language = language;\n    }\n\n    /**\n     * After the selected language has been initialized, this method is called by JPlag to set default values for options\n     * not set by the user.\n     * @param language - initialized language instance\n     */\n    public void setLanguageDefaults(Language language) {\n        if (!hasMinimumTokenMatch()) {\n            setMinimumTokenMatch(language.minimumTokenMatch());\n        }\n\n        if (!hasFileSuffixes()) {\n            fileSuffixes = language.suffixes();\n        }\n    }\n\n    public void setMaximumNumberOfComparisons(int maximumNumberOfComparisons) {\n        this.maximumNumberOfComparisons = Math.max(maximumNumberOfComparisons, -1);\n    }\n\n    public void setMinimumTokenMatch(Integer minimumTokenMatch) {\n        if (minimumTokenMatch != null && minimumTokenMatch < 1) {\n            this.minimumTokenMatch = 1;\n        } else {\n            this.minimumTokenMatch = minimumTokenMatch;\n        }\n    }\n\n    public void setSubmissionDirectories(List<String> submissionDirectories) {\n        this.submissionDirectories = submissionDirectories;\n    }\n\n    public void setOldSubmissionDirectories(List<String> oldSubmissionDirectories) {\n        this.oldSubmissionDirectories = oldSubmissionDirectories;\n    }\n\n    public void setSimilarityMetric(SimilarityMetric similarityMetric) {\n        this.similarityMetric = similarityMetric;\n    }\n\n    public void setSimilarityThreshold(float similarityThreshold) {\n        if (similarityThreshold > 100) {\n            logger.warn(\"Maximum threshold of 100 used instead of {}\", similarityThreshold);\n            this.similarityThreshold = 100;\n        } else if (similarityThreshold < 0) {\n            logger.warn(\"Minimum threshold of 0 used instead of {}\", similarityThreshold);\n            this.similarityThreshold = 0;\n        } else {\n            this.similarityThreshold = similarityThreshold;\n        }\n    }\n\n    public void setSubdirectoryName(String subdirectoryName) {\n        // Trim problematic file separators.\n        this.subdirectoryName = (subdirectoryName == null) ? null : subdirectoryName.replace(File.separator, \"\");\n    }\n\n    public void setVerbosity(Verbosity verbosity) {\n        this.verbosity = verbosity;\n    }\n\n    public void setClusteringOptions(ClusteringOptions clusteringOptions) {\n        this.clusteringOptions = clusteringOptions;\n    }\n\n    private boolean hasFileSuffixes() {\n        return fileSuffixes != null && fileSuffixes.length > 0;\n    }\n\n    private boolean hasMinimumTokenMatch() {\n        return minimumTokenMatch != null;\n    }\n\n}\n"
+}
+
+## OUTPUT
+
+The expected output format and contraints for that output are presented below.
+
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "<class FQN from input>",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "...",
+      "files": ["..."],
+      "ops": [
+        {
+          "op": "<allowed op>",
+          "inputs": ["..."],
+          "outputs": ["..."],
+          "details": "...",
+          "risk": "low|medium|high"
+        }
+      ]
+    }
+  ]
+}
+
+Contraints:
+- Reference only packages, classes, methods, and fields present in the input.
+- Each block must be small and independently compilable.
+- New classes must be placed in the same package as the target class unless the input clearly justifies otherwise.

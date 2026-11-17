@@ -1,0 +1,42 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.apache.accumulo.server.ServerContext",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the data-version compatibility responsibility from ServerContext while preserving the public ensureDataVersionCompatible(int) API.",
+      "files": [
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+        "server/base/src/main/java/org/apache/accumulo/server/ServerContextDataVersionSupport.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.apache.accumulo.server.ServerContext",
+            "org.apache.accumulo.server.ServerContextDataVersionSupport"
+          ],
+          "outputs": [
+            "org.apache.accumulo.server.ServerContextDataVersionSupport"
+          ],
+          "details": "Extract the body and data-version-specific collaborators of ServerContext.ensureDataVersionCompatible(int) into the new same-package class ServerContextDataVersionSupport. The extracted class should contain the existing compatibility check using AccumuloDataVersion.CAN_RUN, AccumuloDataVersion.oldestUpgradeableVersionName(), and Constants.VERSION. Retain ServerContext.ensureDataVersionCompatible(int) as a public compatibility wrapper delegating to ServerContextDataVersionSupport, so callers and behavior remain unchanged. Remove the direct Constants and AccumuloDataVersion references from ServerContext; the target gains only the new ServerContextDataVersionSupport dependency. The expected net Fan-Out change is positive: two outgoing dependencies, Constants and AccumuloDataVersion, disappear from ServerContext and one new helper dependency is introduced, for an estimated net reduction of one distinct dependency.",
+          "risk": "low"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+            "server/base/src/main/java/org/apache/accumulo/server/ServerContextDataVersionSupport.java"
+          ],
+          "outputs": [
+            "server/base/src/main/java/org/apache/accumulo/server/ServerContext.java",
+            "server/base/src/main/java/org/apache/accumulo/server/ServerContextDataVersionSupport.java"
+          ],
+          "details": "Remove the Constants import from ServerContext after the compatibility logic is extracted, and add the Constants import to ServerContextDataVersionSupport. Do not remove or alter dependencies that remain required by ServerContext fields, method signatures, inheritance, constructors, or other methods.",
+          "risk": "low"
+        }
+      ]
+    }
+  ]
+}

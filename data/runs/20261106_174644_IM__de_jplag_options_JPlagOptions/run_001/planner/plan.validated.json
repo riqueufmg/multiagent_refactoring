@@ -1,0 +1,113 @@
+{
+  "smell_type": "Insufficient Modularization",
+  "target_level": "class",
+  "target": "de.jplag.options.JPlagOptions",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the cohesive comparison configuration API and its validation logic from JPlagOptions to reduce the number of public methods and isolate comparison-related state.",
+      "files": [
+        "core/src/main/java/de/jplag/options/JPlagOptions.java",
+        "core/src/main/java/de/jplag/options/JPlagComparisonOptions.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "de.jplag.options.JPlagOptions"
+          ],
+          "outputs": [
+            "de.jplag.options.JPlagComparisonOptions"
+          ],
+          "details": "Extract DEFAULT_COMPARISON_MODE, DEFAULT_SIMILARITY_THRESHOLD, DEFAULT_SHOWN_COMPARISONS, comparisonMode, similarityThreshold, maximumNumberOfComparisons, similarityMetric, minimumTokenMatch, logger, getComparisonMode(), getMaximumNumberOfComparisons(), getMinimumTokenMatch(), getSimilarityMetric(), getSimilarityThreshold(), isDebugParser(), setComparisonMode(ComparisonMode), setMaximumNumberOfComparisons(int), setMinimumTokenMatch(Integer), setSimilarityMetric(SimilarityMetric), setSimilarityThreshold(float), hasMinimumTokenMatch(), and the associated validation and warning behavior into JPlagComparisonOptions in the same package. Preserve the existing defaults and setter behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "de.jplag.options.JPlagOptions.getComparisonMode()",
+            "de.jplag.options.JPlagOptions.getMaximumNumberOfComparisons()",
+            "de.jplag.options.JPlagOptions.getMinimumTokenMatch()",
+            "de.jplag.options.JPlagOptions.getSimilarityMetric()",
+            "de.jplag.options.JPlagOptions.getSimilarityThreshold()",
+            "de.jplag.options.JPlagOptions.setComparisonMode(ComparisonMode)",
+            "de.jplag.options.JPlagOptions.setMaximumNumberOfComparisons(int)",
+            "de.jplag.options.JPlagOptions.setMinimumTokenMatch(Integer)",
+            "de.jplag.options.JPlagOptions.setSimilarityMetric(SimilarityMetric)",
+            "de.jplag.options.JPlagOptions.setSimilarityThreshold(float)"
+          ],
+          "outputs": [
+            "de.jplag.options.JPlagComparisonOptions.getComparisonMode()",
+            "de.jplag.options.JPlagComparisonOptions.getMaximumNumberOfComparisons()",
+            "de.jplag.options.JPlagComparisonOptions.getMinimumTokenMatch()",
+            "de.jplag.options.JPlagComparisonOptions.getSimilarityMetric()",
+            "de.jplag.options.JPlagComparisonOptions.getSimilarityThreshold()",
+            "de.jplag.options.JPlagComparisonOptions.setComparisonMode(ComparisonMode)",
+            "de.jplag.options.JPlagComparisonOptions.setMaximumNumberOfComparisons(int)",
+            "de.jplag.options.JPlagComparisonOptions.setMinimumTokenMatch(Integer)",
+            "de.jplag.options.JPlagComparisonOptions.setSimilarityMetric(SimilarityMetric)",
+            "de.jplag.options.JPlagComparisonOptions.setSimilarityThreshold(float)"
+          ],
+          "details": "Update callers to access the extracted comparison configuration through JPlagComparisonOptions. Preserve JPlagOptions compatibility through the extraction mechanism where required, and update direct field or method references to the new class.",
+          "risk": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "goal": "Extract the cohesive submission and exclusion configuration API from JPlagOptions to further reduce its public API size and separate input-path concerns from comparison concerns.",
+      "files": [
+        "core/src/main/java/de/jplag/options/JPlagOptions.java",
+        "core/src/main/java/de/jplag/options/JPlagSubmissionOptions.java"
+      ],
+      "ops": [
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "de.jplag.options.JPlagOptions"
+          ],
+          "outputs": [
+            "de.jplag.options.JPlagSubmissionOptions"
+          ],
+          "details": "Extract submissionDirectories, oldSubmissionDirectories, baseCodeSubmissionName, exclusionFileName, excludedFiles, subdirectoryName, getBaseCodeSubmissionName(), getExcludedFiles(), getExclusionFileName(), getSubmissionDirectories(), getOldSubmissionDirectories(), getSubdirectoryName(), hasBaseCode(), setBaseCodeSubmissionName(String), setExcludedFiles(Set<String>), setExclusionFileName(String), setSubmissionDirectories(List<String>), setOldSubmissionDirectories(List<String>), and setSubdirectoryName(String) into JPlagSubmissionOptions in the same package. Preserve the existing null, empty-string, and file-separator handling behavior.",
+          "risk": "medium"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "de.jplag.options.JPlagOptions.getBaseCodeSubmissionName()",
+            "de.jplag.options.JPlagOptions.getExcludedFiles()",
+            "de.jplag.options.JPlagOptions.getExclusionFileName()",
+            "de.jplag.options.JPlagOptions.getSubmissionDirectories()",
+            "de.jplag.options.JPlagOptions.getOldSubmissionDirectories()",
+            "de.jplag.options.JPlagOptions.getSubdirectoryName()",
+            "de.jplag.options.JPlagOptions.hasBaseCode()",
+            "de.jplag.options.JPlagOptions.setBaseCodeSubmissionName(String)",
+            "de.jplag.options.JPlagOptions.setExcludedFiles(Set<String>)",
+            "de.jplag.options.JPlagOptions.setExclusionFileName(String)",
+            "de.jplag.options.JPlagOptions.setSubmissionDirectories(List<String>)",
+            "de.jplag.options.JPlagOptions.setOldSubmissionDirectories(List<String>)",
+            "de.jplag.options.JPlagOptions.setSubdirectoryName(String)"
+          ],
+          "outputs": [
+            "de.jplag.options.JPlagSubmissionOptions.getBaseCodeSubmissionName()",
+            "de.jplag.options.JPlagSubmissionOptions.getExcludedFiles()",
+            "de.jplag.options.JPlagSubmissionOptions.getExclusionFileName()",
+            "de.jplag.options.JPlagSubmissionOptions.getSubmissionDirectories()",
+            "de.jplag.options.JPlagSubmissionOptions.getOldSubmissionDirectories()",
+            "de.jplag.options.JPlagSubmissionOptions.getSubdirectoryName()",
+            "de.jplag.options.JPlagSubmissionOptions.hasBaseCode()",
+            "de.jplag.options.JPlagSubmissionOptions.setBaseCodeSubmissionName(String)",
+            "de.jplag.options.JPlagSubmissionOptions.setExcludedFiles(Set<String>)",
+            "de.jplag.options.JPlagSubmissionOptions.setExclusionFileName(String)",
+            "de.jplag.options.JPlagSubmissionOptions.setSubmissionDirectories(List<String>)",
+            "de.jplag.options.JPlagSubmissionOptions.setOldSubmissionDirectories(List<String>)",
+            "de.jplag.options.JPlagSubmissionOptions.setSubdirectoryName(String)"
+          ],
+          "details": "Update callers to use JPlagSubmissionOptions for submission directories, old submission directories, base-code selection, excluded files, exclusion file name, and subdirectory selection. Preserve the existing JPlagOptions construction flow and compatibility behavior while delegating or redirecting access to the extracted object.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

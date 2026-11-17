@@ -1,0 +1,35 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive file-reading and split-parsing responsibility from Utils while preserving its existing public static methods through compatibility wrappers.",
+  "files": [
+    "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java",
+    "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsFileParser.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "org.apache.accumulo.manager.tableOps.Utils",
+        "org.apache.accumulo.manager.tableOps.UtilsFileParser"
+      ],
+      "outputs": [
+        "org.apache.accumulo.manager.tableOps.UtilsFileParser"
+      ],
+      "details": "Extract the implementations of getSortedSetFromFile(Manager, Path, boolean) and getSortedSplitsFromFile(ServerContext, Path) into UtilsFileParser. The new class should own the Hadoop FileSystem access, Scanner-based textual file reading, Base64 decoding for encoded lines, TreeSet and TreeMap construction, TabletMergeabilityUtil.decode, and split logging. Retain the original public methods in Utils as compatibility wrappers that delegate to UtilsFileParser with the same parameters, return types, checked exceptions, and behavior. After extraction, Utils should no longer directly reference FileSystem, TableOperationsImpl, or TabletMergeabilityUtil; those dependencies are confined to UtilsFileParser. Utils will gain one new direct dependency on UtilsFileParser, while its existing public signatures continue to require Path, Text, SortedSet, SortedMap, and TabletMergeability. The expected net Fan-Out reduction is therefore two dependencies: three direct dependencies eliminated from Utils minus one new helper dependency.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java",
+        "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsFileParser.java"
+      ],
+      "outputs": [
+        "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/Utils.java",
+        "server/manager/src/main/java/org/apache/accumulo/manager/tableOps/UtilsFileParser.java"
+      ],
+      "details": "Remove FileSystem, TableOperationsImpl, and TabletMergeabilityUtil imports from Utils after the method bodies are delegated. Add the imports required by UtilsFileParser for Manager, ServerContext, FileSystem, Path, Text, TabletMergeability, TableOperationsImpl, TabletMergeabilityUtil, Base64, Scanner, TreeSet, TreeMap, Logger, and LoggerFactory. Keep the imports required by the compatibility wrapper signatures in Utils.",
+      "risk": "low"
+    }
+  ]
+}

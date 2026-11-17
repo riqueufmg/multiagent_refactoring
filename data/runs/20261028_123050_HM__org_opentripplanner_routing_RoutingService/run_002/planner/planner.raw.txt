@@ -1,0 +1,112 @@
+{
+  "smell_type": "Hub-like Modularization",
+  "target_level": "class",
+  "target": "org.opentripplanner.routing.RoutingService",
+  "blocks": [
+    {
+      "id": 1,
+      "goal": "Extract the GraphIndex lookup, GraphFinder search, and StopTimesHelper timetable groups into one cohesive collaborator, removing RoutingService's direct dependencies on GraphIndex, GraphFinder, and StopTimesHelper while retaining its public method signatures through delegating methods.",
+      "files": [
+        "src/main/java/org/opentripplanner/routing/RoutingService.java",
+        "src/main/java/org/opentripplanner/routing/RoutingServiceLookup.java"
+      ],
+      "ops": [
+        {
+          "op": "CREATE_PACKAGE",
+          "inputs": [
+            "org.opentripplanner.routing"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing"
+          ],
+          "details": "Use the existing org.opentripplanner.routing package for the extracted class; no new package is required.",
+          "risk": "low"
+        },
+        {
+          "op": "EXTRACT_CLASS",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService",
+            "org.opentripplanner.routing.RoutingServiceLookup"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceLookup"
+          ],
+          "details": "Create RoutingServiceLookup and move the following three dependency groups into it. GraphIndex group: getAgencyForId(FeedScopedId), getStopForId(FeedScopedId), getRouteForId(FeedScopedId), addRoutes(Route), getRoutesForStop(StopLocation), getPatternsForStop(StopLocation), getPatternsForStop(StopLocation, TimetableSnapshot), getAllOperators(), getOperatorForId(), getAllStops(), getTripForId(), getAllRoutes(), getStopVertexForStop(), getPatternForTrip(), getPatternsForFeedId(), getPatternsForRoute(), getMultiModalStationForStations(), getStopSpatialIndex(), getServiceCodesRunningForDate(), and getFlexIndex(). GraphFinder group: findClosestStops(double, double, double) and findClosestPlaces(double, double, double, int, List<TransitMode>, List<PlaceType>, List<FeedScopedId>, List<FeedScopedId>, List<String>, List<String>, List<String>, RoutingService). StopTimesHelper group: stopTimesForStop(StopLocation, long, int, int, ArrivalDeparture, boolean), getStopTimesForStop(StopLocation, ServiceDate, ArrivalDeparture), and stopTimesForPatternAtStop(StopLocation, TripPattern, long, int, int, ArrivalDeparture). Preserve the existing public methods in RoutingService as delegating methods so existing callers remain source-compatible. Construct the new class with Graph and RoutingService; initialize its GraphIndex from graph.index and its GraphFinder with GraphFinder.getInstance(graph). Pass the RoutingService owner when invoking StopTimesHelper.",
+          "risk": "medium"
+        },
+        {
+          "op": "ADD_OR_UPDATE_IMPORTS",
+          "inputs": [
+            "src/main/java/org/opentripplanner/routing/RoutingService.java",
+            "src/main/java/org/opentripplanner/routing/RoutingServiceLookup.java"
+          ],
+          "outputs": [
+            "src/main/java/org/opentripplanner/routing/RoutingService.java",
+            "src/main/java/org/opentripplanner/routing/RoutingServiceLookup.java"
+          ],
+          "details": "In RoutingService, remove the GraphIndex and GraphFinder imports and remove the GraphIndex and GraphFinder fields after delegation is introduced. In RoutingServiceLookup, add the imports required by the moved method signatures and implementations, including Graph, GraphIndex, GraphFinder, NearbyStop, PlaceAtDistance, PlaceType, StopTimesHelper, ArrivalDeparture, RoutingRequest-related existing types used by the moved signatures, ServiceDate, StopLocation, Stop, TripPattern, TimetableSnapshot, TransitMode, FeedScopedId, Route, Agency, Operator, Trip, TransitStopVertex, HashGridSpatialIndex, HashGridSpatialIndex-related existing types, FlexIndex, Multimap, TIntSet, Collection, List, Map, Set, and the existing model types referenced by the moved methods.",
+          "risk": "medium"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService.graphIndex",
+            "org.opentripplanner.routing.RoutingServiceLookup.graphIndex"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceLookup.graphIndex"
+          ],
+          "details": "Move the private final GraphIndex graphIndex field into RoutingServiceLookup and initialize it from graph.index in the new collaborator's constructor.",
+          "risk": "low"
+        },
+        {
+          "op": "MOVE_FIELD",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService.graphFinder",
+            "org.opentripplanner.routing.RoutingServiceLookup.graphFinder"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceLookup.graphFinder"
+          ],
+          "details": "Move the private final GraphFinder graphFinder field into RoutingServiceLookup and initialize it with GraphFinder.getInstance(graph).",
+          "risk": "low"
+        },
+        {
+          "op": "UPDATE_CALL_SITES",
+          "inputs": [
+            "org.opentripplanner.routing.RoutingService.getAgencyForId(FeedScopedId)",
+            "org.opentripplanner.routing.RoutingService.getStopForId(FeedScopedId)",
+            "org.opentripplanner.routing.RoutingService.getRouteForId(FeedScopedId)",
+            "org.opentripplanner.routing.RoutingService.addRoutes(Route)",
+            "org.opentripplanner.routing.RoutingService.getRoutesForStop(StopLocation)",
+            "org.opentripplanner.routing.RoutingService.getPatternsForStop(StopLocation)",
+            "org.opentripplanner.routing.RoutingService.getPatternsForStop(StopLocation, TimetableSnapshot)",
+            "org.opentripplanner.routing.RoutingService.getAllOperators()",
+            "org.opentripplanner.routing.RoutingService.getOperatorForId()",
+            "org.opentripplanner.routing.RoutingService.getAllStops()",
+            "org.opentripplanner.routing.RoutingService.getTripForId()",
+            "org.opentripplanner.routing.RoutingService.getAllRoutes()",
+            "org.opentripplanner.routing.RoutingService.getStopVertexForStop()",
+            "org.opentripplanner.routing.RoutingService.getPatternForTrip()",
+            "org.opentripplanner.routing.RoutingService.getPatternsForFeedId()",
+            "org.opentripplanner.routing.RoutingService.getPatternsForRoute()",
+            "org.opentripplanner.routing.RoutingService.getMultiModalStationForStations()",
+            "org.opentripplanner.routing.RoutingService.getStopSpatialIndex()",
+            "org.opentripplanner.routing.RoutingService.getServiceCodesRunningForDate()",
+            "org.opentripplanner.routing.RoutingService.getFlexIndex()",
+            "org.opentripplanner.routing.RoutingService.findClosestStops(double, double, double)",
+            "org.opentripplanner.routing.RoutingService.findClosestPlaces(double, double, double, int, List, List, List, List, List, List, List, RoutingService)",
+            "org.opentripplanner.routing.RoutingService.stopTimesForStop(StopLocation, long, int, int, ArrivalDeparture, boolean)",
+            "org.opentripplanner.routing.RoutingService.getStopTimesForStop(StopLocation, ServiceDate, ArrivalDeparture)",
+            "org.opentripplanner.routing.RoutingService.stopTimesForPatternAtStop(StopLocation, TripPattern, long, int, int, ArrivalDeparture)"
+          ],
+          "outputs": [
+            "org.opentripplanner.routing.RoutingServiceLookup"
+          ],
+          "details": "Change the extracted implementations and the retained RoutingService delegators to invoke RoutingServiceLookup. Keep the existing RoutingService method names, parameters, return types, and visibility. Ensure StopTimesHelper calls receive the owning RoutingService instance, and ensure findClosestPlaces continues to pass the existing RoutingService parameter.",
+          "risk": "medium"
+        }
+      ]
+    }
+  ]
+}

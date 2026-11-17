@@ -1,0 +1,36 @@
+{
+  "id": 1,
+  "goal": "Extract the cohesive pretty-printing and concrete-syntax interpretation responsibility from LexicalPreservingPrinter so the target no longer directly references the concrete syntax model and primitive-type formatting classes.",
+  "files": [
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+    "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextBuilder.java"
+  ],
+  "ops": [
+    {
+      "op": "EXTRACT_CLASS",
+      "inputs": [
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.prettyPrintingTextNode(com.github.javaparser.ast.Node, com.github.javaparser.printer.lexicalpreservation.NodeText)",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.interpret(com.github.javaparser.ast.Node, com.github.javaparser.printer.concretesyntaxmodel.CsmElement, com.github.javaparser.printer.lexicalpreservation.NodeText)"
+      ],
+      "outputs": [
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingTextBuilder.prettyPrintingTextNode(com.github.javaparser.ast.Node, com.github.javaparser.printer.lexicalpreservation.NodeText)",
+        "com.github.javaparser.printer.lexicalpreservation.LexicalPreservingTextBuilder.interpret(com.github.javaparser.ast.Node, com.github.javaparser.printer.concretesyntaxmodel.CsmElement, com.github.javaparser.printer.lexicalpreservation.NodeText)"
+      ],
+      "details": "Create LexicalPreservingTextBuilder in the same package and move the existing prettyPrintingTextNode and interpret implementations, including their recursive interpretation logic, without changing behavior. Update getOrCreateNodeText to delegate to LexicalPreservingTextBuilder. After the move, LexicalPreservingPrinter should no longer directly reference ConcreteSyntaxModel, CsmElement, CsmIndent, CsmMix, CsmToken, CsmUnindent, NodeWithVariables, PrimitiveType, Modifier, or the static SPACE constant; those references are confined to the extracted builder. LexicalPreservingPrinter gains one new outgoing dependency, LexicalPreservingTextBuilder. LexicalDifferenceCalculator, Node, NodeText, Difference, comments, JavaToken, and other dependencies used by the observer or remaining methods must remain because direct references to them still exist. The expected reduction is at least eight eliminated dependency classes minus one new helper dependency, for a positive net Fan-Out change of at least seven, subject to the detector's dependency-counting rules.",
+      "risk": "medium"
+    },
+    {
+      "op": "ADD_OR_UPDATE_IMPORTS",
+      "inputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextBuilder.java"
+      ],
+      "outputs": [
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingPrinter.java",
+        "javaparser-core/src/main/java/com/github/javaparser/printer/lexicalpreservation/LexicalPreservingTextBuilder.java"
+      ],
+      "details": "Remove imports from LexicalPreservingPrinter that are used only by the moved methods, including ConcreteSyntaxModel, CsmElement, CsmIndent, CsmMix, CsmToken, CsmUnindent, NodeWithVariables, PrimitiveType, Modifier, and the static SPACE import. Add the corresponding imports to LexicalPreservingTextBuilder. Keep imports still required by Observer, storeInitialText, findIndentation, or other retained methods. This import update supports the actual removal of direct type references rather than relying on import deletion alone.",
+      "risk": "low"
+    }
+  ]
+}
